@@ -33,6 +33,13 @@ The API Explorer Playground includes powerful Postman integration features that 
 - **API Key Placeholders**: Collections include `{{api_key}}` variables for secure testing
 - **Complete Setup**: Ready-to-import collections with proper headers and body structure
 
+### **Advanced Postman Integration**
+- **Direct Creation**: Create collections directly in your Postman workspace via Postman API
+- **Environment Templates**: Automatic generation of Postman environment files with API key placeholders
+- **Test Scripts**: Pre-built test scripts for response validation and error handling
+- **Collection Variables**: Dynamic variables for prompt content and context
+- **Rich Documentation**: Detailed descriptions and examples in each collection
+
 ### **Bulk Collection Export**
 - **Download All**: Header button to download a combined collection with all responses
 - **Multiple APIs**: Single collection containing requests for all tested providers
@@ -43,11 +50,32 @@ The API Explorer Playground includes powerful Postman integration features that 
 {
   "info": {
     "name": "LLM API Explorer Collection",
-    "description": "Generated collection for prompt: 'Your prompt here'"
+    "description": "Generated collection for prompt: 'Your prompt here'",
+    "variable": [
+      {"key": "prompt", "value": "Your prompt here"},
+      {"key": "context", "value": "Optional context"}
+    ]
   },
   "item": [
     {
       "name": "OpenAI - Direct API Call",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test('Response is successful', function () {",
+              "    pm.response.to.have.status(200);",
+              "});",
+              "pm.test('Response has content', function () {",
+              "    const response = pm.response.json();",
+              "    pm.expect(response.choices).to.be.an('array');",
+              "    pm.expect(response.choices[0].message.content).to.be.a('string');",
+              "});"
+            ]
+          }
+        }
+      ],
       "request": {
         "method": "POST",
         "header": [
@@ -56,7 +84,7 @@ The API Explorer Playground includes powerful Postman integration features that 
         ],
         "body": {
           "mode": "raw",
-          "raw": "{\"messages\": [{\"role\": \"user\", \"content\": \"Your prompt\"}]}"
+          "raw": "{\"messages\": [{\"role\": \"user\", \"content\": \"{{prompt}}\"}]}"
         },
         "url": "https://api.openai.com/v1/chat/completions"
       }
@@ -67,7 +95,13 @@ The API Explorer Playground includes powerful Postman integration features that 
 
 ### **How to Use Postman Collections**
 
-1. **Download Collection**: Click the "Postman" button on any response card
+#### **Option 1: Direct Creation (Recommended)**
+1. **Create in Postman**: Click "Create in Postman" to automatically create the collection in your workspace
+2. **Set API Keys**: Add your API keys to the generated environment variables
+3. **Start Testing**: The collection is ready to use with pre-configured test scripts
+
+#### **Option 2: Download and Import**
+1. **Download Collection**: Click "Download JSON" to get the collection file
 2. **Import to Postman**: Open Postman and import the downloaded JSON file
 3. **Set Environment Variables**: Create environment variables for your API keys:
    - `openai_api_key`
@@ -76,12 +110,22 @@ The API Explorer Playground includes powerful Postman integration features that 
    - `mistral_api_key`
 4. **Test APIs**: Run the requests directly in Postman with your API keys
 
+#### **Environment Setup**
+The collections include automatic environment templates with:
+- API key placeholders for all providers
+- Dynamic variables for prompt and context
+- Pre-configured test scripts for validation
+
 ### **Benefits for API Testing**
 - **Real Examples**: Collections contain actual working API calls
 - **No Manual Setup**: No need to manually create requests
 - **Secure**: API keys are stored as environment variables
 - **Reusable**: Collections can be shared with team members
 - **Documentation**: Each request includes proper headers and body structure
+- **Test Automation**: Pre-built test scripts for response validation
+- **Dynamic Content**: Variables allow easy prompt and context modification
+- **Direct Integration**: Create collections directly in Postman workspace
+- **Environment Templates**: Automatic setup of API key variables
 
 ## Screenshots
 
@@ -242,8 +286,16 @@ npm run dev
 
 ### **Postman Workflow**
 
+#### **Direct Creation Workflow (Recommended)**
 1. **Test in Playground**: Use the web interface to test different prompts and providers
-2. **Download Collections**: Click "Postman" buttons to download collections
+2. **Create in Postman**: Click "Create in Postman" to automatically create collections in your workspace
+3. **Configure Environment**: Add your API keys to the generated environment variables
+4. **Run Tests**: Execute the requests with pre-configured test scripts
+5. **Share with Team**: Collections are automatically available in your Postman workspace
+
+#### **Download Workflow**
+1. **Test in Playground**: Use the web interface to test different prompts and providers
+2. **Download Collections**: Click "Download JSON" to get collection files
 3. **Import to Postman**: Import the JSON files into your Postman workspace
 4. **Set Environment**: Create environment variables for your API keys
 5. **Run Tests**: Execute the requests directly in Postman
@@ -251,9 +303,11 @@ npm run dev
 
 ### **Collection Types**
 
-- **Individual Collections**: One collection per provider response
-- **Combined Collections**: All responses in a single collection
+- **Individual Collections**: One collection per provider response with test scripts
+- **Combined Collections**: All responses in a single collection with environment variables
 - **API Explorer Collection**: The main playground API endpoint
+- **Environment Templates**: Automatic generation of Postman environment files
+- **Test Scripts**: Pre-built validation scripts for response quality and structure
 
 ## API Endpoints
 
@@ -287,24 +341,61 @@ Submit a prompt to multiple LLM providers.
 }
 ```
 
+### POST /api/postman/create-collection
+Create a Postman collection directly in your workspace.
+
+**Request Body:**
+```json
+{
+  "prompt": "Your prompt here",
+  "context": "Optional context",
+  "responses": [
+    {
+      "provider": "OpenAI",
+      "content": "Response content",
+      "latency": 1234,
+      "tokens": {
+        "prompt": 10,
+        "completion": 50,
+        "total": 60
+      }
+    }
+  ]
+}
+```
+
+**Response:**
+```json
+{
+  "success": true,
+  "message": "Collection created successfully in Postman",
+  "collectionId": "collection-uuid",
+  "collectionUrl": "https://go.postman.co/collection/collection-uuid"
+}
+```
+
 ## Project Structure
 
 ```
 src/
 ├── app/
 │   ├── api/
-│   │   └── llm/
-│   │       └── route.ts          # API endpoint for LLM requests
+│   │   ├── llm/
+│   │   │   └── route.ts          # API endpoint for LLM requests
+│   │   └── postman/
+│   │       └── create-collection/
+│   │           └── route.ts      # API endpoint for Postman collection creation
 │   ├── globals.css               # Global styles
 │   ├── layout.tsx                # Root layout
 │   └── page.tsx                  # Main page component
 ├── components/
 │   ├── LLMForm.tsx              # Main form component
 │   ├── ProviderSelector.tsx     # Provider selection component
-│   └── ResponseCard.tsx         # Individual response display
+│   ├── ResponseCard.tsx         # Individual response display
+│   └── PostmanIntegration.tsx   # Enhanced Postman integration component
 └── lib/
     ├── llm-apis.ts              # LLM API integration functions
-    ├── postman.ts               # Postman collection generation
+    ├── postman.ts               # Postman collection generation and API integration
     └── utils.ts                 # Utility functions
 ```
 
