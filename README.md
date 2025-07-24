@@ -131,6 +131,23 @@ The collections include automatic environment templates with:
 
 *[Screenshots will be added here - placeholder for demo images]*
 
+### Postman API Key Setup Guide
+
+**Step 1**: Click on your profile picture in the top-right corner
+![Postman Profile Menu](https://via.placeholder.com/400x200?text=Postman+Profile+Menu)
+
+**Step 2**: Select "Settings" from the dropdown menu
+![Postman Settings](https://via.placeholder.com/400x200?text=Postman+Settings+Menu)
+
+**Step 3**: Click "API Keys" in the left sidebar
+![Postman API Keys Section](https://via.placeholder.com/400x200?text=Postman+API+Keys+Section)
+
+**Step 4**: Click "Generate API Key" and configure your key
+![Postman Generate API Key](https://via.placeholder.com/400x200?text=Postman+Generate+API+Key)
+
+**Step 5**: Copy the generated key and add it to your `.env.local` file
+![Postman API Key Generated](https://via.placeholder.com/400x200?text=Postman+API+Key+Generated)
+
 ## Demo
 
 *[Loom demo link will be added here - placeholder for video demo]*
@@ -268,12 +285,26 @@ npm run dev
 5. Add it to your `.env.local` file
 
 ### Postman (Optional)
-1. Go to [Postman API](https://www.postman.com/api/)
-2. Sign up or log in
-3. Generate an API key
-4. Add it to your `.env.local` file for automatic collection creation
+1. **Sign in to Postman**: Go to [postman.com](https://www.postman.com) and sign in to your account
+2. **Navigate to Settings**: Click on your profile picture/avatar in the top-right corner
+3. **Access API Keys**: In the dropdown menu, click on "Settings"
+4. **Go to API Keys Section**: In the left sidebar, click on "API Keys"
+5. **Generate New Key**: Click the "Generate API Key" button
+6. **Configure Key**:
+   - Enter a name for your API key (e.g., "LLM API Explorer")
+   - Select the workspace where you want collections to be created
+   - Choose permissions (typically "Read & Write" for full functionality)
+7. **Copy the Key**: Click "Generate API Key" and copy the generated key immediately
+8. **Add to Environment**: Add the key to your `.env.local` file:
+   ```env
+   POSTMAN_API_KEY=your_generated_api_key_here
+   ```
 
-**Note**: The Postman API key is optional. Without it, collections are downloaded as JSON files. With it, collections can be automatically created in your Postman workspace.
+**Important Notes**:
+- The Postman API key is optional. Without it, collections are downloaded as JSON files
+- With the API key, collections can be automatically created in your Postman workspace
+- Keep your API key secure and never commit it to version control
+- You can revoke or regenerate API keys at any time from the Postman Settings
 
 ## Usage
 
@@ -418,6 +449,42 @@ If you encounter any issues or have questions:
 1. Check the [Issues](https://github.com/your-repo/issues) page
 2. Create a new issue with detailed information
 3. Include your environment details and error messages
+
+### Troubleshooting Postman Integration
+
+#### **Common Issues and Solutions**
+
+**Issue**: "Failed to create collection in Postman. Please check your API key configuration."
+- **Solution**: Verify your `POSTMAN_API_KEY` is correctly set in `.env.local`
+- **Solution**: Ensure the API key has "Read & Write" permissions
+- **Solution**: Check that the workspace selected during key generation exists
+
+**Issue**: "API key not found" or "Invalid API key"
+- **Solution**: Regenerate your Postman API key from Settings → API Keys
+- **Solution**: Make sure you copied the entire key (it should be a long string)
+- **Solution**: Restart your development server after adding the API key
+
+**Issue**: Collections not appearing in Postman workspace
+- **Solution**: Check that you selected the correct workspace when generating the API key
+- **Solution**: Verify the workspace permissions for your account
+- **Solution**: Try refreshing your Postman workspace
+
+**Issue**: "Permission denied" errors
+- **Solution**: Ensure your API key has the necessary permissions (Read & Write)
+- **Solution**: Check if your Postman account has workspace access
+- **Solution**: Try generating a new API key with different permissions
+
+#### **Testing Your Postman API Key**
+
+You can test if your Postman API key is working by making a simple API call:
+
+```bash
+curl -X GET "https://api.getpostman.com/collections" \
+  -H "X-API-Key: YOUR_POSTMAN_API_KEY" \
+  -H "Content-Type: application/json"
+```
+
+If successful, you should receive a JSON response with your collections. If you get an error, check your API key configuration.
 
 ## Roadmap
 
