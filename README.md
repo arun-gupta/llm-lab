@@ -1,12 +1,14 @@
 # API Explorer Playground
 
-A full-stack web application that allows you to compare responses from multiple LLM providers side by side, with **automatic Postman collection generation**. Perfect for DevRel teams, API testing, and LLM comparison.
+A full-stack web application that allows you to compare responses from multiple LLM providers side by side, with **advanced Postman integration**. Perfect for DevRel teams, API testing, and LLM comparison.
 
 **Key Features:**
 - 🔄 **Side-by-side LLM comparison** (OpenAI, Anthropic, Cohere, Mistral)
-- 📦 **Automatic Postman collection generation** for every API call
+- 🚀 **Direct Postman workspace integration** via Postman API
+- 📦 **Automatic collection generation** with test scripts and environment templates
 - ⚡ **Performance metrics** (latency, token usage)
-- 🎯 **Ready-to-use API examples** for testing and documentation
+- 🎯 **Ready-to-use API examples** with dynamic variables and validation
+- 🔧 **Advanced features**: Environment templates, test scripts, collection variables
 
 ## Current Status
 
@@ -14,12 +16,32 @@ A full-stack web application that allows you to compare responses from multiple 
 🔄 **In Progress**: Cohere and Mistral API integrations  
 ✅ **Complete**: UI, Postman integration, error handling, and deployment setup
 
+## 🚀 Postman Integration Overview
+
+The API Explorer Playground goes beyond simple collection downloads. It provides **enterprise-grade Postman integration**:
+
+### **What You Get:**
+- **Direct Workspace Creation**: Collections appear instantly in your Postman workspace
+- **Environment Templates**: Automatic setup of API key variables and configuration
+- **Test Automation**: Pre-built scripts validate responses and handle errors
+- **Dynamic Content**: Variables allow easy modification of prompts and context
+- **Rich Documentation**: Detailed descriptions and examples in every collection
+
+### **Two Integration Options:**
+1. **🚀 Direct Creation** (Recommended): Collections created directly in your Postman workspace
+2. **📥 Download & Import**: Traditional JSON file download for manual import
+
 ## Features
 
 - **Multi-Provider Support**: Compare responses from OpenAI and Anthropic (Cohere and Mistral support coming soon)
 - **Side-by-Side Comparison**: View responses from all providers simultaneously
 - **Performance Metrics**: See latency and token usage for each response
-- **🚀 Postman Integration**: Generate and download Postman collections for each API call
+- **🚀 Advanced Postman Integration**: 
+  - Direct workspace creation via Postman API
+  - Automatic environment templates with API key placeholders
+  - Pre-built test scripts for response validation
+  - Dynamic collection variables for prompt and context
+  - Rich documentation and examples
 - **Clean UI**: Modern, responsive interface built with Next.js and Tailwind CSS
 - **Error Handling**: Comprehensive error handling and loading states
 
@@ -155,12 +177,15 @@ The collections include automatic environment templates with:
 ## Why This App is Useful
 
 ### For Postman Teams & API Testing
-- **Automatic Collection Generation**: Every API call generates a ready-to-use Postman collection
+- **Direct Workspace Integration**: Create collections automatically in your Postman workspace via API
+- **Advanced Collection Features**: Pre-built test scripts, environment templates, and dynamic variables
 - **Real API Examples**: Collections contain actual working requests with proper headers and body structure
 - **Team Collaboration**: Share working API examples and test suites with your development team
 - **API Documentation**: Generate real-world examples for API documentation and tutorials
 - **Integration Testing**: Verify API integrations work correctly across multiple providers
 - **Performance Testing**: Compare latency and token usage across different LLM services
+- **Automated Testing**: Built-in test scripts validate response structure and content
+- **Environment Management**: Automatic generation of environment templates with API key placeholders
 
 ### For DevRel Teams
 - **API Documentation**: Easily test and compare different LLM APIs for documentation
