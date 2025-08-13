@@ -27,6 +27,8 @@ interface OllamaModel {
 interface ProviderSelectorProps {
   selectedProviders: string[];
   onProvidersChange: (providers: string[]) => void;
+  ollamaModels?: string[];
+  isInitialized?: boolean;
 }
 
 const staticProviders: Provider[] = [
@@ -60,9 +62,11 @@ const staticProviders: Provider[] = [
 
 export function ProviderSelector({ 
   selectedProviders, 
-  onProvidersChange
+  onProvidersChange,
+  ollamaModels = [],
+  isInitialized = true
 }: ProviderSelectorProps) {
-  const [ollamaModels, setOllamaModels] = useState<OllamaModel[]>([]);
+  const [localOllamaModels, setLocalOllamaModels] = useState<OllamaModel[]>([]);
   const [isLoadingOllama, setIsLoadingOllama] = useState(true);
 
   // Fetch available Ollama models on component mount
@@ -71,10 +75,10 @@ export function ProviderSelector({
       try {
         const response = await fetch('/api/ollama/models');
         const data = await response.json();
-        setOllamaModels(data.models || []);
+        setLocalOllamaModels(data.models || []);
       } catch (error) {
         console.log('Ollama not available:', error);
-        setOllamaModels([]);
+        setLocalOllamaModels([]);
       } finally {
         setIsLoadingOllama(false);
       }
@@ -82,6 +86,11 @@ export function ProviderSelector({
 
     fetchOllamaModels();
   }, []);
+
+  // Use passed ollamaModels if available, otherwise use local state
+  const availableOllamaModels = ollamaModels.length > 0 
+    ? ollamaModels.map(name => ({ name, model: name, size: 0 }))
+    : localOllamaModels;
 
   // Group models by provider for compact display
   const providerGroups = [
@@ -99,7 +108,7 @@ export function ProviderSelector({
     }
   ];
 
-  const ollamaProviders = ollamaModels.map(model => ({
+  const ollamaProviders = availableOllamaModels.map(model => ({
     id: `ollama:${model.name}`,
     name: `${model.name}`,
     icon: '🦙',
@@ -149,15 +158,15 @@ export function ProviderSelector({
     {
       name: "Local vs Cloud",
       description: "Compare local Ollama with cloud APIs",
-      models: ollamaModels.length > 0 
-        ? ["openai:gpt-4o-mini", `ollama:${ollamaModels[0].name}`]
+      models: availableOllamaModels.length > 0 
+        ? ["openai:gpt-4o-mini", `ollama:${availableOllamaModels[0].name}`]
         : ["openai:gpt-4o-mini", "anthropic:claude-3-haiku-20240307"]
     },
     {
       name: "All Local",
       description: "Test all running Ollama models",
-      models: ollamaModels.length > 0 
-        ? ollamaModels.map(model => `ollama:${model.name}`)
+      models: availableOllamaModels.length > 0 
+        ? availableOllamaModels.map(model => `ollama:${model.name}`)
         : []
     },
     {
@@ -210,20 +219,27 @@ export function ProviderSelector({
       {/* Quick Combos */}
       <div>
         <label className="text-xs font-medium text-gray-600 mb-2 block">Quick Combos:</label>
-        <div className="flex flex-wrap gap-2">
-          {modelCombos
-            .filter(combo => combo.name !== "All Local" || ollamaModels.length > 0)
-            .map((combo) => (
-            <button
-              key={combo.name}
-              onClick={() => selectCombo(combo)}
-              className="text-xs px-3 py-1.5 bg-blue-50 hover:bg-blue-100 text-blue-700 border border-blue-200 rounded-full transition-colors"
-              title={combo.description}
-            >
-              {combo.name}
-            </button>
-          ))}
-        </div>
+        {!isInitialized ? (
+          <div className="flex items-center space-x-2 text-sm text-gray-500">
+            <div className="w-4 h-4 border-2 border-gray-300 border-t-blue-600 rounded-full animate-spin"></div>
+            <span>Checking for local models...</span>
+          </div>
+        ) : (
+          <div className="flex flex-wrap gap-2">
+            {modelCombos
+              .filter(combo => combo.name !== "All Local" || availableOllamaModels.length > 0)
+              .map((combo) => (
+              <button
+                key={combo.name}
+                onClick={() => selectCombo(combo)}
+                className="text-xs px-3 py-1.5 bg-blue-50 hover:bg-blue-100 text-blue-700 border border-blue-200 rounded-full transition-colors"
+                title={combo.description}
+              >
+                {combo.name}
+              </button>
+            ))}
+          </div>
+        )}
       </div>
 
       {/* Cloud-Based Models */}
@@ -286,7 +302,7 @@ export function ProviderSelector({
           )}
         </div>
         
-        {ollamaModels.length === 0 && !isLoadingOllama ? (
+        {availableOllamaModels.length === 0 && !isLoadingOllama ? (
           <div className="text-sm text-gray-500 p-3 border border-gray-200 rounded-lg bg-gray-50">
             <p className="mb-1">No running Ollama models found.</p>
             <p className="text-xs">Start a model: <code className="bg-gray-200 px-1 rounded">ollama run llama3.2</code></p>

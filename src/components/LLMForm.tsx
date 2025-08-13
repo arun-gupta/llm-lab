@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { Send, Loader2, Lightbulb } from 'lucide-react';
 import { ProviderSelector } from './ProviderSelector';
@@ -21,7 +21,42 @@ interface LLMFormProps {
 }
 
 export function LLMForm({ onResponsesChange, onLoadingChange, onProvidersChange, onFormDataChange }: LLMFormProps) {
-  const [selectedProviders, setSelectedProviders] = useState<string[]>(['openai:gpt-4o-mini']);
+  const [selectedProviders, setSelectedProviders] = useState<string[]>([]);
+  const [ollamaModels, setOllamaModels] = useState<string[]>([]);
+  const [isInitialized, setIsInitialized] = useState(false);
+
+  // Check for Ollama models on mount and set default providers
+  useEffect(() => {
+    const checkOllamaModels = async () => {
+      try {
+        const response = await fetch('/api/ollama/models');
+        const data = await response.json();
+        const models = data.models || [];
+        setOllamaModels(models.map((model: any) => model.name));
+        
+        // Set default providers based on available Ollama models
+        if (models.length > 0) {
+          // Use "All Local" if Ollama models are available
+          const allLocalModels = models.map((model: any) => `ollama:${model.name}`);
+          setSelectedProviders(allLocalModels);
+          onProvidersChange?.(allLocalModels);
+        } else {
+          // Fallback to a single cloud provider if no Ollama models
+          setSelectedProviders(['openai:gpt-4o-mini']);
+          onProvidersChange?.(['openai:gpt-4o-mini']);
+        }
+      } catch (error) {
+        console.log('Ollama not available, using cloud provider as default');
+        // Fallback to a single cloud provider if Ollama is not available
+        setSelectedProviders(['openai:gpt-4o-mini']);
+        onProvidersChange?.(['openai:gpt-4o-mini']);
+      } finally {
+        setIsInitialized(true);
+      }
+    };
+
+    checkOllamaModels();
+  }, [onProvidersChange]);
 
   const handleProvidersChange = (providers: string[]) => {
     setSelectedProviders(providers);
@@ -123,14 +158,13 @@ export function LLMForm({ onResponsesChange, onLoadingChange, onProvidersChange,
 
   return (
     <div className="space-y-6">
-      <form onSubmit={handleSubmit(onSubmit)} className="bg-white rounded-lg border border-gray-200 p-6 space-y-6">
-        {/* Provider Selection */}
-        <div>
-          <ProviderSelector
-            selectedProviders={selectedProviders}
-            onProvidersChange={handleProvidersChange}
-          />
-        </div>
+      <form className="bg-white rounded-lg border border-gray-200 p-6 space-y-6" onSubmit={handleSubmit(onSubmit)}>
+        <ProviderSelector 
+          selectedProviders={selectedProviders} 
+          onProvidersChange={handleProvidersChange}
+          ollamaModels={ollamaModels}
+          isInitialized={isInitialized}
+        />
 
         {/* Prompt Input */}
         <div>
