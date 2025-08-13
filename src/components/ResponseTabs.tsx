@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import { ResponseCard } from './ResponseCard';
 import { LLMResponse } from '@/lib/llm-apis';
-import { BarChart3, MessageSquare, Clock, Zap, DollarSign, Target, Loader2 } from 'lucide-react';
+import { BarChart3, MessageSquare, Clock, Zap, DollarSign, Target, Loader2, Download } from 'lucide-react';
 
 interface ResponseTabsProps {
   responses: LLMResponse[];
@@ -258,10 +258,12 @@ export function ResponseTabs({ responses, prompt, context, isLoading = false, se
         </div>
 
         {/* Summary Stats */}
-        <div className="flex items-center space-x-4 text-sm text-gray-600">
-          <span>Total tokens: {analytics.totalTokens}</span>
-          <span>Avg latency: {Math.round(analytics.avgLatency)}ms</span>
-        </div>
+        {responses.length > 0 && (
+          <div className="flex items-center space-x-4 text-sm text-gray-600">
+            <span>Total tokens: {analytics.totalTokens.toLocaleString()}</span>
+            <span>Avg latency: {Math.round(analytics.avgLatency)}ms</span>
+          </div>
+        )}
       </div>
 
       {/* Tab Content */}
@@ -271,6 +273,39 @@ export function ResponseTabs({ responses, prompt, context, isLoading = false, se
             <div className="bg-white p-8 rounded-lg border border-gray-200 text-center">
               <Loader2 className="w-8 h-8 animate-spin mx-auto mb-4 text-blue-600" />
               <p className="text-gray-600">Getting responses from {selectedProviders.length} provider{selectedProviders.length !== 1 ? 's' : ''}...</p>
+            </div>
+          ) : responses.length === 0 ? (
+            <div className="bg-white rounded-lg border border-gray-200 p-12 text-center">
+              <div className="max-w-md mx-auto">
+                <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                  <MessageSquare className="w-8 h-8 text-gray-400" />
+                </div>
+                <h3 className="text-lg font-medium text-gray-900 mb-2">
+                  No responses yet
+                </h3>
+                <p className="text-gray-600 mb-6">
+                  Enter a prompt and select providers to see responses and compare different LLM outputs.
+                </p>
+                
+                <div className="grid grid-cols-2 gap-4 text-sm">
+                  <div className="flex items-center space-x-2 text-gray-600">
+                    <MessageSquare className="w-4 h-4" />
+                    <span>Compare Responses</span>
+                  </div>
+                  <div className="flex items-center space-x-2 text-gray-600">
+                    <Download className="w-4 h-4" />
+                    <span>Export to Postman</span>
+                  </div>
+                  <div className="flex items-center space-x-2 text-gray-600">
+                    <Zap className="w-4 h-4" />
+                    <span>View Metrics</span>
+                  </div>
+                  <div className="flex items-center space-x-2 text-gray-600">
+                    <BarChart3 className="w-4 h-4" />
+                    <span>Performance Data</span>
+                  </div>
+                </div>
+              </div>
             </div>
           ) : (
             <div className="grid grid-cols-1 xl:grid-cols-2 gap-6">
@@ -289,7 +324,37 @@ export function ResponseTabs({ responses, prompt, context, isLoading = false, se
         <div className="bg-white rounded-lg border border-gray-200 p-6">
           <h3 className="text-lg font-semibold text-gray-900 mb-6">Response Analytics</h3>
 
-          {analytics.successfulResponses === 0 ? (
+          {responses.length === 0 ? (
+            <div className="text-center py-12">
+              <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                <BarChart3 className="w-8 h-8 text-gray-400" />
+              </div>
+              <h3 className="text-lg font-medium text-gray-900 mb-2">
+                No responses to analyze yet
+              </h3>
+              <p className="text-gray-600 mb-4">
+                Test some prompts to see detailed analytics and performance metrics.
+              </p>
+              <div className="grid grid-cols-2 gap-4 text-sm max-w-md mx-auto">
+                <div className="flex items-center space-x-2 text-gray-600">
+                  <Clock className="w-4 h-4" />
+                  <span>Latency Analysis</span>
+                </div>
+                <div className="flex items-center space-x-2 text-gray-600">
+                  <Zap className="w-4 h-4" />
+                  <span>Token Usage</span>
+                </div>
+                <div className="flex items-center space-x-2 text-gray-600">
+                  <Target className="w-4 h-4" />
+                  <span>Quality Metrics</span>
+                </div>
+                <div className="flex items-center space-x-2 text-gray-600">
+                  <BarChart3 className="w-4 h-4" />
+                  <span>Performance Ranking</span>
+                </div>
+              </div>
+            </div>
+          ) : analytics.successfulResponses === 0 ? (
             <div className="text-center py-8">
               <div className="text-gray-400 mb-2">
                 <BarChart3 className="w-12 h-12 mx-auto" />

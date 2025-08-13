@@ -3,8 +3,9 @@
 import { useState } from 'react';
 import { LLMForm } from '@/components/LLMForm';
 import { ResponseTabs } from '@/components/ResponseTabs';
+import { PostmanSetupGuide } from '@/components/PostmanSetupGuide';
 import { LLMResponse } from '@/lib/llm-apis';
-import { generatePostmanCollection } from '@/lib/postman';
+import { generatePostmanCollection, createPostmanCollection } from '@/lib/postman';
 import { Download, Zap, Globe, Code, Github } from 'lucide-react';
 
 export default function Home() {
@@ -12,8 +13,9 @@ export default function Home() {
   const [isLoading, setIsLoading] = useState(false);
   const [selectedProviders, setSelectedProviders] = useState<string[]>([]);
   const [formData, setFormData] = useState<{ prompt: string; context?: string } | null>(null);
+  const [showPostmanSetup, setShowPostmanSetup] = useState(false);
 
-  const downloadAllPostmanCollection = () => {
+  const createPostmanCollectionInWorkspace = async () => {
     if (responses.length === 0) return;
 
     const collection = generatePostmanCollection(
@@ -22,17 +24,28 @@ export default function Home() {
       responses
     );
 
-    const blob = new Blob([JSON.stringify(collection, null, 2)], {
-      type: 'application/json',
-    });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = 'llm-api-explorer-collection.json';
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
-    URL.revokeObjectURL(url);
+    try {
+      const collectionId = await createPostmanCollection(collection);
+      if (collectionId) {
+        // Open the collection directly in Postman
+        window.open(`https://go.postman.co/collection/${collectionId}`, '_blank');
+      } else {
+        // Fallback to download if API key not configured
+        const blob = new Blob([JSON.stringify(collection, null, 2)], {
+          type: 'application/json',
+        });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = 'llm-api-explorer-collection.json';
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+      }
+    } catch (error) {
+      console.error('Failed to create Postman collection:', error);
+    }
   };
 
   return (
@@ -53,13 +66,22 @@ export default function Home() {
             
             <div className="flex items-center space-x-3">
               {responses.length > 0 && (
-                <button
-                  onClick={downloadAllPostmanCollection}
-                  className="flex items-center space-x-2 px-3 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors text-sm"
-                >
-                  <Download className="w-4 h-4" />
-                  <span>Download All Postman</span>
-                </button>
+                <>
+                  <button
+                    onClick={createPostmanCollectionInWorkspace}
+                    className="flex items-center space-x-2 px-3 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors text-sm"
+                  >
+                    <Download className="w-4 h-4" />
+                    <span>Create in Postman</span>
+                  </button>
+                  <button
+                    onClick={() => setShowPostmanSetup(true)}
+                    className="flex items-center space-x-2 px-3 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors text-sm"
+                  >
+                    <span>⚙️</span>
+                    <span>Setup Guide</span>
+                  </button>
+                </>
               )}
               
               <a
@@ -93,48 +115,13 @@ export default function Home() {
 
           {/* Right Column - Output */}
           <div className="lg:col-span-2">
-            {(isLoading || responses.length > 0) ? (
-              <ResponseTabs 
-                responses={responses}
-                prompt={formData?.prompt || ''}
-                context={formData?.context || ''}
-                isLoading={isLoading}
-                selectedProviders={selectedProviders}
-              />
-            ) : (
-              <div className="bg-white rounded-lg border border-gray-200 p-12 text-center">
-                <div className="max-w-md mx-auto">
-                  <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                    <Globe className="w-8 h-8 text-gray-400" />
-                  </div>
-                  <h3 className="text-lg font-medium text-gray-900 mb-2">
-                    Ready to test your prompts?
-                  </h3>
-                  <p className="text-gray-600 mb-6">
-                    Select your preferred providers, enter a prompt, and compare how different LLMs respond to the same input.
-                  </p>
-                  
-                  <div className="grid grid-cols-2 gap-4 text-sm">
-                    <div className="flex items-center space-x-2 text-gray-600">
-                      <Code className="w-4 h-4" />
-                      <span>Compare Prompts</span>
-                    </div>
-                    <div className="flex items-center space-x-2 text-gray-600">
-                      <Download className="w-4 h-4" />
-                      <span>Export to Postman</span>
-                    </div>
-                    <div className="flex items-center space-x-2 text-gray-600">
-                      <Zap className="w-4 h-4" />
-                      <span>View Metrics</span>
-                    </div>
-                    <div className="flex items-center space-x-2 text-gray-600">
-                      <Globe className="w-4 h-4" />
-                      <span>Test Prompts</span>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            )}
+            <ResponseTabs 
+              responses={responses}
+              prompt={formData?.prompt || ''}
+              context={formData?.context || ''}
+              isLoading={isLoading}
+              selectedProviders={selectedProviders}
+            />
           </div>
         </div>
       </main>
@@ -150,6 +137,12 @@ export default function Home() {
           </div>
         </div>
       </footer>
+
+      {/* Postman Setup Guide */}
+      <PostmanSetupGuide 
+        isOpen={showPostmanSetup} 
+        onClose={() => setShowPostmanSetup(false)} 
+      />
     </div>
   );
 }

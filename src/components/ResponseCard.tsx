@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { LLMResponse } from '@/lib/llm-apis';
-import { generatePostmanCollection } from '@/lib/postman';
+import { generatePostmanCollection, createPostmanCollection } from '@/lib/postman';
 import { Download, Copy, Check, AlertCircle, Clock, Zap } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
@@ -26,23 +26,31 @@ export function ResponseCard({ response, prompt, context }: ResponseCardProps) {
     }
   };
 
-  const downloadPostmanCollection = async () => {
+  const createPostmanCollectionForResponse = async () => {
     setDownloading(true);
     try {
       const collection = generatePostmanCollection(prompt, context, [response]);
-      const blob = new Blob([JSON.stringify(collection, null, 2)], {
-        type: 'application/json',
-      });
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = `${response.provider}-collection.json`;
-      document.body.appendChild(a);
-      a.click();
-      document.body.removeChild(a);
-      URL.revokeObjectURL(url);
+      const collectionId = await createPostmanCollection(collection);
+      
+      if (collectionId) {
+        // Open the collection directly in Postman
+        window.open(`https://go.postman.co/collection/${collectionId}`, '_blank');
+      } else {
+        // Fallback to download if API key not configured
+        const blob = new Blob([JSON.stringify(collection, null, 2)], {
+          type: 'application/json',
+        });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `${response.provider}-collection.json`;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+      }
     } catch (error) {
-      console.error('Failed to download collection:', error);
+      console.error('Failed to create Postman collection:', error);
     } finally {
       setDownloading(false);
     }
@@ -158,12 +166,12 @@ export function ResponseCard({ response, prompt, context }: ResponseCardProps) {
         </div>
 
         <button
-          onClick={downloadPostmanCollection}
+          onClick={createPostmanCollectionForResponse}
           disabled={downloading || !!response.error}
           className="flex items-center space-x-1 px-3 py-1.5 text-sm bg-blue-600 text-white rounded-md hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
         >
           <Download className="w-4 h-4" />
-          <span>{downloading ? 'Downloading...' : 'Postman'}</span>
+          <span>{downloading ? 'Creating...' : 'Create in Postman'}</span>
         </button>
       </div>
     </div>
