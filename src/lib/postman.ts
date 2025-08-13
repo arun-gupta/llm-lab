@@ -45,13 +45,13 @@ export function generatePostmanCollection(
   
   const collection: PostmanCollection = {
     info: {
-      name: 'LLM API Explorer Collection',
+      name: 'LLM Prompt Lab Collection',
       description: `Generated collection for prompt: "${prompt}"`,
       schema: 'https://schema.getpostman.com/json/collection/v2.1.0/collection.json',
     },
     item: [
       {
-        name: 'LLM API Explorer - All Providers',
+        name: 'LLM Prompt Lab - All Providers',
         request: {
           method: 'POST',
           header: [

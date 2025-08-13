@@ -2,9 +2,10 @@
 
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
-import { Send, Loader2 } from 'lucide-react';
+import { Send, Loader2, Lightbulb } from 'lucide-react';
 import { ProviderSelector } from './ProviderSelector';
 import { ResponseCard } from './ResponseCard';
+import { ResponseTabs } from './ResponseTabs';
 import { LLMResponse } from '@/lib/llm-apis';
 
 interface FormData {
@@ -14,10 +15,18 @@ interface FormData {
 
 interface LLMFormProps {
   onResponsesChange: (responses: LLMResponse[]) => void;
+  onLoadingChange?: (loading: boolean) => void;
+  onProvidersChange?: (providers: string[]) => void;
+  onFormDataChange?: (data: { prompt: string; context?: string }) => void;
 }
 
-export function LLMForm({ onResponsesChange }: LLMFormProps) {
-  const [selectedProviders, setSelectedProviders] = useState<string[]>(['openai']);
+export function LLMForm({ onResponsesChange, onLoadingChange, onProvidersChange, onFormDataChange }: LLMFormProps) {
+  const [selectedProviders, setSelectedProviders] = useState<string[]>(['openai:gpt-4o-mini']);
+
+  const handleProvidersChange = (providers: string[]) => {
+    setSelectedProviders(providers);
+    onProvidersChange?.(providers);
+  };
   const [isLoading, setIsLoading] = useState(false);
   const [responses, setResponses] = useState<LLMResponse[]>([]);
   const [error, setError] = useState<string | null>(null);
@@ -28,7 +37,47 @@ export function LLMForm({ onResponsesChange }: LLMFormProps) {
     handleSubmit,
     formState: { errors },
     reset,
+    setValue,
   } = useForm<FormData>();
+
+  // Sample prompts for quick testing
+  const samplePrompts = [
+    {
+      title: "Creative Writing",
+      prompt: "Write a short story about a robot who discovers emotions for the first time.",
+      context: "The story should be suitable for young adults and have a hopeful ending."
+    },
+    {
+      title: "Code Explanation",
+      prompt: "Explain how async/await works in JavaScript with a simple example.",
+      context: "Assume the reader is familiar with basic JavaScript but new to asynchronous programming."
+    },
+    {
+      title: "Business Analysis",
+      prompt: "What are the key factors to consider when launching a SaaS product in 2024?",
+      context: "Focus on market research, pricing strategies, and customer acquisition."
+    },
+    {
+      title: "Technical Documentation",
+      prompt: "Write API documentation for a user authentication endpoint.",
+      context: "Include request/response examples, error codes, and security considerations."
+    },
+    {
+      title: "Data Analysis",
+      prompt: "Analyze the pros and cons of remote work for software development teams.",
+      context: "Consider productivity, collaboration, work-life balance, and company culture."
+    },
+    {
+      title: "Educational Content",
+      prompt: "Explain quantum computing in simple terms that a high school student could understand.",
+      context: "Use analogies and avoid complex mathematical formulas."
+    }
+  ];
+
+  const loadSamplePrompt = (sample: typeof samplePrompts[0]) => {
+    setValue('prompt', sample.prompt);
+    setValue('context', sample.context);
+  };
 
   const onSubmit = async (data: FormData) => {
     if (selectedProviders.length === 0) {
@@ -38,6 +87,8 @@ export function LLMForm({ onResponsesChange }: LLMFormProps) {
 
     setFormData(data);
     setIsLoading(true);
+    onLoadingChange?.(true);
+    onFormDataChange?.(data);
     setError(null);
     setResponses([]);
 
@@ -66,22 +117,23 @@ export function LLMForm({ onResponsesChange }: LLMFormProps) {
       setError(err instanceof Error ? err.message : 'An unexpected error occurred');
     } finally {
       setIsLoading(false);
+      onLoadingChange?.(false);
     }
   };
 
   return (
     <div className="space-y-6">
-      <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
+      <form onSubmit={handleSubmit(onSubmit)} className="bg-white rounded-lg border border-gray-200 p-6 space-y-6">
         {/* Provider Selection */}
-        <div className="bg-white p-6 rounded-lg border border-gray-200">
+        <div>
           <ProviderSelector
             selectedProviders={selectedProviders}
-            onProvidersChange={setSelectedProviders}
+            onProvidersChange={handleProvidersChange}
           />
         </div>
 
         {/* Prompt Input */}
-        <div className="bg-white p-6 rounded-lg border border-gray-200">
+        <div>
           <label htmlFor="prompt" className="block text-sm font-medium text-gray-700 mb-2">
             Prompt *
           </label>
@@ -90,7 +142,7 @@ export function LLMForm({ onResponsesChange }: LLMFormProps) {
             {...register('prompt', { required: 'Prompt is required' })}
             rows={3}
             className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-            placeholder="Enter your prompt here (e.g., 'Summarize this text', 'Explain quantum physics', etc.)"
+            placeholder="Enter your prompt here or try a sample below..."
           />
           {errors.prompt && (
             <p className="mt-1 text-sm text-red-600">{errors.prompt.message}</p>
@@ -98,7 +150,7 @@ export function LLMForm({ onResponsesChange }: LLMFormProps) {
         </div>
 
         {/* Context Input */}
-        <div className="bg-white p-6 rounded-lg border border-gray-200">
+        <div>
           <label htmlFor="context" className="block text-sm font-medium text-gray-700 mb-2">
             Context (Optional)
           </label>
@@ -111,8 +163,29 @@ export function LLMForm({ onResponsesChange }: LLMFormProps) {
           />
         </div>
 
+        {/* Sample Prompts */}
+        <div>
+          <div className="flex items-center space-x-2 mb-4">
+            <Lightbulb className="w-5 h-5 text-yellow-500" />
+            <h3 className="text-sm font-medium text-gray-700">Try Sample Prompts</h3>
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
+            {samplePrompts.map((sample, index) => (
+              <button
+                key={index}
+                type="button"
+                onClick={() => loadSamplePrompt(sample)}
+                className="text-left p-3 border border-gray-200 rounded-lg hover:border-blue-300 hover:bg-blue-50 transition-colors"
+              >
+                <div className="font-medium text-sm text-gray-900 mb-1">{sample.title}</div>
+                <div className="text-xs text-gray-600 line-clamp-2">{sample.prompt}</div>
+              </button>
+            ))}
+          </div>
+        </div>
+
         {/* Submit Button */}
-        <div className="flex justify-center">
+        <div className="flex justify-center pt-2">
           <button
             type="submit"
             disabled={isLoading || selectedProviders.length === 0}
@@ -140,30 +213,7 @@ export function LLMForm({ onResponsesChange }: LLMFormProps) {
         </div>
       )}
 
-      {/* Loading State */}
-      {isLoading && (
-        <div className="bg-white p-8 rounded-lg border border-gray-200 text-center">
-          <Loader2 className="w-8 h-8 animate-spin mx-auto mb-4 text-blue-600" />
-          <p className="text-gray-600">Getting responses from {selectedProviders.length} provider{selectedProviders.length !== 1 ? 's' : ''}...</p>
-        </div>
-      )}
 
-      {/* Responses */}
-      {responses.length > 0 && !isLoading && (
-        <div className="space-y-4">
-          <h2 className="text-xl font-semibold text-gray-900">Responses</h2>
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-            {responses.map((response, index) => (
-              <ResponseCard
-                key={`${response.provider}-${index}`}
-                response={response}
-                prompt={formData?.prompt || ''}
-                context={formData?.context || ''}
-              />
-            ))}
-          </div>
-        </div>
-      )}
     </div>
   );
 } 

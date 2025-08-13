@@ -2,13 +2,13 @@ import type { Metadata } from "next";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "API Explorer Playground - Compare LLM APIs",
-  description: "Compare responses from multiple LLM providers including OpenAI, Anthropic, Cohere, and Mistral. Perfect for DevRel teams and API testing.",
-  keywords: ["LLM", "API", "OpenAI", "Anthropic", "Cohere", "Mistral", "comparison", "testing"],
-  authors: [{ name: "API Explorer Team" }],
+  title: "LLM Prompt Lab - Test and Compare AI Prompts",
+  description: "Test and compare prompts across multiple LLM providers including OpenAI, Anthropic, and Ollama. Perfect for prompt engineering and AI experimentation.",
+  keywords: ["LLM", "prompts", "prompt engineering", "OpenAI", "Anthropic", "Ollama", "AI", "comparison", "testing"],
+  authors: [{ name: "LLM Prompt Lab Team" }],
   openGraph: {
-    title: "API Explorer Playground",
-    description: "Compare responses from multiple LLM providers side by side",
+    title: "LLM Prompt Lab",
+    description: "Test and compare prompts across multiple LLM providers side by side",
     type: "website",
   },
 };

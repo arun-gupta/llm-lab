@@ -1,10 +1,73 @@
-# API Explorer Playground
+# LLM Prompt Lab
 
-A full-stack web application that allows you to compare responses from multiple LLM providers side by side, with **advanced Postman integration**. Perfect for DevRel teams, API testing, and LLM comparison.
+A full-stack web application that allows you to test and compare prompts across multiple LLM providers side by side, with **advanced Postman integration**. Perfect for prompt engineering, AI experimentation, and LLM comparison.
+
+## 🚀 QuickStart
+
+Get up and running in under 3 minutes with our automated setup:
+
+### **Option 1: Automated QuickStart (Recommended)**
+
+```bash
+# 1. Clone the repository
+git clone https://github.com/arun-gupta/llm-prompt-lab.git
+cd llm-prompt-lab
+
+# 2. Run the quickstart script (installs dependencies, sets up environment, and opens browser)
+./quickstart.sh
+```
+
+The quickstart script will:
+- ✅ Install all dependencies automatically
+- ✅ Create `.env.local` from template
+- ✅ Guide you through API key setup
+- ✅ Start the development server
+- ✅ Open the app in your browser automatically
+
+### **Option 2: Manual Setup**
+
+```bash
+# 1. Clone and install
+git clone https://github.com/arun-gupta/llm-prompt-lab.git
+cd llm-prompt-lab
+npm install
+
+# 2. Set up environment variables
+cp .env.local.example .env.local
+# Edit .env.local with your API keys (see below)
+
+# 3. Run the app
+npm run dev
+# Open http://localhost:3000
+```
+
+### **Required API Keys** (add to `.env.local`):
+```env
+# At minimum, add one of these working integrations:
+OPENAI_API_KEY=your_openai_key_here
+ANTHROPIC_API_KEY=your_anthropic_key_here
+
+# Optional: For Postman integration
+POSTMAN_API_KEY=your_postman_key_here
+
+# Coming Soon - Not yet implemented:
+# COHERE_API_KEY=your_cohere_key_here
+# MISTRAL_API_KEY=your_mistral_key_here
+```
+
+### **Get API Keys:**
+- **OpenAI**: [platform.openai.com](https://platform.openai.com/) → API Keys
+- **Anthropic**: [console.anthropic.com](https://console.anthropic.com/) → API Keys  
+- **Postman**: [postman.com](https://www.postman.com) → Settings → API Keys
+
+**That's it!** Start comparing LLM responses and generating Postman collections.
+
+---
 
 **Key Features:**
-- 🔄 **Side-by-side LLM comparison** (OpenAI, Anthropic, Cohere, Mistral)
-- 🚀 **Direct Postman workspace integration** via Postman API
+- 🔄 **Side-by-side LLM comparison** (OpenAI, Anthropic, Ollama local models)
+- 🦙 **Local model support** via Ollama integration (auto-detects running models)
+- � **Diroect Postman workspace integration** via Postman API
 - 📦 **Automatic collection generation** with test scripts and environment templates
 - ⚡ **Performance metrics** (latency, token usage)
 - 🎯 **Ready-to-use API examples** with dynamic variables and validation
@@ -18,7 +81,7 @@ A full-stack web application that allows you to compare responses from multiple 
 
 ## 🚀 Postman Integration Overview
 
-The API Explorer Playground goes beyond simple collection downloads. It provides **enterprise-grade Postman integration**:
+LLM Prompt Lab goes beyond simple collection downloads. It provides **enterprise-grade Postman integration**:
 
 ### **What You Get:**
 - **Direct Workspace Creation**: Collections appear instantly in your Postman workspace
@@ -47,7 +110,7 @@ The API Explorer Playground goes beyond simple collection downloads. It provides
 
 ## Postman Integration
 
-The API Explorer Playground includes powerful Postman integration features that make it easy to test and explore LLM APIs:
+LLM Prompt Lab includes powerful Postman integration features that make it easy to test and explore LLM APIs:
 
 ### **Individual Response Collections**
 - **Download Button**: Each response card has a "Postman" button
@@ -71,7 +134,7 @@ The API Explorer Playground includes powerful Postman integration features that 
 ```json
 {
   "info": {
-    "name": "LLM API Explorer Collection",
+    "name": "LLM Prompt Lab Collection",
     "description": "Generated collection for prompt: 'Your prompt here'",
     "variable": [
       {"key": "prompt", "value": "Your prompt here"},
@@ -316,7 +379,7 @@ npm run dev
 4. **Go to API Keys Section**: In the left sidebar, click on "API Keys"
 5. **Generate New Key**: Click the "Generate API Key" button
 6. **Configure Key**:
-   - Enter a name for your API key (e.g., "LLM API Explorer")
+   - Enter a name for your API key (e.g., "LLM Prompt Lab")
    - Select the workspace where you want collections to be created
    - Choose permissions (typically "Read & Write" for full functionality)
 7. **Copy the Key**: Click "Generate API Key" and copy the generated key immediately
@@ -361,7 +424,7 @@ npm run dev
 
 - **Individual Collections**: One collection per provider response with test scripts
 - **Combined Collections**: All responses in a single collection with environment variables
-- **API Explorer Collection**: The main playground API endpoint
+- **LLM Prompt Lab Collection**: The main prompt testing API endpoint
 - **Environment Templates**: Automatic generation of Postman environment files
 - **Test Scripts**: Pre-built validation scripts for response quality and structure
 
