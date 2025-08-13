@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { LLMResponse } from '@/lib/llm-apis';
-import { generatePostmanCollection, createPostmanCollection } from '@/lib/postman';
+import { generatePostmanCollection } from '@/lib/postman';
 import { Download, Copy, Check, AlertCircle, Clock, Zap } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
@@ -30,11 +30,20 @@ export function ResponseCard({ response, prompt, context }: ResponseCardProps) {
     setDownloading(true);
     try {
       const collection = generatePostmanCollection(prompt, context, [response]);
-      const collectionId = await createPostmanCollection(collection);
       
-      if (collectionId) {
+      const apiResponse = await fetch('/api/postman/create-collection', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ collection }),
+      });
+
+      const result = await apiResponse.json();
+      
+      if (result.success) {
         // Open the collection directly in Postman
-        window.open(`https://go.postman.co/collection/${collectionId}`, '_blank');
+        window.open(result.collectionUrl, '_blank');
       } else {
         // Fallback to download if API key not configured
         const blob = new Blob([JSON.stringify(collection, null, 2)], {
@@ -51,6 +60,19 @@ export function ResponseCard({ response, prompt, context }: ResponseCardProps) {
       }
     } catch (error) {
       console.error('Failed to create Postman collection:', error);
+      // Fallback to download on error
+      const collection = generatePostmanCollection(prompt, context, [response]);
+      const blob = new Blob([JSON.stringify(collection, null, 2)], {
+        type: 'application/json',
+      });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `${response.provider}-collection.json`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
     } finally {
       setDownloading(false);
     }

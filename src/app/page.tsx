@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { LLMForm } from '@/components/LLMForm';
 import { ResponseTabs } from '@/components/ResponseTabs';
 import { PostmanSetupGuide } from '@/components/PostmanSetupGuide';
+import { PostmanStatusIndicator } from '@/components/PostmanStatusIndicator';
 import { LLMResponse } from '@/lib/llm-apis';
 import { generatePostmanCollection, createPostmanCollection } from '@/lib/postman';
 import { Download, Zap, Globe, Code, Github } from 'lucide-react';
@@ -14,6 +15,7 @@ export default function Home() {
   const [selectedProviders, setSelectedProviders] = useState<string[]>([]);
   const [formData, setFormData] = useState<{ prompt: string; context?: string } | null>(null);
   const [showPostmanSetup, setShowPostmanSetup] = useState(false);
+  const [postmanConfigured, setPostmanConfigured] = useState(false);
 
   const createPostmanCollectionInWorkspace = async () => {
     if (responses.length === 0) return;
@@ -25,12 +27,21 @@ export default function Home() {
     );
 
     try {
-      const collectionId = await createPostmanCollection(collection);
-      if (collectionId) {
+      const response = await fetch('/api/postman/create-collection', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ collection }),
+      });
+
+      const result = await response.json();
+
+      if (result.success) {
         // Open the collection directly in Postman
-        window.open(`https://go.postman.co/collection/${collectionId}`, '_blank');
+        window.open(result.collectionUrl, '_blank');
       } else {
-        // Fallback to download if API key not configured
+        // Fallback to download if API key not configured or failed
         const blob = new Blob([JSON.stringify(collection, null, 2)], {
           type: 'application/json',
         });
@@ -45,6 +56,18 @@ export default function Home() {
       }
     } catch (error) {
       console.error('Failed to create Postman collection:', error);
+      // Fallback to download on error
+      const blob = new Blob([JSON.stringify(collection, null, 2)], {
+        type: 'application/json',
+      });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = 'llm-api-explorer-collection.json';
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
     }
   };
 
@@ -65,6 +88,8 @@ export default function Home() {
             </div>
             
             <div className="flex items-center space-x-3">
+              <PostmanStatusIndicator onStatusChange={setPostmanConfigured} />
+              
               {responses.length > 0 && (
                 <>
                   <button
@@ -72,7 +97,7 @@ export default function Home() {
                     className="flex items-center space-x-2 px-3 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors text-sm"
                   >
                     <Download className="w-4 h-4" />
-                    <span>Create in Postman</span>
+                    <span>{postmanConfigured ? 'Create in Postman' : 'Download All Postman'}</span>
                   </button>
                   <button
                     onClick={() => setShowPostmanSetup(true)}
