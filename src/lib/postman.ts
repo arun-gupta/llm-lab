@@ -89,6 +89,9 @@ export function generatePostmanCollection(
   if (responses) {
     responses.forEach((response) => {
       if (response.provider) {
+        const isOllama = response.provider.startsWith('ollama:');
+        const providerName = isOllama ? response.provider.replace('ollama:', '') : response.provider;
+        
         collection.item.push({
           name: `${response.provider} - Direct API Call`,
           request: {
@@ -99,23 +102,32 @@ export function generatePostmanCollection(
                 value: 'application/json',
                 type: 'text',
               },
-              {
+              ...(isOllama ? [] : [{
                 key: 'Authorization',
-                value: `Bearer {{${response.provider.toLowerCase()}_api_key}}`,
+                value: `Bearer {{${providerName.toLowerCase()}_api_key}}`,
                 type: 'text',
-              },
+              }]),
             ],
             body: {
               mode: 'raw',
-              raw: JSON.stringify({
-                messages: [
-                  {
-                    role: 'user',
-                    content: context ? `${context}\n\n${prompt}` : prompt,
-                  },
-                ],
-                max_tokens: 1000,
-              }, null, 2),
+              raw: JSON.stringify(
+                isOllama 
+                  ? {
+                      model: providerName,
+                      prompt: context ? `${context}\n\n${prompt}` : prompt,
+                      stream: false,
+                    }
+                  : {
+                      messages: [
+                        {
+                          role: 'user',
+                          content: context ? `${context}\n\n${prompt}` : prompt,
+                        },
+                      ],
+                      max_tokens: 1000,
+                    },
+                null, 2
+              ),
               options: {
                 raw: {
                   language: 'json',
@@ -124,7 +136,7 @@ export function generatePostmanCollection(
             },
             url: {
               raw: getProviderUrl(response.provider),
-              protocol: 'https',
+              protocol: isOllama ? 'http' : 'https',
               host: [getProviderHost(response.provider)],
               path: getProviderPath(response.provider),
             },
@@ -138,6 +150,10 @@ export function generatePostmanCollection(
 }
 
 function getProviderUrl(provider: string): string {
+  if (provider.startsWith('ollama:')) {
+    return 'http://localhost:11434/api/generate';
+  }
+  
   switch (provider.toLowerCase()) {
     case 'openai':
       return 'https://api.openai.com/v1/chat/completions';
@@ -153,6 +169,10 @@ function getProviderUrl(provider: string): string {
 }
 
 function getProviderHost(provider: string): string {
+  if (provider.startsWith('ollama:')) {
+    return 'localhost:11434';
+  }
+  
   switch (provider.toLowerCase()) {
     case 'openai':
       return 'api.openai.com';
@@ -168,6 +188,10 @@ function getProviderHost(provider: string): string {
 }
 
 function getProviderPath(provider: string): string[] {
+  if (provider.startsWith('ollama:')) {
+    return ['api', 'generate'];
+  }
+  
   switch (provider.toLowerCase()) {
     case 'openai':
       return ['v1', 'chat', 'completions'];
