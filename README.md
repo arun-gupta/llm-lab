@@ -511,16 +511,143 @@ curl -X GET "https://api.getpostman.com/collections" \
 
 If successful, you should receive a JSON response with your collections. If you get an error, check your API key configuration.
 
-## Roadmap
+## PLG-Focused Roadmap
 
-- [ ] Add more LLM providers (Google Gemini, Meta Llama, etc.)
-- [ ] Implement response streaming
-- [ ] Add conversation history
-- [ ] Create user accounts and saved prompts
-- [ ] Add response quality scoring
-- [ ] Implement A/B testing for prompts
-- [ ] Add cost estimation features
-- [ ] Create API rate limiting and usage tracking
+Our roadmap is designed to maximize Postman adoption and showcase Product-Led Growth (PLG) strategies. Each phase includes specific metrics to measure success and drive user engagement.
+
+### **Phase 1: Enhanced Postman Integration & Onboarding** 🎯
+**Timeline:** 2-3 weeks | **Focus:** User Activation
+
+**Features:**
+- [ ] **One-click Postman workspace setup** - Auto-create workspace + environment + collection in single flow
+- [ ] **Interactive Postman onboarding wizard** - Step-by-step guide with API key setup and validation
+- [ ] **Collection preview before creation** - Show users exactly what they'll get in Postman
+- [ ] **Success celebration moments** - Congratulate users on first collection creation
+- [ ] **Improved error handling** - Better UX for Postman API failures with actionable solutions
+
+**Success Metrics:**
+- **Primary:** Collection Creation Rate - Target: 65% of users create at least one collection
+- **Secondary:** Time to First Collection - Target: <3 minutes from landing page
+- **Tertiary:** Postman API Key Setup Success Rate - Target: 85% completion rate
+- **Engagement:** Return Rate - Target: 40% of users return within 7 days
+
+### **Phase 2: Viral Collection Sharing** 🚀
+**Timeline:** 2 weeks | **Focus:** Organic Growth
+
+**Features:**
+- [ ] **Public collection gallery** - Showcase best LLM prompt collections with search/filter
+- [ ] **One-click collection import** - Share collections via simple URLs (`/import/collection-id`)
+- [ ] **Collection templates library** - Pre-built collections for common use cases (summarization, code review, etc.)
+- [ ] **Social sharing integration** - "Share on Twitter/LinkedIn" buttons with collection previews
+- [ ] **Collection analytics** - Show collection creators how many people imported their collections
+
+**Success Metrics:**
+- **Primary:** Viral Coefficient - Target: 1.2 (each user brings 1.2 new users through sharing)
+- **Secondary:** Collection Import Rate - Target: 30% of shared collections get imported
+- **Tertiary:** Social Shares per Collection - Target: 15% of collections get shared socially
+- **Growth:** Weekly New User Acquisition via Shares - Target: 25% of new users from viral sharing
+
+### **Phase 3: Postman-First User Experience** 🎨
+**Timeline:** 3 weeks | **Focus:** Product Positioning
+
+**Features:**
+- [ ] **Redesigned landing page** - "Build and share LLM API collections in Postman" messaging
+- [ ] **Postman-centric user journey** - Primary CTA: "Create Postman Collection" (not "Compare APIs")
+- [ ] **Collection-first results page** - Emphasize collection creation over response comparison
+- [ ] **Postman branding integration** - Co-branded experience showcasing Postman partnership
+- [ ] **Advanced collection features** - Environment variables, test scripts, documentation templates
+
+**Success Metrics:**
+- **Primary:** Collection Creation Intent - Target: 80% of users click "Create Collection" vs other CTAs
+- **Secondary:** Session Duration - Target: 5+ minutes average (up from current baseline)
+- **Tertiary:** Feature Discovery Rate - Target: 60% of users explore advanced Postman features
+- **Positioning:** Brand Association - Target: 70% of users associate the tool with "Postman collections"
+
+### **Phase 4: Team Collaboration Features** 👥
+**Timeline:** 4 weeks | **Focus:** Team Expansion
+
+**Features:**
+- [ ] **Team workspace integration** - Share collections directly with Postman team workspaces
+- [ ] **Collection commenting system** - Add context and documentation to shared collections
+- [ ] **Usage analytics dashboard** - Show which team members are using shared collections
+- [ ] **Organization templates** - Company-specific prompt templates and standards
+- [ ] **Team invitation flows** - Invite colleagues to collaborate on collections
+
+**Success Metrics:**
+- **Primary:** Team Expansion Rate - Target: 35% of individual users invite team members
+- **Secondary:** Team Collection Usage - Target: 60% of team-shared collections get used by 3+ members
+- **Tertiary:** Workspace Integration Rate - Target: 45% of collections created in team workspaces
+- **Retention:** Team User Retention - Target: 80% retention rate for users in team workspaces
+
+### **Phase 5: Advanced Postman Features Showcase** ⚡
+**Timeline:** 3 weeks | **Focus:** Platform Stickiness
+
+**Features:**
+- [ ] **Dynamic environment management** - API key rotation, staging vs production environments
+- [ ] **Advanced test automation** - Complex test scripts for response validation and chaining
+- [ ] **Mock server integration** - Create mock LLM responses for development workflows
+- [ ] **API monitoring setup** - Track LLM API performance and reliability over time
+- [ ] **CI/CD integration examples** - Show how to use collections in automated testing pipelines
+
+**Success Metrics:**
+- **Primary:** Advanced Feature Adoption - Target: 25% of users use 2+ advanced features
+- **Secondary:** Collection Complexity Score - Target: Average 3+ requests per collection
+- **Tertiary:** Postman Pro Feature Discovery - Target: 40% of users explore Postman Pro features
+- **Stickiness:** Long-term Retention - Target: 60% of users active after 30 days
+
+## **Overall PLG Success Metrics**
+
+### **Acquisition Metrics**
+- **Monthly Active Users (MAU)** - Target: 10,000 MAU by end of Phase 3
+- **Organic Growth Rate** - Target: 15% month-over-month growth
+- **Viral Coefficient** - Target: 1.3 overall (each user brings 1.3 new users)
+
+### **Activation Metrics**
+- **Time to Value** - Target: <5 minutes from signup to first collection creation
+- **Activation Rate** - Target: 70% of visitors create at least one collection
+- **Feature Adoption Rate** - Target: 80% of users use core Postman integration features
+
+### **Engagement Metrics**
+- **Collections per User** - Target: 3.5 collections per active user
+- **Session Frequency** - Target: 2.2 sessions per user per week
+- **Feature Depth** - Target: 60% of users use 3+ features per session
+
+### **Retention Metrics**
+- **Day 1 Retention** - Target: 60%
+- **Day 7 Retention** - Target: 35%
+- **Day 30 Retention** - Target: 20%
+- **Cohort Retention** - Target: 15% of users still active after 90 days
+
+### **Revenue Impact Metrics** (Postman PLG)
+- **Postman Pro Conversion Rate** - Target: 8% of users upgrade to Postman Pro
+- **Team Workspace Creation** - Target: 25% of users create or join team workspaces
+- **Enterprise Lead Generation** - Target: 50 qualified enterprise leads per month
+
+## **Measurement & Analytics Setup**
+
+### **Tracking Implementation**
+- **Event Tracking:** Collection creation, sharing, imports, team invitations
+- **Funnel Analysis:** Landing page → Collection creation → Sharing → Team expansion
+- **Cohort Analysis:** User behavior patterns over time
+- **A/B Testing:** Feature variations and messaging optimization
+
+### **Dashboard & Reporting**
+- **Weekly PLG Metrics Review** - Track all key metrics against targets
+- **Monthly Cohort Analysis** - Deep dive into user retention patterns
+- **Quarterly Business Impact Review** - Assess contribution to Postman's growth goals
+
+---
+
+## Legacy Roadmap (Deprioritized for PLG Focus)
+
+- [ ] Add more LLM providers (Google Gemini, Meta Llama, etc.) - *Phase 6+*
+- [ ] Implement response streaming - *Phase 6+*
+- [ ] Add conversation history - *Phase 6+*
+- [ ] Create user accounts and saved prompts - *Phase 6+*
+- [ ] Add response quality scoring - *Phase 6+*
+- [ ] Implement A/B testing for prompts - *Phase 6+*
+- [ ] Add cost estimation features - *Phase 6+*
+- [ ] Create API rate limiting and usage tracking - *Phase 6+*
 
 ---
 
