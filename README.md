@@ -7,9 +7,8 @@ A full-stack web application that allows you to test and compare prompts across 
 ## 🚀 Quick Start
 
 ### **Option 1: GitHub Codespaces (Recommended for trying)**
-[![Open in GitHub Codespaces](https://github.com/codespaces/badge.svg)](https://codespaces.new/arun-gupta/llm-prompt-lab)
 
-Click the button above to open LLM Prompt Lab in GitHub Codespaces. This will:
+Click the button at the top of this README to open LLM Prompt Lab in GitHub Codespaces. This will:
 - 🚀 **Launch instantly** in your browser
 - ⚡ **Auto-install dependencies** and start the dev server
 - 🔑 **Set up environment** with example configuration
