@@ -11,9 +11,10 @@ interface ApiKeyStatus {
 
 interface ApiKeyStatusIndicatorProps {
   onStatusChange?: (status: ApiKeyStatus) => void;
+  refreshTrigger?: number; // Add this to allow parent to trigger refresh
 }
 
-export function ApiKeyStatusIndicator({ onStatusChange }: ApiKeyStatusIndicatorProps) {
+export function ApiKeyStatusIndicator({ onStatusChange, refreshTrigger }: ApiKeyStatusIndicatorProps) {
   const [status, setStatus] = useState<ApiKeyStatus>({
     openai: 'loading',
     anthropic: 'loading',
@@ -21,10 +22,14 @@ export function ApiKeyStatusIndicator({ onStatusChange }: ApiKeyStatusIndicatorP
   });
 
   useEffect(() => {
+    let mounted = true;
+    
     const checkApiKeys = async () => {
       try {
         const response = await fetch('/api/config/keys');
         const data = await response.json();
+        
+        if (!mounted) return;
         
         const newStatus: ApiKeyStatus = {
           openai: data.openai ? 'configured' : 'missing',
@@ -35,6 +40,7 @@ export function ApiKeyStatusIndicator({ onStatusChange }: ApiKeyStatusIndicatorP
         setStatus(newStatus);
         onStatusChange?.(newStatus);
       } catch (error) {
+        if (!mounted) return;
         console.error('Failed to check API keys:', error);
         setStatus({
           openai: 'missing',
@@ -44,8 +50,14 @@ export function ApiKeyStatusIndicator({ onStatusChange }: ApiKeyStatusIndicatorP
       }
     };
 
+    // Check once on mount
     checkApiKeys();
-  }, [onStatusChange]);
+
+    // Cleanup function
+    return () => {
+      mounted = false;
+    };
+  }, [refreshTrigger]); // Only re-run when refreshTrigger changes
 
   const getStatusIcon = (keyStatus: string) => {
     switch (keyStatus) {

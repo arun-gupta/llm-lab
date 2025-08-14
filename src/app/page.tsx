@@ -36,6 +36,9 @@ export default function Home() {
 
   // Config panel state
   const [showConfigPanel, setShowConfigPanel] = useState(false);
+  
+  // Refresh trigger for API key status
+  const [apiKeyRefreshTrigger, setApiKeyRefreshTrigger] = useState(0);
 
   const createPostmanCollectionInWorkspace = async () => {
     if (responses.length === 0) return;
@@ -219,7 +222,10 @@ export default function Home() {
             </button>
             
             <div className="flex items-center space-x-3">
-              <ApiKeyStatusIndicator onStatusChange={handleApiKeyStatusChange} />
+              <ApiKeyStatusIndicator 
+                onStatusChange={handleApiKeyStatusChange} 
+                refreshTrigger={apiKeyRefreshTrigger}
+              />
               
               <button
                 onClick={() => setShowConfigPanel(true)}
@@ -333,7 +339,11 @@ export default function Home() {
       {/* Config Panel */}
       <ConfigPanel
         isOpen={showConfigPanel}
-        onClose={() => setShowConfigPanel(false)}
+        onClose={() => {
+          setShowConfigPanel(false);
+          // Refresh API key status after config panel closes
+          setApiKeyRefreshTrigger(prev => prev + 1);
+        }}
         onConfigChange={() => {
           // Refresh Postman status when config changes
           if (typeof window !== 'undefined') {
