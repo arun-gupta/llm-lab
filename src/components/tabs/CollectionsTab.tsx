@@ -415,46 +415,30 @@ Please try the "Download & Import" option instead.`);
                   onClick={() => {
                     const collectionUrl = `${window.location.origin}/postman-collections/mcp-integration-demo.json`;
                     
-                    // Try multiple approaches for Postman Desktop
+                    // Single attempt to open Postman Desktop
                     try {
-                      // Method 1: Try postman:// scheme
+                      // Try the most reliable URL scheme
                       const postmanDesktopUrl = `postman://import?url=${encodeURIComponent(collectionUrl)}`;
                       window.open(postmanDesktopUrl, '_blank');
                       
-                      // Method 2: Try alternative scheme
-                      setTimeout(() => {
-                        const alternativeUrl = `postman://collection/import?url=${encodeURIComponent(collectionUrl)}`;
-                        window.open(alternativeUrl, '_blank');
-                      }, 500);
-                      
-                      // Method 3: Try with a different approach
-                      setTimeout(() => {
-                        const link = document.createElement('a');
-                        link.href = postmanDesktopUrl;
-                        link.style.display = 'none';
-                        document.body.appendChild(link);
-                        link.click();
-                        document.body.removeChild(link);
-                      }, 1000);
+                      // Show immediate feedback
+                      alert(`🚀 Attempting to open Postman Desktop...
+
+Collection URL: ${collectionUrl}
+
+If Postman Desktop doesn't open automatically:
+1. Make sure Postman Desktop is installed from: https://www.postman.com/downloads/
+2. Try the "Direct API Creation" option instead (recommended)
+3. Or use "Download & Import" for manual import`);
                       
                     } catch (error) {
                       console.log('Postman Desktop URL scheme not supported');
+                      alert(`❌ Could not open Postman Desktop automatically.
+
+Please try the "Direct API Creation" option instead - it's more reliable and creates the collection directly in Postman Desktop via API.
+
+Collection URL: ${collectionUrl}`);
                     }
-                    
-                    // Show helpful message
-                    setTimeout(() => {
-                      const message = `Postman Desktop Integration Attempted!
-
-If Postman Desktop didn't open automatically:
-
-1. Make sure Postman Desktop is installed from: https://www.postman.com/downloads/
-2. Try the "Download & Import" option instead
-3. Or use "Postman Web" for browser-based import
-
-The collection URL is: ${collectionUrl}`;
-                      
-                      alert(message);
-                    }, 1500);
                     
                     setShowInstallModal(false);
                   }}
@@ -512,34 +496,19 @@ The collection URL is: ${collectionUrl}`;
 Collection URL: ${result.collectionUrl}`;
 
               if (!createInWeb) {
-                // For Desktop deployment, try to open Postman Desktop
+                // For Desktop deployment, try to open Postman Desktop once
                 try {
-                  // Method 1: Try postman:// scheme to open the collection directly
-                  const postmanDesktopUrl = `postman://collection/import?url=${encodeURIComponent(result.collectionUrl)}`;
+                  // Single attempt to open Postman Desktop with the collection
+                  const postmanDesktopUrl = `postman://import?url=${encodeURIComponent(result.collectionUrl)}`;
                   window.open(postmanDesktopUrl, '_blank');
-                  
-                  // Method 2: Try alternative scheme if first one doesn't work
-                  setTimeout(() => {
-                    const alternativeUrl = `postman://import?url=${encodeURIComponent(result.collectionUrl)}`;
-                    window.open(alternativeUrl, '_blank');
-                  }, 500);
-                  
-                  // Method 3: Try to open Postman Desktop app directly
-                  setTimeout(() => {
-                    try {
-                      window.open('postman://', '_blank');
-                    } catch (e) {
-                      console.log('Could not open Postman Desktop directly');
-                    }
-                  }, 1000);
                   
                   alert(`${successMessage}
 
 🚀 Attempting to open Postman Desktop...
 
-If Postman Desktop doesn't open automatically:
+If Postman Desktop didn't open automatically:
 1. Make sure Postman Desktop is installed from: https://www.postman.com/downloads/
-2. Open Postman Desktop manually and look for your new collection
+2. Open Postman Desktop manually and look for "${collectionName}" collection
 3. Or use the collection URL above to import manually`);
                 } catch (error) {
                   console.log('Postman Desktop URL scheme not supported');
