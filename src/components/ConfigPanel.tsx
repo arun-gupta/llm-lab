@@ -95,10 +95,20 @@ export function ConfigPanel({ isOpen, onClose, onConfigChange }: ConfigPanelProp
     }));
   };
 
-  const getKeyStatus = (key: string) => {
+  const getKeyStatus = (key: string, type: 'openai' | 'anthropic' | 'postman') => {
     if (!key) return 'missing';
-    if (key.startsWith('sk-') || key.startsWith('sk-ant-')) return 'valid';
-    return 'invalid';
+    
+    switch (type) {
+      case 'openai':
+        return key.startsWith('sk-') ? 'valid' : 'invalid';
+      case 'anthropic':
+        return key.startsWith('sk-ant-') ? 'valid' : 'invalid';
+      case 'postman':
+        // Postman API keys can have various formats, so we'll be more lenient
+        return key.length > 10 ? 'valid' : 'invalid';
+      default:
+        return 'invalid';
+    }
   };
 
   const getStatusIcon = (status: string) => {
@@ -159,9 +169,9 @@ export function ConfigPanel({ isOpen, onClose, onConfigChange }: ConfigPanelProp
                 OpenAI API Key
               </label>
               <div className="flex items-center space-x-2">
-                {getStatusIcon(getKeyStatus(apiKeys.openai))}
+                {getStatusIcon(getKeyStatus(apiKeys.openai, 'openai'))}
                 <span className="text-xs text-gray-500">
-                  {getStatusText(getKeyStatus(apiKeys.openai))}
+                  {getStatusText(getKeyStatus(apiKeys.openai, 'openai'))}
                 </span>
               </div>
             </div>
@@ -193,9 +203,9 @@ export function ConfigPanel({ isOpen, onClose, onConfigChange }: ConfigPanelProp
                 Anthropic API Key
               </label>
               <div className="flex items-center space-x-2">
-                {getStatusIcon(getKeyStatus(apiKeys.anthropic))}
+                {getStatusIcon(getKeyStatus(apiKeys.anthropic, 'anthropic'))}
                 <span className="text-xs text-gray-500">
-                  {getStatusText(getKeyStatus(apiKeys.anthropic))}
+                  {getStatusText(getKeyStatus(apiKeys.anthropic, 'anthropic'))}
                 </span>
               </div>
             </div>
@@ -227,9 +237,9 @@ export function ConfigPanel({ isOpen, onClose, onConfigChange }: ConfigPanelProp
                 Postman API Key (Optional)
               </label>
               <div className="flex items-center space-x-2">
-                {getStatusIcon(getKeyStatus(apiKeys.postman))}
+                {getStatusIcon(getKeyStatus(apiKeys.postman, 'postman'))}
                 <span className="text-xs text-gray-500">
-                  {getStatusText(getKeyStatus(apiKeys.postman))}
+                  {getStatusText(getKeyStatus(apiKeys.postman, 'postman'))}
                 </span>
               </div>
             </div>

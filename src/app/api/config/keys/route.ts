@@ -60,9 +60,9 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    if (postman && !postman.startsWith('PMAK-')) {
+    if (postman && postman.length < 10) {
       return NextResponse.json(
-        { error: 'Invalid Postman API key format' },
+        { error: 'Postman API key seems too short' },
         { status: 400 }
       );
     }
