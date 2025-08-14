@@ -68,9 +68,31 @@ print_step "3" "Setting up environment file"
 
 # Set up environment file if it doesn't exist
 if [ ! -f ".env.local" ]; then
-    echo "📝 Creating .env.local from template..."
-    cp .env.local.example .env.local
-    print_success "Environment file created from template"
+    echo "📝 Creating .env.local..."
+    
+    # Create basic .env.local file
+    cat > .env.local << EOF
+# LLM Prompt Lab Environment Variables
+# API Keys (add your actual keys here)
+OPENAI_API_KEY=your_openai_api_key_here
+ANTHROPIC_API_KEY=your_anthropic_api_key_here
+POSTMAN_API_KEY=your_postman_api_key_here
+
+# Base URL for the application
+EOF
+    
+    # Set NEXT_PUBLIC_BASE_URL for Codespaces
+    if [ -n "$CODESPACES" ]; then
+        echo "🌐 Detecting Codespaces URL..."
+        CODESPACE_URL="https://${CODESPACE_NAME}-${GITHUB_USER}.github.dev"
+        echo "NEXT_PUBLIC_BASE_URL=${CODESPACE_URL}" >> .env.local
+        print_success "Set NEXT_PUBLIC_BASE_URL to ${CODESPACE_URL}"
+    else
+        echo "NEXT_PUBLIC_BASE_URL=http://localhost:3000" >> .env.local
+        print_success "Set NEXT_PUBLIC_BASE_URL to http://localhost:3000"
+    fi
+    
+    print_success "Environment file created"
     
     print_info "🔑 API Key Setup Required"
     echo ""
@@ -87,6 +109,11 @@ if [ ! -f ".env.local" ]; then
     echo "      - OPENAI_API_KEY"
     echo "      - ANTHROPIC_API_KEY"
     echo "      - POSTMAN_API_KEY (optional)"
+    echo "      - NEXT_PUBLIC_BASE_URL (set to your Codespaces URL)"
+    echo ""
+    echo "   🌐 For Postman collections to work correctly in Codespaces:"
+    echo "   • Set NEXT_PUBLIC_BASE_URL to your Codespaces URL"
+    echo "   • Example: https://your-codespace-name.github.dev"
     echo ""
 else
     print_success "Environment file already exists"
