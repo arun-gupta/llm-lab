@@ -6,6 +6,7 @@ import { ResponseTabs } from '@/components/ResponseTabs';
 import { PostmanSetupGuide } from '@/components/PostmanSetupGuide';
 import { PostmanStatusIndicator } from '@/components/PostmanStatusIndicator';
 import { CollectionPreview } from '@/components/CollectionPreview';
+import { SuccessCelebration } from '@/components/SuccessCelebration';
 import { LLMResponse } from '@/lib/llm-apis';
 import { generatePostmanCollection, createPostmanCollection } from '@/lib/postman';
 import { Download, Zap, Globe, Code, Github } from 'lucide-react';
@@ -20,6 +21,14 @@ export default function Home() {
   const [showCollectionPreview, setShowCollectionPreview] = useState(false);
   const [isCreatingCollection, setIsCreatingCollection] = useState(false);
   const [activeTab, setActiveTab] = useState<'responses' | 'analytics'>('responses');
+  
+  // Success celebration states
+  const [showSuccessCelebration, setShowSuccessCelebration] = useState(false);
+  const [celebrationType, setCelebrationType] = useState<'collection-created' | 'api-key-setup' | 'first-response' | 'postman-connected'>('first-response');
+  const [celebrationData, setCelebrationData] = useState<any>({});
+
+  // Track if this is the first response
+  const [hasGeneratedFirstResponse, setHasGeneratedFirstResponse] = useState(false);
 
   const createPostmanCollectionInWorkspace = async () => {
     if (responses.length === 0) return;
@@ -58,6 +67,11 @@ export default function Home() {
           window.open(desktopUrl, '_blank');
         }
         setShowCollectionPreview(false);
+        
+        // Show collection created celebration
+        setCelebrationType('collection-created');
+        setCelebrationData({ collectionUrl: result.collectionUrl });
+        setShowSuccessCelebration(true);
       } else {
         // Fallback to download if API key not configured or failed
         const blob = new Blob([JSON.stringify(collection, null, 2)], { type: 'application/json' });
@@ -127,6 +141,28 @@ export default function Home() {
           });
         }
       }, 100);
+
+      // Show first response celebration
+      if (!hasGeneratedFirstResponse) {
+        setHasGeneratedFirstResponse(true);
+        setCelebrationType('first-response');
+        setCelebrationData({ 
+          provider: newResponses[0]?.provider,
+          responseCount: newResponses.length 
+        });
+        setShowSuccessCelebration(true);
+      }
+    }
+  };
+
+  const handlePostmanStatusChange = (configured: boolean) => {
+    setPostmanConfigured(configured);
+    
+    // Show celebration when Postman is first connected
+    if (configured && !showSuccessCelebration) {
+      setCelebrationType('postman-connected');
+      setCelebrationData({});
+      setShowSuccessCelebration(true);
     }
   };
 
@@ -165,7 +201,7 @@ export default function Home() {
             </button>
             
             <div className="flex items-center space-x-3">
-              <PostmanStatusIndicator onStatusChange={setPostmanConfigured} />
+              <PostmanStatusIndicator onStatusChange={handlePostmanStatusChange} />
               
               {responses.length > 0 && (
                 <>
@@ -257,6 +293,14 @@ export default function Home() {
         context={formData?.context}
         responses={responses}
         isCreating={isCreatingCollection}
+      />
+
+      {/* Success Celebration */}
+      <SuccessCelebration
+        isVisible={showSuccessCelebration}
+        type={celebrationType}
+        onClose={() => setShowSuccessCelebration(false)}
+        data={celebrationData}
       />
     </div>
   );
