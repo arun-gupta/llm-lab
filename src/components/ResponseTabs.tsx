@@ -297,11 +297,19 @@ export function ResponseTabs({
 
       {/* Tab Content */}
       {activeTab === 'responses' ? (
-        <div>
+        <div className="transition-all duration-300 ease-in-out">
           {isLoading ? (
-            <div className="bg-white p-8 rounded-lg border border-gray-200 text-center">
+            <div className="bg-white p-8 rounded-lg border border-gray-200 text-center animate-pulse">
               <Loader2 className="w-8 h-8 animate-spin mx-auto mb-4 text-blue-600" />
-              <p className="text-gray-600">Getting responses from {selectedProviders.length} provider{selectedProviders.length !== 1 ? 's' : ''}...</p>
+              <p className="text-gray-600 mb-2">Getting responses from {selectedProviders.length} provider{selectedProviders.length !== 1 ? 's' : ''}...</p>
+              <div className="flex justify-center space-x-2">
+                {selectedProviders.map((provider, index) => (
+                  <div key={index} className="flex items-center space-x-1 text-sm text-gray-500">
+                    <div className="w-2 h-2 bg-blue-500 rounded-full animate-pulse"></div>
+                    <span>{provider.includes('ollama:') ? provider.replace('ollama:', '') : provider}</span>
+                  </div>
+                ))}
+              </div>
             </div>
           ) : responses.length === 0 ? (
             <div className="bg-white rounded-lg border border-gray-200 p-12 text-center">
@@ -337,14 +345,15 @@ export function ResponseTabs({
               </div>
             </div>
           ) : (
-            <div className="grid grid-cols-1 xl:grid-cols-2 gap-6">
+            <div className="space-y-4 animate-in fade-in duration-300">
               {responses.map((response, index) => (
-                <ResponseCard
-                  key={`${response.provider}-${index}`}
-                  response={response}
-                  prompt={prompt}
-                  context={context}
-                />
+                <div key={index} className="animate-in slide-in-from-bottom-2 duration-300" style={{ animationDelay: `${index * 100}ms` }}>
+                  <ResponseCard
+                    response={response}
+                    prompt={prompt}
+                    context={context}
+                  />
+                </div>
               ))}
             </div>
           )}

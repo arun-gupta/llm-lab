@@ -84,19 +84,39 @@ export default function Home() {
     }
   };
 
-  const handleResponsesChange = (newResponses: LLMResponse[]) => {
-    setResponses(newResponses);
-    // Auto-switch to responses tab when new responses arrive
-    if (newResponses.length > 0) {
-      setActiveTab('responses');
-    }
-  };
-
   const handleLoadingChange = (loading: boolean) => {
     setIsLoading(loading);
     // Auto-switch to responses tab when starting to load
     if (loading) {
       setActiveTab('responses');
+      // Scroll to responses area when loading starts
+      setTimeout(() => {
+        const responsesElement = document.getElementById('responses-section');
+        if (responsesElement) {
+          responsesElement.scrollIntoView({ 
+            behavior: 'smooth', 
+            block: 'start' 
+          });
+        }
+      }, 100); // Small delay to ensure tab switch happens first
+    }
+  };
+
+  const handleResponsesChange = (newResponses: LLMResponse[]) => {
+    setResponses(newResponses);
+    // Auto-switch to responses tab when new responses arrive
+    if (newResponses.length > 0) {
+      setActiveTab('responses');
+      // Scroll to responses area when responses arrive
+      setTimeout(() => {
+        const responsesElement = document.getElementById('responses-section');
+        if (responsesElement) {
+          responsesElement.scrollIntoView({ 
+            behavior: 'smooth', 
+            block: 'start' 
+          });
+        }
+      }, 100);
     }
   };
 
@@ -168,7 +188,7 @@ export default function Home() {
           </div>
 
           {/* Right Column - Output */}
-          <div className="lg:col-span-2">
+          <div className="lg:col-span-2" id="responses-section">
             <ResponseTabs 
               responses={responses}
               prompt={formData?.prompt || ''}
