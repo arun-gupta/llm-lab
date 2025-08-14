@@ -353,19 +353,99 @@ export function CollectionsTab() {
                 </button>
 
                 <button
+                  onClick={async () => {
+                    try {
+                      // Fetch the collection JSON
+                      const response = await fetch('/postman-collections/mcp-integration-demo.json');
+                      const collection = await response.json();
+                      
+                      // Create collection via Postman API
+                      const apiResponse = await fetch('/api/postman/create-collection', {
+                        method: 'POST',
+                        headers: {
+                          'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({
+                          collection: collection,
+                          createInWeb: false, // Create in Desktop
+                        }),
+                      });
+                      
+                      const result = await apiResponse.json();
+                      
+                      if (result.success) {
+                        alert(`✅ Collection created successfully in Postman Desktop!
+                        
+Collection URL: ${result.collectionUrl}
+                        
+You can now open Postman Desktop to see your new collection.`);
+                      } else {
+                        throw new Error(result.message || 'Failed to create collection');
+                      }
+                    } catch (error) {
+                      console.error('Error creating collection:', error);
+                      alert(`❌ Failed to create collection in Postman Desktop.
+
+Error: ${error.message}
+
+Please try the "Download & Import" option instead.`);
+                    }
+                    
+                    setShowInstallModal(false);
+                  }}
+                  className="w-full flex items-center space-x-3 p-4 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors"
+                >
+                  <Code className="w-5 h-5 text-orange-600" />
+                  <div className="text-left">
+                    <div className="font-medium text-gray-900">Direct API Creation</div>
+                    <div className="text-sm text-gray-600">Create collection directly in Postman Desktop via API</div>
+                  </div>
+                </button>
+
+                <button
                   onClick={() => {
                     const collectionUrl = `${window.location.origin}/postman-collections/mcp-integration-demo.json`;
-                    const postmanDesktopUrl = `postman://import?url=${encodeURIComponent(collectionUrl)}`;
                     
-                    // Try to open Postman Desktop
-                    const desktopWindow = window.open(postmanDesktopUrl, '_blank');
+                    // Try multiple approaches for Postman Desktop
+                    try {
+                      // Method 1: Try postman:// scheme
+                      const postmanDesktopUrl = `postman://import?url=${encodeURIComponent(collectionUrl)}`;
+                      window.open(postmanDesktopUrl, '_blank');
+                      
+                      // Method 2: Try alternative scheme
+                      setTimeout(() => {
+                        const alternativeUrl = `postman://collection/import?url=${encodeURIComponent(collectionUrl)}`;
+                        window.open(alternativeUrl, '_blank');
+                      }, 500);
+                      
+                      // Method 3: Try with a different approach
+                      setTimeout(() => {
+                        const link = document.createElement('a');
+                        link.href = postmanDesktopUrl;
+                        link.style.display = 'none';
+                        document.body.appendChild(link);
+                        link.click();
+                        document.body.removeChild(link);
+                      }, 1000);
+                      
+                    } catch (error) {
+                      console.log('Postman Desktop URL scheme not supported');
+                    }
                     
-                    // If Postman Desktop doesn't open, show a fallback message
+                    // Show helpful message
                     setTimeout(() => {
-                      if (desktopWindow && desktopWindow.closed) {
-                        alert('Postman Desktop not detected. Please:\n1. Install Postman Desktop from https://www.postman.com/downloads/\n2. Or use "Download & Import" option instead');
-                      }
-                    }, 1000);
+                      const message = `Postman Desktop Integration Attempted!
+
+If Postman Desktop didn't open automatically:
+
+1. Make sure Postman Desktop is installed from: https://www.postman.com/downloads/
+2. Try the "Download & Import" option instead
+3. Or use "Postman Web" for browser-based import
+
+The collection URL is: ${collectionUrl}`;
+                      
+                      alert(message);
+                    }, 1500);
                     
                     setShowInstallModal(false);
                   }}
@@ -383,9 +463,13 @@ export function CollectionsTab() {
                 <h4 className="font-medium text-blue-900 mb-2">💡 Installation Tips</h4>
                 <ul className="text-sm text-blue-800 space-y-1">
                   <li>• <strong>Download & Import:</strong> Works everywhere, no security blocks</li>
-                  <li>• <strong>Postman Desktop:</strong> Best for localhost, uses native app</li>
+                  <li>• <strong>Direct API Creation:</strong> Best option - creates collection directly in Postman Desktop</li>
+                  <li>• <strong>Postman Desktop:</strong> Uses URL scheme (may not work in all browsers)</li>
                   <li>• <strong>Postman Web:</strong> Works best in production environments</li>
                 </ul>
+                <p className="text-xs text-blue-700 mt-2">
+                  <strong>Recommended:</strong> Try "Direct API Creation" first for the best experience with Postman Desktop.
+                </p>
               </div>
             </div>
           </div>
