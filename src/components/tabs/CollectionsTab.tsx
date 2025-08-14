@@ -347,18 +347,45 @@ export function CollectionsTab() {
                 >
                   <Code className="w-5 h-5 text-green-600" />
                   <div className="text-left">
-                    <div className="font-medium text-gray-900">Direct Import (Production)</div>
-                    <div className="text-sm text-gray-600">Open directly in Postman (works best in production)</div>
+                    <div className="font-medium text-gray-900">Postman Web</div>
+                    <div className="text-sm text-gray-600">Open directly in Postman Web browser</div>
+                  </div>
+                </button>
+
+                <button
+                  onClick={() => {
+                    const collectionUrl = `${window.location.origin}/postman-collections/mcp-integration-demo.json`;
+                    const postmanDesktopUrl = `postman://import?url=${encodeURIComponent(collectionUrl)}`;
+                    
+                    // Try to open Postman Desktop
+                    const desktopWindow = window.open(postmanDesktopUrl, '_blank');
+                    
+                    // If Postman Desktop doesn't open, show a fallback message
+                    setTimeout(() => {
+                      if (desktopWindow && desktopWindow.closed) {
+                        alert('Postman Desktop not detected. Please:\n1. Install Postman Desktop from https://www.postman.com/downloads/\n2. Or use "Download & Import" option instead');
+                      }
+                    }, 1000);
+                    
+                    setShowInstallModal(false);
+                  }}
+                  className="w-full flex items-center space-x-3 p-4 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors"
+                >
+                  <Code className="w-5 h-5 text-purple-600" />
+                  <div className="text-left">
+                    <div className="font-medium text-gray-900">Postman Desktop</div>
+                    <div className="text-sm text-gray-600">Open directly in Postman Desktop app (if installed)</div>
                   </div>
                 </button>
               </div>
               
               <div className="mt-6 p-4 bg-blue-50 rounded-lg">
-                <h4 className="font-medium text-blue-900 mb-2">💡 Tip</h4>
-                <p className="text-sm text-blue-800">
-                  If you're running locally (localhost), use "Download & Import" to avoid security blocks. 
-                  For production deployments, "Direct Import" works seamlessly.
-                </p>
+                <h4 className="font-medium text-blue-900 mb-2">💡 Installation Tips</h4>
+                <ul className="text-sm text-blue-800 space-y-1">
+                  <li>• <strong>Download & Import:</strong> Works everywhere, no security blocks</li>
+                  <li>• <strong>Postman Desktop:</strong> Best for localhost, uses native app</li>
+                  <li>• <strong>Postman Web:</strong> Works best in production environments</li>
+                </ul>
               </div>
             </div>
           </div>
