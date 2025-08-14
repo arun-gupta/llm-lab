@@ -203,7 +203,7 @@ export function CollectionsTab() {
             <div className="space-y-3 text-sm text-gray-600">
               <div className="flex items-center space-x-2">
                 <span className="w-6 h-6 bg-blue-100 text-blue-600 rounded-full flex items-center justify-center text-xs font-bold">1</span>
-                <span>Download MCP Integration collection</span>
+                <span>Install MCP Integration collection in Postman</span>
               </div>
               <div className="flex items-center space-x-2">
                 <span className="w-6 h-6 bg-blue-100 text-blue-600 rounded-full flex items-center justify-center text-xs font-bold">2</span>
@@ -226,15 +226,15 @@ export function CollectionsTab() {
           <div className="flex justify-center space-x-4">
             <button 
               onClick={() => {
-                const link = document.createElement('a');
-                link.href = '/postman-collections/mcp-integration-demo.json';
-                link.download = 'mcp-integration-demo.json';
-                link.click();
+                // Open collection directly in Postman
+                const collectionUrl = `${window.location.origin}/postman-collections/mcp-integration-demo.json`;
+                const postmanUrl = `https://go.postman.co/import?url=${encodeURIComponent(collectionUrl)}`;
+                window.open(postmanUrl, '_blank');
               }}
               className="flex items-center space-x-2 px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
             >
               <Download className="w-4 h-4" />
-              <span>Download MCP Collection</span>
+              <span>Install in Postman</span>
             </button>
             <button 
               onClick={() => window.open('/docs/MCP-POSTMAN-INTEGRATION.md', '_blank')}
