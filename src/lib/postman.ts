@@ -152,7 +152,6 @@ STEP 4: Add Your API Keys
                 '}',
                 '',
                 '// Set request variables',
-                'const baseUrl = pm.environment.get("base_url");',
                 'if (baseUrl && baseUrl !== "your_base_url_here") {',
                 '    pm.request.url.raw = baseUrl + "/api/llm";',
                 '}'
