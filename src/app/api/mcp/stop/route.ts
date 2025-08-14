@@ -14,14 +14,14 @@ export async function POST() {
     const fs = require('fs');
     if (!fs.existsSync(mcpDir)) {
       return NextResponse.json(
-        { error: 'MCP servers not installed. Please run ./setup-mcp.sh first.' },
+        { error: 'MCP servers not installed. Please run npm run setup-mcp first.' },
         { status: 404 }
       );
     }
 
     if (!fs.existsSync(stopScriptPath)) {
       return NextResponse.json(
-        { error: 'MCP stop script not found. Please run ./setup-mcp.sh first.' },
+        { error: 'MCP stop script not found. Please run npm run setup-mcp first.' },
         { status: 404 }
       );
     }
