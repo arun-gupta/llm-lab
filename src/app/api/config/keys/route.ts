@@ -30,7 +30,8 @@ export async function GET() {
     return NextResponse.json({
       openai: keys.OPENAI_API_KEY || '',
       anthropic: keys.ANTHROPIC_API_KEY || '',
-      postman: keys.POSTMAN_API_KEY || ''
+      postman: keys.POSTMAN_API_KEY || '',
+      github: keys.GITHUB_TOKEN || ''
     });
   } catch (error) {
     console.error('Error reading API keys:', error);
@@ -43,7 +44,7 @@ export async function GET() {
 
 export async function POST(request: NextRequest) {
   try {
-    const { openai, anthropic, postman } = await request.json();
+    const { openai, anthropic, postman, github } = await request.json();
 
     // Validate API key formats
     if (openai && !openai.startsWith('sk-')) {
@@ -63,6 +64,13 @@ export async function POST(request: NextRequest) {
     if (postman && postman.length < 10) {
       return NextResponse.json(
         { error: 'Postman API key seems too short' },
+        { status: 400 }
+      );
+    }
+
+    if (github && !github.startsWith('ghp_') && !github.startsWith('github_pat_')) {
+      return NextResponse.json(
+        { error: 'Invalid GitHub token format. Should start with ghp_ or github_pat_' },
         { status: 400 }
       );
     }
@@ -88,6 +96,7 @@ export async function POST(request: NextRequest) {
     if (openai) envVars.OPENAI_API_KEY = openai;
     if (anthropic) envVars.ANTHROPIC_API_KEY = anthropic;
     if (postman) envVars.POSTMAN_API_KEY = postman;
+    if (github) envVars.GITHUB_TOKEN = github;
 
     // Remove empty values
     Object.keys(envVars).forEach(key => {

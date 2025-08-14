@@ -13,18 +13,21 @@ interface ApiKeys {
   openai: string;
   anthropic: string;
   postman: string;
+  github: string;
 }
 
 export function ConfigPanel({ isOpen, onClose, onConfigChange }: ConfigPanelProps) {
   const [apiKeys, setApiKeys] = useState<ApiKeys>({
     openai: '',
     anthropic: '',
-    postman: ''
+    postman: '',
+    github: ''
   });
   const [showKeys, setShowKeys] = useState<{ [key in keyof ApiKeys]: boolean }>({
     openai: false,
     anthropic: false,
-    postman: false
+    postman: false,
+    github: false
   });
   const [isSaving, setIsSaving] = useState(false);
   const [saveStatus, setSaveStatus] = useState<'idle' | 'success' | 'error'>('idle');
@@ -32,7 +35,8 @@ export function ConfigPanel({ isOpen, onClose, onConfigChange }: ConfigPanelProp
   const [copyStatus, setCopyStatus] = useState<{ [key in keyof ApiKeys]: boolean }>({
     openai: false,
     anthropic: false,
-    postman: false
+    postman: false,
+    github: false
   });
 
   // Load existing API keys on mount
@@ -50,7 +54,8 @@ export function ConfigPanel({ isOpen, onClose, onConfigChange }: ConfigPanelProp
         setApiKeys({
           openai: keys.openai || '',
           anthropic: keys.anthropic || '',
-          postman: keys.postman || ''
+          postman: keys.postman || '',
+          github: keys.github || ''
         });
       }
     } catch (error) {
@@ -123,7 +128,7 @@ export function ConfigPanel({ isOpen, onClose, onConfigChange }: ConfigPanelProp
     }
   };
 
-  const getKeyStatus = (key: string, type: 'openai' | 'anthropic' | 'postman') => {
+  const getKeyStatus = (key: string, type: 'openai' | 'anthropic' | 'postman' | 'github') => {
     if (!key) return 'missing';
     
     switch (type) {
@@ -134,6 +139,8 @@ export function ConfigPanel({ isOpen, onClose, onConfigChange }: ConfigPanelProp
       case 'postman':
         // Postman API keys can have various formats, so we'll be more lenient
         return key.length > 10 ? 'valid' : 'invalid';
+      case 'github':
+        return (key.startsWith('ghp_') || key.startsWith('github_pat_')) ? 'valid' : 'invalid';
       default:
         return 'invalid';
     }
@@ -337,6 +344,56 @@ export function ConfigPanel({ isOpen, onClose, onConfigChange }: ConfigPanelProp
             </div>
             <p className="text-xs text-gray-500">
               Get your key from <a href="https://www.postman.com/settings/api-keys" target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline">Postman Settings</a>
+            </p>
+          </div>
+
+          {/* GitHub */}
+          <div className="space-y-3">
+            <div className="flex items-center justify-between">
+              <label className="block text-sm font-medium text-gray-700">
+                GitHub Personal Access Token (Optional)
+              </label>
+              <div className="flex items-center space-x-2">
+                {getStatusIcon(getKeyStatus(apiKeys.github, 'github'))}
+                <span className="text-xs text-gray-500">
+                  {getStatusText(getKeyStatus(apiKeys.github, 'github'))}
+                </span>
+              </div>
+            </div>
+            <div className="relative">
+              <input
+                type={showKeys.github ? 'text' : 'password'}
+                value={apiKeys.github}
+                onChange={(e) => setApiKeys(prev => ({ ...prev, github: e.target.value }))}
+                placeholder="ghp_... or github_pat_..."
+                className="w-full px-3 py-2 pr-20 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-900 placeholder-gray-500"
+              />
+              <div className="absolute right-2 top-1/2 transform -translate-y-1/2 flex items-center space-x-1">
+                {apiKeys.github && (
+                  <button
+                    type="button"
+                    onClick={() => copyToClipboard('github')}
+                    className={`p-1 rounded transition-colors ${
+                      copyStatus.github 
+                        ? 'text-green-600' 
+                        : 'text-gray-400 hover:text-gray-600'
+                    }`}
+                    title="Copy to clipboard"
+                  >
+                    {copyStatus.github ? <CheckCircle className="w-4 h-4" /> : <Copy className="w-4 h-4" />}
+                  </button>
+                )}
+                <button
+                  type="button"
+                  onClick={() => toggleKeyVisibility('github')}
+                  className="p-1 text-gray-400 hover:text-gray-600"
+                >
+                  {showKeys.github ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                </button>
+              </div>
+            </div>
+            <p className="text-xs text-gray-500">
+              Get your token from <a href="https://github.com/settings/tokens" target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline">GitHub Settings</a> (requires 'repo' scope for MCP integration)
             </p>
           </div>
 
