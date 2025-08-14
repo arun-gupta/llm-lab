@@ -191,7 +191,7 @@ STEP 4: Add Your API Keys
                 '',
                 '// Performance test',
                 'pm.test("Response time is reasonable", function () {',
-                '    pm.expect(pm.response.responseTime).to.be.lessThan(25000); // 25 seconds',
+                '    pm.expect(pm.response.responseTime).to.be.lessThan(60000); // 60 seconds for Codespaces',
                 '});',
                 '',
                 '// Set collection variables for comparison',

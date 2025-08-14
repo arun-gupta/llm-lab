@@ -50,8 +50,8 @@ export async function callOpenAI(prompt: string, context?: string, model: string
   try {
     const fullPrompt = context ? `${context}\n\n${prompt}` : prompt;
     
-    // Add timeout to individual provider calls
-    const timeoutMs = 20000; // 20 seconds per provider
+    // Add timeout to individual provider calls - increased for Codespaces
+    const timeoutMs = process.env.CODESPACES ? 45000 : 20000; // 45 seconds for Codespaces, 20 for local
     
     const response = await Promise.race([
       openai.chat.completions.create({
@@ -97,8 +97,8 @@ export async function callAnthropic(prompt: string, context?: string, model: str
   try {
     const fullPrompt = context ? `${context}\n\n${prompt}` : prompt;
     
-    // Add timeout to individual provider calls
-    const timeoutMs = 20000; // 20 seconds per provider
+    // Add timeout to individual provider calls - increased for Codespaces
+    const timeoutMs = process.env.CODESPACES ? 45000 : 20000; // 45 seconds for Codespaces, 20 for local
     
     const response = await Promise.race([
       anthropic.messages.create({
@@ -172,8 +172,8 @@ export async function callOllama(prompt: string, model: string, context?: string
     const ollamaUrl = process.env.OLLAMA_BASE_URL || 'http://localhost:11434';
     const fullPrompt = context ? `${context}\n\n${prompt}` : prompt;
     
-    // Add timeout to individual provider calls
-    const timeoutMs = 20000; // 20 seconds per provider
+    // Add timeout to individual provider calls - increased for Codespaces
+    const timeoutMs = process.env.CODESPACES ? 45000 : 20000; // 45 seconds for Codespaces, 20 for local
     
     const controller = new AbortController();
     const timeoutId = setTimeout(() => controller.abort(), timeoutMs);
@@ -240,7 +240,7 @@ export async function callAllProviders(request: LLMRequest): Promise<LLMResponse
   }
   
   // Use Promise.allSettled with timeout to handle slow providers gracefully
-  const timeoutMs = 25000; // 25 seconds to stay under Postman's 30s limit
+  const timeoutMs = process.env.CODESPACES ? 60000 : 25000; // 60 seconds for Codespaces, 25 for local
   
   const timeoutPromise = new Promise<LLMResponse[]>((_, reject) => {
     setTimeout(() => reject(new Error('Request timeout')), timeoutMs);
