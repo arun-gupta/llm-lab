@@ -1,9 +1,21 @@
 # LLM Prompt Lab
 
+[![Open in GitHub Codespaces](https://github.com/codespaces/badge.svg)](https://codespaces.new/arun-gupta/llm-prompt-lab)
+
 A full-stack web application that allows you to test and compare prompts across multiple LLM providers side by side, with **advanced Postman integration**. Perfect for prompt engineering, AI experimentation, and LLM comparison.
 
 ## 🚀 Quick Start
 
+### **Option 1: GitHub Codespaces (Recommended for trying)**
+[![Open in GitHub Codespaces](https://github.com/codespaces/badge.svg)](https://codespaces.new/arun-gupta/llm-prompt-lab)
+
+Click the button above to open LLM Prompt Lab in GitHub Codespaces. This will:
+- 🚀 **Launch instantly** in your browser
+- ⚡ **Auto-install dependencies** and start the dev server
+- 🔑 **Set up environment** with example configuration
+- 🌐 **Forward port 3000** automatically
+
+### **Option 2: Local Development**
 ```bash
 # Clone and run
 git clone https://github.com/arun-gupta/llm-prompt-lab.git
@@ -32,6 +44,22 @@ POSTMAN_API_KEY=your_key_here
 ```
 
 **Get API Keys:** [OpenAI](https://platform.openai.com/) | [Anthropic](https://console.anthropic.com/) | [Postman](https://www.postman.com)
+
+### **🔑 Setting Up API Keys in Codespaces**
+
+If you're using GitHub Codespaces, you can add your API keys in two ways:
+
+**Option 1: Environment Variables (Recommended)**
+1. Go to your Codespace settings
+2. Add environment variables:
+   - `OPENAI_API_KEY`
+   - `ANTHROPIC_API_KEY` 
+   - `POSTMAN_API_KEY` (optional)
+
+**Option 2: Direct File Edit**
+1. Open `.env.local` in the Codespace
+2. Replace the placeholder values with your actual API keys
+3. Save the file - the dev server will auto-restart
 
 ## ✨ Key Features
 
