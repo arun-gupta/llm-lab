@@ -1,8 +1,13 @@
 'use client';
 
 import { useState } from 'react';
-import { LLMForm } from '@/components/LLMForm';
-import { ResponseTabs } from '@/components/ResponseTabs';
+import { TabNavigation, TabType } from '@/components/TabNavigation';
+import { HomeTab } from '@/components/tabs/HomeTab';
+import { TestTab } from '@/components/tabs/TestTab';
+import { CompareTab } from '@/components/tabs/CompareTab';
+import { CollectionsTab } from '@/components/tabs/CollectionsTab';
+import { AnalyticsTab } from '@/components/tabs/AnalyticsTab';
+import { SettingsTab } from '@/components/tabs/SettingsTab';
 import { PostmanSetupGuide } from '@/components/PostmanSetupGuide';
 import { ApiKeyStatusIndicator } from '@/components/ApiKeyStatusIndicator';
 import { CollectionPreview } from '@/components/CollectionPreview';
@@ -13,164 +18,28 @@ import { generatePostmanCollection, createPostmanCollection } from '@/lib/postma
 import { Download, Zap, Globe, Code, Github, Settings } from 'lucide-react';
 
 export default function Home() {
-  const [responses, setResponses] = useState<LLMResponse[]>([]);
-  const [isLoading, setIsLoading] = useState(false);
-  const [selectedProviders, setSelectedProviders] = useState<string[]>([]);
-  const [formData, setFormData] = useState<{ prompt: string; context?: string } | null>(null);
-  const [showPostmanSetup, setShowPostmanSetup] = useState(false);
+  // Tab navigation state
+  const [activeTab, setActiveTab] = useState<TabType>('home');
+  
+  // API key status state
   const [apiKeyStatus, setApiKeyStatus] = useState<any>({});
+  const [apiKeyRefreshTrigger, setApiKeyRefreshTrigger] = useState(0);
+  
+  // Postman integration states
+  const [showPostmanSetup, setShowPostmanSetup] = useState(false);
   const [showCollectionPreview, setShowCollectionPreview] = useState(false);
   const [isCreatingCollection, setIsCreatingCollection] = useState(false);
-  const [activeTab, setActiveTab] = useState<'responses' | 'analytics'>('responses');
   
   // Success celebration states
   const [showSuccessCelebration, setShowSuccessCelebration] = useState(false);
   const [celebrationType, setCelebrationType] = useState<'collection-created' | 'api-key-setup' | 'first-response' | 'postman-connected'>('first-response');
   const [celebrationData, setCelebrationData] = useState<any>({});
 
-  // Track if this is the first response
-  const [hasGeneratedFirstResponse, setHasGeneratedFirstResponse] = useState(false);
-
   // Track if we've shown the Postman connected celebration
   const [hasShownPostmanConnected, setHasShownPostmanConnected] = useState(false);
 
   // Config panel state
   const [showConfigPanel, setShowConfigPanel] = useState(false);
-  
-  // Refresh trigger for API key status
-  const [apiKeyRefreshTrigger, setApiKeyRefreshTrigger] = useState(0);
-
-  const createPostmanCollectionInWorkspace = async () => {
-    if (responses.length === 0) return;
-    
-    // Show preview first
-    setShowCollectionPreview(true);
-  };
-
-  const handleConfirmCollectionCreation = async (createInWeb: boolean = true, collectionName?: string, collection?: any, environment?: any) => {
-    setIsCreatingCollection(true);
-    try {
-      // Use provided collection and environment, or generate them
-      const finalCollection = collection || generatePostmanCollection(
-        formData?.prompt || '',
-        formData?.context,
-        responses,
-        collectionName
-      );
-      
-      const response = await fetch('/api/postman/create-collection', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ 
-          collection: finalCollection,
-          environment,
-          createInWeb 
-        }),
-      });
-      
-      const result = await response.json();
-      
-      if (result.success) {
-        if (createInWeb) {
-          // Open in web browser
-          window.open(result.collectionUrl, '_blank');
-        } else {
-          // For desktop, we'll use a postman:// URL scheme
-          const desktopUrl = result.collectionUrl.replace('https://go.postman.co', 'postman://');
-          window.open(desktopUrl, '_blank');
-        }
-        setShowCollectionPreview(false);
-        
-        // Show collection created celebration
-        setCelebrationType('collection-created');
-        setCelebrationData({ 
-          collectionUrl: result.collectionUrl,
-          environmentUrl: result.environmentUrl,
-          hasEnvironment: !!result.environmentId
-        });
-        setShowSuccessCelebration(true);
-      } else {
-        // Fallback to download if API key not configured or failed
-        const blob = new Blob([JSON.stringify(collection, null, 2)], { type: 'application/json' });
-        const url = URL.createObjectURL(blob);
-        const a = document.createElement('a');
-        a.href = url;
-        a.download = 'llm-api-explorer-collection.json';
-        document.body.appendChild(a);
-        a.click();
-        document.body.removeChild(a);
-        URL.revokeObjectURL(url);
-        setShowCollectionPreview(false);
-      }
-    } catch (error) {
-      console.error('Failed to create Postman collection:', error);
-      // Fallback to download on error
-      const collection = generatePostmanCollection(
-        formData?.prompt || '',
-        formData?.context,
-        responses
-      );
-      const blob = new Blob([JSON.stringify(collection, null, 2)], { type: 'application/json' });
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = 'llm-api-explorer-collection.json';
-      document.body.appendChild(a);
-      a.click();
-      document.body.removeChild(a);
-      URL.revokeObjectURL(url);
-      setShowCollectionPreview(false);
-    } finally {
-      setIsCreatingCollection(false);
-    }
-  };
-
-  const handleLoadingChange = (loading: boolean) => {
-    setIsLoading(loading);
-    // Auto-switch to responses tab when starting to load
-    if (loading) {
-      setActiveTab('responses');
-      // Scroll to responses area when loading starts
-      setTimeout(() => {
-        const responsesElement = document.getElementById('responses-section');
-        if (responsesElement) {
-          responsesElement.scrollIntoView({ 
-            behavior: 'smooth', 
-            block: 'start' 
-          });
-        }
-      }, 100); // Small delay to ensure tab switch happens first
-    }
-  };
-
-  const handleResponsesChange = (newResponses: LLMResponse[]) => {
-    setResponses(newResponses);
-    // Auto-switch to responses tab when new responses arrive
-    if (newResponses.length > 0) {
-      setActiveTab('responses');
-      // Scroll to responses area when responses arrive
-      setTimeout(() => {
-        const responsesElement = document.getElementById('responses-section');
-        if (responsesElement) {
-          responsesElement.scrollIntoView({ 
-            behavior: 'smooth', 
-            block: 'start' 
-          });
-        }
-      }, 100);
-
-      // Show first response celebration
-      if (!hasGeneratedFirstResponse) {
-        setHasGeneratedFirstResponse(true);
-        setCelebrationType('first-response');
-        setCelebrationData({ 
-          provider: newResponses[0]?.provider,
-          responseCount: newResponses.length 
-        });
-        setShowSuccessCelebration(true);
-      }
-    }
-  };
 
   const handleApiKeyStatusChange = (status: any) => {
     setApiKeyStatus(status);
@@ -185,17 +54,8 @@ export default function Home() {
   };
 
   const handleHomeClick = () => {
-    // Reset all state to initial values
-    setResponses([]);
-    setIsLoading(false);
-    setActiveTab('responses');
-    setFormData(null);
-    setShowPostmanSetup(false);
-    setShowCollectionPreview(false);
-    setIsCreatingCollection(false);
-    setHasGeneratedFirstResponse(false);
-    setHasShownPostmanConnected(false);
-    setShowSuccessCelebration(false);
+    // Navigate to home tab
+    setActiveTab('home');
     
     // Scroll to top of page
     window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -236,25 +96,6 @@ export default function Home() {
                 <span>Configure</span>
               </button>
               
-              {responses.length > 0 && (
-                <>
-                  <button
-                    onClick={createPostmanCollectionInWorkspace}
-                    className="flex items-center space-x-2 px-3 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors text-sm"
-                  >
-                    <Download className="w-4 h-4" />
-                    <span>{apiKeyStatus.postman === 'configured' ? 'Create in Postman' : 'Download All Postman'}</span>
-                  </button>
-                  <button
-                    onClick={() => setShowPostmanSetup(true)}
-                    className="flex items-center space-x-2 px-3 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors text-sm"
-                  >
-                    <span>⚙️</span>
-                    <span>Setup Guide</span>
-                  </button>
-                </>
-              )}
-              
               <a
                 href="https://github.com/arun-gupta/llm-prompt-lab"
                 target="_blank"
@@ -269,34 +110,31 @@ export default function Home() {
         </div>
       </header>
 
-      {/* Main Content with top padding to account for fixed header */}
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 pt-20">
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-          {/* Left Column - Form */}
-          <div className="lg:col-span-1">
-            <div className="sticky top-8">
-              <LLMForm 
-                onResponsesChange={handleResponsesChange}
-                onLoadingChange={handleLoadingChange}
-                onProvidersChange={setSelectedProviders}
-                onFormDataChange={setFormData}
-              />
-            </div>
-          </div>
+      {/* Tab Navigation */}
+      <div className="pt-16">
+        <TabNavigation activeTab={activeTab} onTabChange={setActiveTab} />
+      </div>
 
-          {/* Right Column - Output */}
-          <div className="lg:col-span-2" id="responses-section">
-            <ResponseTabs 
-              responses={responses}
-              prompt={formData?.prompt || ''}
-              context={formData?.context || ''}
-              isLoading={isLoading}
-              selectedProviders={selectedProviders}
-              activeTab={activeTab}
-              onTabChange={setActiveTab}
-            />
-          </div>
-        </div>
+      {/* Tab Content */}
+      <main className="pt-8">
+        {activeTab === 'home' && (
+          <HomeTab onTabChange={setActiveTab} apiKeyStatus={apiKeyStatus} />
+        )}
+        {activeTab === 'test' && (
+          <TestTab onTabChange={setActiveTab} />
+        )}
+        {activeTab === 'compare' && (
+          <CompareTab />
+        )}
+        {activeTab === 'collections' && (
+          <CollectionsTab />
+        )}
+        {activeTab === 'analytics' && (
+          <AnalyticsTab />
+        )}
+        {activeTab === 'settings' && (
+          <SettingsTab />
+        )}
       </main>
 
       {/* Footer */}
@@ -321,10 +159,10 @@ export default function Home() {
       <CollectionPreview
         isOpen={showCollectionPreview}
         onClose={() => setShowCollectionPreview(false)}
-        onConfirm={handleConfirmCollectionCreation}
-        prompt={formData?.prompt || ''}
-        context={formData?.context}
-        responses={responses}
+        onConfirm={() => console.log('Collection creation coming soon...')}
+        prompt=""
+        context=""
+        responses={[]}
         isCreating={isCreatingCollection}
       />
 
