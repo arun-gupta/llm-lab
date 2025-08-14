@@ -14,6 +14,7 @@ Click the button at the top of this README to open LLM Prompt Lab in GitHub Code
 - 🔑 **Set up environment** with example configuration
 - 🌐 **Forward port 3000** automatically
 - 📋 **Show detailed logs** during setup (use Cmd/Ctrl + Shift + P → "View Creation Log")
+- 💻 **Use 4-core machine** with 8GB RAM for optimal LLM performance
 
 ### **Option 2: Local Development**
 ```bash
