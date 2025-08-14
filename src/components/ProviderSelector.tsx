@@ -22,6 +22,7 @@ interface OllamaModel {
   name: string;
   model: string;
   size: number;
+  size_vram?: number;
 }
 
 interface ProviderSelectorProps {
@@ -115,8 +116,11 @@ export function ProviderSelector({
     color: 'border-purple-200 bg-purple-50',
     type: 'local' as const,
     cost: 'low' as const,
-    description: model.size_vram ? `${(model.size_vram / (1024 * 1024 * 1024)).toFixed(1)}GB VRAM` : 'Running'
+    description: (model as any).size_vram ? `${((model as any).size_vram / (1024 * 1024 * 1024)).toFixed(1)}GB VRAM` : 'Running'
   }));
+
+  // Combine all providers
+  const allProviders = [...staticProviders, ...ollamaProviders];
 
   const toggleProvider = (providerId: string) => {
     if (selectedProviders.includes(providerId)) {
@@ -136,7 +140,7 @@ export function ProviderSelector({
   };
 
   const selectAll = () => {
-    onProvidersChange(allProviders.map(p => p.id));
+    onProvidersChange(allProviders.map((p: any) => p.id));
   };
 
   const selectNone = () => {

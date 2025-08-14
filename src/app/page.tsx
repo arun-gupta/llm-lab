@@ -5,6 +5,7 @@ import { LLMForm } from '@/components/LLMForm';
 import { ResponseTabs } from '@/components/ResponseTabs';
 import { PostmanSetupGuide } from '@/components/PostmanSetupGuide';
 import { PostmanStatusIndicator } from '@/components/PostmanStatusIndicator';
+import { CollectionPreview } from '@/components/CollectionPreview';
 import { LLMResponse } from '@/lib/llm-apis';
 import { generatePostmanCollection, createPostmanCollection } from '@/lib/postman';
 import { Download, Zap, Globe, Code, Github } from 'lucide-react';
@@ -16,35 +17,39 @@ export default function Home() {
   const [formData, setFormData] = useState<{ prompt: string; context?: string } | null>(null);
   const [showPostmanSetup, setShowPostmanSetup] = useState(false);
   const [postmanConfigured, setPostmanConfigured] = useState(false);
+  const [showCollectionPreview, setShowCollectionPreview] = useState(false);
+  const [isCreatingCollection, setIsCreatingCollection] = useState(false);
 
   const createPostmanCollectionInWorkspace = async () => {
     if (responses.length === 0) return;
+    
+    // Show preview first
+    setShowCollectionPreview(true);
+  };
 
-    const collection = generatePostmanCollection(
-      'LLM Prompt Lab Collection',
-      'Generated from LLM Prompt Lab',
-      responses
-    );
-
+  const handleConfirmCollectionCreation = async () => {
+    setIsCreatingCollection(true);
     try {
+      const collection = generatePostmanCollection(
+        formData?.prompt || '',
+        formData?.context,
+        responses
+      );
+      
       const response = await fetch('/api/postman/create-collection', {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ collection }),
       });
-
+      
       const result = await response.json();
-
+      
       if (result.success) {
-        // Open the collection directly in Postman
         window.open(result.collectionUrl, '_blank');
+        setShowCollectionPreview(false);
       } else {
         // Fallback to download if API key not configured or failed
-        const blob = new Blob([JSON.stringify(collection, null, 2)], {
-          type: 'application/json',
-        });
+        const blob = new Blob([JSON.stringify(collection, null, 2)], { type: 'application/json' });
         const url = URL.createObjectURL(blob);
         const a = document.createElement('a');
         a.href = url;
@@ -53,13 +58,17 @@ export default function Home() {
         a.click();
         document.body.removeChild(a);
         URL.revokeObjectURL(url);
+        setShowCollectionPreview(false);
       }
     } catch (error) {
       console.error('Failed to create Postman collection:', error);
       // Fallback to download on error
-      const blob = new Blob([JSON.stringify(collection, null, 2)], {
-        type: 'application/json',
-      });
+      const collection = generatePostmanCollection(
+        formData?.prompt || '',
+        formData?.context,
+        responses
+      );
+      const blob = new Blob([JSON.stringify(collection, null, 2)], { type: 'application/json' });
       const url = URL.createObjectURL(blob);
       const a = document.createElement('a');
       a.href = url;
@@ -68,6 +77,9 @@ export default function Home() {
       a.click();
       document.body.removeChild(a);
       URL.revokeObjectURL(url);
+      setShowCollectionPreview(false);
+    } finally {
+      setIsCreatingCollection(false);
     }
   };
 
@@ -167,6 +179,17 @@ export default function Home() {
       <PostmanSetupGuide 
         isOpen={showPostmanSetup} 
         onClose={() => setShowPostmanSetup(false)} 
+      />
+
+      {/* Collection Preview */}
+      <CollectionPreview
+        isOpen={showCollectionPreview}
+        onClose={() => setShowCollectionPreview(false)}
+        onConfirm={handleConfirmCollectionCreation}
+        prompt={formData?.prompt || ''}
+        context={formData?.context}
+        responses={responses}
+        isCreating={isCreatingCollection}
       />
     </div>
   );

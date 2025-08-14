@@ -5,6 +5,7 @@ import { LLMResponse } from '@/lib/llm-apis';
 import { generatePostmanCollection } from '@/lib/postman';
 import { Download, Copy, Check, AlertCircle, Clock, Zap } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { CollectionPreview } from './CollectionPreview';
 
 interface ResponseCardProps {
   response: LLMResponse;
@@ -15,6 +16,8 @@ interface ResponseCardProps {
 export function ResponseCard({ response, prompt, context }: ResponseCardProps) {
   const [copied, setCopied] = useState(false);
   const [downloading, setDownloading] = useState(false);
+  const [showCollectionPreview, setShowCollectionPreview] = useState(false);
+  const [isCreatingCollection, setIsCreatingCollection] = useState(false);
 
   const copyToClipboard = async () => {
     try {
@@ -27,23 +30,26 @@ export function ResponseCard({ response, prompt, context }: ResponseCardProps) {
   };
 
   const createPostmanCollectionForResponse = async () => {
-    setDownloading(true);
+    // Show preview first
+    setShowCollectionPreview(true);
+  };
+
+  const handleConfirmCollectionCreation = async () => {
+    setIsCreatingCollection(true);
     try {
       const collection = generatePostmanCollection(prompt, context, [response]);
       
       const apiResponse = await fetch('/api/postman/create-collection', {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ collection }),
       });
 
       const result = await apiResponse.json();
       
       if (result.success) {
-        // Open the collection directly in Postman
         window.open(result.collectionUrl, '_blank');
+        setShowCollectionPreview(false);
       } else {
         // Fallback to download if API key not configured
         const blob = new Blob([JSON.stringify(collection, null, 2)], {
@@ -57,6 +63,7 @@ export function ResponseCard({ response, prompt, context }: ResponseCardProps) {
         a.click();
         document.body.removeChild(a);
         URL.revokeObjectURL(url);
+        setShowCollectionPreview(false);
       }
     } catch (error) {
       console.error('Failed to create Postman collection:', error);
@@ -73,8 +80,9 @@ export function ResponseCard({ response, prompt, context }: ResponseCardProps) {
       a.click();
       document.body.removeChild(a);
       URL.revokeObjectURL(url);
+      setShowCollectionPreview(false);
     } finally {
-      setDownloading(false);
+      setIsCreatingCollection(false);
     }
   };
 
@@ -196,6 +204,17 @@ export function ResponseCard({ response, prompt, context }: ResponseCardProps) {
           <span>{downloading ? 'Creating...' : 'Create in Postman'}</span>
         </button>
       </div>
+
+      {/* Collection Preview */}
+      <CollectionPreview
+        isOpen={showCollectionPreview}
+        onClose={() => setShowCollectionPreview(false)}
+        onConfirm={handleConfirmCollectionCreation}
+        prompt={prompt}
+        context={context}
+        responses={[response]}
+        isCreating={isCreatingCollection}
+      />
     </div>
   );
 } 
