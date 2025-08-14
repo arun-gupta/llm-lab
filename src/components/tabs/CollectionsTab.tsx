@@ -1,8 +1,10 @@
 'use client';
 
-import { Library, Plus, Search, Star, Download, Share2, Users, TrendingUp, Code, Zap, Database, Globe } from 'lucide-react';
+import { useState } from 'react';
+import { Library, Plus, Search, Star, Download, Share2, Users, TrendingUp, Code, Zap, Database, Globe, X } from 'lucide-react';
 
 export function CollectionsTab() {
+  const [showInstallModal, setShowInstallModal] = useState(false);
   const features = [
     {
       icon: Library,
@@ -225,12 +227,7 @@ export function CollectionsTab() {
         <div className="text-center">
           <div className="flex justify-center space-x-4">
             <button 
-              onClick={() => {
-                // Open collection directly in Postman
-                const collectionUrl = `${window.location.origin}/postman-collections/mcp-integration-demo.json`;
-                const postmanUrl = `https://go.postman.co/import?url=${encodeURIComponent(collectionUrl)}`;
-                window.open(postmanUrl, '_blank');
-              }}
+              onClick={() => setShowInstallModal(true)}
               className="flex items-center space-x-2 px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
             >
               <Download className="w-4 h-4" />
@@ -301,6 +298,72 @@ export function CollectionsTab() {
           🚧 The public gallery is currently in development. Stay tuned for the launch!
         </div>
       </div>
+
+      {/* Install Modal */}
+      {showInstallModal && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white rounded-lg p-8 max-w-md w-full mx-4">
+            <div className="flex items-center justify-between mb-6">
+              <h3 className="text-xl font-semibold text-gray-900">Install MCP Collection</h3>
+              <button
+                onClick={() => setShowInstallModal(false)}
+                className="text-gray-400 hover:text-gray-600"
+              >
+                <X className="w-6 h-6" />
+              </button>
+            </div>
+            
+            <div className="space-y-4">
+              <p className="text-gray-600">
+                Choose how you'd like to install the MCP Integration collection:
+              </p>
+              
+              <div className="space-y-3">
+                <button
+                  onClick={() => {
+                    const link = document.createElement('a');
+                    link.href = '/postman-collections/mcp-integration-demo.json';
+                    link.download = 'mcp-integration-demo.json';
+                    link.click();
+                    setShowInstallModal(false);
+                  }}
+                  className="w-full flex items-center space-x-3 p-4 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors"
+                >
+                  <Download className="w-5 h-5 text-blue-600" />
+                  <div className="text-left">
+                    <div className="font-medium text-gray-900">Download & Import</div>
+                    <div className="text-sm text-gray-600">Download the collection file and import it manually</div>
+                  </div>
+                </button>
+                
+                <button
+                  onClick={() => {
+                    const collectionUrl = `${window.location.origin}/postman-collections/mcp-integration-demo.json`;
+                    const postmanUrl = `https://go.postman.co/import?url=${encodeURIComponent(collectionUrl)}`;
+                    window.open(postmanUrl, '_blank');
+                    setShowInstallModal(false);
+                  }}
+                  className="w-full flex items-center space-x-3 p-4 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors"
+                >
+                  <Code className="w-5 h-5 text-green-600" />
+                  <div className="text-left">
+                    <div className="font-medium text-gray-900">Direct Import (Production)</div>
+                    <div className="text-sm text-gray-600">Open directly in Postman (works best in production)</div>
+                  </div>
+                </button>
+              </div>
+              
+              <div className="mt-6 p-4 bg-blue-50 rounded-lg">
+                <h4 className="font-medium text-blue-900 mb-2">💡 Tip</h4>
+                <p className="text-sm text-blue-800">
+                  If you're running locally (localhost), use "Download & Import" to avoid security blocks. 
+                  For production deployments, "Direct Import" works seamlessly.
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
