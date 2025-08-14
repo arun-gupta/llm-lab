@@ -1,7 +1,7 @@
 {
   "info": {
     "name": "MCP Server Integration Demo",
-    "description": "Demonstrates how to integrate popular MCP servers with Postman for enhanced API testing and automation.\n\n🔧 **Real GitHub Remote MCP Server Integration**\nThis collection connects to the official GitHub Remote MCP server at api.githubcopilot.com for real GitHub operations!\n\n🔑 **Authentication Configured**\n• GitHub Personal Access Token is pre-configured\n• Token has 'repo' scope for full functionality\n• Ready to test real GitHub operations\n\n📋 **What's Included**\n• GitHub Remote MCP Server (real repositories, issues)\n• File System MCP (read files, search files)\n• Web Search MCP (search, weather data)\n• Database MCP (query execution)\n• Multi-MCP Orchestration (combine multiple servers)\n\n✅ **Ready to Use**\n• Real GitHub MCP server integration\n• Official GitHub Copilot MCP endpoints\n• Proper MCP protocol implementation\n• Pre-configured authentication\n• Clear error messages and setup instructions\n\n🎯 **Perfect for Learning**\n• See how real MCP server integration works\n• Understand the MCP protocol with GitHub\n• Learn Postman script best practices\n• Explore official GitHub MCP tools\n\n🚀 **Quick Start**\n1. Import this collection into Postman\n2. The GitHub token is already configured\n3. Run the GitHub requests to see real data\n4. Try the 'Test GitHub Token' request first to verify authentication",
+    "description": "Demonstrates how to integrate popular MCP servers with Postman for enhanced API testing and automation.\n\n🔧 **Real GitHub Remote MCP Server Integration**\nThis collection connects to the official GitHub Remote MCP server at api.githubcopilot.com for real GitHub operations!\n\n🔑 **Dynamic Authentication**\n• GitHub Personal Access Token is auto-loaded from .env.local\n• Token has 'repo' scope for full functionality\n• Ready to test real GitHub operations\n\n📋 **What's Included**\n• GitHub Remote MCP Server (real repositories, issues)\n• File System MCP (read files, search files)\n• Web Search MCP (search, weather data)\n• Database MCP (query execution)\n• Multi-MCP Orchestration (combine multiple servers)\n\n✅ **Ready to Use**\n• Real GitHub MCP server integration\n• Official GitHub Copilot MCP endpoints\n• Proper MCP protocol implementation\n• Auto-configured authentication from .env.local\n• Clear error messages and setup instructions\n\n🎯 **Perfect for Learning**\n• See how real MCP server integration works\n• Understand the MCP protocol with GitHub\n• Learn Postman script best practices\n• Explore official GitHub MCP tools\n\n🚀 **Quick Start**\n1. Import this collection into Postman\n2. GitHub token is auto-loaded from .env.local\n3. Run the GitHub requests to see real data\n4. Try the 'Test GitHub Token' request first to verify authentication",
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
   },
   "variable": [
@@ -12,7 +12,7 @@
     },
     {
       "key": "github_token",
-      "value": "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",
+      "value": "{{github_token}}",
       "type": "string"
     },
     {
@@ -335,7 +335,7 @@
                   "",
                   "  // Check if GitHub token is configured",
                   "  const githubToken = pm.environment.get('github_token');",
-                  "  if (!githubToken || githubToken === 'your_github_personal_access_token_here' || githubToken === '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') {",
+                  "  if (!githubToken || githubToken === 'your_github_personal_access_token_here' || githubToken === '{{github_token}}') {",
                   "    console.warn('GitHub token not configured or using placeholder. Using mock data instead.');",
                   "    // Use mock data as fallback",
                   "    const mockRepos = [",
@@ -662,7 +662,7 @@
                   "try {",
                   "  // Check if GitHub token is configured",
                   "  const githubToken = pm.environment.get('github_token');",
-                  "  if (!githubToken || githubToken === 'your_github_personal_access_token_here' || githubToken === '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') {",
+                  "  if (!githubToken || githubToken === 'your_github_personal_access_token_here' || githubToken === '{{github_token}}') {",
                   "    console.warn('GitHub token not configured or using placeholder. Using mock issue creation instead.');",
                   "    // Use mock data as fallback",
                   "    const mockIssue = {",

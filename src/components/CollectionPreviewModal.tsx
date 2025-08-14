@@ -23,8 +23,23 @@ export function CollectionPreviewModal({ isOpen, onClose, onDeploy, collectionUr
   useEffect(() => {
     if (isOpen && collectionUrl) {
       loadCollection();
+      loadGitHubToken();
     }
   }, [isOpen, collectionUrl]);
+
+  const loadGitHubToken = async () => {
+    try {
+      const response = await fetch('/api/github/token');
+      if (response.ok) {
+        const data = await response.json();
+        if (data.configured && data.token) {
+          setGithubToken(data.token);
+        }
+      }
+    } catch (error) {
+      console.log('Could not load GitHub token from .env.local:', error);
+    }
+  };
 
   const loadCollection = async () => {
     setIsLoading(true);
@@ -248,18 +263,23 @@ export function CollectionPreviewModal({ isOpen, onClose, onDeploy, collectionUr
                   )}
                 </button>
               </div>
-                               <div className="text-xs text-gray-500">
-                   Required for GitHub MCP server integration. 
-                   <a 
-                     href="https://github.com/settings/tokens" 
-                     target="_blank" 
-                     rel="noopener noreferrer"
-                     className="text-blue-600 hover:text-blue-800 ml-1"
-                   >
-                     Generate token →
-                   </a>
-                   <span className="text-green-600 ml-2">✅ Pre-configured token available</span>
-                 </div>
+              <div className="text-xs text-gray-500">
+                {githubToken ? (
+                  <span className="text-green-600">✅ Auto-loaded from .env.local</span>
+                ) : (
+                  <>
+                    Required for GitHub MCP server integration. 
+                    <a 
+                      href="https://github.com/settings/tokens" 
+                      target="_blank" 
+                      rel="noopener noreferrer"
+                      className="text-blue-600 hover:text-blue-800 ml-1"
+                    >
+                      Generate token →
+                    </a>
+                  </>
+                )}
+              </div>
             </div>
           </div>
 
