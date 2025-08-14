@@ -473,27 +473,44 @@ Collection URL: ${collectionUrl}`);
       <CollectionPreviewModal
         isOpen={showPreviewModal}
         onClose={() => setShowPreviewModal(false)}
-        onDeploy={async (collection, collectionName, createInWeb) => {
-          try {
-            // Create collection via Postman API
-            const apiResponse = await fetch('/api/postman/create-collection', {
-              method: 'POST',
-              headers: {
-                'Content-Type': 'application/json',
-              },
-              body: JSON.stringify({
-                collection: collection,
-                createInWeb: createInWeb,
-              }),
-            });
+        onDeploy={async (collection, collectionName, createInWeb, githubToken) => {
+                      try {
+              // Update collection with GitHub token if provided
+              if (githubToken) {
+                // Update the github_token variable in the collection
+                if (collection.variable) {
+                  const githubTokenVar = collection.variable.find(v => v.key === 'github_token');
+                  if (githubTokenVar) {
+                    githubTokenVar.value = githubToken;
+                  } else {
+                    collection.variable.push({
+                      key: 'github_token',
+                      value: githubToken,
+                      type: 'string'
+                    });
+                  }
+                }
+              }
+
+              // Create collection via Postman API
+              const apiResponse = await fetch('/api/postman/create-collection', {
+                method: 'POST',
+                headers: {
+                  'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                  collection: collection,
+                  createInWeb: createInWeb,
+                }),
+              });
             
             const result = await apiResponse.json();
             
-            if (result.success) {
-              // Show success message
-              const successMessage = `✅ Collection "${collectionName}" created successfully in Postman ${createInWeb ? 'Web' : 'Desktop'}!
+                          if (result.success) {
+                // Show success message
+                const successMessage = `✅ Collection "${collectionName}" created successfully in Postman ${createInWeb ? 'Web' : 'Desktop'}!
               
-Collection URL: ${result.collectionUrl}`;
+Collection URL: ${result.collectionUrl}${githubToken ? '\n\n🔑 GitHub token has been configured in the collection!' : '\n\n⚠️ Remember to configure your GitHub token in Postman for GitHub MCP integration.'}`;
 
               if (!createInWeb) {
                 // For Desktop deployment, try to open Postman Desktop once

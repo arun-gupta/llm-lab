@@ -17,6 +17,8 @@ export function CollectionPreviewModal({ isOpen, onClose, onDeploy, collectionUr
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [createInWeb, setCreateInWeb] = useState(false);
+  const [githubToken, setGithubToken] = useState('');
+  const [showGithubToken, setShowGithubToken] = useState(false);
 
   useEffect(() => {
     if (isOpen && collectionUrl) {
@@ -58,7 +60,7 @@ export function CollectionPreviewModal({ isOpen, onClose, onDeploy, collectionUr
       const deployMessage = `🚀 Deploying "${collectionName}" to Postman ${createInWeb ? 'Web' : 'Desktop'}...`;
       alert(deployMessage);
       
-      onDeploy(updatedCollection, collectionName, createInWeb);
+      onDeploy(updatedCollection, collectionName, createInWeb, githubToken);
     }
   };
 
@@ -218,6 +220,50 @@ export function CollectionPreviewModal({ isOpen, onClose, onDeploy, collectionUr
 
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">
+              GitHub Personal Access Token
+            </label>
+            <div className="space-y-2">
+              <div className="relative">
+                <input
+                  type={showGithubToken ? "text" : "password"}
+                  value={githubToken}
+                  onChange={(e) => setGithubToken(e.target.value)}
+                  className="w-full px-3 py-2 pr-10 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  placeholder="ghp_your_github_token_here"
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowGithubToken(!showGithubToken)}
+                  className="absolute inset-y-0 right-0 pr-3 flex items-center"
+                >
+                  {showGithubToken ? (
+                    <svg className="h-5 w-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.878 9.878L3 3m6.878 6.878L21 21" />
+                    </svg>
+                  ) : (
+                    <svg className="h-5 w-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                    </svg>
+                  )}
+                </button>
+              </div>
+              <div className="text-xs text-gray-500">
+                Required for GitHub MCP server integration. 
+                <a 
+                  href="https://github.com/settings/tokens" 
+                  target="_blank" 
+                  rel="noopener noreferrer"
+                  className="text-blue-600 hover:text-blue-800 ml-1"
+                >
+                  Generate token →
+                </a>
+              </div>
+            </div>
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">
               Deployment Target
             </label>
             <div className="space-y-2">
@@ -265,6 +311,12 @@ export function CollectionPreviewModal({ isOpen, onClose, onDeploy, collectionUr
             <span>Total Requests:</span>
             <span className="font-medium">{getRequestCount()}</span>
           </div>
+          <div className="flex justify-between">
+            <span>GitHub Token:</span>
+            <span className={`font-medium ${githubToken ? 'text-green-700' : 'text-red-700'}`}>
+              {githubToken ? '✅ Configured' : '❌ Not configured'}
+            </span>
+          </div>
         </div>
         <div className="mt-3 p-3 bg-blue-100 rounded-lg">
           <p className="text-xs text-blue-900">
@@ -273,6 +325,11 @@ export function CollectionPreviewModal({ isOpen, onClose, onDeploy, collectionUr
               : 'Postman Desktop will attempt to open automatically after deployment. Make sure it\'s installed from postman.com/downloads/'
             }
           </p>
+          {!githubToken && (
+            <p className="text-xs text-red-700 mt-2">
+              <strong>⚠️ Note:</strong> GitHub token is required for GitHub MCP server integration to work properly.
+            </p>
+          )}
         </div>
       </div>
     </div>
