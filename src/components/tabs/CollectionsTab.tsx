@@ -2,9 +2,11 @@
 
 import { useState } from 'react';
 import { Library, Plus, Search, Star, Download, Share2, Users, TrendingUp, Code, Zap, Database, Globe, X } from 'lucide-react';
+import { CollectionPreviewModal } from '../CollectionPreviewModal';
 
 export function CollectionsTab() {
   const [showInstallModal, setShowInstallModal] = useState(false);
+  const [showPreviewModal, setShowPreviewModal] = useState(false);
   const features = [
     {
       icon: Library,
@@ -227,11 +229,18 @@ export function CollectionsTab() {
         <div className="text-center">
           <div className="flex justify-center space-x-4">
             <button 
-              onClick={() => setShowInstallModal(true)}
+              onClick={() => setShowPreviewModal(true)}
               className="flex items-center space-x-2 px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
             >
               <Download className="w-4 h-4" />
-              <span>Install in Postman</span>
+              <span>Preview & Deploy</span>
+            </button>
+            <button 
+              onClick={() => setShowInstallModal(true)}
+              className="flex items-center space-x-2 px-6 py-3 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors"
+            >
+              <Code className="w-4 h-4" />
+              <span>Quick Install</span>
             </button>
             <button 
               onClick={() => window.open('/docs/MCP-POSTMAN-INTEGRATION.md', '_blank')}
@@ -475,6 +484,49 @@ The collection URL is: ${collectionUrl}`;
           </div>
         </div>
       )}
+
+      {/* Collection Preview Modal */}
+      <CollectionPreviewModal
+        isOpen={showPreviewModal}
+        onClose={() => setShowPreviewModal(false)}
+        onDeploy={async (collection, collectionName, createInWeb) => {
+          try {
+            // Create collection via Postman API
+            const apiResponse = await fetch('/api/postman/create-collection', {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+              },
+              body: JSON.stringify({
+                collection: collection,
+                createInWeb: createInWeb,
+              }),
+            });
+            
+            const result = await apiResponse.json();
+            
+            if (result.success) {
+              alert(`✅ Collection "${collectionName}" created successfully in Postman ${createInWeb ? 'Web' : 'Desktop'}!
+              
+Collection URL: ${result.collectionUrl}
+
+You can now open Postman to see your new collection.`);
+            } else {
+              throw new Error(result.message || 'Failed to create collection');
+            }
+          } catch (error) {
+            console.error('Error creating collection:', error);
+            alert(`❌ Failed to create collection in Postman.
+
+Error: ${error instanceof Error ? error.message : 'Unknown error'}
+
+Please try the "Quick Install" option instead.`);
+          }
+          
+          setShowPreviewModal(false);
+        }}
+        collectionUrl="/postman-collections/mcp-integration-demo.json"
+      />
     </div>
   );
 }
