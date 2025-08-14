@@ -513,18 +513,19 @@ function getProviderUrl(provider: string): string {
     return 'http://localhost:11434/api/generate';
   }
   
-  switch (provider.toLowerCase()) {
-    case 'openai':
-      return 'https://api.openai.com/v1/chat/completions';
-    case 'anthropic':
-      return 'https://api.anthropic.com/v1/messages';
-    case 'cohere':
-      return 'https://api.cohere.ai/v1/generate';
-    case 'mistral':
-      return 'https://api.mistral.ai/v1/chat/completions';
-    default:
-      return 'https://api.openai.com/v1/chat/completions';
+  // Use includes() to match provider names within complex strings
+  if (provider.toLowerCase().includes('openai')) {
+    return 'https://api.openai.com/v1/chat/completions';
+  } else if (provider.toLowerCase().includes('anthropic')) {
+    return 'https://api.anthropic.com/v1/messages';
+  } else if (provider.toLowerCase().includes('cohere')) {
+    return 'https://api.cohere.ai/v1/generate';
+  } else if (provider.toLowerCase().includes('mistral')) {
+    return 'https://api.mistral.ai/v1/chat/completions';
   }
+  
+  // Fallback to OpenAI
+  return 'https://api.openai.com/v1/chat/completions';
 }
 
 function getProviderHost(provider: string): string {
@@ -532,18 +533,19 @@ function getProviderHost(provider: string): string {
     return 'localhost:11434';
   }
   
-  switch (provider.toLowerCase()) {
-    case 'openai':
-      return 'api.openai.com';
-    case 'anthropic':
-      return 'api.anthropic.com';
-    case 'cohere':
-      return 'api.cohere.ai';
-    case 'mistral':
-      return 'api.mistral.ai';
-    default:
-      return 'api.openai.com';
+  // Use includes() to match provider names within complex strings
+  if (provider.toLowerCase().includes('openai')) {
+    return 'api.openai.com';
+  } else if (provider.toLowerCase().includes('anthropic')) {
+    return 'api.anthropic.com';
+  } else if (provider.toLowerCase().includes('cohere')) {
+    return 'api.cohere.ai';
+  } else if (provider.toLowerCase().includes('mistral')) {
+    return 'api.mistral.ai';
   }
+  
+  // Fallback to OpenAI
+  return 'api.openai.com';
 }
 
 function getProviderPath(provider: string): string[] {
@@ -551,18 +553,19 @@ function getProviderPath(provider: string): string[] {
     return ['api', 'generate'];
   }
   
-  switch (provider.toLowerCase()) {
-    case 'openai':
-      return ['v1', 'chat', 'completions'];
-    case 'anthropic':
-      return ['v1', 'messages'];
-    case 'cohere':
-      return ['v1', 'generate'];
-    case 'mistral':
-      return ['v1', 'chat', 'completions'];
-    default:
-      return ['v1', 'chat', 'completions'];
+  // Use includes() to match provider names within complex strings
+  if (provider.toLowerCase().includes('openai')) {
+    return ['v1', 'chat', 'completions'];
+  } else if (provider.toLowerCase().includes('anthropic')) {
+    return ['v1', 'messages'];
+  } else if (provider.toLowerCase().includes('cohere')) {
+    return ['v1', 'generate'];
+  } else if (provider.toLowerCase().includes('mistral')) {
+    return ['v1', 'chat', 'completions'];
   }
+  
+  // Fallback to OpenAI
+  return ['v1', 'chat', 'completions'];
 }
 
 function getProviderKeyName(provider: string): string {
