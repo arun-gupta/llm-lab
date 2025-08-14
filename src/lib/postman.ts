@@ -50,6 +50,13 @@ export function generatePostmanCollection(
 ): PostmanCollection {
   const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000';
   
+  // Parse the base URL to get protocol, host, and port
+  const url = new URL(baseUrl);
+  const protocol = url.protocol.replace(':', '');
+  const host = url.hostname;
+  const port = url.port;
+  const hostArray = port ? [host, port] : [host];
+  
   // Get the actual providers from responses, or use default implemented ones
   const availableProviders = responses 
     ? responses.map(response => {
@@ -146,8 +153,8 @@ export function generatePostmanCollection(
           },
           url: {
             raw: `${baseUrl}/api/llm`,
-            protocol: 'http',
-            host: ['localhost'],
+            protocol: protocol,
+            host: hostArray,
             path: ['api', 'llm'],
           },
         },
