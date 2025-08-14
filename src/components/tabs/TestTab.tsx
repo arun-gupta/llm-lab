@@ -72,9 +72,9 @@ export function TestTab({ onTabChange }: TestTabProps) {
       <div className="mb-8">
         <div className="flex items-center justify-between">
           <div>
-            <h1 className="text-3xl font-bold text-gray-900 mb-2">Test Prompts</h1>
+            <h1 className="text-3xl font-bold text-gray-900 mb-2">Test & Experiment</h1>
             <p className="text-gray-600">
-              Test your prompts across different providers and models with A/B testing capabilities.
+              Test and experiment with prompts across different providers and models with A/B testing capabilities.
             </p>
           </div>
           <div className="flex space-x-3">
@@ -109,7 +109,7 @@ export function TestTab({ onTabChange }: TestTabProps) {
 
       {/* A/B Testing Options */}
       <div className="mb-8">
-        <h2 className="text-xl font-semibold text-gray-900 mb-4">A/B Testing Options</h2>
+        <h2 className="text-xl font-semibold text-gray-900 mb-4">Experiment Options</h2>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           <div className="bg-white border border-gray-200 rounded-lg p-4">
             <div className="flex items-center space-x-2 mb-2">
@@ -173,20 +173,20 @@ export function TestTab({ onTabChange }: TestTabProps) {
       <div className="mt-12">
         <h2 className="text-xl font-semibold text-gray-900 mb-4">Coming Soon</h2>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <div className="bg-gray-50 rounded-lg p-6">
-            <h3 className="font-medium text-gray-900 mb-2">Advanced A/B Testing</h3>
-            <p className="text-sm text-gray-600 mb-4">
-              Statistical significance testing, confidence intervals, and automated winner selection.
-            </p>
-            <div className="text-xs text-gray-500">🚧 In Development</div>
-          </div>
-          <div className="bg-gray-50 rounded-lg p-6">
-            <h3 className="font-medium text-gray-900 mb-2">Test Templates</h3>
-            <p className="text-sm text-gray-600 mb-4">
-              Pre-built test scenarios for common use cases like content generation, code review, etc.
-            </p>
-            <div className="text-xs text-gray-500">🚧 In Development</div>
-          </div>
+                      <div className="bg-gray-50 rounded-lg p-6">
+              <h3 className="font-medium text-gray-900 mb-2">Advanced Experimentation</h3>
+              <p className="text-sm text-gray-600 mb-4">
+                Statistical significance testing, confidence intervals, and automated winner selection.
+              </p>
+              <div className="text-xs text-gray-500">🚧 In Development</div>
+            </div>
+                      <div className="bg-gray-50 rounded-lg p-6">
+              <h3 className="font-medium text-gray-900 mb-2">Experiment Templates</h3>
+              <p className="text-sm text-gray-600 mb-4">
+                Pre-built experiment scenarios for common use cases like content generation, code review, etc.
+              </p>
+              <div className="text-xs text-gray-500">🚧 In Development</div>
+            </div>
         </div>
       </div>
     </div>

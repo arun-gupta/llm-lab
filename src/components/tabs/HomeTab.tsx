@@ -52,10 +52,10 @@ export function HomeTab({ onTabChange, apiKeyStatus }: HomeTabProps) {
           </div>
         </div>
         <h1 className="text-4xl font-bold text-gray-900 mb-4">
-          Welcome to LLM Prompt Lab
+          Welcome to LLM Lab
         </h1>
         <p className="text-xl text-gray-600 mb-8 max-w-3xl mx-auto">
-          Test prompts across cloud & local models with advanced A/B testing, performance benchmarking, and Postman integration.
+          Test, compare, and optimize LLMs with advanced analytics, performance benchmarking, and Postman integration.
         </p>
         
         {/* API Key Status */}
@@ -110,7 +110,7 @@ export function HomeTab({ onTabChange, apiKeyStatus }: HomeTabProps) {
               </div>
               <h3 className="font-semibold text-gray-900 mb-2">Test Your Prompts</h3>
               <p className="text-gray-600 text-sm">
-                Use the Test tab to try your prompts across different providers and models.
+                Use the Test tab to experiment with prompts across different providers and models.
               </p>
             </div>
             <div className="text-center">
@@ -119,7 +119,7 @@ export function HomeTab({ onTabChange, apiKeyStatus }: HomeTabProps) {
               </div>
               <h3 className="font-semibold text-gray-900 mb-2">Create Collections</h3>
               <p className="text-gray-600 text-sm">
-                Generate Postman collections and share them with the community.
+                Generate Postman collections and discover shared collections from the community.
               </p>
             </div>
           </div>
@@ -130,14 +130,14 @@ export function HomeTab({ onTabChange, apiKeyStatus }: HomeTabProps) {
       <div className="mb-12">
         <h2 className="text-2xl font-semibold text-gray-900 mb-6">Recent Activity</h2>
         <div className="bg-gray-50 rounded-lg p-6 text-center">
-          <p className="text-gray-500">No recent activity yet. Start by testing a prompt!</p>
-          <button
-            onClick={() => onTabChange('test')}
-            className="mt-4 inline-flex items-center space-x-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
-          >
-            <Play className="w-4 h-4" />
-            <span>Start Testing</span>
-          </button>
+                      <p className="text-gray-500">No recent activity yet. Start by experimenting with prompts!</p>
+                      <button
+              onClick={() => onTabChange('test')}
+              className="mt-4 inline-flex items-center space-x-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+            >
+              <Play className="w-4 h-4" />
+              <span>Start Experimenting</span>
+            </button>
         </div>
       </div>
 

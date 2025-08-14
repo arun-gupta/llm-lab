@@ -65,7 +65,7 @@ export function SettingsTab() {
           Settings & Configuration
         </h1>
         <p className="text-xl text-gray-600 max-w-3xl mx-auto">
-          Configure your API keys, preferences, and application settings to customize your LLM Prompt Lab experience.
+          Configure your API keys, preferences, and application settings to customize your LLM Lab experience.
         </p>
       </div>
 

@@ -1,14 +1,14 @@
-# LLM Prompt Lab
+# LLM Lab
 
 [![Open in GitHub Codespaces](https://github.com/codespaces/badge.svg)](https://codespaces.new/arun-gupta/llm-prompt-lab)
 
-A full-stack web application that allows you to test and compare prompts across multiple LLM providers side by side, with **advanced Postman integration**. Perfect for prompt engineering, AI experimentation, and LLM comparison.
+A full-stack web application that allows you to test, compare, and optimize LLMs across multiple providers side by side, with **advanced analytics and Postman integration**. Perfect for LLM experimentation, performance analysis, and AI development.
 
 ## 🚀 Quick Start
 
 ### **Option 1: GitHub Codespaces (Recommended for trying)**
 
-Click the button at the top of this README to open LLM Prompt Lab in GitHub Codespaces. This will:
+Click the button at the top of this README to open LLM Lab in GitHub Codespaces. This will:
 - 🚀 **Launch instantly** in your browser
 - ⚡ **Auto-install dependencies** and start the dev server
 - 🔑 **Set up environment** with example configuration
@@ -19,8 +19,8 @@ Click the button at the top of this README to open LLM Prompt Lab in GitHub Code
 ### **Option 2: Local Development**
 ```bash
 # Clone and run
-git clone https://github.com/arun-gupta/llm-prompt-lab.git
-cd llm-prompt-lab
+git clone https://github.com/arun-gupta/llm-lab.git
+cd llm-lab
 ./quickstart.sh
 ```
 
@@ -75,6 +75,8 @@ If you're using GitHub Codespaces, you can add your API keys in two ways:
 - 📊 **Performance metrics** (latency, token usage)
 - 🧪 **Comprehensive test scripts** for automated validation
 - 🔧 **Environment variables** for secure API key management
+- 📈 **Advanced analytics** and performance insights
+- 🏗️ **Tabbed interface** for organized workflow
 
 ## 🎯 Postman Integration
 
