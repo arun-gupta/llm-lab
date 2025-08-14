@@ -7,6 +7,17 @@ export interface PostmanCollection {
   item: PostmanItem[];
 }
 
+export interface PostmanEnvironment {
+  id: string;
+  name: string;
+  values: {
+    key: string;
+    value: string;
+    type: string;
+    enabled: boolean;
+  }[];
+}
+
 export interface PostmanItem {
   name: string;
   request: {
@@ -78,7 +89,17 @@ export function generatePostmanCollection(
   const collection: PostmanCollection = {
     info: {
       name: collectionName || 'LLM Prompt Lab Collection',
-      description: `Generated collection for prompt: "${prompt}"`,
+      description: `Generated collection for prompt: "${prompt}"
+
+IMPORTANT: Before using this collection, you need to set up environment variables:
+1. Create a new environment in Postman
+2. Add these variables:
+   - openai_api_key: Your OpenAI API key (starts with sk-)
+   - anthropic_api_key: Your Anthropic API key (starts with sk-ant-)
+   - postman_api_key: Your Postman API key (optional, for advanced features)
+   - base_url: The base URL of your LLM Prompt Lab instance
+
+You can also download the environment file that will be generated alongside this collection.`,
       schema: 'https://schema.getpostman.com/json/collection/v2.1.0/collection.json',
     },
     item: [
@@ -246,6 +267,39 @@ export function generatePostmanCollection(
   }
 
   return collection;
+}
+
+export function generatePostmanEnvironment(collectionName: string): PostmanEnvironment {
+  return {
+    id: `env-${Date.now()}`,
+    name: `${collectionName} Environment`,
+    values: [
+      {
+        key: 'openai_api_key',
+        value: 'your_openai_api_key_here',
+        type: 'secret',
+        enabled: true,
+      },
+      {
+        key: 'anthropic_api_key',
+        value: 'your_anthropic_api_key_here',
+        type: 'secret',
+        enabled: true,
+      },
+      {
+        key: 'postman_api_key',
+        value: 'your_postman_api_key_here',
+        type: 'secret',
+        enabled: true,
+      },
+      {
+        key: 'base_url',
+        value: process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000',
+        type: 'default',
+        enabled: true,
+      },
+    ],
+  };
 }
 
 function generateProviderTestScripts(provider: string, isOllama: boolean): string[] {

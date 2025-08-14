@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { X, Download, Eye, FileText, Code, Settings, Play } from 'lucide-react';
-import { generatePostmanCollection } from '@/lib/postman';
+import { generatePostmanCollection, generatePostmanEnvironment } from '@/lib/postman';
 import { LLMResponse } from '@/lib/llm-apis';
 
 interface CollectionPreviewProps {
@@ -31,7 +31,9 @@ export function CollectionPreview({
   if (!isOpen) return null;
 
   const collection = generatePostmanCollection(prompt, context, responses, collectionName);
+  const environment = generatePostmanEnvironment(collectionName);
   const collectionJson = JSON.stringify(collection, null, 2);
+  const environmentJson = JSON.stringify(environment, null, 2);
 
   const getProviderIcon = (provider: string) => {
     if (provider.startsWith('ollama:')) return '🦙';
@@ -362,7 +364,25 @@ export function CollectionPreview({
               className="flex items-center space-x-2 px-4 py-2 text-sm bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
             >
               <Download className="w-4 h-4" />
-              <span>Download JSON</span>
+              <span>Download Collection</span>
+            </button>
+            
+            <button
+              onClick={() => {
+                const blob = new Blob([environmentJson], { type: 'application/json' });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = `${collectionName.replace(/[^a-z0-9]/gi, '_').toLowerCase()}_environment.json`;
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                URL.revokeObjectURL(url);
+              }}
+              className="flex items-center space-x-2 px-4 py-2 text-sm bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
+            >
+              <Download className="w-4 h-4" />
+              <span>Download Environment</span>
             </button>
             
             {/* Postman Agent Selection */}
