@@ -73,7 +73,19 @@ export function LLMForm({ onResponsesChange, onLoadingChange, onProvidersChange,
     formState: { errors },
     reset,
     setValue,
+    watch,
+    clearErrors,
   } = useForm<FormData>();
+
+  // Watch the prompt field to clear errors when user types
+  const promptValue = watch('prompt');
+  
+  // Clear prompt error when user starts typing
+  useEffect(() => {
+    if (promptValue && promptValue.trim().length > 0 && errors.prompt) {
+      clearErrors('prompt');
+    }
+  }, [promptValue, errors.prompt, clearErrors]);
 
   // Sample prompts for quick testing
   const samplePrompts = [
@@ -173,7 +185,10 @@ export function LLMForm({ onResponsesChange, onLoadingChange, onProvidersChange,
           </label>
           <textarea
             id="prompt"
-            {...register('prompt', { required: 'Prompt is required' })}
+            {...register('prompt', { 
+              required: 'Prompt is required',
+              validate: (value) => value.trim().length > 0 || 'Prompt is required'
+            })}
             rows={3}
             className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
             placeholder="Enter your prompt here or try a sample below..."
