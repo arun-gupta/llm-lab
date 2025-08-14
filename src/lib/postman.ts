@@ -89,8 +89,13 @@ export function generatePostmanCollection(
   if (responses) {
     responses.forEach((response) => {
       if (response.provider) {
-        const isOllama = response.provider.startsWith('ollama:');
-        const providerName = isOllama ? response.provider.replace('ollama:', '') : response.provider;
+        // Handle both original provider format (ollama:model) and formatted names (Ollama (model))
+        const isOllama = response.provider.startsWith('ollama:') || response.provider.startsWith('Ollama (');
+        const providerName = isOllama 
+          ? response.provider.startsWith('ollama:') 
+            ? response.provider.replace('ollama:', '')
+            : response.provider.match(/Ollama \((.+)\)/)?.[1] || response.provider
+          : response.provider;
         
         collection.item.push({
           name: `${response.provider} - Direct API Call`,
@@ -150,7 +155,7 @@ export function generatePostmanCollection(
 }
 
 function getProviderUrl(provider: string): string {
-  if (provider.startsWith('ollama:')) {
+  if (provider.startsWith('ollama:') || provider.startsWith('Ollama (')) {
     return 'http://localhost:11434/api/generate';
   }
   
@@ -169,7 +174,7 @@ function getProviderUrl(provider: string): string {
 }
 
 function getProviderHost(provider: string): string {
-  if (provider.startsWith('ollama:')) {
+  if (provider.startsWith('ollama:') || provider.startsWith('Ollama (')) {
     return 'localhost:11434';
   }
   
@@ -188,7 +193,7 @@ function getProviderHost(provider: string): string {
 }
 
 function getProviderPath(provider: string): string[] {
-  if (provider.startsWith('ollama:')) {
+  if (provider.startsWith('ollama:') || provider.startsWith('Ollama (')) {
     return ['api', 'generate'];
   }
   
