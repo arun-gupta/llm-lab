@@ -152,7 +152,10 @@ STEP 4: Add Your API Keys
                 '}',
                 '',
                 '// Set request variables',
-                'pm.request.url.raw = pm.environment.get("base_url") + "/api/llm";'
+                'const baseUrl = pm.environment.get("base_url");',
+                'if (baseUrl && baseUrl !== "your_base_url_here") {',
+                '    pm.request.url.raw = baseUrl + "/api/llm";',
+                '}'
               ]
             }
           },
@@ -265,21 +268,24 @@ STEP 4: Add Your API Keys
                   'const openaiKey = pm.environment.get("openai_api_key");',
                   'const anthropicKey = pm.environment.get("anthropic_api_key");',
                   '',
+                  '// Get the request URL safely',
+                  'const requestUrl = pm.request.url.raw || pm.request.url.toString() || "";',
+                  '',
                   '// Provider-specific checks',
-                  `if (pm.request.url.raw.includes("openai.com") && (!openaiKey || openaiKey === "your_openai_api_key_here")) {`,
+                  `if (requestUrl.includes("openai.com") && (!openaiKey || openaiKey === "your_openai_api_key_here")) {`,
                   '    console.warn("⚠️ WARNING: OpenAI API key not set for this request");',
                   '    console.warn("Please import the environment file and add your OpenAI API key");',
                   '}',
                   '',
-                  `if (pm.request.url.raw.includes("anthropic.com") && (!anthropicKey || anthropicKey === "your_anthropic_api_key_here")) {`,
+                  `if (requestUrl.includes("anthropic.com") && (!anthropicKey || anthropicKey === "your_anthropic_api_key_here")) {`,
                   '    console.warn("⚠️ WARNING: Anthropic API key not set for this request");',
                   '    console.warn("Please import the environment file and add your Anthropic API key");',
                   '}',
                   '',
                   '// Set Authorization header dynamically',
-                  'if (pm.request.url.raw.includes("openai.com")) {',
+                  'if (requestUrl.includes("openai.com")) {',
                   '    pm.request.headers.add({ key: "Authorization", value: "Bearer " + openaiKey });',
-                  '} else if (pm.request.url.raw.includes("anthropic.com")) {',
+                  '} else if (requestUrl.includes("anthropic.com")) {',
                   '    pm.request.headers.add({ key: "x-api-key", value: anthropicKey });',
                   '}'
                 ]
