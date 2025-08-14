@@ -4,7 +4,6 @@ import { useState } from 'react';
 import { LLMForm } from '@/components/LLMForm';
 import { ResponseTabs } from '@/components/ResponseTabs';
 import { PostmanSetupGuide } from '@/components/PostmanSetupGuide';
-import { PostmanStatusIndicator } from '@/components/PostmanStatusIndicator';
 import { ApiKeyStatusIndicator } from '@/components/ApiKeyStatusIndicator';
 import { CollectionPreview } from '@/components/CollectionPreview';
 import { SuccessCelebration } from '@/components/SuccessCelebration';
@@ -19,7 +18,7 @@ export default function Home() {
   const [selectedProviders, setSelectedProviders] = useState<string[]>([]);
   const [formData, setFormData] = useState<{ prompt: string; context?: string } | null>(null);
   const [showPostmanSetup, setShowPostmanSetup] = useState(false);
-  const [postmanConfigured, setPostmanConfigured] = useState(false);
+  const [apiKeyStatus, setApiKeyStatus] = useState<any>({});
   const [showCollectionPreview, setShowCollectionPreview] = useState(false);
   const [isCreatingCollection, setIsCreatingCollection] = useState(false);
   const [activeTab, setActiveTab] = useState<'responses' | 'analytics'>('responses');
@@ -167,11 +166,11 @@ export default function Home() {
     }
   };
 
-  const handlePostmanStatusChange = (configured: boolean) => {
-    setPostmanConfigured(configured);
+  const handleApiKeyStatusChange = (status: any) => {
+    setApiKeyStatus(status);
     
     // Show celebration when Postman is first connected
-    if (configured && !showSuccessCelebration) {
+    if (status.postman === 'configured' && !showSuccessCelebration) {
       setCelebrationType('postman-connected');
       setCelebrationData({});
       setShowSuccessCelebration(true);
@@ -213,7 +212,7 @@ export default function Home() {
             </button>
             
             <div className="flex items-center space-x-3">
-              <ApiKeyStatusIndicator />
+              <ApiKeyStatusIndicator onStatusChange={handleApiKeyStatusChange} />
               
               <button
                 onClick={() => setShowConfigPanel(true)}
@@ -224,8 +223,6 @@ export default function Home() {
                 <span>Configure</span>
               </button>
               
-              <PostmanStatusIndicator onStatusChange={handlePostmanStatusChange} />
-              
               {responses.length > 0 && (
                 <>
                   <button
@@ -233,7 +230,7 @@ export default function Home() {
                     className="flex items-center space-x-2 px-3 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors text-sm"
                   >
                     <Download className="w-4 h-4" />
-                    <span>{postmanConfigured ? 'Create in Postman' : 'Download All Postman'}</span>
+                    <span>{apiKeyStatus.postman === 'configured' ? 'Create in Postman' : 'Download All Postman'}</span>
                   </button>
                   <button
                     onClick={() => setShowPostmanSetup(true)}
