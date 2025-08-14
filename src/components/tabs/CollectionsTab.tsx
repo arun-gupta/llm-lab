@@ -7,6 +7,17 @@ import { CollectionPreviewModal } from '../CollectionPreviewModal';
 export function CollectionsTab() {
   const [showInstallModal, setShowInstallModal] = useState(false);
   const [showPreviewModal, setShowPreviewModal] = useState(false);
+  const [deploymentStatus, setDeploymentStatus] = useState<{ type: 'success' | 'error', message: string } | null>(null);
+
+  // Auto-dismiss notification after 5 seconds
+  useEffect(() => {
+    if (deploymentStatus) {
+      const timer = setTimeout(() => {
+        setDeploymentStatus(null);
+      }, 5000);
+      return () => clearTimeout(timer);
+    }
+  }, [deploymentStatus]);
   const features = [
     {
       icon: Library,
@@ -57,6 +68,27 @@ export function CollectionsTab() {
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      {/* Deployment Status Notification */}
+      {deploymentStatus && (
+        <div className={`fixed top-4 right-4 z-50 p-4 rounded-lg shadow-lg max-w-md ${
+          deploymentStatus.type === 'success' 
+            ? 'bg-green-50 border border-green-200 text-green-800' 
+            : 'bg-red-50 border border-red-200 text-red-800'
+        }`}>
+          <div className="flex items-center space-x-2">
+            <span className="text-lg">
+              {deploymentStatus.type === 'success' ? '✅' : '❌'}
+            </span>
+            <span className="text-sm font-medium">{deploymentStatus.message}</span>
+            <button 
+              onClick={() => setDeploymentStatus(null)}
+              className="ml-auto text-gray-400 hover:text-gray-600"
+            >
+              ×
+            </button>
+          </div>
+        </div>
+      )}
       {/* Header */}
       <div className="text-center mb-12">
         <div className="flex justify-center mb-6">
@@ -383,21 +415,19 @@ export function CollectionsTab() {
                       const result = await apiResponse.json();
                       
                       if (result.success) {
-                        alert(`✅ Collection created successfully in Postman Desktop!
-                        
-Collection URL: ${result.collectionUrl}
-                        
-You can now open Postman Desktop to see your new collection.`);
+                        setDeploymentStatus({
+                          type: 'success',
+                          message: 'Collection created successfully in Postman Desktop!'
+                        });
                       } else {
                         throw new Error(result.message || 'Failed to create collection');
                       }
                     } catch (error) {
                       console.error('Error creating collection:', error);
-                      alert(`❌ Failed to create collection in Postman Desktop.
-
-Error: ${error.message}
-
-Please try the "Download & Import" option instead.`);
+                      setDeploymentStatus({
+                        type: 'error',
+                        message: 'Failed to create collection. Try "Download & Import" instead.'
+                      });
                     }
                     
                     setShowInstallModal(false);
@@ -422,22 +452,17 @@ Please try the "Download & Import" option instead.`);
                       window.open(postmanDesktopUrl, '_blank');
                       
                       // Show immediate feedback
-                      alert(`🚀 Attempting to open Postman Desktop...
-
-Collection URL: ${collectionUrl}
-
-If Postman Desktop doesn't open automatically:
-1. Make sure Postman Desktop is installed from: https://www.postman.com/downloads/
-2. Try the "Direct API Creation" option instead (recommended)
-3. Or use "Download & Import" for manual import`);
+                      setDeploymentStatus({
+                        type: 'success',
+                        message: 'Attempting to open Postman Desktop...'
+                      });
                       
                     } catch (error) {
                       console.log('Postman Desktop URL scheme not supported');
-                      alert(`❌ Could not open Postman Desktop automatically.
-
-Please try the "Direct API Creation" option instead - it's more reliable and creates the collection directly in Postman Desktop via API.
-
-Collection URL: ${collectionUrl}`);
+                      setDeploymentStatus({
+                        type: 'error',
+                        message: 'Could not open Postman Desktop. Try "Direct API Creation" instead.'
+                      });
                     }
                     
                     setShowInstallModal(false);
@@ -519,40 +544,34 @@ Collection URL: ${result.collectionUrl}${githubToken ? '\n\n🔑 GitHub token ha
                   const postmanDesktopUrl = `postman://import?url=${encodeURIComponent(result.collectionUrl)}`;
                   window.open(postmanDesktopUrl, '_blank');
                   
-                  alert(`${successMessage}
-
-🚀 Attempting to open Postman Desktop...
-
-If Postman Desktop didn't open automatically:
-1. Make sure Postman Desktop is installed from: https://www.postman.com/downloads/
-2. Open Postman Desktop manually and look for "${collectionName}" collection
-3. Or use the collection URL above to import manually`);
+                  setDeploymentStatus({
+                    type: 'success',
+                    message: `Collection "${collectionName}" created! Opening Postman Desktop...`
+                  });
                 } catch (error) {
                   console.log('Postman Desktop URL scheme not supported');
-                  alert(`${successMessage}
-
-📝 To view your collection:
-1. Open Postman Desktop manually
-2. Look for "${collectionName}" in your collections
-3. Or use the collection URL above to import manually`);
+                  setDeploymentStatus({
+                    type: 'success',
+                    message: `Collection "${collectionName}" created! Open Postman Desktop to view it.`
+                  });
                 }
               } else {
                 // For Web deployment, open in browser
                 window.open(result.collectionUrl, '_blank');
-                alert(`${successMessage}
-
-🌐 Opening Postman Web in your browser...`);
+                setDeploymentStatus({
+                  type: 'success',
+                  message: `Collection "${collectionName}" created! Opening Postman Web...`
+                });
               }
             } else {
               throw new Error(result.message || 'Failed to create collection');
             }
           } catch (error) {
             console.error('Error creating collection:', error);
-            alert(`❌ Failed to create collection in Postman.
-
-Error: ${error instanceof Error ? error.message : 'Unknown error'}
-
-Please try the "Quick Install" option instead.`);
+            setDeploymentStatus({
+              type: 'error',
+              message: 'Failed to create collection. Try "Quick Install" instead.'
+            });
           }
           
           setShowPreviewModal(false);

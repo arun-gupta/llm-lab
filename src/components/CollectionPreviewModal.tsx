@@ -71,10 +71,6 @@ export function CollectionPreviewModal({ isOpen, onClose, onDeploy, collectionUr
         },
       };
       
-      // Show deployment in progress message
-      const deployMessage = `🚀 Deploying "${collectionName}" to Postman ${createInWeb ? 'Web' : 'Desktop'}...`;
-      alert(deployMessage);
-      
       onDeploy(updatedCollection, collectionName, createInWeb, githubToken);
     }
   };
