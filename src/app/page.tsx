@@ -77,7 +77,7 @@ export default function Home() {
               </div>
               <div>
                 <h1 className="text-xl font-bold text-gray-900">LLM Lab</h1>
-                <p className="text-xs text-gray-600">Test, compare, and optimize LLMs with advanced analytics and Postman integration</p>
+                <p className="text-xs text-gray-600">Test and compare LLMs with Postman integration and analytics</p>
               </div>
             </button>
             

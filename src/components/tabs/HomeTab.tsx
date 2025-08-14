@@ -55,7 +55,7 @@ export function HomeTab({ onTabChange, apiKeyStatus }: HomeTabProps) {
           Welcome to LLM Lab
         </h1>
         <p className="text-xl text-gray-600 mb-8 max-w-3xl mx-auto">
-          Test, compare, and optimize LLMs with advanced analytics, performance benchmarking, and Postman integration.
+          Test and compare LLMs with Postman integration and analytics.
         </p>
         
         {/* API Key Status */}
