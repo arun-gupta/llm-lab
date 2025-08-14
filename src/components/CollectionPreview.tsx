@@ -372,9 +372,9 @@ export function CollectionPreview({
                 document.body.removeChild(a);
                 URL.revokeObjectURL(url);
               }}
-              className="flex items-center space-x-2 px-4 py-2 text-sm bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
+              className="flex items-center space-x-2 px-4 py-2 text-sm bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors text-gray-900 hover:text-gray-700"
             >
-              <Download className="w-4 h-4" />
+              <Download className="w-4 h-4 text-gray-700" />
               <span>Download Collection</span>
             </button>
             
@@ -390,9 +390,9 @@ export function CollectionPreview({
                 document.body.removeChild(a);
                 URL.revokeObjectURL(url);
               }}
-              className="flex items-center space-x-2 px-4 py-2 text-sm bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
+              className="flex items-center space-x-2 px-4 py-2 text-sm bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors text-gray-900 hover:text-gray-700"
             >
-              <Download className="w-4 h-4" />
+              <Download className="w-4 h-4 text-gray-700" />
               <span>Download Environment</span>
             </button>
             
@@ -405,7 +405,7 @@ export function CollectionPreview({
                   className={`px-3 py-1 text-xs rounded-md transition-colors ${
                     createInWeb 
                       ? 'bg-blue-600 text-white' 
-                      : 'text-gray-600 hover:text-gray-900'
+                      : 'text-gray-700 hover:text-gray-900'
                   }`}
                 >
                   Web
@@ -415,7 +415,7 @@ export function CollectionPreview({
                   className={`px-3 py-1 text-xs rounded-md transition-colors ${
                     !createInWeb 
                       ? 'bg-blue-600 text-white' 
-                      : 'text-gray-600 hover:text-gray-900'
+                      : 'text-gray-700 hover:text-gray-900'
                   }`}
                 >
                   Desktop
@@ -427,7 +427,7 @@ export function CollectionPreview({
           <div className="flex items-center space-x-3">
             <button
               onClick={onClose}
-              className="px-4 py-2 text-sm text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
+              className="px-4 py-2 text-sm text-gray-900 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 hover:text-gray-700 transition-colors"
             >
               Cancel
             </button>
