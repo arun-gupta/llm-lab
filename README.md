@@ -55,11 +55,13 @@ If you're using GitHub Codespaces, you can add your API keys in two ways:
    - `OPENAI_API_KEY`
    - `ANTHROPIC_API_KEY` 
    - `POSTMAN_API_KEY` (optional)
+   - `NEXT_PUBLIC_BASE_URL` (set to your Codespaces URL)
 
 **Option 2: Direct File Edit**
 1. Open `.env.local` in the Codespace
 2. Replace the placeholder values with your actual API keys
-3. Save the file - the dev server will auto-restart
+3. Set `NEXT_PUBLIC_BASE_URL` to your Codespaces URL (e.g., `https://your-codespace-name.your-username.github.dev`)
+4. Save the file - the dev server will auto-restart
 
 ## ✨ Key Features
 

@@ -57,8 +57,10 @@ export function generatePostmanCollection(
   const host = url.hostname;
   const port = url.port || '3000'; // Default to 3000 if no port specified
   
-  // Use 127.0.0.1 for localhost to avoid DNS resolution issues
-  const hostForPostman = host === 'localhost' ? '127.0.0.1' : host;
+  // Use the actual hostname for the environment
+  // In Codespaces, this will be the Codespaces hostname
+  // In local development, this will be localhost or 127.0.0.1
+  const hostForPostman = host;
   
   // Get the actual providers from responses, or use default implemented ones
   const availableProviders = responses 
@@ -155,10 +157,10 @@ export function generatePostmanCollection(
             },
           },
           url: {
-            raw: `http://127.0.0.1:3000/api/llm`,
-            protocol: 'http',
-            host: ['127.0.0.1'],
-            port: '3000',
+            raw: `${baseUrl}/api/llm`,
+            protocol: protocol,
+            host: [hostForPostman],
+            port: port,
             path: ['api', 'llm'],
           },
         },
