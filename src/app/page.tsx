@@ -7,9 +7,10 @@ import { PostmanSetupGuide } from '@/components/PostmanSetupGuide';
 import { PostmanStatusIndicator } from '@/components/PostmanStatusIndicator';
 import { CollectionPreview } from '@/components/CollectionPreview';
 import { SuccessCelebration } from '@/components/SuccessCelebration';
+import { ConfigPanel } from '@/components/ConfigPanel';
 import { LLMResponse } from '@/lib/llm-apis';
 import { generatePostmanCollection, createPostmanCollection } from '@/lib/postman';
-import { Download, Zap, Globe, Code, Github } from 'lucide-react';
+import { Download, Zap, Globe, Code, Github, Settings } from 'lucide-react';
 
 export default function Home() {
   const [responses, setResponses] = useState<LLMResponse[]>([]);
@@ -29,6 +30,9 @@ export default function Home() {
 
   // Track if this is the first response
   const [hasGeneratedFirstResponse, setHasGeneratedFirstResponse] = useState(false);
+
+  // Config panel state
+  const [showConfigPanel, setShowConfigPanel] = useState(false);
 
   const createPostmanCollectionInWorkspace = async () => {
     if (responses.length === 0) return;
@@ -202,6 +206,15 @@ export default function Home() {
             </button>
             
             <div className="flex items-center space-x-3">
+              <button
+                onClick={() => setShowConfigPanel(true)}
+                className="flex items-center space-x-2 px-3 py-2 text-sm bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors"
+                title="Configure API Keys"
+              >
+                <Settings className="w-4 h-4" />
+                <span>Configure</span>
+              </button>
+              
               <PostmanStatusIndicator onStatusChange={handlePostmanStatusChange} />
               
               {responses.length > 0 && (
@@ -302,6 +315,19 @@ export default function Home() {
         type={celebrationType}
         onClose={() => setShowSuccessCelebration(false)}
         data={celebrationData}
+      />
+
+      {/* Config Panel */}
+      <ConfigPanel
+        isOpen={showConfigPanel}
+        onClose={() => setShowConfigPanel(false)}
+        onConfigChange={() => {
+          // Refresh Postman status when config changes
+          if (typeof window !== 'undefined') {
+            // Trigger a page refresh to pick up new environment variables
+            window.location.reload();
+          }
+        }}
       />
     </div>
   );
