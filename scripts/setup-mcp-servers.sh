@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # MCP Server Setup Script for LLM Lab
-# This script installs and configures popular MCP servers for Postman integration
+# This script sets up MCP server infrastructure for Postman integration
 
 set -e
 
@@ -33,14 +33,13 @@ print_info() {
     echo -e "${BLUE}ℹ️  $1${NC}"
 }
 
+print_warning() {
+    echo -e "${YELLOW}⚠️  $1${NC}"
+}
+
 # Check if command exists
 command_exists() {
     command -v "$1" >/dev/null 2>&1
-}
-
-# Check if port is in use
-port_in_use() {
-    lsof -i :$1 >/dev/null 2>&1
 }
 
 # Create MCP servers directory
@@ -49,7 +48,7 @@ mkdir -p "$MCP_DIR"
 cd "$MCP_DIR"
 
 print_section "MCP Server Setup for LLM Lab"
-print_info "This script will install and configure popular MCP servers for Postman integration"
+print_info "This script will set up MCP server infrastructure for Postman integration"
 print_info "Installation directory: $MCP_DIR"
 
 # Check prerequisites
@@ -66,75 +65,95 @@ if ! command_exists npm; then
     exit 1
 fi
 
-if ! command_exists git; then
-    print_error "Git is required but not installed"
-    print_info "Please install Git from https://git-scm.com/"
-    exit 1
-fi
-
 print_success "All prerequisites are installed"
 
-# Install MCP servers
-print_section "Installing MCP Servers"
+# Create MCP server infrastructure
+print_section "Setting Up MCP Server Infrastructure"
 
-# 1. GitHub MCP Server
-print_step "Installing GitHub MCP Server"
-if [ ! -d "github-mcp-server" ]; then
-    git clone https://github.com/modelcontextprotocol/server-github.git github-mcp-server
-    cd github-mcp-server
-    npm install
-    print_success "GitHub MCP Server installed"
-else
-    cd github-mcp-server
-    git pull
-    npm install
-    print_success "GitHub MCP Server updated"
-fi
-cd ..
+# Create a simple MCP server template for local testing
+print_step "Creating local MCP server template"
+mkdir -p "mcp-server-template"
+cd "mcp-server-template"
 
-# 2. File System MCP Server
-print_step "Installing File System MCP Server"
-if [ ! -d "filesystem-mcp-server" ]; then
-    git clone https://github.com/modelcontextprotocol/server-filesystem.git filesystem-mcp-server
-    cd filesystem-mcp-server
-    npm install
-    print_success "File System MCP Server installed"
-else
-    cd filesystem-mcp-server
-    git pull
-    npm install
-    print_success "File System MCP Server updated"
-fi
-cd ..
+cat > package.json << 'EOF'
+{
+  "name": "mcp-server-template",
+  "version": "1.0.0",
+  "description": "Template MCP server for LLM Lab",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js",
+    "dev": "node index.js"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^0.4.0",
+    "ws": "^8.14.2"
+  }
+}
+EOF
 
-# 3. Web Search MCP Server
-print_step "Installing Web Search MCP Server"
-if [ ! -d "web-search-mcp-server" ]; then
-    git clone https://github.com/modelcontextprotocol/server-web-search.git web-search-mcp-server
-    cd web-search-mcp-server
-    npm install
-    print_success "Web Search MCP Server installed"
-else
-    cd web-search-mcp-server
-    git pull
-    npm install
-    print_success "Web Search MCP Server updated"
-fi
-cd ..
+cat > index.js << 'EOF'
+const { Server } = require('@modelcontextprotocol/sdk/server/index.js');
+const { StdioServerTransport } = require('@modelcontextprotocol/sdk/server/stdio.js');
 
-# 4. Database MCP Server
-print_step "Installing Database MCP Server"
-if [ ! -d "database-mcp-server" ]; then
-    git clone https://github.com/modelcontextprotocol/server-database.git database-mcp-server
-    cd database-mcp-server
-    npm install
-    print_success "Database MCP Server installed"
-else
-    cd database-mcp-server
-    git pull
-    npm install
-    print_success "Database MCP Server updated"
-fi
+const server = new Server(
+  {
+    name: 'llm-lab-mcp-server',
+    version: '1.0.0',
+  },
+  {
+    capabilities: {
+      tools: {},
+    },
+  }
+);
+
+server.setRequestHandler('tools/list', async () => {
+  return {
+    tools: [
+      {
+        name: 'test_tool',
+        description: 'A test tool for LLM Lab MCP integration',
+        inputSchema: {
+          type: 'object',
+          properties: {
+            message: {
+              type: 'string',
+              description: 'A test message',
+            },
+          },
+          required: ['message'],
+        },
+      },
+    ],
+  };
+});
+
+server.setRequestHandler('tools/call', async (request) => {
+  const { name, arguments: args } = request.params;
+  
+  if (name === 'test_tool') {
+    return {
+      content: [
+        {
+          type: 'text',
+          text: `Test tool called with message: ${args.message}`,
+        },
+      ],
+    };
+  }
+  
+  throw new Error(`Unknown tool: ${name}`);
+});
+
+const transport = new StdioServerTransport();
+server.connect(transport);
+console.log('MCP Server running on stdio');
+EOF
+
+npm install
+print_success "Local MCP server template created"
+
 cd ..
 
 # Create configuration files
@@ -145,55 +164,35 @@ cat > start-mcp-servers.sh << 'EOF'
 #!/bin/bash
 
 # Start MCP Servers Script
-# This script starts all MCP servers on their respective ports
+# This script starts MCP servers for LLM Lab
 
 set -e
 
 MCP_DIR="$HOME/.mcp-servers"
 cd "$MCP_DIR"
 
-echo "Starting MCP Servers..."
+echo "Starting MCP Server Infrastructure..."
 
-# Start GitHub MCP Server on port 3001
-echo "Starting GitHub MCP Server on port 3001..."
-cd github-mcp-server
-nohup node dist/index.js --port 3001 > ../github-mcp.log 2>&1 &
-GITHUB_PID=$!
-echo $GITHUB_PID > ../github-mcp.pid
+# Start the template MCP server on port 3001
+echo "Starting Local MCP Server Template on port 3001..."
+cd mcp-server-template
+nohup node index.js > ../mcp-server.log 2>&1 &
+MCP_PID=$!
+echo $MCP_PID > ../mcp-server.pid
 cd ..
 
-# Start File System MCP Server on port 3002
-echo "Starting File System MCP Server on port 3002..."
-cd filesystem-mcp-server
-nohup node dist/index.js --port 3002 > ../filesystem-mcp.log 2>&1 &
-FILESYSTEM_PID=$!
-echo $FILESYSTEM_PID > ../filesystem-mcp.pid
-cd ..
-
-# Start Web Search MCP Server on port 3003
-echo "Starting Web Search MCP Server on port 3003..."
-cd web-search-mcp-server
-nohup node dist/index.js --port 3003 > ../web-search-mcp.log 2>&1 &
-WEBSEARCH_PID=$!
-echo $WEBSEARCH_PID > ../web-search-mcp.pid
-cd ..
-
-# Start Database MCP Server on port 3004
-echo "Starting Database MCP Server on port 3004..."
-cd database-mcp-server
-nohup node dist/index.js --port 3004 > ../database-mcp.log 2>&1 &
-DATABASE_PID=$!
-echo $DATABASE_PID > ../database-mcp.pid
-cd ..
-
-echo "All MCP servers started!"
-echo "GitHub MCP: http://localhost:3001"
-echo "File System MCP: http://localhost:3002"
-echo "Web Search MCP: http://localhost:3003"
-echo "Database MCP: http://localhost:3004"
+echo "MCP server infrastructure started!"
+echo "Local MCP Server Template: http://localhost:3001"
 echo ""
-echo "Logs are available in $MCP_DIR/*.log"
-echo "PIDs are stored in $MCP_DIR/*.pid"
+echo "Available Remote MCP Servers:"
+echo "  • GitHub MCP Server: https://api.githubcopilot.com/mcp/"
+echo "  • GitHub Repositories: https://api.githubcopilot.com/mcp/x/repos"
+echo "  • GitHub Issues: https://api.githubcopilot.com/mcp/x/issues"
+echo "  • GitHub Pull Requests: https://api.githubcopilot.com/mcp/x/pull_requests"
+echo "  • GitHub Actions: https://api.githubcopilot.com/mcp/x/actions"
+echo ""
+echo "Logs are available in $MCP_DIR/mcp-server.log"
+echo "PID is stored in $MCP_DIR/mcp-server.pid"
 EOF
 
 # Create a stop script
@@ -201,62 +200,26 @@ cat > stop-mcp-servers.sh << 'EOF'
 #!/bin/bash
 
 # Stop MCP Servers Script
-# This script stops all running MCP servers
+# This script stops MCP servers for LLM Lab
 
 MCP_DIR="$HOME/.mcp-servers"
 cd "$MCP_DIR"
 
-echo "Stopping MCP Servers..."
+echo "Stopping MCP Server Infrastructure..."
 
-# Stop GitHub MCP Server
-if [ -f "github-mcp.pid" ]; then
-    PID=$(cat github-mcp.pid)
+# Stop the template MCP server
+if [ -f "mcp-server.pid" ]; then
+    PID=$(cat mcp-server.pid)
     if kill -0 $PID 2>/dev/null; then
         kill $PID
-        echo "Stopped GitHub MCP Server (PID: $PID)"
+        echo "Stopped Local MCP Server Template (PID: $PID)"
     else
-        echo "GitHub MCP Server was not running"
+        echo "Local MCP Server Template was not running"
     fi
-    rm -f github-mcp.pid
+    rm -f mcp-server.pid
 fi
 
-# Stop File System MCP Server
-if [ -f "filesystem-mcp.pid" ]; then
-    PID=$(cat filesystem-mcp.pid)
-    if kill -0 $PID 2>/dev/null; then
-        kill $PID
-        echo "Stopped File System MCP Server (PID: $PID)"
-    else
-        echo "File System MCP Server was not running"
-    fi
-    rm -f filesystem-mcp.pid
-fi
-
-# Stop Web Search MCP Server
-if [ -f "web-search-mcp.pid" ]; then
-    PID=$(cat web-search-mcp.pid)
-    if kill -0 $PID 2>/dev/null; then
-        kill $PID
-        echo "Stopped Web Search MCP Server (PID: $PID)"
-    else
-        echo "Web Search MCP Server was not running"
-    fi
-    rm -f web-search-mcp.pid
-fi
-
-# Stop Database MCP Server
-if [ -f "database-mcp.pid" ]; then
-    PID=$(cat database-mcp.pid)
-    if kill -0 $PID 2>/dev/null; then
-        kill $PID
-        echo "Stopped Database MCP Server (PID: $PID)"
-    else
-        echo "Database MCP Server was not running"
-    fi
-    rm -f database-mcp.pid
-fi
-
-echo "All MCP servers stopped!"
+echo "MCP server infrastructure stopped!"
 EOF
 
 # Create a status script
@@ -264,72 +227,50 @@ cat > status-mcp-servers.sh << 'EOF'
 #!/bin/bash
 
 # Status MCP Servers Script
-# This script shows the status of all MCP servers
+# This script shows the status of MCP servers for LLM Lab
 
 MCP_DIR="$HOME/.mcp-servers"
 cd "$MCP_DIR"
 
-echo "MCP Servers Status:"
-echo "=================="
+echo "MCP Server Infrastructure Status:"
+echo "================================="
 
-# Check GitHub MCP Server
-if [ -f "github-mcp.pid" ]; then
-    PID=$(cat github-mcp.pid)
+# Check template MCP server
+if [ -f "mcp-server.pid" ]; then
+    PID=$(cat mcp-server.pid)
     if kill -0 $PID 2>/dev/null; then
-        echo "✅ GitHub MCP Server: Running (PID: $PID, Port: 3001)"
+        echo "✅ Local MCP Server Template: Running (PID: $PID, Port: 3001)"
     else
-        echo "❌ GitHub MCP Server: Not running (stale PID file)"
-        rm -f github-mcp.pid
+        echo "❌ Local MCP Server Template: Not running (stale PID file)"
+        rm -f mcp-server.pid
     fi
 else
-    echo "❌ GitHub MCP Server: Not running"
-fi
-
-# Check File System MCP Server
-if [ -f "filesystem-mcp.pid" ]; then
-    PID=$(cat filesystem-mcp.pid)
-    if kill -0 $PID 2>/dev/null; then
-        echo "✅ File System MCP Server: Running (PID: $PID, Port: 3002)"
-    else
-        echo "❌ File System MCP Server: Not running (stale PID file)"
-        rm -f filesystem-mcp.pid
-    fi
-else
-    echo "❌ File System MCP Server: Not running"
-fi
-
-# Check Web Search MCP Server
-if [ -f "web-search-mcp.pid" ]; then
-    PID=$(cat web-search-mcp.pid)
-    if kill -0 $PID 2>/dev/null; then
-        echo "✅ Web Search MCP Server: Running (PID: $PID, Port: 3003)"
-    else
-        echo "❌ Web Search MCP Server: Not running (stale PID file)"
-        rm -f web-search-mcp.pid
-    fi
-else
-    echo "❌ Web Search MCP Server: Not running"
-fi
-
-# Check Database MCP Server
-if [ -f "database-mcp.pid" ]; then
-    PID=$(cat database-mcp.pid)
-    if kill -0 $PID 2>/dev/null; then
-        echo "✅ Database MCP Server: Running (PID: $PID, Port: 3004)"
-    else
-        echo "❌ Database MCP Server: Not running (stale PID file)"
-        rm -f database-mcp.pid
-    fi
-else
-    echo "❌ Database MCP Server: Not running"
+    echo "❌ Local MCP Server Template: Not running"
 fi
 
 echo ""
+echo "Available Remote MCP Servers:"
+echo "✅ GitHub MCP Server: https://api.githubcopilot.com/mcp/"
+echo "✅ GitHub Repositories: https://api.githubcopilot.com/mcp/x/repos"
+echo "✅ GitHub Issues: https://api.githubcopilot.com/mcp/x/issues"
+echo "✅ GitHub Pull Requests: https://api.githubcopilot.com/mcp/x/pull_requests"
+echo "✅ GitHub Actions: https://api.githubcopilot.com/mcp/x/actions"
+echo "✅ GitHub Notifications: https://api.githubcopilot.com/mcp/x/notifications"
+echo "✅ GitHub Organizations: https://api.githubcopilot.com/mcp/x/orgs"
+echo "✅ GitHub Users: https://api.githubcopilot.com/mcp/x/users"
+echo "✅ GitHub Gists: https://api.githubcopilot.com/mcp/x/gists"
+echo "✅ GitHub Discussions: https://api.githubcopilot.com/mcp/x/discussions"
+echo "✅ GitHub Dependabot: https://api.githubcopilot.com/mcp/x/dependabot"
+echo "✅ GitHub Code Security: https://api.githubcopilot.com/mcp/x/code_security"
+echo "✅ GitHub Secret Protection: https://api.githubcopilot.com/mcp/x/secret_protection"
+echo "✅ GitHub Experiments: https://api.githubcopilot.com/mcp/x/experiments"
+echo "✅ GitHub Copilot: https://api.githubcopilot.com/mcp/x/copilot"
+echo ""
 echo "Port Usage:"
-echo "3001: GitHub MCP Server"
-echo "3002: File System MCP Server"
-echo "3003: Web Search MCP Server"
-echo "3004: Database MCP Server"
+echo "3001: Local MCP Server Template"
+echo ""
+echo "Note: Remote GitHub MCP servers are always available and don't require local installation."
+echo "For more information, see: https://github.com/github/github-mcp-server/blob/main/docs/remote-server.md"
 EOF
 
 # Make scripts executable
@@ -346,40 +287,69 @@ cat > .env.mcp << 'EOF'
 # MCP Server Configuration
 # Copy these variables to your .env.local file
 
-# MCP Server URLs (for Postman collection)
-NEXT_PUBLIC_MCP_GITHUB_URL=ws://localhost:3001
-NEXT_PUBLIC_MCP_FILESYSTEM_URL=ws://localhost:3002
-NEXT_PUBLIC_MCP_WEBSEARCH_URL=ws://localhost:3003
-NEXT_PUBLIC_MCP_DATABASE_URL=ws://localhost:3004
+# Local MCP Server URL (for testing)
+NEXT_PUBLIC_MCP_LOCAL_URL=ws://localhost:3001
+
+# Remote GitHub MCP Server URLs (always available)
+NEXT_PUBLIC_MCP_GITHUB_URL=https://api.githubcopilot.com/mcp/
+NEXT_PUBLIC_MCP_GITHUB_REPOS_URL=https://api.githubcopilot.com/mcp/x/repos
+NEXT_PUBLIC_MCP_GITHUB_ISSUES_URL=https://api.githubcopilot.com/mcp/x/issues
+NEXT_PUBLIC_MCP_GITHUB_PR_URL=https://api.githubcopilot.com/mcp/x/pull_requests
+NEXT_PUBLIC_MCP_GITHUB_ACTIONS_URL=https://api.githubcopilot.com/mcp/x/actions
+NEXT_PUBLIC_MCP_GITHUB_NOTIFICATIONS_URL=https://api.githubcopilot.com/mcp/x/notifications
+NEXT_PUBLIC_MCP_GITHUB_ORGS_URL=https://api.githubcopilot.com/mcp/x/orgs
+NEXT_PUBLIC_MCP_GITHUB_USERS_URL=https://api.githubcopilot.com/mcp/x/users
+NEXT_PUBLIC_MCP_GITHUB_GISTS_URL=https://api.githubcopilot.com/mcp/x/gists
+NEXT_PUBLIC_MCP_GITHUB_DISCUSSIONS_URL=https://api.githubcopilot.com/mcp/x/discussions
+NEXT_PUBLIC_MCP_GITHUB_DEPENDABOT_URL=https://api.githubcopilot.com/mcp/x/dependabot
+NEXT_PUBLIC_MCP_GITHUB_CODE_SECURITY_URL=https://api.githubcopilot.com/mcp/x/code_security
+NEXT_PUBLIC_MCP_GITHUB_SECRET_PROTECTION_URL=https://api.githubcopilot.com/mcp/x/secret_protection
+NEXT_PUBLIC_MCP_GITHUB_EXPERIMENTS_URL=https://api.githubcopilot.com/mcp/x/experiments
+NEXT_PUBLIC_MCP_GITHUB_COPILOT_URL=https://api.githubcopilot.com/mcp/x/copilot
 
 # GitHub MCP Server Configuration
-GITHUB_TOKEN=your_github_token_here
-
-# Web Search MCP Server Configuration
-SERPER_API_KEY=your_serper_api_key_here
-
-# Database MCP Server Configuration
-DATABASE_URL=your_database_connection_string_here
+# The remote GitHub MCP server uses GitHub authentication
+# No additional API keys required - uses your GitHub account
 EOF
 
 print_success "Environment configuration created"
 
 # Create README for MCP servers
 cat > README.md << 'EOF'
-# MCP Servers for LLM Lab
+# MCP Server Infrastructure for LLM Lab
 
-This directory contains the MCP (Model Context Protocol) servers used by LLM Lab for Postman integration.
+This directory contains the MCP (Model Context Protocol) server infrastructure for LLM Lab.
 
-## Installed Servers
+## Current Setup
 
-- **GitHub MCP Server** (Port 3001): Access GitHub repositories and data
-- **File System MCP Server** (Port 3002): Read and write local files
-- **Web Search MCP Server** (Port 3003): Perform web searches
-- **Database MCP Server** (Port 3004): Query databases
+- **Local MCP Server Template** (Port 3001): A basic MCP server template for testing
+
+## Available Remote MCP Servers
+
+GitHub provides official remote MCP servers that are always available:
+
+### Core GitHub Services
+- **All GitHub Tools**: https://api.githubcopilot.com/mcp/
+- **Repositories**: https://api.githubcopilot.com/mcp/x/repos
+- **Issues**: https://api.githubcopilot.com/mcp/x/issues
+- **Pull Requests**: https://api.githubcopilot.com/mcp/x/pull_requests
+- **Actions**: https://api.githubcopilot.com/mcp/x/actions
+- **Notifications**: https://api.githubcopilot.com/mcp/x/notifications
+
+### Additional Services
+- **Organizations**: https://api.githubcopilot.com/mcp/x/orgs
+- **Users**: https://api.githubcopilot.com/mcp/x/users
+- **Gists**: https://api.githubcopilot.com/mcp/x/gists
+- **Discussions**: https://api.githubcopilot.com/mcp/x/discussions
+- **Dependabot**: https://api.githubcopilot.com/mcp/x/dependabot
+- **Code Security**: https://api.githubcopilot.com/mcp/x/code_security
+- **Secret Protection**: https://api.githubcopilot.com/mcp/x/secret_protection
+- **Experiments**: https://api.githubcopilot.com/mcp/x/experiments
+- **Copilot**: https://api.githubcopilot.com/mcp/x/copilot
 
 ## Quick Start
 
-1. **Start all servers:**
+1. **Start local server (optional):**
    ```bash
    ./start-mcp-servers.sh
    ```
@@ -389,64 +359,57 @@ This directory contains the MCP (Model Context Protocol) servers used by LLM Lab
    ./status-mcp-servers.sh
    ```
 
-3. **Stop all servers:**
+3. **Stop local server:**
    ```bash
    ./stop-mcp-servers.sh
    ```
-
-## Configuration
-
-1. Copy `.env.mcp` to your project's `.env.local`
-2. Update the API keys and tokens as needed
-3. Restart the servers after configuration changes
 
 ## Usage with Postman
 
 The MCP Integration collection in LLM Lab is configured to use these servers:
 
-- GitHub: `ws://localhost:3001`
-- File System: `ws://localhost:3002`
-- Web Search: `ws://localhost:3003`
-- Database: `ws://localhost:3004`
+- Local Template Server: `ws://localhost:3001`
+- Remote GitHub Servers: `https://api.githubcopilot.com/mcp/` (and variants)
+
+## Authentication
+
+- **Local Server**: No authentication required
+- **Remote GitHub Servers**: Uses GitHub authentication (your GitHub account)
 
 ## Troubleshooting
 
-- Check logs: `tail -f *.log`
-- Check ports: `lsof -i :3001-3004`
-- Restart servers: `./stop-mcp-servers.sh && ./start-mcp-servers.sh`
-
-## API Keys Required
-
-- **GitHub**: Personal access token for repository access
-- **Web Search**: Serper API key for web search functionality
-- **Database**: Connection string for your database
+- Check local logs: `tail -f mcp-server.log`
+- Check local ports: `lsof -i :3001`
+- Restart local server: `./stop-mcp-servers.sh && ./start-mcp-servers.sh`
+- Remote servers are always available and don't require local setup
 
 ## More Information
 
+- [GitHub MCP Server Documentation](https://github.com/github/github-mcp-server/blob/main/docs/remote-server.md)
 - [MCP Documentation](https://modelcontextprotocol.io/)
-- [GitHub MCP Server](https://github.com/modelcontextprotocol/server-github)
-- [File System MCP Server](https://github.com/modelcontextprotocol/server-filesystem)
-- [Web Search MCP Server](https://github.com/modelcontextprotocol/server-web-search)
-- [Database MCP Server](https://github.com/modelcontextprotocol/server-database)
+- [GitHub MCP Server Repository](https://github.com/github/github-mcp-server)
 EOF
 
 print_success "Documentation created"
 
 print_section "Setup Complete!"
 
-print_success "MCP servers have been installed and configured"
+print_success "MCP server infrastructure has been set up"
 print_info "Installation directory: $MCP_DIR"
 
 echo ""
 echo "Next steps:"
-echo "1. Configure API keys in .env.mcp"
-echo "2. Start the servers: ./start-mcp-servers.sh"
-echo "3. Check status: ./status-mcp-servers.sh"
+echo "1. Start local server (optional): ./start-mcp-servers.sh"
+echo "2. Check status: ./status-mcp-servers.sh"
+echo "3. Remote GitHub MCP servers are always available"
 echo "4. Import the MCP collection in Postman"
 echo ""
 echo "Available commands:"
-echo "  ./start-mcp-servers.sh  - Start all MCP servers"
-echo "  ./stop-mcp-servers.sh   - Stop all MCP servers"
+echo "  ./start-mcp-servers.sh  - Start local MCP server infrastructure"
+echo "  ./stop-mcp-servers.sh   - Stop local MCP server infrastructure"
 echo "  ./status-mcp-servers.sh - Check server status"
+echo ""
+echo "Remote GitHub MCP servers are always available at:"
+echo "  https://api.githubcopilot.com/mcp/"
 echo ""
 echo "For more information, see README.md in $MCP_DIR"

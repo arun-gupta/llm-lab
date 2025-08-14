@@ -34,27 +34,43 @@ npm run dev
 
 ### **MCP Server Integration (Auto-Installed)**
 
-MCP (Model Context Protocol) servers are **automatically installed** during setup for enhanced Postman integration:
+MCP (Model Context Protocol) server infrastructure is **automatically installed** during setup for enhanced Postman integration:
 
-**Installed Servers:**
-- **GitHub MCP Server** (Port 3001): Access GitHub repositories and data
-- **File System MCP Server** (Port 3002): Read and write local files  
-- **Web Search MCP Server** (Port 3003): Perform web searches
-- **Database MCP Server** (Port 3004): Query databases
+**Local Infrastructure:**
+- **Local MCP Server Template** (Port 3001): Basic MCP server for testing
+
+**Remote GitHub MCP Servers (Always Available):**
+- **GitHub MCP Server**: https://api.githubcopilot.com/mcp/
+- **GitHub Repositories**: https://api.githubcopilot.com/mcp/x/repos
+- **GitHub Issues**: https://api.githubcopilot.com/mcp/x/issues
+- **GitHub Pull Requests**: https://api.githubcopilot.com/mcp/x/pull_requests
+- **GitHub Actions**: https://api.githubcopilot.com/mcp/x/actions
+- **GitHub Notifications**: https://api.githubcopilot.com/mcp/x/notifications
+- **GitHub Organizations**: https://api.githubcopilot.com/mcp/x/orgs
+- **GitHub Users**: https://api.githubcopilot.com/mcp/x/users
+- **GitHub Gists**: https://api.githubcopilot.com/mcp/x/gists
+- **GitHub Discussions**: https://api.githubcopilot.com/mcp/x/discussions
+- **GitHub Dependabot**: https://api.githubcopilot.com/mcp/x/dependabot
+- **GitHub Code Security**: https://api.githubcopilot.com/mcp/x/code_security
+- **GitHub Secret Protection**: https://api.githubcopilot.com/mcp/x/secret_protection
+- **GitHub Experiments**: https://api.githubcopilot.com/mcp/x/experiments
+- **GitHub Copilot**: https://api.githubcopilot.com/mcp/x/copilot
 
 **Management:**
 - **UI Management**: Go to Settings → MCP Server Management
 - **Command Line**: Use npm scripts for quick access
   ```bash
-  npm run start-mcp    # Start all servers
-  npm run stop-mcp     # Stop all servers
+  npm run start-mcp    # Start local server
+  npm run stop-mcp     # Stop local server
   npm run status-mcp   # Check status
   ```
 
-**Required API Keys for MCP:**
-- GitHub: Personal access token for repository access
-- Web Search: Serper API key for web search functionality
-- Database: Connection string for your database
+**Authentication:**
+- **Local Server**: No authentication required
+- **Remote GitHub Servers**: Uses GitHub authentication (your GitHub account)
+
+**Documentation:**
+- [GitHub MCP Server Documentation](https://github.com/github/github-mcp-server/blob/main/docs/remote-server.md)
 
 ## 🔑 Required API Keys
 

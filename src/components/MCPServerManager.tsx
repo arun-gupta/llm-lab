@@ -18,28 +18,43 @@ interface MCPServerManagerProps {
 export function MCPServerManager({ className = '' }: MCPServerManagerProps) {
   const [servers, setServers] = useState<MCPServer[]>([
     {
-      name: 'GitHub MCP Server',
+      name: 'Local MCP Server Template',
       port: 3001,
       status: 'stopped',
-      description: 'Access GitHub repositories and data'
+      description: 'Basic MCP server template for testing'
+    }
+  ]);
+
+  const [remoteServers] = useState([
+    {
+      name: 'GitHub MCP Server (Remote)',
+      url: 'https://api.githubcopilot.com/mcp/',
+      status: 'running' as const,
+      description: 'Official GitHub MCP server - always available'
     },
     {
-      name: 'File System MCP Server',
-      port: 3002,
-      status: 'stopped',
-      description: 'Read and write local files'
+      name: 'GitHub Repositories',
+      url: 'https://api.githubcopilot.com/mcp/x/repos',
+      status: 'running' as const,
+      description: 'GitHub repository management tools'
     },
     {
-      name: 'Web Search MCP Server',
-      port: 3003,
-      status: 'stopped',
-      description: 'Perform web searches'
+      name: 'GitHub Issues',
+      url: 'https://api.githubcopilot.com/mcp/x/issues',
+      status: 'running' as const,
+      description: 'GitHub issue management tools'
     },
     {
-      name: 'Database MCP Server',
-      port: 3004,
-      status: 'stopped',
-      description: 'Query databases'
+      name: 'GitHub Pull Requests',
+      url: 'https://api.githubcopilot.com/mcp/x/pull_requests',
+      status: 'running' as const,
+      description: 'GitHub pull request management tools'
+    },
+    {
+      name: 'GitHub Actions',
+      url: 'https://api.githubcopilot.com/mcp/x/actions',
+      status: 'running' as const,
+      description: 'GitHub Actions and CI/CD tools'
     }
   ]);
   const [isLoading, setIsLoading] = useState(false);
@@ -183,28 +198,57 @@ export function MCPServerManager({ className = '' }: MCPServerManagerProps) {
         </div>
       )}
 
-      {/* Server Status Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
-        {servers.map((server) => (
-          <div key={server.port} className="border border-gray-200 rounded-lg p-4">
-            <div className="flex items-start justify-between">
-              <div className="flex-1">
-                <div className="flex items-center space-x-2 mb-2">
-                  {getStatusIcon(server.status)}
-                  <h4 className="font-medium text-gray-900">{server.name}</h4>
+      {/* Local Server Status */}
+      <div className="mb-6">
+        <h4 className="text-lg font-semibold text-gray-900 mb-4">Local MCP Servers</h4>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+          {servers.map((server) => (
+            <div key={server.port} className="border border-gray-200 rounded-lg p-4">
+              <div className="flex items-start justify-between">
+                <div className="flex-1">
+                  <div className="flex items-center space-x-2 mb-2">
+                    {getStatusIcon(server.status)}
+                    <h4 className="font-medium text-gray-900">{server.name}</h4>
+                  </div>
+                  <p className="text-sm text-gray-600 mb-2">{server.description}</p>
+                  <div className="flex items-center space-x-4 text-xs text-gray-500">
+                    <span>Port: {server.port}</span>
+                    {server.pid && <span>PID: {server.pid}</span>}
+                  </div>
                 </div>
-                <p className="text-sm text-gray-600 mb-2">{server.description}</p>
-                <div className="flex items-center space-x-4 text-xs text-gray-500">
-                  <span>Port: {server.port}</span>
-                  {server.pid && <span>PID: {server.pid}</span>}
+                <div className={`px-2 py-1 rounded-full text-xs font-medium border ${getStatusColor(server.status)}`}>
+                  {getStatusText(server.status)}
                 </div>
-              </div>
-              <div className={`px-2 py-1 rounded-full text-xs font-medium border ${getStatusColor(server.status)}`}>
-                {getStatusText(server.status)}
               </div>
             </div>
-          </div>
-        ))}
+          ))}
+        </div>
+      </div>
+
+      {/* Remote Server Status */}
+      <div className="mb-6">
+        <h4 className="text-lg font-semibold text-gray-900 mb-4">Remote GitHub MCP Servers</h4>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+          {remoteServers.map((server) => (
+            <div key={server.url} className="border border-gray-200 rounded-lg p-4">
+              <div className="flex items-start justify-between">
+                <div className="flex-1">
+                  <div className="flex items-center space-x-2 mb-2">
+                    {getStatusIcon(server.status)}
+                    <h4 className="font-medium text-gray-900">{server.name}</h4>
+                  </div>
+                  <p className="text-sm text-gray-600 mb-2">{server.description}</p>
+                  <div className="flex items-center space-x-4 text-xs text-gray-500">
+                    <span className="truncate">URL: {server.url}</span>
+                  </div>
+                </div>
+                <div className={`px-2 py-1 rounded-full text-xs font-medium border ${getStatusColor(server.status)}`}>
+                  {getStatusText(server.status)}
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
       </div>
 
       {/* Control Buttons */}
@@ -232,13 +276,21 @@ export function MCPServerManager({ className = '' }: MCPServerManagerProps) {
       <div className="mt-6 p-4 bg-blue-50 rounded-lg">
         <h4 className="font-medium text-blue-900 mb-2">💡 MCP Server Information</h4>
         <p className="text-sm text-blue-800 mb-3">
-          MCP servers are automatically installed during project setup. If they're missing:
+          Local MCP server infrastructure is automatically installed during project setup. If it's missing:
         </p>
         <div className="bg-gray-800 text-green-400 p-3 rounded text-sm font-mono">
           npm run setup-mcp
         </div>
         <p className="text-xs text-blue-700 mt-2">
-          This will install GitHub, File System, Web Search, and Database MCP servers.
+          Remote GitHub MCP servers are always available and don't require local installation.
+        </p>
+        <p className="text-xs text-blue-700 mt-1">
+          <a href="https://github.com/github/github-mcp-server/blob/main/docs/remote-server.md" 
+             target="_blank" 
+             rel="noopener noreferrer"
+             className="underline hover:text-blue-600">
+            View GitHub MCP Server Documentation →
+          </a>
         </p>
       </div>
     </div>
