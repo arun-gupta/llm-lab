@@ -152,7 +152,7 @@ STEP 4: Add Your API Keys
                 '}',
                 '',
                 '// Set request variables',
-                'pm.request.url = pm.environment.get("base_url") + "/api/llm";'
+                'pm.request.url.raw = pm.environment.get("base_url") + "/api/llm";'
               ]
             }
           },
@@ -266,20 +266,20 @@ STEP 4: Add Your API Keys
                   'const anthropicKey = pm.environment.get("anthropic_api_key");',
                   '',
                   '// Provider-specific checks',
-                  `if (pm.request.url.includes("openai.com") && (!openaiKey || openaiKey === "your_openai_api_key_here")) {`,
+                  `if (pm.request.url.raw.includes("openai.com") && (!openaiKey || openaiKey === "your_openai_api_key_here")) {`,
                   '    console.warn("⚠️ WARNING: OpenAI API key not set for this request");',
                   '    console.warn("Please import the environment file and add your OpenAI API key");',
                   '}',
                   '',
-                  `if (pm.request.url.includes("anthropic.com") && (!anthropicKey || anthropicKey === "your_anthropic_api_key_here")) {`,
+                  `if (pm.request.url.raw.includes("anthropic.com") && (!anthropicKey || anthropicKey === "your_anthropic_api_key_here")) {`,
                   '    console.warn("⚠️ WARNING: Anthropic API key not set for this request");',
                   '    console.warn("Please import the environment file and add your Anthropic API key");',
                   '}',
                   '',
                   '// Set Authorization header dynamically',
-                  'if (pm.request.url.includes("openai.com")) {',
+                  'if (pm.request.url.raw.includes("openai.com")) {',
                   '    pm.request.headers.add({ key: "Authorization", value: "Bearer " + openaiKey });',
-                  '} else if (pm.request.url.includes("anthropic.com")) {',
+                  '} else if (pm.request.url.raw.includes("anthropic.com")) {',
                   '    pm.request.headers.add({ key: "x-api-key", value: anthropicKey });',
                   '}'
                 ]
