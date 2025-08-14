@@ -120,13 +120,31 @@ export default function Home() {
     }
   };
 
+  const handleHomeClick = () => {
+    // Reset all state to initial values
+    setResponses([]);
+    setIsLoading(false);
+    setActiveTab('responses');
+    setFormData(null);
+    setShowPostmanSetup(false);
+    setShowCollectionPreview(false);
+    setIsCreatingCollection(false);
+    
+    // Scroll to top of page
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Fixed Header */}
       <header className="fixed top-0 left-0 right-0 bg-white shadow-sm border-b z-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center py-4">
-            <div className="flex items-center space-x-3">
+            <button
+              onClick={handleHomeClick}
+              className="flex items-center space-x-3 hover:opacity-80 transition-opacity cursor-pointer"
+              title="Go to home page"
+            >
               <div className="w-8 h-8 bg-gradient-to-r from-blue-600 to-purple-600 rounded-lg flex items-center justify-center">
                 <Zap className="w-5 h-5 text-white" />
               </div>
@@ -134,7 +152,7 @@ export default function Home() {
                 <h1 className="text-xl font-bold text-gray-900">LLM Prompt Lab</h1>
                 <p className="text-xs text-gray-600">Test prompts across cloud & local models with Postman integration</p>
               </div>
-            </div>
+            </button>
             
             <div className="flex items-center space-x-3">
               <PostmanStatusIndicator onStatusChange={setPostmanConfigured} />
