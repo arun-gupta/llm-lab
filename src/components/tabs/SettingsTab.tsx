@@ -1,11 +1,14 @@
 'use client';
 
-import { Settings, Key, Globe, Bell, User, Shield, Download, Upload } from 'lucide-react';
+import { Settings, Key, Globe, Bell, User, Shield, Download, Upload, Server } from 'lucide-react';
 import { ConfigPanel } from '../ConfigPanel';
+import { MCPServerManager } from '../MCPServerManager';
 import { useState } from 'react';
 
 export function SettingsTab() {
   const [showConfigPanel, setShowConfigPanel] = useState(false);
+
+  const [showMCPServerManager, setShowMCPServerManager] = useState(false);
 
   const settingsSections = [
     {
@@ -13,6 +16,13 @@ export function SettingsTab() {
       title: 'API Configuration',
       description: 'Manage your API keys and provider settings',
       action: () => setShowConfigPanel(true),
+      status: '✅ Available'
+    },
+    {
+      icon: Server,
+      title: 'MCP Server Management',
+      description: 'Start, stop, and monitor MCP servers for enhanced Postman integration',
+      action: () => setShowMCPServerManager(true),
       status: '✅ Available'
     },
     {
@@ -171,6 +181,25 @@ export function SettingsTab() {
           }
         }}
       />
+
+      {/* MCP Server Manager Modal */}
+      {showMCPServerManager && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white rounded-lg max-w-4xl w-full mx-4 max-h-[90vh] overflow-y-auto">
+            <div className="p-6">
+              <MCPServerManager />
+            </div>
+            <div className="border-t border-gray-200 p-4 flex justify-end">
+              <button
+                onClick={() => setShowMCPServerManager(false)}
+                className="px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors"
+              >
+                Close
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
