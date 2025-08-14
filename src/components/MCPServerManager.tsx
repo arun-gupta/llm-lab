@@ -230,12 +230,12 @@ export function MCPServerManager({ className = '' }: MCPServerManagerProps) {
 
       {/* Setup Instructions */}
       <div className="mt-6 p-4 bg-blue-50 rounded-lg">
-        <h4 className="font-medium text-blue-900 mb-2">💡 MCP Server Setup</h4>
+        <h4 className="font-medium text-blue-900 mb-2">💡 MCP Server Information</h4>
         <p className="text-sm text-blue-800 mb-3">
-          If MCP servers are not installed, run the setup script first:
+          MCP servers are automatically installed during project setup. If they're missing:
         </p>
         <div className="bg-gray-800 text-green-400 p-3 rounded text-sm font-mono">
-          ./setup-mcp.sh
+          npm run setup-mcp
         </div>
         <p className="text-xs text-blue-700 mt-2">
           This will install GitHub, File System, Web Search, and Database MCP servers.

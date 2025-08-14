@@ -7,7 +7,12 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
-    "type-check": "tsc --noEmit"
+    "type-check": "tsc --noEmit",
+    "postinstall": "bash scripts/setup-mcp-servers.sh",
+    "setup-mcp": "bash scripts/setup-mcp-servers.sh",
+    "start-mcp": "bash ~/.mcp-servers/start-mcp-servers.sh",
+    "stop-mcp": "bash ~/.mcp-servers/stop-mcp-servers.sh",
+    "status-mcp": "bash ~/.mcp-servers/status-mcp-servers.sh"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.57.0",

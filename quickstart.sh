@@ -29,6 +29,22 @@ echo "✅ Node.js $(node -v) detected"
 echo "📦 Installing dependencies..."
 npm install
 
+# Install MCP servers for enhanced Postman integration
+echo "🔌 Setting up MCP servers for enhanced Postman integration..."
+if [ -f "scripts/setup-mcp-servers.sh" ]; then
+    bash scripts/setup-mcp-servers.sh
+    echo "✅ MCP servers installed successfully"
+    echo "   • GitHub MCP Server: Port 3001"
+    echo "   • File System MCP Server: Port 3002"
+    echo "   • Web Search MCP Server: Port 3003"
+    echo "   • Database MCP Server: Port 3004"
+    echo "   💡 You can manage MCP servers from the Settings tab in the UI"
+    echo ""
+else
+    echo "⚠️  MCP setup script not found, skipping MCP server installation"
+    echo ""
+fi
+
 # Set up environment file if it doesn't exist
 if [ ! -f ".env.local" ]; then
     echo "⚙️  Setting up environment file..."

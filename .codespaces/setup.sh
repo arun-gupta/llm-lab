@@ -63,8 +63,30 @@ echo "📦 Running: npm install"
 npm install
 print_success "Dependencies installed successfully"
 
+print_section "MCP Server Setup"
+print_step "3" "Installing MCP servers for enhanced Postman integration"
+
+# Check if MCP setup script exists
+if [ -f "scripts/setup-mcp-servers.sh" ]; then
+    echo "🔌 Setting up MCP servers..."
+    bash scripts/setup-mcp-servers.sh
+    print_success "MCP servers installed successfully"
+    
+    print_info "MCP Server Information:"
+    echo "   • GitHub MCP Server: Port 3001"
+    echo "   • File System MCP Server: Port 3002"
+    echo "   • Web Search MCP Server: Port 3003"
+    echo "   • Database MCP Server: Port 3004"
+    echo ""
+    echo "   💡 You can manage MCP servers from the Settings tab in the UI"
+    echo "   💡 MCP servers provide enhanced Postman integration capabilities"
+    echo ""
+else
+    print_warning "MCP setup script not found, skipping MCP server installation"
+fi
+
 print_section "Environment Configuration"
-print_step "3" "Setting up environment file"
+print_step "4" "Setting up environment file"
 
 # Set up environment file if it doesn't exist
 if [ ! -f ".env.local" ]; then
@@ -119,7 +141,7 @@ else
     print_success "Environment file already exists"
 fi
 
-print_step "4" "Checking API key configuration"
+print_step "5" "Checking API key configuration"
 
 # Check if at least one API key is configured
 if ! grep -q "^OPENAI_API_KEY=sk-" .env.local 2>/dev/null && ! grep -q "^ANTHROPIC_API_KEY=sk-ant-" .env.local 2>/dev/null; then
@@ -132,7 +154,7 @@ else
 fi
 
 print_section "Starting Development Server"
-print_step "5" "Launching LLM Prompt Lab"
+print_step "6" "Launching LLM Prompt Lab"
 
 echo "🌐 Starting development server..."
 echo "   The app will be available at the forwarded port 3000"
