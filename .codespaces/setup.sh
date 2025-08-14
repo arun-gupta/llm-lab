@@ -5,8 +5,42 @@
 
 set -e  # Exit on any error
 
-echo "🚀 Setting up LLM Prompt Lab in GitHub Codespaces..."
+# Function to print section headers
+print_section() {
+    echo ""
+    echo "=========================================="
+    echo "🔧 $1"
+    echo "=========================================="
+}
+
+# Function to print step progress
+print_step() {
+    echo "📋 Step $1: $2"
+}
+
+# Function to print success message
+print_success() {
+    echo "✅ $1"
+}
+
+# Function to print info message
+print_info() {
+    echo "ℹ️  $1"
+}
+
+# Function to print warning message
+print_warning() {
+    echo "⚠️  $1"
+}
+
 echo ""
+echo "🚀 =========================================="
+echo "🚀 LLM Prompt Lab - GitHub Codespaces Setup"
+echo "🚀 =========================================="
+echo ""
+
+print_section "Environment Check"
+print_step "1" "Checking Node.js installation"
 
 # Check if Node.js is installed
 if ! command -v node &> /dev/null; then
@@ -21,48 +55,73 @@ if [ "$NODE_VERSION" -lt 18 ]; then
     exit 1
 fi
 
-echo "✅ Node.js $(node -v) detected"
+print_success "Node.js $(node -v) detected"
 
-# Install dependencies
-echo "📦 Installing dependencies..."
+print_section "Dependencies Installation"
+print_step "2" "Installing npm dependencies"
+echo "📦 Running: npm install"
 npm install
+print_success "Dependencies installed successfully"
+
+print_section "Environment Configuration"
+print_step "3" "Setting up environment file"
 
 # Set up environment file if it doesn't exist
 if [ ! -f ".env.local" ]; then
-    echo "⚙️  Setting up environment file..."
+    echo "📝 Creating .env.local from template..."
     cp .env.local.example .env.local
-    echo "📝 Created .env.local from template"
+    print_success "Environment file created from template"
+    
+    print_info "🔑 API Key Setup Required"
     echo ""
-    echo "🔑 IMPORTANT: You need to add your API keys to .env.local"
-    echo "   Required: At least one working LLM provider API key"
-    echo "   Working: OpenAI or Anthropic"
-    echo "   Optional: POSTMAN_API_KEY for advanced Postman integration"
+    echo "   To use LLM Prompt Lab, you need to add your API keys:"
     echo ""
-    echo "📖 Get API keys from:"
+    echo "   📖 Get API keys from:"
     echo "   • OpenAI: https://platform.openai.com/ → API Keys"
     echo "   • Anthropic: https://console.anthropic.com/ → API Keys"
     echo "   • Postman: https://www.postman.com → Settings → API Keys"
     echo ""
-    echo "💡 In Codespaces, you can also add API keys as environment variables:"
-    echo "   1. Go to Codespace settings"
-    echo "   2. Add OPENAI_API_KEY, ANTHROPIC_API_KEY, POSTMAN_API_KEY"
+    echo "   💡 In Codespaces, you can add API keys as environment variables:"
+    echo "   1. Go to Codespace settings (gear icon)"
+    echo "   2. Add these environment variables:"
+    echo "      - OPENAI_API_KEY"
+    echo "      - ANTHROPIC_API_KEY"
+    echo "      - POSTMAN_API_KEY (optional)"
     echo ""
 else
-    echo "✅ .env.local already exists"
+    print_success "Environment file already exists"
 fi
+
+print_step "4" "Checking API key configuration"
 
 # Check if at least one API key is configured
 if ! grep -q "^OPENAI_API_KEY=sk-" .env.local 2>/dev/null && ! grep -q "^ANTHROPIC_API_KEY=sk-ant-" .env.local 2>/dev/null; then
-    echo ""
-    echo "⚠️  Warning: No API keys detected in .env.local"
+    print_warning "No API keys detected in .env.local"
     echo "   The app will start but you'll need API keys to test LLM providers"
     echo "   You can add them via Codespace environment variables or edit .env.local"
     echo ""
+else
+    print_success "API keys detected in environment file"
 fi
 
-echo "🎯 Starting development server..."
+print_section "Starting Development Server"
+print_step "5" "Launching LLM Prompt Lab"
+
+echo "🌐 Starting development server..."
 echo "   The app will be available at the forwarded port 3000"
 echo "   GitHub Codespaces will automatically forward the port to your browser"
+echo ""
+
+print_success "Setup complete! LLM Prompt Lab is starting..."
+echo ""
+echo "🎉 =========================================="
+echo "🎉 LLM Prompt Lab is ready to use!"
+echo "🎉 =========================================="
+echo ""
+echo "📖 Next steps:"
+echo "   1. Add your API keys (see instructions above)"
+echo "   2. The app will open automatically in your browser"
+echo "   3. Start testing LLM prompts and creating Postman collections!"
 echo ""
 
 # Start the development server

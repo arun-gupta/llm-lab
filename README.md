@@ -13,6 +13,7 @@ Click the button at the top of this README to open LLM Prompt Lab in GitHub Code
 - ⚡ **Auto-install dependencies** and start the dev server
 - 🔑 **Set up environment** with example configuration
 - 🌐 **Forward port 3000** automatically
+- 📋 **Show detailed logs** during setup (use Cmd/Ctrl + Shift + P → "View Creation Log")
 
 ### **Option 2: Local Development**
 ```bash
