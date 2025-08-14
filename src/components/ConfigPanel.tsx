@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { Settings, Key, Eye, EyeOff, Save, CheckCircle, AlertCircle } from 'lucide-react';
+import { Settings, Key, Eye, EyeOff, Save, CheckCircle, AlertCircle, Copy } from 'lucide-react';
 
 interface ConfigPanelProps {
   isOpen: boolean;
@@ -29,6 +29,11 @@ export function ConfigPanel({ isOpen, onClose, onConfigChange }: ConfigPanelProp
   const [isSaving, setIsSaving] = useState(false);
   const [saveStatus, setSaveStatus] = useState<'idle' | 'success' | 'error'>('idle');
   const [statusMessage, setStatusMessage] = useState('');
+  const [copyStatus, setCopyStatus] = useState<{ [key in keyof ApiKeys]: boolean }>({
+    openai: false,
+    anthropic: false,
+    postman: false
+  });
 
   // Load existing API keys on mount
   useEffect(() => {
@@ -93,6 +98,29 @@ export function ConfigPanel({ isOpen, onClose, onConfigChange }: ConfigPanelProp
       ...prev,
       [key]: !prev[key]
     }));
+  };
+
+  const copyToClipboard = async (key: keyof ApiKeys) => {
+    const keyValue = apiKeys[key];
+    if (!keyValue) return;
+
+    try {
+      await navigator.clipboard.writeText(keyValue);
+      setCopyStatus(prev => ({
+        ...prev,
+        [key]: true
+      }));
+      
+      // Reset copy status after 2 seconds
+      setTimeout(() => {
+        setCopyStatus(prev => ({
+          ...prev,
+          [key]: false
+        }));
+      }, 2000);
+    } catch (error) {
+      console.error('Failed to copy to clipboard:', error);
+    }
   };
 
   const getKeyStatus = (key: string, type: 'openai' | 'anthropic' | 'postman') => {
@@ -181,15 +209,31 @@ export function ConfigPanel({ isOpen, onClose, onConfigChange }: ConfigPanelProp
                 value={apiKeys.openai}
                 onChange={(e) => setApiKeys(prev => ({ ...prev, openai: e.target.value }))}
                 placeholder="sk-..."
-                className="w-full px-3 py-2 pr-10 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                className="w-full px-3 py-2 pr-20 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
               />
-              <button
-                type="button"
-                onClick={() => toggleKeyVisibility('openai')}
-                className="absolute right-2 top-1/2 transform -translate-y-1/2 p-1 text-gray-400 hover:text-gray-600"
-              >
-                {showKeys.openai ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
-              </button>
+              <div className="absolute right-2 top-1/2 transform -translate-y-1/2 flex items-center space-x-1">
+                {apiKeys.openai && (
+                  <button
+                    type="button"
+                    onClick={() => copyToClipboard('openai')}
+                    className={`p-1 rounded transition-colors ${
+                      copyStatus.openai 
+                        ? 'text-green-600' 
+                        : 'text-gray-400 hover:text-gray-600'
+                    }`}
+                    title="Copy to clipboard"
+                  >
+                    {copyStatus.openai ? <CheckCircle className="w-4 h-4" /> : <Copy className="w-4 h-4" />}
+                  </button>
+                )}
+                <button
+                  type="button"
+                  onClick={() => toggleKeyVisibility('openai')}
+                  className="p-1 text-gray-400 hover:text-gray-600"
+                >
+                  {showKeys.openai ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                </button>
+              </div>
             </div>
             <p className="text-xs text-gray-500">
               Get your key from <a href="https://platform.openai.com/api-keys" target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline">OpenAI Platform</a>
@@ -215,15 +259,31 @@ export function ConfigPanel({ isOpen, onClose, onConfigChange }: ConfigPanelProp
                 value={apiKeys.anthropic}
                 onChange={(e) => setApiKeys(prev => ({ ...prev, anthropic: e.target.value }))}
                 placeholder="sk-ant-..."
-                className="w-full px-3 py-2 pr-10 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                className="w-full px-3 py-2 pr-20 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
               />
-              <button
-                type="button"
-                onClick={() => toggleKeyVisibility('anthropic')}
-                className="absolute right-2 top-1/2 transform -translate-y-1/2 p-1 text-gray-400 hover:text-gray-600"
-              >
-                {showKeys.anthropic ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
-              </button>
+              <div className="absolute right-2 top-1/2 transform -translate-y-1/2 flex items-center space-x-1">
+                {apiKeys.anthropic && (
+                  <button
+                    type="button"
+                    onClick={() => copyToClipboard('anthropic')}
+                    className={`p-1 rounded transition-colors ${
+                      copyStatus.anthropic 
+                        ? 'text-green-600' 
+                        : 'text-gray-400 hover:text-gray-600'
+                    }`}
+                    title="Copy to clipboard"
+                  >
+                    {copyStatus.anthropic ? <CheckCircle className="w-4 h-4" /> : <Copy className="w-4 h-4" />}
+                  </button>
+                )}
+                <button
+                  type="button"
+                  onClick={() => toggleKeyVisibility('anthropic')}
+                  className="p-1 text-gray-400 hover:text-gray-600"
+                >
+                  {showKeys.anthropic ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                </button>
+              </div>
             </div>
             <p className="text-xs text-gray-500">
               Get your key from <a href="https://console.anthropic.com/" target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline">Anthropic Console</a>
@@ -249,15 +309,31 @@ export function ConfigPanel({ isOpen, onClose, onConfigChange }: ConfigPanelProp
                 value={apiKeys.postman}
                 onChange={(e) => setApiKeys(prev => ({ ...prev, postman: e.target.value }))}
                 placeholder="PMAK-..."
-                className="w-full px-3 py-2 pr-10 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                className="w-full px-3 py-2 pr-20 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
               />
-              <button
-                type="button"
-                onClick={() => toggleKeyVisibility('postman')}
-                className="absolute right-2 top-1/2 transform -translate-y-1/2 p-1 text-gray-400 hover:text-gray-600"
-              >
-                {showKeys.postman ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
-              </button>
+              <div className="absolute right-2 top-1/2 transform -translate-y-1/2 flex items-center space-x-1">
+                {apiKeys.postman && (
+                  <button
+                    type="button"
+                    onClick={() => copyToClipboard('postman')}
+                    className={`p-1 rounded transition-colors ${
+                      copyStatus.postman 
+                        ? 'text-green-600' 
+                        : 'text-gray-400 hover:text-gray-600'
+                    }`}
+                    title="Copy to clipboard"
+                  >
+                    {copyStatus.postman ? <CheckCircle className="w-4 h-4" /> : <Copy className="w-4 h-4" />}
+                  </button>
+                )}
+                <button
+                  type="button"
+                  onClick={() => toggleKeyVisibility('postman')}
+                  className="p-1 text-gray-400 hover:text-gray-600"
+                >
+                  {showKeys.postman ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                </button>
+              </div>
             </div>
             <p className="text-xs text-gray-500">
               Get your key from <a href="https://www.postman.com/settings/api-keys" target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline">Postman Settings</a>

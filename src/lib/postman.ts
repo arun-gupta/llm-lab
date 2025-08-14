@@ -91,15 +91,18 @@ export function generatePostmanCollection(
       name: collectionName || 'LLM Prompt Lab Collection',
       description: `Generated collection for prompt: "${prompt}"
 
-IMPORTANT: Before using this collection, you need to set up environment variables:
-1. Create a new environment in Postman
-2. Add these variables:
+🔑 API KEY SETUP REQUIRED:
+1. Import the environment file (download it from the preview)
+2. In Postman, go to Environments → Import the downloaded environment file
+3. Edit the environment variables and replace placeholder values with your actual API keys:
    - openai_api_key: Your OpenAI API key (starts with sk-)
    - anthropic_api_key: Your Anthropic API key (starts with sk-ant-)
-   - postman_api_key: Your Postman API key (optional, for advanced features)
-   - base_url: The base URL of your LLM Prompt Lab instance
+   - postman_api_key: Your Postman API key (optional)
+   - base_url: Already set to your current environment
 
-You can also download the environment file that will be generated alongside this collection.`,
+💡 TIP: You can copy your API keys from the LLM Prompt Lab Config Panel (gear icon in the header)
+
+⚠️ SECURITY: Never share your environment file with actual API keys. The downloaded file contains safe placeholder values.`,
       schema: 'https://schema.getpostman.com/json/collection/v2.1.0/collection.json',
     },
     item: [
@@ -297,6 +300,12 @@ export function generatePostmanEnvironment(collectionName: string): PostmanEnvir
         value: process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000',
         type: 'default',
         enabled: true,
+      },
+      {
+        key: 'setup_instructions',
+        value: 'IMPORTANT: Replace the placeholder values above with your actual API keys. You can copy them from your LLM Prompt Lab environment.',
+        type: 'default',
+        enabled: false,
       },
     ],
   };
