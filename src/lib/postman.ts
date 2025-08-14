@@ -28,6 +28,12 @@ export interface PostmanItem {
       path: string[];
     };
   };
+  event?: {
+    listen: string;
+    script: {
+      exec: string[];
+    };
+  }[];
 }
 
 export interface PostmanHeader {

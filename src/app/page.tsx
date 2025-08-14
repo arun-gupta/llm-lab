@@ -19,6 +19,7 @@ export default function Home() {
   const [postmanConfigured, setPostmanConfigured] = useState(false);
   const [showCollectionPreview, setShowCollectionPreview] = useState(false);
   const [isCreatingCollection, setIsCreatingCollection] = useState(false);
+  const [activeTab, setActiveTab] = useState<'responses' | 'analytics'>('responses');
 
   const createPostmanCollectionInWorkspace = async () => {
     if (responses.length === 0) return;
@@ -83,6 +84,22 @@ export default function Home() {
     }
   };
 
+  const handleResponsesChange = (newResponses: LLMResponse[]) => {
+    setResponses(newResponses);
+    // Auto-switch to responses tab when new responses arrive
+    if (newResponses.length > 0) {
+      setActiveTab('responses');
+    }
+  };
+
+  const handleLoadingChange = (loading: boolean) => {
+    setIsLoading(loading);
+    // Auto-switch to responses tab when starting to load
+    if (loading) {
+      setActiveTab('responses');
+    }
+  };
+
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Fixed Header */}
@@ -142,8 +159,8 @@ export default function Home() {
           <div className="lg:col-span-1">
             <div className="sticky top-8">
               <LLMForm 
-                onResponsesChange={setResponses}
-                onLoadingChange={setIsLoading}
+                onResponsesChange={handleResponsesChange}
+                onLoadingChange={handleLoadingChange}
                 onProvidersChange={setSelectedProviders}
                 onFormDataChange={setFormData}
               />
@@ -158,6 +175,8 @@ export default function Home() {
               context={formData?.context || ''}
               isLoading={isLoading}
               selectedProviders={selectedProviders}
+              activeTab={activeTab}
+              onTabChange={setActiveTab}
             />
           </div>
         </div>

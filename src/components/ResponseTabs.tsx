@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { ResponseCard } from './ResponseCard';
 import { LLMResponse } from '@/lib/llm-apis';
 import { BarChart3, MessageSquare, Clock, Zap, DollarSign, Target, Loader2, Download } from 'lucide-react';
+import React from 'react'; // Added missing import for React.useEffect
 
 interface ResponseTabsProps {
   responses: LLMResponse[];
@@ -11,10 +12,38 @@ interface ResponseTabsProps {
   context?: string;
   isLoading?: boolean;
   selectedProviders?: string[];
+  activeTab?: 'responses' | 'analytics';
+  onTabChange?: (tab: 'responses' | 'analytics') => void;
 }
 
-export function ResponseTabs({ responses, prompt, context, isLoading = false, selectedProviders = [] }: ResponseTabsProps) {
-  const [activeTab, setActiveTab] = useState<'responses' | 'analytics'>('responses');
+export function ResponseTabs({ 
+  responses, 
+  prompt, 
+  context, 
+  isLoading = false, 
+  selectedProviders = [],
+  activeTab: externalActiveTab,
+  onTabChange
+}: ResponseTabsProps) {
+  const [internalActiveTab, setInternalActiveTab] = useState<'responses' | 'analytics'>('responses');
+  
+  // Use external activeTab if provided, otherwise use internal state
+  const activeTab = externalActiveTab !== undefined ? externalActiveTab : internalActiveTab;
+  
+  const handleTabChange = (tab: 'responses' | 'analytics') => {
+    if (onTabChange) {
+      onTabChange(tab);
+    } else {
+      setInternalActiveTab(tab);
+    }
+  };
+
+  // Auto-switch to responses tab when new responses arrive
+  React.useEffect(() => {
+    if (responses.length > 0 && activeTab === 'analytics') {
+      handleTabChange('responses');
+    }
+  }, [responses.length]);
 
   const calculateAnalytics = () => {
     const totalResponses = responses.length;
@@ -235,7 +264,7 @@ export function ResponseTabs({ responses, prompt, context, isLoading = false, se
       <div className="flex items-center justify-between">
         <div className="flex space-x-1 bg-gray-100 p-1 rounded-lg">
           <button
-            onClick={() => setActiveTab('responses')}
+            onClick={() => handleTabChange('responses')}
             className={`flex items-center space-x-2 px-4 py-2 rounded-md text-sm font-medium transition-colors ${activeTab === 'responses'
                 ? 'bg-white text-gray-900 shadow-sm'
                 : 'text-gray-600 hover:text-gray-900'
@@ -245,7 +274,7 @@ export function ResponseTabs({ responses, prompt, context, isLoading = false, se
             <span>Responses ({responses.length})</span>
           </button>
           <button
-            onClick={() => setActiveTab('analytics')}
+            onClick={() => handleTabChange('analytics')}
             disabled={isLoading || responses.length === 0}
             className={`flex items-center space-x-2 px-4 py-2 rounded-md text-sm font-medium transition-colors ${activeTab === 'analytics'
                 ? 'bg-white text-gray-900 shadow-sm'
