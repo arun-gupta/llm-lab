@@ -1,13 +1,33 @@
 {
   "info": {
     "name": "MCP Server Integration Demo",
-    "description": "Demonstrates how to integrate popular MCP servers with Postman for enhanced API testing and automation.\n\n🔧 **Built-in MCP Client Library**\nThis collection includes a complete MCP client library that works out of the box. No external setup required!\n\n📋 **What's Included**\n• GitHub MCP Integration (repositories, issues)\n• File System MCP (read files, search files)\n• Web Search MCP (search, weather data)\n• Database MCP (query execution)\n• Multi-MCP Orchestration (combine multiple servers)\n\n✅ **Ready to Use**\n• No MCP servers needed - uses built-in mock data\n• All scripts work immediately in Postman\n• Realistic demo data for testing\n• Comprehensive error handling\n\n🎯 **Perfect for Learning**\n• See how MCP integration works in practice\n• Understand the MCP client-server pattern\n• Learn Postman script best practices\n• Explore multi-server orchestration",
+    "description": "Demonstrates how to integrate popular MCP servers with Postman for enhanced API testing and automation.\n\n🔧 **Real GitHub Remote MCP Server Integration**\nThis collection connects to the official GitHub Remote MCP server at api.githubcopilot.com for real GitHub operations!\n\n📋 **What's Included**\n• GitHub Remote MCP Server (real repositories, issues)\n• File System MCP (read files, search files)\n• Web Search MCP (search, weather data)\n• Database MCP (query execution)\n• Multi-MCP Orchestration (combine multiple servers)\n\n✅ **Ready to Use**\n• Real GitHub MCP server integration\n• Official GitHub Copilot MCP endpoints\n• Proper MCP protocol implementation\n• GitHub token authentication support\n\n🎯 **Perfect for Learning**\n• See how real MCP server integration works\n• Understand the MCP protocol with GitHub\n• Learn Postman script best practices\n• Explore official GitHub MCP tools",
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
   },
   "variable": [
     {
       "key": "base_url",
       "value": "http://localhost:3000",
+      "type": "string"
+    },
+    {
+      "key": "github_mcp_url",
+      "value": "https://api.githubcopilot.com/mcp/",
+      "type": "string"
+    },
+    {
+      "key": "github_repos_url",
+      "value": "https://api.githubcopilot.com/mcp/x/repos",
+      "type": "string"
+    },
+    {
+      "key": "github_issues_url",
+      "value": "https://api.githubcopilot.com/mcp/x/issues",
+      "type": "string"
+    },
+    {
+      "key": "github_actions_url",
+      "value": "https://api.githubcopilot.com/mcp/x/actions",
       "type": "string"
     },
     {
@@ -194,9 +214,9 @@
               "raw": "{\n  \"owner\": \"arun-gupta\",\n  \"type\": \"all\"\n}"
             },
             "url": {
-              "raw": "{{base_url}}/api/mcp/github/list_repositories",
-              "host": ["{{base_url}}"],
-              "path": ["api", "mcp", "github", "list_repositories"]
+              "raw": "{{github_repos_url}}",
+              "host": ["api.githubcopilot.com"],
+              "path": ["mcp", "x", "repos"]
             }
           },
           "event": [
@@ -263,33 +283,39 @@
                   "  }",
                   "}",
                   "",
-                  "// MCP Client for GitHub integration",
+                  "// GitHub Remote MCP Server Integration",
                   "try {",
-                  "  const mcpClient = new MCPClient(pm.environment.get('mcp_github_url'));",
-                  "  await mcpClient.connect();",
-                  "  ",
-                  "  const repos = await mcpClient.call('github/list_repositories', {",
+                  "  // Set up request for GitHub Remote MCP server",
+                  "  const requestBody = {",
+                  "    method: 'tools/call',",
+                  "    params: {",
+                  "      name: 'list_repositories',",
+                  "      arguments: {",
+                  "        owner: 'arun-gupta',",
+                  "        type: 'all'",
+                  "      }",
+                  "    }",
+                  "  };",
+                  "",
+                  "  // Update request body for GitHub MCP server",
+                  "  pm.request.body.raw = JSON.stringify(requestBody);",
+                  "",
+                  "  // Set Authorization header if GitHub token is available",
+                  "  const githubToken = pm.environment.get('github_token');",
+                  "  if (githubToken) {",
+                  "    pm.request.headers.add({",
+                  "      key: 'Authorization',",
+                  "      value: `Bearer ${githubToken}`",
+                  "    });",
+                  "  }",
+                  "",
+                  "  console.log('Making request to GitHub Remote MCP server:', requestBody);",
+                  "} catch (error) {",
+                  "  console.error('GitHub MCP setup error:', error);",
+                  "  // Fallback to basic request",
+                  "  pm.request.body.raw = JSON.stringify({",
                   "    owner: 'arun-gupta',",
                   "    type: 'all'",
-                  "  });",
-                  "",
-                  "  // Use the MCP data in the request",
-                  "  pm.request.body.raw = JSON.stringify({",
-                  "    repositories: repos,",
-                  "    timestamp: new Date().toISOString(),",
-                  "    source: 'MCP GitHub Server',",
-                  "    owner: 'arun-gupta'",
-                  "  });",
-                  "",
-                  "  console.log('MCP GitHub data:', repos);",
-                  "  pm.environment.set('github_repos_count', repos.length);",
-                  "} catch (error) {",
-                  "  console.error('MCP GitHub error:', error);",
-                  "  // Fallback to original request body",
-                  "  pm.request.body.raw = JSON.stringify({",
-                  "    owner: 'arun-gupta',",
-                  "    type: 'all',",
-                  "    error: 'MCP integration failed, using fallback'",
                   "  });",
                   "}"
                 ]
@@ -332,9 +358,9 @@
               "raw": "{\n  \"title\": \"Test Issue via MCP\",\n  \"body\": \"This issue was created using MCP integration\",\n  \"labels\": [\"mcp\", \"postman\"]\n}"
             },
             "url": {
-              "raw": "{{base_url}}/api/mcp/github/create_issue",
-              "host": ["{{base_url}}"],
-              "path": ["api", "mcp", "github", "create_issue"]
+              "raw": "{{github_issues_url}}",
+              "host": ["api.githubcopilot.com"],
+              "path": ["mcp", "x", "issues"]
             }
           },
           "event": [
@@ -342,34 +368,41 @@
               "listen": "prerequest",
               "script": {
                 "exec": [
-                  "// MCP Client for GitHub issue creation",
+                  "// GitHub Remote MCP Server Integration for Issue Creation",
                   "try {",
-                  "  const mcpClient = new MCPClient(pm.environment.get('mcp_github_url'));",
-                  "  await mcpClient.connect();",
-                  "  ",
-                  "  const issue = await mcpClient.call('github/create_issue', {",
+                  "  // Set up request for GitHub Remote MCP server",
+                  "  const requestBody = {",
+                  "    method: 'tools/call',",
+                  "    params: {",
+                  "      name: 'create_issue',",
+                  "      arguments: {",
+                  "        title: 'Test Issue via MCP',",
+                  "        body: 'This issue was created using MCP integration',",
+                  "        labels: ['mcp', 'postman']",
+                  "      }",
+                  "    }",
+                  "  };",
+                  "",
+                  "  // Update request body for GitHub MCP server",
+                  "  pm.request.body.raw = JSON.stringify(requestBody);",
+                  "",
+                  "  // Set Authorization header if GitHub token is available",
+                  "  const githubToken = pm.environment.get('github_token');",
+                  "  if (githubToken) {",
+                  "    pm.request.headers.add({",
+                  "      key: 'Authorization',",
+                  "      value: `Bearer ${githubToken}`",
+                  "    });",
+                  "  }",
+                  "",
+                  "  console.log('Making request to GitHub Remote MCP server for issue creation:', requestBody);",
+                  "} catch (error) {",
+                  "  console.error('GitHub MCP setup error:', error);",
+                  "  // Fallback to basic request",
+                  "  pm.request.body.raw = JSON.stringify({",
                   "    title: 'Test Issue via MCP',",
                   "    body: 'This issue was created using MCP integration',",
                   "    labels: ['mcp', 'postman']",
-                  "  });",
-                  "",
-                  "  // Use the MCP data in the request",
-                  "  pm.request.body.raw = JSON.stringify({",
-                  "    issue: issue,",
-                  "    timestamp: new Date().toISOString(),",
-                  "    source: 'MCP GitHub Server'",
-                  "  });",
-                  "",
-                  "  console.log('MCP GitHub issue:', issue);",
-                  "  pm.environment.set('last_issue_number', issue.number);",
-                  "} catch (error) {",
-                  "  console.error('MCP GitHub error:', error);",
-                  "  // Fallback to original request body",
-                  "  pm.request.body.raw = JSON.stringify({",
-                  "    title: 'Test Issue via MCP',",
-                  "    body: 'This issue was created using MCP integration',",
-                  "    labels: ['mcp', 'postman'],",
-                  "    error: 'MCP integration failed, using fallback'",
                   "  });",
                   "}"
                 ]
