@@ -248,17 +248,18 @@ export function CollectionPreviewModal({ isOpen, onClose, onDeploy, collectionUr
                   )}
                 </button>
               </div>
-              <div className="text-xs text-gray-500">
-                Required for GitHub MCP server integration. 
-                <a 
-                  href="https://github.com/settings/tokens" 
-                  target="_blank" 
-                  rel="noopener noreferrer"
-                  className="text-blue-600 hover:text-blue-800 ml-1"
-                >
-                  Generate token →
-                </a>
-              </div>
+                               <div className="text-xs text-gray-500">
+                   Required for GitHub MCP server integration. 
+                   <a 
+                     href="https://github.com/settings/tokens" 
+                     target="_blank" 
+                     rel="noopener noreferrer"
+                     className="text-blue-600 hover:text-blue-800 ml-1"
+                   >
+                     Generate token →
+                   </a>
+                   <span className="text-green-600 ml-2">✅ Pre-configured token available</span>
+                 </div>
             </div>
           </div>
 
@@ -325,11 +326,16 @@ export function CollectionPreviewModal({ isOpen, onClose, onDeploy, collectionUr
               : 'Postman Desktop will attempt to open automatically after deployment. Make sure it\'s installed from postman.com/downloads/'
             }
           </p>
-          {!githubToken && (
-            <p className="text-xs text-red-700 mt-2">
-              <strong>⚠️ Note:</strong> GitHub token is required for GitHub MCP server integration to work properly.
-            </p>
-          )}
+                       {!githubToken && (
+               <p className="text-xs text-red-700 mt-2">
+                 <strong>⚠️ Note:</strong> GitHub token is required for GitHub MCP server integration to work properly.
+               </p>
+             )}
+             {githubToken && (
+               <p className="text-xs text-green-700 mt-2">
+                 <strong>✅ Ready:</strong> GitHub token is configured and ready for MCP server integration.
+               </p>
+             )}
         </div>
       </div>
     </div>

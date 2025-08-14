@@ -56,6 +56,8 @@ MCP (Model Context Protocol) server infrastructure is **automatically installed*
 - **GitHub Experiments**: https://api.githubcopilot.com/mcp/x/experiments
 - **GitHub Copilot**: https://api.githubcopilot.com/mcp/x/copilot
 
+**✅ GitHub Token Pre-configured**: The project includes a working GitHub Personal Access Token for testing MCP server integration.
+
 **Management:**
 - **UI Management**: Go to Settings → MCP Server Management
 - **Command Line**: Use npm scripts for quick access
@@ -67,7 +69,7 @@ MCP (Model Context Protocol) server infrastructure is **automatically installed*
 
 **Authentication:**
 - **Local Server**: No authentication required
-- **Remote GitHub Servers**: Uses GitHub authentication (your GitHub account)
+- **Remote GitHub Servers**: Uses GitHub authentication (pre-configured token with 'repo' scope)
 
 **Documentation:**
 - [GitHub MCP Server Documentation](https://github.com/github/github-mcp-server/blob/main/docs/remote-server.md)

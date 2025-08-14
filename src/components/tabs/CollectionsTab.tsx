@@ -211,11 +211,11 @@ export function CollectionsTab() {
               </div>
               <div className="flex items-center space-x-2">
                 <span className="w-6 h-6 bg-blue-100 text-blue-600 rounded-full flex items-center justify-center text-xs font-bold">2</span>
-                <span>Start MCP servers (GitHub, File System, etc.)</span>
+                <span>GitHub token is pre-configured and ready to use</span>
               </div>
               <div className="flex items-center space-x-2">
                 <span className="w-6 h-6 bg-blue-100 text-blue-600 rounded-full flex items-center justify-center text-xs font-bold">3</span>
-                <span>Import collection and configure environment</span>
+                <span>Test GitHub MCP server with "Test GitHub Token" request</span>
               </div>
               <div className="flex items-center space-x-2">
                 <span className="w-6 h-6 bg-blue-100 text-blue-600 rounded-full flex items-center justify-center text-xs font-bold">4</span>
