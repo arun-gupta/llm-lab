@@ -246,24 +246,60 @@ export function CollectionPreview({
               <h3 className="font-semibold text-gray-900">Test Scripts</h3>
               <div className="bg-green-50 border border-green-200 rounded-lg p-4">
                 <p className="text-sm text-green-800 mb-3">
-                  Each request includes automated test scripts for validation:
+                  Each request includes comprehensive automated test scripts for validation and monitoring:
                 </p>
-                <div className="space-y-3">
+                <div className="space-y-4">
                   <div className="bg-white rounded p-3">
-                    <h4 className="font-medium text-gray-900 mb-2">Response Validation</h4>
+                    <h4 className="font-medium text-gray-900 mb-2">Basic Validation</h4>
                     <ul className="text-sm text-gray-600 space-y-1">
                       <li>• Status code verification (200 OK)</li>
-                      <li>• Response structure validation</li>
-                      <li>• Content presence checks</li>
-                      <li>• Error handling for failed requests</li>
+                      <li>• Response time validation (under 30 seconds)</li>
+                      <li>• Content-Type header validation</li>
+                      <li>• JSON response structure validation</li>
                     </ul>
                   </div>
+                  
                   <div className="bg-white rounded p-3">
-                    <h4 className="font-medium text-gray-900 mb-2">Performance Checks</h4>
+                    <h4 className="font-medium text-gray-900 mb-2">Provider-Specific Tests</h4>
+                    <div className="space-y-2">
+                      <div>
+                        <span className="text-sm font-medium text-blue-600">Cloud Providers (OpenAI, Anthropic):</span>
+                        <ul className="text-sm text-gray-600 space-y-1 ml-4">
+                          <li>• Response structure validation (choices array)</li>
+                          <li>• Message content verification</li>
+                          <li>• Usage statistics validation (tokens)</li>
+                          <li>• Response quality checks</li>
+                        </ul>
+                      </div>
+                      <div>
+                        <span className="text-sm font-medium text-green-600">Ollama (Local):</span>
+                        <ul className="text-sm text-gray-600 space-y-1 ml-4">
+                          <li>• Ollama-specific response fields (response, model, done)</li>
+                          <li>• Model name validation</li>
+                          <li>• Response content quality checks</li>
+                          <li>• Local endpoint validation</li>
+                        </ul>
+                      </div>
+                    </div>
+                  </div>
+                  
+                  <div className="bg-white rounded p-3">
+                    <h4 className="font-medium text-gray-900 mb-2">Performance & Monitoring</h4>
                     <ul className="text-sm text-gray-600 space-y-1">
-                      <li>• Response time monitoring</li>
-                      <li>• Token usage tracking</li>
-                      <li>• Rate limit detection</li>
+                      <li>• Response time tracking and alerts</li>
+                      <li>• Token usage monitoring</li>
+                      <li>• Error detection and reporting</li>
+                      <li>• Collection variables for comparison</li>
+                    </ul>
+                  </div>
+                  
+                  <div className="bg-white rounded p-3">
+                    <h4 className="font-medium text-gray-900 mb-2">Automated Variables</h4>
+                    <ul className="text-sm text-gray-600 space-y-1">
+                      <li>• Response content extraction</li>
+                      <li>• Latency tracking across providers</li>
+                      <li>• Token usage comparison</li>
+                      <li>• Model information storage</li>
                     </ul>
                   </div>
                 </div>
