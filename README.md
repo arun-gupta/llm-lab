@@ -38,14 +38,20 @@ POSTMAN_API_KEY=your_key_here
 - 🔄 **Side-by-side LLM comparison** (OpenAI, Anthropic, Ollama)
 - 🦙 **Local model support** via Ollama (auto-detects running models)
 - 📦 **Direct Postman workspace integration** via Postman API
-- ⚡ **Performance metrics** (latency, token usage)
-- 🎯 **Ready-to-use API examples** with dynamic variables
-- 🔧 **Advanced features**: Environment templates, test scripts, collection variables
+- 🎯 **Custom collection names** for personalized organization
+- 🎉 **Success celebrations** with confetti animations
+- 👀 **Collection preview** before creation
+- 📊 **Performance metrics** (latency, token usage)
+- 🧪 **Comprehensive test scripts** for automated validation
+- 🔧 **Environment variables** for secure API key management
 
 ## 🎯 Postman Integration
 
 ### **What You Get:**
 - **Direct Workspace Creation**: Collections appear instantly in your Postman workspace
+- **Collection Preview**: Review collection details before creation
+- **Custom Names**: Personalize collection names for better organization
+- **Success Celebrations**: Engaging feedback when collections are created
 - **Environment Templates**: Automatic setup of API key variables
 - **Test Automation**: Pre-built scripts validate responses
 - **Dynamic Content**: Variables for easy prompt modification
@@ -55,18 +61,24 @@ POSTMAN_API_KEY=your_key_here
 1. **🚀 Direct Creation** (Recommended): Collections created directly in Postman
 2. **📥 Download & Import**: Traditional JSON file download
 
+### **Agent Selection:**
+- **Web**: Create collections in Postman web interface
+- **Desktop**: Create collections in Postman desktop app
+
 ## 📊 Current Status
 
 ✅ **Working**: OpenAI, Anthropic, Ollama integrations  
-✅ **Complete**: Postman integration, UI, error handling  
-🔄 **In Progress**: Cohere and Mistral integrations  
+✅ **Complete**: Postman integration, UI, error handling, success celebrations  
+✅ **Features**: Custom collection names, collection preview, status indicators  
 
 ## 🛠️ Usage
 
 1. **Enter your prompt** and optional context
 2. **Select providers** (defaults to "All Local" if Ollama models available)
 3. **Submit** to compare responses side-by-side
-4. **Create Postman collection** for direct API testing
+4. **Preview collection** details before creation
+5. **Create Postman collection** with custom name for direct API testing
+6. **Celebrate success** with engaging animations
 
 ## 📈 Planned Features
 
@@ -76,6 +88,7 @@ POSTMAN_API_KEY=your_key_here
 - [x] Collection preview before creation
 - [x] Success celebration moments
 - [x] Improved error handling
+- [x] Custom collection names
 
 ### **Phase 2: Viral Sharing** 🚀
 - [ ] Public collection gallery
@@ -143,8 +156,15 @@ GET /api/postman/status
 # Create collection in Postman workspace
 POST /api/postman/create-collection
 {
-  "collection": { /* Postman collection object */ }
+  "collection": { /* Postman collection object */ },
+  "createInWeb": true
 }
+```
+
+### **Ollama Models**
+```bash
+# Get available Ollama models
+GET /api/ollama/models
 ```
 
 ## 🤝 Contributing
