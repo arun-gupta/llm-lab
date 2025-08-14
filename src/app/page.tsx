@@ -31,6 +31,9 @@ export default function Home() {
   // Track if this is the first response
   const [hasGeneratedFirstResponse, setHasGeneratedFirstResponse] = useState(false);
 
+  // Track if we've shown the Postman connected celebration
+  const [hasShownPostmanConnected, setHasShownPostmanConnected] = useState(false);
+
   // Config panel state
   const [showConfigPanel, setShowConfigPanel] = useState(false);
 
@@ -170,7 +173,8 @@ export default function Home() {
     setApiKeyStatus(status);
     
     // Show celebration when Postman is first connected
-    if (status.postman === 'configured' && !showSuccessCelebration) {
+    if (status.postman === 'configured' && !hasShownPostmanConnected) {
+      setHasShownPostmanConnected(true);
       setCelebrationType('postman-connected');
       setCelebrationData({});
       setShowSuccessCelebration(true);
@@ -186,6 +190,9 @@ export default function Home() {
     setShowPostmanSetup(false);
     setShowCollectionPreview(false);
     setIsCreatingCollection(false);
+    setHasGeneratedFirstResponse(false);
+    setHasShownPostmanConnected(false);
+    setShowSuccessCelebration(false);
     
     // Scroll to top of page
     window.scrollTo({ top: 0, behavior: 'smooth' });
