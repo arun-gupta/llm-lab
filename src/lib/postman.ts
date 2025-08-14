@@ -302,7 +302,7 @@ STEP 4: Add Your API Keys
               },
               ...(isOllama ? [] : [{
                 key: 'Authorization',
-                value: `Bearer {{${providerName.toLowerCase()}_api_key}}`,
+                value: `Bearer {{${getProviderKeyName(response.provider)}}}`,
                 type: 'text',
               }]),
             ],
@@ -546,6 +546,26 @@ function getProviderPath(provider: string): string[] {
     default:
       return ['v1', 'chat', 'completions'];
   }
+}
+
+function getProviderKeyName(provider: string): string {
+  if (provider.startsWith('ollama:') || provider.startsWith('Ollama (')) {
+    return 'ollama_api_key'; // Not used for Ollama, but consistent naming
+  }
+  
+  // Extract the base provider name for clean environment variable names
+  if (provider.toLowerCase().includes('openai')) {
+    return 'openai_api_key';
+  } else if (provider.toLowerCase().includes('anthropic')) {
+    return 'anthropic_api_key';
+  } else if (provider.toLowerCase().includes('cohere')) {
+    return 'cohere_api_key';
+  } else if (provider.toLowerCase().includes('mistral')) {
+    return 'mistral_api_key';
+  }
+  
+  // Fallback to a clean version of the provider name
+  return provider.toLowerCase().replace(/[^a-z0-9]/g, '_') + '_api_key';
 }
 
 export async function createPostmanCollection(collection: PostmanCollection): Promise<string | null> {

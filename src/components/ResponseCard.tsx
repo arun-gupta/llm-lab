@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { LLMResponse } from '@/lib/llm-apis';
-import { generatePostmanCollection } from '@/lib/postman';
+import { generatePostmanCollection, generatePostmanEnvironment } from '@/lib/postman';
 import { Download, Copy, Check, AlertCircle, Clock, Zap } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { CollectionPreview } from './CollectionPreview';
@@ -34,16 +34,19 @@ export function ResponseCard({ response, prompt, context }: ResponseCardProps) {
     setShowCollectionPreview(true);
   };
 
-  const handleConfirmCollectionCreation = async (createInWeb: boolean = true) => {
+  const handleConfirmCollectionCreation = async (createInWeb: boolean = true, collectionName?: string, collection?: any, environment?: any) => {
     setIsCreatingCollection(true);
     try {
-      const collection = generatePostmanCollection(prompt, context, [response]);
+      // Use provided collection and environment, or generate them
+      const finalCollection = collection || generatePostmanCollection(prompt, context, [response], collectionName);
+      const finalEnvironment = environment || generatePostmanEnvironment(collectionName || 'LLM Prompt Lab Collection');
       
       const apiResponse = await fetch('/api/postman/create-collection', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ 
-          collection,
+          collection: finalCollection,
+          environment: finalEnvironment,
           createInWeb 
         }),
       });

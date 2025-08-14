@@ -12,9 +12,10 @@ export async function POST(request: NextRequest) {
   }
 
   try {
-    const { collection, createInWeb = true } = await request.json();
+    const { collection, environment, createInWeb = true } = await request.json();
 
-    const response = await fetch('https://api.getpostman.com/collections', {
+    // Create collection first
+    const collectionResponse = await fetch('https://api.getpostman.com/collections', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -25,23 +26,8 @@ export async function POST(request: NextRequest) {
       }),
     });
 
-    if (response.ok) {
-      const result = await response.json();
-      const collectionId = result.collection?.uid;
-      
-      // Return appropriate URL based on agent selection
-      const collectionUrl = createInWeb 
-        ? `https://go.postman.co/collection/${collectionId}`
-        : `postman://collection/${collectionId}`;
-      
-      return NextResponse.json({
-        success: true,
-        collectionId: collectionId,
-        collectionUrl: collectionUrl,
-        message: `Collection created successfully in Postman ${createInWeb ? 'Web' : 'Desktop'}`
-      });
-    } else {
-      const errorData = await response.json();
+    if (!collectionResponse.ok) {
+      const errorData = await collectionResponse.json();
       return NextResponse.json({ 
         success: false, 
         message: 'Failed to create collection in Postman',
@@ -49,6 +35,54 @@ export async function POST(request: NextRequest) {
         fallback: true 
       });
     }
+
+    const collectionResult = await collectionResponse.json();
+    const collectionId = collectionResult.collection?.uid;
+
+    // Create environment if provided
+    let environmentId = null;
+    if (environment) {
+      try {
+        const environmentResponse = await fetch('https://api.getpostman.com/environments', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'X-API-Key': postmanApiKey,
+          },
+          body: JSON.stringify({
+            environment: environment,
+          }),
+        });
+
+        if (environmentResponse.ok) {
+          const environmentResult = await environmentResponse.json();
+          environmentId = environmentResult.environment?.uid;
+        }
+      } catch (envError) {
+        console.warn('Failed to create environment, but collection was created:', envError);
+        // Continue without environment - collection is more important
+      }
+    }
+
+    // Return appropriate URL based on agent selection
+    const collectionUrl = createInWeb 
+      ? `https://go.postman.co/collection/${collectionId}`
+      : `postman://collection/${collectionId}`;
+    
+    const environmentUrl = environmentId ? (createInWeb 
+      ? `https://go.postman.co/environment/${environmentId}`
+      : `postman://environment/${environmentId}`) : null;
+    
+    return NextResponse.json({
+      success: true,
+      collectionId: collectionId,
+      collectionUrl: collectionUrl,
+      environmentId: environmentId,
+      environmentUrl: environmentUrl,
+      message: environmentId 
+        ? `Collection and environment created successfully in Postman ${createInWeb ? 'Web' : 'Desktop'}`
+        : `Collection created successfully in Postman ${createInWeb ? 'Web' : 'Desktop'} (environment creation failed)`
+    });
   } catch (error) {
     console.error('Error creating Postman collection:', error);
     return NextResponse.json({ 

@@ -41,10 +41,11 @@ export default function Home() {
     setShowCollectionPreview(true);
   };
 
-  const handleConfirmCollectionCreation = async (createInWeb: boolean = true, collectionName?: string) => {
+  const handleConfirmCollectionCreation = async (createInWeb: boolean = true, collectionName?: string, collection?: any, environment?: any) => {
     setIsCreatingCollection(true);
     try {
-      const collection = generatePostmanCollection(
+      // Use provided collection and environment, or generate them
+      const finalCollection = collection || generatePostmanCollection(
         formData?.prompt || '',
         formData?.context,
         responses,
@@ -55,7 +56,8 @@ export default function Home() {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ 
-          collection,
+          collection: finalCollection,
+          environment,
           createInWeb 
         }),
       });
@@ -75,7 +77,11 @@ export default function Home() {
         
         // Show collection created celebration
         setCelebrationType('collection-created');
-        setCelebrationData({ collectionUrl: result.collectionUrl });
+        setCelebrationData({ 
+          collectionUrl: result.collectionUrl,
+          environmentUrl: result.environmentUrl,
+          hasEnvironment: !!result.environmentId
+        });
         setShowSuccessCelebration(true);
       } else {
         // Fallback to download if API key not configured or failed

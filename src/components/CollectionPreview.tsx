@@ -8,7 +8,7 @@ import { LLMResponse } from '@/lib/llm-apis';
 interface CollectionPreviewProps {
   isOpen: boolean;
   onClose: () => void;
-  onConfirm: (createInWeb?: boolean, collectionName?: string) => void;
+  onConfirm: (createInWeb?: boolean, collectionName?: string, collection?: any, environment?: any) => void;
   prompt: string;
   context?: string;
   responses: LLMResponse[];
@@ -58,7 +58,22 @@ export function CollectionPreview({
   };
 
   const handleConfirm = () => {
-    onConfirm(createInWeb, collectionName);
+    // Create collection with custom name
+    const customCollection = {
+      ...collection,
+      info: {
+        ...collection.info,
+        name: collectionName
+      }
+    };
+    
+    // Create environment with custom name
+    const customEnvironment = {
+      ...environment,
+      name: `${collectionName} Environment`
+    };
+    
+    onConfirm(createInWeb, collectionName, customCollection, customEnvironment);
   };
 
   return (
@@ -143,14 +158,13 @@ export function CollectionPreview({
                     </div>
                   </div>
                   
-                  <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
-                    <h3 className="font-semibold text-yellow-900 mb-2">⚠️ Important Setup Steps</h3>
-                    <div className="space-y-2 text-sm text-yellow-800">
-                      <p><strong>1.</strong> Download the environment file below</p>
-                      <p><strong>2.</strong> Import it into Postman (Import → Select file)</p>
-                      <p><strong>3.</strong> <strong>CRITICAL:</strong> Select the environment in Postman's top-right dropdown</p>
-                      <p><strong>4.</strong> Edit the environment and add your API keys</p>
-                      <p><strong>5.</strong> Copy API keys from the Config Panel (gear icon in header)</p>
+                  <div className="bg-green-50 border border-green-200 rounded-lg p-4">
+                    <h3 className="font-semibold text-green-900 mb-2">✨ Automatic Setup</h3>
+                    <div className="space-y-2 text-sm text-green-800">
+                      <p><strong>✅ Collection & Environment:</strong> Both will be created automatically in your Postman workspace</p>
+                      <p><strong>✅ Environment Variables:</strong> Pre-configured with placeholder values for your API keys</p>
+                      <p><strong>✅ Ready to Use:</strong> Just edit the environment variables with your actual API keys</p>
+                      <p><strong>💡 Tip:</strong> Copy API keys from the Config Panel (gear icon in header)</p>
                     </div>
                   </div>
 

@@ -11,6 +11,8 @@ interface SuccessCelebrationProps {
     collectionUrl?: string;
     provider?: string;
     responseCount?: number;
+    hasEnvironment?: boolean;
+    environmentUrl?: string;
   };
 }
 
@@ -31,10 +33,13 @@ export function SuccessCelebration({ isVisible, type, onClose, data }: SuccessCe
   const getCelebrationContent = () => {
     switch (type) {
       case 'collection-created':
+        const hasEnvironment = data?.hasEnvironment;
         return {
           icon: <FileText className="w-6 h-6 text-green-600" />,
-          title: '🎉 Collection Created!',
-          message: 'Your Postman collection is ready to use',
+          title: hasEnvironment ? '🎉 Collection & Environment Created!' : '🎉 Collection Created!',
+          message: hasEnvironment 
+            ? 'Your Postman collection and environment have been created successfully. The environment is ready to use with placeholder API keys.'
+            : 'Your Postman collection is ready to use',
           action: data?.collectionUrl ? {
             label: 'View Collection',
             url: data.collectionUrl,
