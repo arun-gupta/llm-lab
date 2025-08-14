@@ -347,11 +347,48 @@ STEP 4: Add Your API Keys
   return collection;
 }
 
-export function generatePostmanEnvironment(collectionName: string): PostmanEnvironment {
-  return {
-    id: `env-${Date.now()}`,
-    name: `${collectionName} Environment`,
-    values: [
+export function generatePostmanEnvironment(collectionName: string, responses?: any[]): PostmanEnvironment {
+  const values = [
+    {
+      key: 'base_url',
+      value: process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000',
+      type: 'default',
+      enabled: true,
+    },
+    {
+      key: 'setup_instructions',
+      value: '🚨 CRITICAL: After importing this environment, you MUST: 1) Select it in the top-right dropdown, 2) Replace placeholder values with your actual API keys from LLM Prompt Lab Config Panel.',
+      type: 'default',
+      enabled: false,
+    },
+  ];
+
+  // Add API key variables based on actual providers used
+  if (responses) {
+    const providers = new Set<string>();
+    
+    responses.forEach(response => {
+      if (response.provider) {
+        const isOllama = response.provider.startsWith('ollama:') || response.provider.startsWith('Ollama (');
+        if (!isOllama) {
+          const keyName = getProviderKeyName(response.provider);
+          providers.add(keyName);
+        }
+      }
+    });
+
+    // Add unique provider API keys
+    providers.forEach(keyName => {
+      values.unshift({
+        key: keyName,
+        value: `your_${keyName.replace('_api_key', '')}_api_key_here`,
+        type: 'secret',
+        enabled: true,
+      });
+    });
+  } else {
+    // Fallback to default keys if no responses provided
+    values.unshift(
       {
         key: 'openai_api_key',
         value: 'your_openai_api_key_here',
@@ -369,20 +406,14 @@ export function generatePostmanEnvironment(collectionName: string): PostmanEnvir
         value: 'your_postman_api_key_here',
         type: 'secret',
         enabled: true,
-      },
-      {
-        key: 'base_url',
-        value: process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000',
-        type: 'default',
-        enabled: true,
-      },
-      {
-        key: 'setup_instructions',
-        value: '🚨 CRITICAL: After importing this environment, you MUST: 1) Select it in the top-right dropdown, 2) Replace placeholder values with your actual API keys from LLM Prompt Lab Config Panel.',
-        type: 'default',
-        enabled: false,
-      },
-    ],
+      }
+    );
+  }
+
+  return {
+    id: `env-${Date.now()}`,
+    name: `${collectionName} Environment`,
+    values,
   };
 }
 

@@ -31,7 +31,7 @@ export function CollectionPreview({
   if (!isOpen) return null;
 
   const collection = generatePostmanCollection(prompt, context, responses, collectionName);
-  const environment = generatePostmanEnvironment(collectionName);
+  const environment = generatePostmanEnvironment(collectionName, responses);
   const collectionJson = JSON.stringify(collection, null, 2);
   const environmentJson = JSON.stringify(environment, null, 2);
 

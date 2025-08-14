@@ -39,7 +39,7 @@ export function ResponseCard({ response, prompt, context }: ResponseCardProps) {
     try {
       // Use provided collection and environment, or generate them
       const finalCollection = collection || generatePostmanCollection(prompt, context, [response], collectionName);
-      const finalEnvironment = environment || generatePostmanEnvironment(collectionName || 'LLM Prompt Lab Collection');
+      const finalEnvironment = environment || generatePostmanEnvironment(collectionName || 'LLM Prompt Lab Collection', [response]);
       
       const apiResponse = await fetch('/api/postman/create-collection', {
         method: 'POST',
