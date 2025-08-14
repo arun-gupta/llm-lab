@@ -43,6 +43,19 @@ export function generatePostmanCollection(
 ): PostmanCollection {
   const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000';
   
+  // Get the actual providers from responses, or use default implemented ones
+  const availableProviders = responses 
+    ? responses.map(response => {
+        const isOllama = response.provider.startsWith('ollama:') || response.provider.startsWith('Ollama (');
+        if (isOllama) {
+          return response.provider.startsWith('ollama:') 
+            ? response.provider 
+            : `ollama:${response.provider.match(/Ollama \((.+)\)/)?.[1] || ''}`;
+        }
+        return response.provider.toLowerCase().includes('openai') ? 'openai' : 'anthropic';
+      })
+    : ['openai', 'anthropic']; // Default to implemented providers only
+  
   const collection: PostmanCollection = {
     info: {
       name: 'LLM Prompt Lab Collection',
@@ -66,7 +79,7 @@ export function generatePostmanCollection(
             raw: JSON.stringify({
               prompt,
               context,
-              providers: ['openai', 'anthropic', 'cohere', 'mistral'],
+              providers: availableProviders,
             }, null, 2),
             options: {
               raw: {
