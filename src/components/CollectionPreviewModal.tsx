@@ -53,6 +53,11 @@ export function CollectionPreviewModal({ isOpen, onClose, onDeploy, collectionUr
           name: collectionName,
         },
       };
+      
+      // Show deployment in progress message
+      const deployMessage = `🚀 Deploying "${collectionName}" to Postman ${createInWeb ? 'Web' : 'Desktop'}...`;
+      alert(deployMessage);
+      
       onDeploy(updatedCollection, collectionName, createInWeb);
     }
   };
@@ -259,6 +264,14 @@ export function CollectionPreviewModal({ isOpen, onClose, onDeploy, collectionUr
             <span className="font-medium">{getRequestCount()}</span>
           </div>
         </div>
+        <div className="mt-3 p-3 bg-blue-100 rounded-lg">
+          <p className="text-xs text-blue-900">
+            <strong>💡 Tip:</strong> {createInWeb 
+              ? 'Postman Web will open automatically in your browser after deployment.' 
+              : 'Postman Desktop will attempt to open automatically after deployment. Make sure it\'s installed from postman.com/downloads/'
+            }
+          </p>
+        </div>
       </div>
     </div>
   );
@@ -282,10 +295,10 @@ export function CollectionPreviewModal({ isOpen, onClose, onDeploy, collectionUr
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-      <div className="bg-white rounded-lg max-w-4xl w-full mx-4 max-h-[90vh] overflow-hidden">
+    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+      <div className="bg-white rounded-lg max-w-4xl w-full max-h-[95vh] flex flex-col">
         {/* Header */}
-        <div className="flex items-center justify-between p-6 border-b border-gray-200">
+        <div className="flex items-center justify-between p-6 border-b border-gray-200 flex-shrink-0">
           <div className="flex items-center space-x-3">
             <Eye className="w-6 h-6 text-blue-600" />
             <div>
@@ -302,9 +315,9 @@ export function CollectionPreviewModal({ isOpen, onClose, onDeploy, collectionUr
         </div>
 
         {/* Content */}
-        <div className="flex h-[calc(90vh-140px)]">
+        <div className="flex flex-1 min-h-0">
           {/* Tabs */}
-          <div className="w-64 border-r border-gray-200 bg-gray-50">
+          <div className="w-64 border-r border-gray-200 bg-gray-50 flex-shrink-0">
             <nav className="p-4 space-y-2">
               <button
                 onClick={() => setActiveTab('overview')}
@@ -379,7 +392,7 @@ export function CollectionPreviewModal({ isOpen, onClose, onDeploy, collectionUr
         </div>
 
         {/* Footer */}
-        <div className="flex items-center justify-between p-6 border-t border-gray-200 bg-gray-50">
+        <div className="flex items-center justify-between p-6 border-t border-gray-200 bg-gray-50 flex-shrink-0">
           <div className="flex space-x-3">
             <button
               onClick={() => {

@@ -506,11 +506,57 @@ The collection URL is: ${collectionUrl}`;
             const result = await apiResponse.json();
             
             if (result.success) {
-              alert(`✅ Collection "${collectionName}" created successfully in Postman ${createInWeb ? 'Web' : 'Desktop'}!
+              // Show success message
+              const successMessage = `✅ Collection "${collectionName}" created successfully in Postman ${createInWeb ? 'Web' : 'Desktop'}!
               
-Collection URL: ${result.collectionUrl}
+Collection URL: ${result.collectionUrl}`;
 
-You can now open Postman to see your new collection.`);
+              if (!createInWeb) {
+                // For Desktop deployment, try to open Postman Desktop
+                try {
+                  // Method 1: Try postman:// scheme to open the collection directly
+                  const postmanDesktopUrl = `postman://collection/import?url=${encodeURIComponent(result.collectionUrl)}`;
+                  window.open(postmanDesktopUrl, '_blank');
+                  
+                  // Method 2: Try alternative scheme if first one doesn't work
+                  setTimeout(() => {
+                    const alternativeUrl = `postman://import?url=${encodeURIComponent(result.collectionUrl)}`;
+                    window.open(alternativeUrl, '_blank');
+                  }, 500);
+                  
+                  // Method 3: Try to open Postman Desktop app directly
+                  setTimeout(() => {
+                    try {
+                      window.open('postman://', '_blank');
+                    } catch (e) {
+                      console.log('Could not open Postman Desktop directly');
+                    }
+                  }, 1000);
+                  
+                  alert(`${successMessage}
+
+🚀 Attempting to open Postman Desktop...
+
+If Postman Desktop doesn't open automatically:
+1. Make sure Postman Desktop is installed from: https://www.postman.com/downloads/
+2. Open Postman Desktop manually and look for your new collection
+3. Or use the collection URL above to import manually`);
+                } catch (error) {
+                  console.log('Postman Desktop URL scheme not supported');
+                  alert(`${successMessage}
+
+📝 To view your collection:
+1. Open Postman Desktop manually
+2. Look for "${collectionName}" in your collections
+3. Or use the collection URL above to import manually`);
+                }
+              } else {
+                // For Web deployment, open in browser
+                window.open(result.collectionUrl, '_blank');
+                alert(`${successMessage}
+
+🌐 Opening Postman Web in your browser...`);
+              }
             } else {
               throw new Error(result.message || 'Failed to create collection');
             }
