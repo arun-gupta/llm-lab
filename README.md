@@ -32,6 +32,33 @@ cp .env.local.example .env.local
 npm run dev
 ```
 
+### **Setting Up MCP Servers (Optional)**
+
+For enhanced Postman integration with MCP (Model Context Protocol) servers:
+
+```bash
+# Run the MCP setup script
+./setup-mcp.sh
+
+# Start MCP servers
+cd ~/.mcp-servers
+./start-mcp-servers.sh
+
+# Check status
+./status-mcp-servers.sh
+```
+
+This will install and configure:
+- **GitHub MCP Server** (Port 3001): Access GitHub repositories and data
+- **File System MCP Server** (Port 3002): Read and write local files  
+- **Web Search MCP Server** (Port 3003): Perform web searches
+- **Database MCP Server** (Port 3004): Query databases
+
+**Required API Keys for MCP:**
+- GitHub: Personal access token for repository access
+- Web Search: Serper API key for web search functionality
+- Database: Connection string for your database
+
 ## 🔑 Required API Keys
 
 Add to `.env.local`:
@@ -77,6 +104,7 @@ If you're using GitHub Codespaces, you can add your API keys in two ways:
 - 🔧 **Environment variables** for secure API key management
 - 📈 **Analytics** and performance insights
 - 🏗️ **Tabbed interface** for organized workflow
+- 🔌 **MCP Integration** for enhanced Postman automation
 
 ## 🎯 Postman Integration
 
