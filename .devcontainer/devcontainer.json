@@ -16,7 +16,6 @@
     }
   },
   "postCreateCommand": "bash .codespaces/setup.sh",
-  "postStartCommand": "npm run dev",
   "customizations": {
     "vscode": {
       "extensions": [
