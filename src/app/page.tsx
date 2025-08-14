@@ -5,6 +5,7 @@ import { LLMForm } from '@/components/LLMForm';
 import { ResponseTabs } from '@/components/ResponseTabs';
 import { PostmanSetupGuide } from '@/components/PostmanSetupGuide';
 import { PostmanStatusIndicator } from '@/components/PostmanStatusIndicator';
+import { ApiKeyStatusIndicator } from '@/components/ApiKeyStatusIndicator';
 import { CollectionPreview } from '@/components/CollectionPreview';
 import { SuccessCelebration } from '@/components/SuccessCelebration';
 import { ConfigPanel } from '@/components/ConfigPanel';
@@ -212,6 +213,8 @@ export default function Home() {
             </button>
             
             <div className="flex items-center space-x-3">
+              <ApiKeyStatusIndicator />
+              
               <button
                 onClick={() => setShowConfigPanel(true)}
                 className="flex items-center space-x-2 px-3 py-2 text-sm bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors"
