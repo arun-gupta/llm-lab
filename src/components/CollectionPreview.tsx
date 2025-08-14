@@ -133,15 +133,26 @@ export function CollectionPreview({
                 </div>
               </div>
 
-              <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
-                <h3 className="font-semibold text-blue-900 mb-2">Collection Details</h3>
-                <div className="space-y-2 text-sm text-blue-800">
-                  <p><strong>Name:</strong> {collectionName}</p>
-                  <p><strong>Description:</strong> {collection.info.description}</p>
-                  <p><strong>Total Requests:</strong> {collection.item.length}</p>
-                  <p><strong>Providers:</strong> {responses.length} different LLM services</p>
-                </div>
-              </div>
+                                <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+                    <h3 className="font-semibold text-blue-900 mb-2">Collection Details</h3>
+                    <div className="space-y-2 text-sm text-blue-800">
+                      <p><strong>Name:</strong> {collectionName}</p>
+                      <p><strong>Description:</strong> {collection.info.description}</p>
+                      <p><strong>Total Requests:</strong> {collection.item.length}</p>
+                      <p><strong>Providers:</strong> {responses.length} different LLM services</p>
+                    </div>
+                  </div>
+                  
+                  <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
+                    <h3 className="font-semibold text-yellow-900 mb-2">⚠️ Important Setup Steps</h3>
+                    <div className="space-y-2 text-sm text-yellow-800">
+                      <p><strong>1.</strong> Download the environment file below</p>
+                      <p><strong>2.</strong> Import it into Postman (Import → Select file)</p>
+                      <p><strong>3.</strong> <strong>CRITICAL:</strong> Select the environment in Postman's top-right dropdown</p>
+                      <p><strong>4.</strong> Edit the environment and add your API keys</p>
+                      <p><strong>5.</strong> Copy API keys from the Config Panel (gear icon in header)</p>
+                    </div>
+                  </div>
 
               <div>
                 <h3 className="font-semibold text-gray-900 mb-3">What's Included</h3>

@@ -91,24 +91,71 @@ export function generatePostmanCollection(
       name: collectionName || 'LLM Prompt Lab Collection',
       description: `Generated collection for prompt: "${prompt}"
 
-🔑 API KEY SETUP REQUIRED:
-1. Import the environment file (download it from the preview)
-2. In Postman, go to Environments → Import the downloaded environment file
-3. Edit the environment variables and replace placeholder values with your actual API keys:
-   - openai_api_key: Your OpenAI API key (starts with sk-)
-   - anthropic_api_key: Your Anthropic API key (starts with sk-ant-)
-   - postman_api_key: Your Postman API key (optional)
-   - base_url: Already set to your current environment
+🔑 CRITICAL: API KEY SETUP REQUIRED BEFORE USING
 
-💡 TIP: You can copy your API keys from the LLM Prompt Lab Config Panel (gear icon in the header)
+STEP 1: Download Environment File
+• Download the environment file from the collection preview
+• This file contains placeholder values for your API keys
 
-⚠️ SECURITY: Never share your environment file with actual API keys. The downloaded file contains safe placeholder values.`,
+STEP 2: Import Environment in Postman
+• In Postman, click "Import" (top left)
+• Select the downloaded environment file
+• The environment will appear in your Environments list
+
+STEP 3: Select Environment
+• In the top-right corner of Postman, click the environment dropdown
+• Select your imported environment (NOT "No environment")
+• This is crucial - requests will fail without an environment selected
+
+STEP 4: Add Your API Keys
+• Go to Environments → Edit your imported environment
+• Replace placeholder values with your actual API keys:
+  - openai_api_key: Your OpenAI API key (starts with sk-)
+  - anthropic_api_key: Your Anthropic API key (starts with sk-ant-)
+  - postman_api_key: Your Postman API key (optional)
+  - base_url: Already set correctly
+
+💡 TIP: Copy API keys from LLM Prompt Lab Config Panel (gear icon in header)
+
+⚠️ SECURITY: The downloaded environment file contains safe placeholder values only.
+
+🚨 TROUBLESHOOTING: If you see "{{openai_api_key}}" in errors, make sure you've selected the environment in the top-right dropdown!`,
       schema: 'https://schema.getpostman.com/json/collection/v2.1.0/collection.json',
     },
     item: [
       {
         name: 'LLM Prompt Lab - All Providers',
         event: [
+          {
+            listen: 'prerequest',
+            script: {
+              exec: [
+                '// Check if environment variables are properly set',
+                'const openaiKey = pm.environment.get("openai_api_key");',
+                'const anthropicKey = pm.environment.get("anthropic_api_key");',
+                'const baseUrl = pm.environment.get("base_url");',
+                '',
+                '// Warn if environment is not set up',
+                'if (!openaiKey || openaiKey === "your_openai_api_key_here") {',
+                '    console.warn("⚠️ WARNING: OpenAI API key not set. Please:");',
+                '    console.warn("1. Import the environment file");',
+                '    console.warn("2. Select the environment in the top-right dropdown");',
+                '    console.warn("3. Edit the environment and add your API keys");',
+                '}',
+                '',
+                'if (!anthropicKey || anthropicKey === "your_anthropic_api_key_here") {',
+                '    console.warn("⚠️ WARNING: Anthropic API key not set");',
+                '}',
+                '',
+                'if (!baseUrl || baseUrl === "your_base_url_here") {',
+                '    console.warn("⚠️ WARNING: Base URL not set");',
+                '}',
+                '',
+                '// Set request variables',
+                'pm.request.url = pm.environment.get("base_url") + "/api/llm";'
+              ]
+            }
+          },
           {
             listen: 'test',
             script: {
@@ -211,6 +258,34 @@ export function generatePostmanCollection(
           name: `${response.provider} - Direct API Call`,
           event: [
             {
+              listen: 'prerequest',
+              script: {
+                exec: [
+                  '// Check if environment variables are properly set',
+                  'const openaiKey = pm.environment.get("openai_api_key");',
+                  'const anthropicKey = pm.environment.get("anthropic_api_key");',
+                  '',
+                  '// Provider-specific checks',
+                  `if (pm.request.url.includes("openai.com") && (!openaiKey || openaiKey === "your_openai_api_key_here")) {`,
+                  '    console.warn("⚠️ WARNING: OpenAI API key not set for this request");',
+                  '    console.warn("Please import the environment file and add your OpenAI API key");',
+                  '}',
+                  '',
+                  `if (pm.request.url.includes("anthropic.com") && (!anthropicKey || anthropicKey === "your_anthropic_api_key_here")) {`,
+                  '    console.warn("⚠️ WARNING: Anthropic API key not set for this request");',
+                  '    console.warn("Please import the environment file and add your Anthropic API key");',
+                  '}',
+                  '',
+                  '// Set Authorization header dynamically',
+                  'if (pm.request.url.includes("openai.com")) {',
+                  '    pm.request.headers.add({ key: "Authorization", value: "Bearer " + openaiKey });',
+                  '} else if (pm.request.url.includes("anthropic.com")) {',
+                  '    pm.request.headers.add({ key: "x-api-key", value: anthropicKey });',
+                  '}'
+                ]
+              }
+            },
+            {
               listen: 'test',
               script: {
                 exec: testScripts
@@ -303,7 +378,7 @@ export function generatePostmanEnvironment(collectionName: string): PostmanEnvir
       },
       {
         key: 'setup_instructions',
-        value: 'IMPORTANT: Replace the placeholder values above with your actual API keys. You can copy them from your LLM Prompt Lab environment.',
+        value: '🚨 CRITICAL: After importing this environment, you MUST: 1) Select it in the top-right dropdown, 2) Replace placeholder values with your actual API keys from LLM Prompt Lab Config Panel.',
         type: 'default',
         enabled: false,
       },
