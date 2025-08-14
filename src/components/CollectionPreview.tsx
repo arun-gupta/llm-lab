@@ -57,6 +57,14 @@ export function CollectionPreview({
     }
   };
 
+  const getCleanProviderName = (provider: string) => {
+    if (provider.toLowerCase().includes('openai')) return 'openai';
+    if (provider.toLowerCase().includes('anthropic')) return 'anthropic';
+    if (provider.toLowerCase().includes('cohere')) return 'cohere';
+    if (provider.toLowerCase().includes('mistral')) return 'mistral';
+    return 'provider';
+  };
+
   const handleConfirm = () => {
     // Create collection with custom name
     const customCollection = {
@@ -280,11 +288,12 @@ export function CollectionPreview({
                       );
                     }
                     
-                    const provider = response.provider.toLowerCase();
+                    const cleanProviderName = getCleanProviderName(response.provider);
+                    
                     return (
                       <div key={index} className="flex items-center space-x-3 text-sm">
                         <span className="font-mono bg-white px-2 py-1 rounded border">
-                          {provider}_api_key
+                          {cleanProviderName}_api_key
                         </span>
                         <span className="text-gray-600">→ Your {response.provider} API key</span>
                       </div>
