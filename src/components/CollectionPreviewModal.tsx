@@ -91,9 +91,11 @@ export function CollectionPreviewModal({ isOpen, onClose, onDeploy, collectionUr
             <span className="text-gray-600">Name:</span>
             <span className="font-medium">{collection?.info?.name}</span>
           </div>
-          <div className="flex justify-between">
-            <span className="text-gray-600">Description:</span>
-            <span className="font-medium">{collection?.info?.description || 'No description'}</span>
+          <div className="flex flex-col">
+            <span className="text-gray-600 mb-2">Description:</span>
+            <div className="text-sm text-gray-700 leading-relaxed whitespace-pre-line">
+              {collection?.info?.description || 'No description'}
+            </div>
           </div>
           <div className="flex justify-between">
             <span className="text-gray-600">Total Requests:</span>
