@@ -45,7 +45,8 @@ export interface PostmanHeader {
 export function generatePostmanCollection(
   prompt: string,
   context?: string,
-  responses?: any[]
+  responses?: any[],
+  collectionName?: string
 ): PostmanCollection {
   const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000';
   
@@ -64,7 +65,7 @@ export function generatePostmanCollection(
   
   const collection: PostmanCollection = {
     info: {
-      name: 'LLM Prompt Lab Collection',
+      name: collectionName || 'LLM Prompt Lab Collection',
       description: `Generated collection for prompt: "${prompt}"`,
       schema: 'https://schema.getpostman.com/json/collection/v2.1.0/collection.json',
     },

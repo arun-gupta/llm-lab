@@ -8,7 +8,7 @@ import { LLMResponse } from '@/lib/llm-apis';
 interface CollectionPreviewProps {
   isOpen: boolean;
   onClose: () => void;
-  onConfirm: (createInWeb?: boolean) => void;
+  onConfirm: (createInWeb?: boolean, collectionName?: string) => void;
   prompt: string;
   context?: string;
   responses: LLMResponse[];
@@ -26,10 +26,11 @@ export function CollectionPreview({
 }: CollectionPreviewProps) {
   const [activeTab, setActiveTab] = useState<'overview' | 'requests' | 'environment' | 'tests'>('overview');
   const [createInWeb, setCreateInWeb] = useState(true);
+  const [collectionName, setCollectionName] = useState('LLM Prompt Lab Collection');
   
   if (!isOpen) return null;
 
-  const collection = generatePostmanCollection(prompt, context, responses);
+  const collection = generatePostmanCollection(prompt, context, responses, collectionName);
   const collectionJson = JSON.stringify(collection, null, 2);
 
   const getProviderIcon = (provider: string) => {
@@ -55,7 +56,7 @@ export function CollectionPreview({
   };
 
   const handleConfirm = () => {
-    onConfirm(createInWeb);
+    onConfirm(createInWeb, collectionName);
   };
 
   return (
@@ -109,10 +110,31 @@ export function CollectionPreview({
         <div className="flex-1 overflow-y-auto p-6 min-h-0">
           {activeTab === 'overview' && (
             <div className="space-y-6">
+              {/* Collection Name Input */}
+              <div className="bg-white border border-gray-200 rounded-lg p-4">
+                <h3 className="font-semibold text-gray-900 mb-3">Collection Name</h3>
+                <div className="space-y-2">
+                  <label htmlFor="collection-name" className="block text-sm font-medium text-gray-700">
+                    Customize the collection name:
+                  </label>
+                  <input
+                    id="collection-name"
+                    type="text"
+                    value={collectionName}
+                    onChange={(e) => setCollectionName(e.target.value)}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    placeholder="Enter collection name..."
+                  />
+                  <p className="text-xs text-gray-500">
+                    This name will be used for the Postman collection and downloaded file.
+                  </p>
+                </div>
+              </div>
+
               <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
                 <h3 className="font-semibold text-blue-900 mb-2">Collection Details</h3>
                 <div className="space-y-2 text-sm text-blue-800">
-                  <p><strong>Name:</strong> {collection.info.name}</p>
+                  <p><strong>Name:</strong> {collectionName}</p>
                   <p><strong>Description:</strong> {collection.info.description}</p>
                   <p><strong>Total Requests:</strong> {collection.item.length}</p>
                   <p><strong>Providers:</strong> {responses.length} different LLM services</p>
@@ -318,11 +340,20 @@ export function CollectionPreview({
           <div className="flex items-center space-x-4">
             <button
               onClick={() => {
-                const blob = new Blob([collectionJson], { type: 'application/json' });
+                // Create collection with custom name
+                const customCollection = {
+                  ...collection,
+                  info: {
+                    ...collection.info,
+                    name: collectionName
+                  }
+                };
+                const customCollectionJson = JSON.stringify(customCollection, null, 2);
+                const blob = new Blob([customCollectionJson], { type: 'application/json' });
                 const url = URL.createObjectURL(blob);
                 const a = document.createElement('a');
                 a.href = url;
-                a.download = 'llm-prompt-lab-collection.json';
+                a.download = `${collectionName.replace(/[^a-z0-9]/gi, '_').toLowerCase()}.json`;
                 document.body.appendChild(a);
                 a.click();
                 document.body.removeChild(a);

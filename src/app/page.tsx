@@ -37,13 +37,14 @@ export default function Home() {
     setShowCollectionPreview(true);
   };
 
-  const handleConfirmCollectionCreation = async (createInWeb: boolean = true) => {
+  const handleConfirmCollectionCreation = async (createInWeb: boolean = true, collectionName?: string) => {
     setIsCreatingCollection(true);
     try {
       const collection = generatePostmanCollection(
         formData?.prompt || '',
         formData?.context,
-        responses
+        responses,
+        collectionName
       );
       
       const response = await fetch('/api/postman/create-collection', {
