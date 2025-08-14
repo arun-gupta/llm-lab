@@ -50,16 +50,24 @@ export async function callOpenAI(prompt: string, context?: string, model: string
   try {
     const fullPrompt = context ? `${context}\n\n${prompt}` : prompt;
     
-    const response = await openai.chat.completions.create({
-      model: model,
-      messages: [
-        {
-          role: 'user',
-          content: fullPrompt,
-        },
-      ],
-      max_tokens: 1000,
-    });
+    // Add timeout to individual provider calls
+    const timeoutMs = 20000; // 20 seconds per provider
+    
+    const response = await Promise.race([
+      openai.chat.completions.create({
+        model: model,
+        messages: [
+          {
+            role: 'user',
+            content: fullPrompt,
+          },
+        ],
+        max_tokens: 1000,
+      }),
+      new Promise((_, reject) => 
+        setTimeout(() => reject(new Error('OpenAI request timeout')), timeoutMs)
+      )
+    ]) as any;
 
     const latency = Date.now() - startTime;
     
@@ -89,16 +97,24 @@ export async function callAnthropic(prompt: string, context?: string, model: str
   try {
     const fullPrompt = context ? `${context}\n\n${prompt}` : prompt;
     
-    const response = await anthropic.messages.create({
-      model: model,
-      max_tokens: 1000,
-      messages: [
-        {
-          role: 'user',
-          content: fullPrompt,
-        },
-      ],
-    });
+    // Add timeout to individual provider calls
+    const timeoutMs = 20000; // 20 seconds per provider
+    
+    const response = await Promise.race([
+      anthropic.messages.create({
+        model: model,
+        max_tokens: 1000,
+        messages: [
+          {
+            role: 'user',
+            content: fullPrompt,
+          },
+        ],
+      }),
+      new Promise((_, reject) => 
+        setTimeout(() => reject(new Error('Anthropic request timeout')), timeoutMs)
+      )
+    ]) as any;
 
     const latency = Date.now() - startTime;
     
@@ -156,6 +172,12 @@ export async function callOllama(prompt: string, model: string, context?: string
     const ollamaUrl = process.env.OLLAMA_BASE_URL || 'http://localhost:11434';
     const fullPrompt = context ? `${context}\n\n${prompt}` : prompt;
     
+    // Add timeout to individual provider calls
+    const timeoutMs = 20000; // 20 seconds per provider
+    
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), timeoutMs);
+    
     const response = await fetch(`${ollamaUrl}/api/generate`, {
       method: 'POST',
       headers: {
@@ -169,7 +191,10 @@ export async function callOllama(prompt: string, model: string, context?: string
           num_predict: 1000,
         },
       }),
+      signal: controller.signal,
     });
+    
+    clearTimeout(timeoutId);
 
     if (!response.ok) {
       throw new Error(`Ollama API error: ${response.statusText}`);
@@ -214,5 +239,29 @@ export async function callAllProviders(request: LLMRequest): Promise<LLMResponse
     }
   }
   
-  return Promise.all(promises);
+  // Use Promise.allSettled with timeout to handle slow providers gracefully
+  const timeoutMs = 25000; // 25 seconds to stay under Postman's 30s limit
+  
+  const timeoutPromise = new Promise<LLMResponse[]>((_, reject) => {
+    setTimeout(() => reject(new Error('Request timeout')), timeoutMs);
+  });
+  
+  const providersPromise = Promise.allSettled(promises).then(results => {
+    return results.map((result, index) => {
+      if (result.status === 'fulfilled') {
+        return result.value;
+      } else {
+        // Return error response for failed providers
+        const provider = request.providers[index];
+        return {
+          provider: provider.includes(':') ? provider.split(':')[1] : provider,
+          content: '',
+          latency: 0,
+          error: `Provider timeout or error: ${result.reason?.message || 'Unknown error'}`,
+        };
+      }
+    });
+  });
+  
+  return Promise.race([providersPromise, timeoutPromise]);
 } 
