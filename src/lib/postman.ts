@@ -299,18 +299,7 @@ STEP 4: Add Your API Keys
           ],
           request: {
             method: 'POST',
-            header: [
-              {
-                key: 'Content-Type',
-                value: 'application/json',
-                type: 'text',
-              },
-              ...(isOllama ? [] : [{
-                key: 'Authorization',
-                value: `Bearer {{${getProviderKeyName(response.provider)}}}`,
-                type: 'text',
-              }]),
-            ],
+            header: getProviderHeaders(response.provider),
             body: {
               mode: 'raw',
               raw: JSON.stringify(
@@ -320,15 +309,7 @@ STEP 4: Add Your API Keys
                       prompt: context ? `${context}\n\n${prompt}` : prompt,
                       stream: false,
                     }
-                  : {
-                      messages: [
-                        {
-                          role: 'user',
-                          content: context ? `${context}\n\n${prompt}` : prompt,
-                        },
-                      ],
-                      max_tokens: 1000,
-                    },
+                  : getProviderRequestBody(response.provider, prompt, context),
                 null, 2
               ),
               options: {
@@ -602,6 +583,126 @@ function getProviderKeyName(provider: string): string {
   
   // Fallback to a clean version of the provider name
   return provider.toLowerCase().replace(/[^a-z0-9]/g, '_') + '_api_key';
+}
+
+function getProviderHeaders(provider: string): any[] {
+  const isOllama = provider.startsWith('ollama:') || provider.startsWith('Ollama (');
+  
+  const headers = [
+    {
+      key: 'Content-Type',
+      value: 'application/json',
+      type: 'text',
+    },
+  ];
+
+  if (!isOllama) {
+    if (provider.toLowerCase().includes('openai')) {
+      headers.push({
+        key: 'Authorization',
+        value: `Bearer {{${getProviderKeyName(provider)}}}`,
+        type: 'text',
+      });
+    } else if (provider.toLowerCase().includes('anthropic')) {
+      headers.push({
+        key: 'x-api-key',
+        value: `{{${getProviderKeyName(provider)}}}`,
+        type: 'text',
+      });
+      headers.push({
+        key: 'anthropic-version',
+        value: '2023-06-01',
+        type: 'text',
+      });
+    } else if (provider.toLowerCase().includes('cohere')) {
+      headers.push({
+        key: 'Authorization',
+        value: `Bearer {{${getProviderKeyName(provider)}}}`,
+        type: 'text',
+      });
+    } else if (provider.toLowerCase().includes('mistral')) {
+      headers.push({
+        key: 'Authorization',
+        value: `Bearer {{${getProviderKeyName(provider)}}}`,
+        type: 'text',
+      });
+    }
+  }
+
+  return headers;
+}
+
+function getProviderRequestBody(provider: string, prompt: string, context?: string): any {
+  const isOllama = provider.startsWith('ollama:') || provider.startsWith('Ollama (');
+  
+  if (isOllama) {
+    return {
+      model: provider.startsWith('ollama:') 
+        ? provider.replace('ollama:', '')
+        : provider.match(/Ollama \((.+)\)/)?.[1] || provider,
+      prompt: context ? `${context}\n\n${prompt}` : prompt,
+      stream: false,
+    };
+  }
+
+  const content = context ? `${context}\n\n${prompt}` : prompt;
+
+  if (provider.toLowerCase().includes('openai')) {
+    return {
+      model: 'gpt-4o-mini',
+      messages: [
+        {
+          role: 'user',
+          content: content,
+        },
+      ],
+      max_tokens: 1000,
+      temperature: 0.7,
+    };
+  } else if (provider.toLowerCase().includes('anthropic')) {
+    return {
+      model: 'claude-3-5-sonnet-20241022',
+      max_tokens: 1000,
+      messages: [
+        {
+          role: 'user',
+          content: content,
+        },
+      ],
+    };
+  } else if (provider.toLowerCase().includes('cohere')) {
+    return {
+      model: 'command',
+      prompt: content,
+      max_tokens: 1000,
+      temperature: 0.7,
+    };
+  } else if (provider.toLowerCase().includes('mistral')) {
+    return {
+      model: 'mistral-large-latest',
+      messages: [
+        {
+          role: 'user',
+          content: content,
+        },
+      ],
+      max_tokens: 1000,
+      temperature: 0.7,
+    };
+  }
+
+  // Fallback to OpenAI format
+  return {
+    model: 'gpt-4o-mini',
+    messages: [
+      {
+        role: 'user',
+        content: content,
+      },
+    ],
+    max_tokens: 1000,
+    temperature: 0.7,
+  };
 }
 
 export async function createPostmanCollection(collection: PostmanCollection): Promise<string | null> {
