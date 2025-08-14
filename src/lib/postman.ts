@@ -25,6 +25,7 @@ export interface PostmanItem {
       raw: string;
       protocol: string;
       host: string[];
+      port?: string;
       path: string[];
     };
   };
@@ -154,9 +155,10 @@ export function generatePostmanCollection(
             },
           },
           url: {
-            raw: `${protocol}://${hostForPostman}:${port}/api/llm`,
-            protocol: protocol,
-            host: [hostForPostman, port],
+            raw: `http://127.0.0.1:3000/api/llm`,
+            protocol: 'http',
+            host: ['127.0.0.1'],
+            port: '3000',
             path: ['api', 'llm'],
           },
         },
