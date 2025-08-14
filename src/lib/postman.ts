@@ -55,7 +55,10 @@ export function generatePostmanCollection(
   const protocol = url.protocol.replace(':', '');
   const host = url.hostname;
   const port = url.port;
-  const hostArray = port ? [host, port] : [host];
+  
+  // Use 127.0.0.1 for localhost to avoid DNS resolution issues
+  const hostForPostman = host === 'localhost' ? '127.0.0.1' : host;
+  const hostArray = port ? [hostForPostman, port] : [hostForPostman];
   
   // Get the actual providers from responses, or use default implemented ones
   const availableProviders = responses 
@@ -152,7 +155,7 @@ export function generatePostmanCollection(
             },
           },
           url: {
-            raw: `${baseUrl}/api/llm`,
+            raw: `${protocol}://${hostForPostman}${port ? ':' + port : ''}/api/llm`,
             protocol: protocol,
             host: hostArray,
             path: ['api', 'llm'],
