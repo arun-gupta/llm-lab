@@ -34,7 +34,7 @@ export function ResponseCard({ response, prompt, context }: ResponseCardProps) {
     setShowCollectionPreview(true);
   };
 
-  const handleConfirmCollectionCreation = async () => {
+  const handleConfirmCollectionCreation = async (createInWeb: boolean = true) => {
     setIsCreatingCollection(true);
     try {
       const collection = generatePostmanCollection(prompt, context, [response]);
@@ -42,13 +42,22 @@ export function ResponseCard({ response, prompt, context }: ResponseCardProps) {
       const apiResponse = await fetch('/api/postman/create-collection', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ collection }),
+        body: JSON.stringify({ 
+          collection,
+          createInWeb 
+        }),
       });
 
       const result = await apiResponse.json();
       
       if (result.success) {
-        window.open(result.collectionUrl, '_blank');
+        if (createInWeb) {
+          // Open in web browser
+          window.open(result.collectionUrl, '_blank');
+        } else {
+          // For desktop, use the postman:// URL scheme
+          window.open(result.collectionUrl, '_blank');
+        }
         setShowCollectionPreview(false);
       } else {
         // Fallback to download if API key not configured

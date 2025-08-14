@@ -28,7 +28,7 @@ export default function Home() {
     setShowCollectionPreview(true);
   };
 
-  const handleConfirmCollectionCreation = async () => {
+  const handleConfirmCollectionCreation = async (createInWeb: boolean = true) => {
     setIsCreatingCollection(true);
     try {
       const collection = generatePostmanCollection(
@@ -40,13 +40,23 @@ export default function Home() {
       const response = await fetch('/api/postman/create-collection', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ collection }),
+        body: JSON.stringify({ 
+          collection,
+          createInWeb 
+        }),
       });
       
       const result = await response.json();
       
       if (result.success) {
-        window.open(result.collectionUrl, '_blank');
+        if (createInWeb) {
+          // Open in web browser
+          window.open(result.collectionUrl, '_blank');
+        } else {
+          // For desktop, we'll use a postman:// URL scheme
+          const desktopUrl = result.collectionUrl.replace('https://go.postman.co', 'postman://');
+          window.open(desktopUrl, '_blank');
+        }
         setShowCollectionPreview(false);
       } else {
         // Fallback to download if API key not configured or failed

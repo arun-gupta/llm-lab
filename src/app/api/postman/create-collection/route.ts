@@ -12,7 +12,7 @@ export async function POST(request: NextRequest) {
   }
 
   try {
-    const { collection } = await request.json();
+    const { collection, createInWeb = true } = await request.json();
 
     const response = await fetch('https://api.getpostman.com/collections', {
       method: 'POST',
@@ -27,11 +27,18 @@ export async function POST(request: NextRequest) {
 
     if (response.ok) {
       const result = await response.json();
+      const collectionId = result.collection?.uid;
+      
+      // Return appropriate URL based on agent selection
+      const collectionUrl = createInWeb 
+        ? `https://go.postman.co/collection/${collectionId}`
+        : `postman://collection/${collectionId}`;
+      
       return NextResponse.json({
         success: true,
-        collectionId: result.collection?.uid,
-        collectionUrl: `https://go.postman.co/collection/${result.collection?.uid}`,
-        message: 'Collection created successfully in Postman'
+        collectionId: collectionId,
+        collectionUrl: collectionUrl,
+        message: `Collection created successfully in Postman ${createInWeb ? 'Web' : 'Desktop'}`
       });
     } else {
       const errorData = await response.json();

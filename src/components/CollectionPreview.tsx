@@ -8,7 +8,7 @@ import { LLMResponse } from '@/lib/llm-apis';
 interface CollectionPreviewProps {
   isOpen: boolean;
   onClose: () => void;
-  onConfirm: () => void;
+  onConfirm: (createInWeb?: boolean) => void;
   prompt: string;
   context?: string;
   responses: LLMResponse[];
@@ -25,6 +25,7 @@ export function CollectionPreview({
   isCreating 
 }: CollectionPreviewProps) {
   const [activeTab, setActiveTab] = useState<'overview' | 'requests' | 'environment' | 'tests'>('overview');
+  const [createInWeb, setCreateInWeb] = useState(true);
   
   if (!isOpen) return null;
 
@@ -51,6 +52,10 @@ export function CollectionPreview({
       case 'mistral': return 'text-orange-600';
       default: return 'text-gray-600';
     }
+  };
+
+  const handleConfirm = () => {
+    onConfirm(createInWeb);
   };
 
   return (
@@ -328,6 +333,33 @@ export function CollectionPreview({
               <Download className="w-4 h-4" />
               <span>Download JSON</span>
             </button>
+            
+            {/* Postman Agent Selection */}
+            <div className="flex items-center space-x-3">
+              <span className="text-sm text-gray-600">Create in:</span>
+              <div className="flex bg-white border border-gray-300 rounded-lg p-1">
+                <button
+                  onClick={() => setCreateInWeb(true)}
+                  className={`px-3 py-1 text-xs rounded-md transition-colors ${
+                    createInWeb 
+                      ? 'bg-blue-600 text-white' 
+                      : 'text-gray-600 hover:text-gray-900'
+                  }`}
+                >
+                  Web
+                </button>
+                <button
+                  onClick={() => setCreateInWeb(false)}
+                  className={`px-3 py-1 text-xs rounded-md transition-colors ${
+                    !createInWeb 
+                      ? 'bg-blue-600 text-white' 
+                      : 'text-gray-600 hover:text-gray-900'
+                  }`}
+                >
+                  Desktop
+                </button>
+              </div>
+            </div>
           </div>
           
           <div className="flex items-center space-x-3">
@@ -338,7 +370,7 @@ export function CollectionPreview({
               Cancel
             </button>
             <button
-              onClick={onConfirm}
+              onClick={handleConfirm}
               disabled={isCreating}
               className="flex items-center space-x-2 px-4 py-2 text-sm bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
             >
@@ -350,7 +382,7 @@ export function CollectionPreview({
               ) : (
                 <>
                   <FileText className="w-4 h-4" />
-                  <span>Create in Postman</span>
+                  <span>Create in Postman {createInWeb ? 'Web' : 'Desktop'}</span>
                 </>
               )}
             </button>
