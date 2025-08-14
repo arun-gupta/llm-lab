@@ -170,14 +170,15 @@ export function CollectionsTab() {
         {/* MCP Servers Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
           <div className="bg-white rounded-lg p-6 border border-gray-200 hover:shadow-lg transition-shadow">
-            <div className="flex items-center space-x-3 mb-4">
-              <div className="w-10 h-10 bg-gray-800 rounded-lg flex items-center justify-center">
-                <Code className="w-5 h-5 text-white" />
+                          <div className="flex items-center space-x-3 mb-4">
+                <div className="w-10 h-10 bg-gray-800 rounded-lg flex items-center justify-center">
+                  <Code className="w-5 h-5 text-white" />
+                </div>
+                <h3 className="font-semibold text-gray-900">GitHub MCP</h3>
               </div>
-              <h3 className="font-semibold text-gray-900">GitHub MCP</h3>
-            </div>
-            <p className="text-sm text-gray-600 mb-4">Access repositories, create issues, search code</p>
-            <div className="text-xs text-gray-500">✅ Available</div>
+              <p className="text-sm text-gray-600 mb-4">Access repositories, create issues, search code</p>
+              <div className="text-xs text-gray-500">✅ Available (with fallback)</div>
+              <div className="text-xs text-orange-600 mt-1">⚠️ May use mock data if slow</div>
           </div>
           <div className="bg-white rounded-lg p-6 border border-gray-200 hover:shadow-lg transition-shadow">
             <div className="flex items-center space-x-3 mb-4">
@@ -247,7 +248,11 @@ export function CollectionsTab() {
               </div>
               <div className="flex items-center space-x-2">
                 <span className="w-6 h-6 bg-blue-100 text-blue-600 rounded-full flex items-center justify-center text-xs font-bold">3</span>
-                <span>Test GitHub MCP server with "Test GitHub Token" request</span>
+                <span>Test GitHub token with "Test GitHub Token" request</span>
+              </div>
+              <div className="flex items-center space-x-2">
+                <span className="w-6 h-6 bg-blue-100 text-blue-600 rounded-full flex items-center justify-center text-xs font-bold">4</span>
+                <span>Run GitHub requests - uses mock data if MCP server is slow</span>
               </div>
               <div className="flex items-center space-x-2">
                 <span className="w-6 h-6 bg-blue-100 text-blue-600 rounded-full flex items-center justify-center text-xs font-bold">4</span>
