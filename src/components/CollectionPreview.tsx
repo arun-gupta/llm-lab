@@ -215,9 +215,18 @@ export function CollectionPreview({
                 </p>
                 <div className="space-y-2">
                   {responses.map((response, index) => {
-                    const provider = response.provider.startsWith('ollama:') 
-                      ? 'ollama' 
-                      : response.provider.toLowerCase();
+                    const isOllama = response.provider.startsWith('ollama:') || response.provider.startsWith('Ollama (');
+                    
+                    // Skip API key variables for Ollama since it doesn't require authentication
+                    if (isOllama) {
+                      return (
+                        <div key={index} className="flex items-center space-x-3 text-sm">
+                          <span className="text-gray-500 italic">No API key required (local Ollama)</span>
+                        </div>
+                      );
+                    }
+                    
+                    const provider = response.provider.toLowerCase();
                     return (
                       <div key={index} className="flex items-center space-x-3 text-sm">
                         <span className="font-mono bg-white px-2 py-1 rounded border">
