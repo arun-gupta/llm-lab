@@ -1,6 +1,6 @@
 'use client';
 
-import { Zap, TestTube, BarChart3, Library, TrendingUp, Settings, ArrowRight, Play } from 'lucide-react';
+import { Zap, TestTube, BarChart3, Library, TrendingUp, Settings, ArrowRight, Play, Code } from 'lucide-react';
 import { ApiKeyStatusIndicator } from '../ApiKeyStatusIndicator';
 
 import { TabType } from '../TabNavigation';
@@ -164,6 +164,13 @@ export function HomeTab({ onTabChange, apiKeyStatus }: HomeTabProps) {
             <h3 className="font-semibold text-gray-900 mb-2">Collection Gallery</h3>
             <p className="text-gray-600 text-sm">
               Share and discover Postman collections with the community.
+            </p>
+          </div>
+          <div className="bg-white border border-gray-200 rounded-lg p-6">
+            <Code className="w-8 h-8 text-blue-600 mb-4" />
+            <h3 className="font-semibold text-gray-900 mb-2">MCP Integration</h3>
+            <p className="text-gray-600 text-sm">
+              Integrate MCP servers with Postman for enhanced API testing and automation.
             </p>
           </div>
         </div>

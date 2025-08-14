@@ -1,0 +1,482 @@
+{
+  "info": {
+    "name": "MCP Server Integration Demo",
+    "description": "Demonstrates how to integrate popular MCP servers with Postman for enhanced API testing and automation.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "mcp_github_url",
+      "value": "ws://localhost:3001",
+      "type": "string"
+    },
+    {
+      "key": "mcp_filesystem_url",
+      "value": "ws://localhost:3002",
+      "type": "string"
+    },
+    {
+      "key": "mcp_web_search_url",
+      "value": "ws://localhost:3003",
+      "type": "string"
+    },
+    {
+      "key": "mcp_database_url",
+      "value": "ws://localhost:3004",
+      "type": "string"
+    }
+  ],
+  "item": [
+    {
+      "name": "GitHub MCP Integration",
+      "item": [
+        {
+          "name": "List Repositories",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"owner\": \"arun-gupta\",\n  \"type\": \"all\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/mcp/github/list_repositories",
+              "host": ["{{base_url}}"],
+              "path": ["api", "mcp", "github", "list_repositories"]
+            }
+          },
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "exec": [
+                  "// MCP Client for GitHub integration",
+                  "const mcpClient = new MCPClient(pm.environment.get('mcp_github_url'));",
+                  "",
+                  "try {",
+                  "  await mcpClient.connect();",
+                  "  const repos = await mcpClient.call('github/list_repositories', {",
+                  "    owner: 'arun-gupta',",
+                  "    type: 'all'",
+                  "  });",
+                  "",
+                  "  // Use the MCP data in the request",
+                  "  pm.request.body.raw = JSON.stringify({",
+                  "    repositories: repos,",
+                  "    timestamp: new Date().toISOString(),",
+                  "    source: 'MCP GitHub Server'",
+                  "  });",
+                  "",
+                  "  console.log('MCP GitHub data:', repos);",
+                  "} catch (error) {",
+                  "  console.error('MCP GitHub error:', error);",
+                  "} finally {",
+                  "  mcpClient.disconnect();",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Create Issue with MCP",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"Test Issue via MCP\",\n  \"body\": \"This issue was created using MCP integration\",\n  \"labels\": [\"mcp\", \"postman\"]\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/mcp/github/create_issue",
+              "host": ["{{base_url}}"],
+              "path": ["api", "mcp", "github", "create_issue"]
+            }
+          },
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "exec": [
+                  "// Create GitHub issue via MCP",
+                  "const mcpClient = new MCPClient(pm.environment.get('mcp_github_url'));",
+                  "",
+                  "try {",
+                  "  await mcpClient.connect();",
+                  "  const issue = await mcpClient.call('github/create_issue', {",
+                  "    owner: 'arun-gupta',",
+                  "    repo: 'llm-lab',",
+                  "    title: 'Test Issue via MCP Integration',",
+                  "    body: 'This issue was created using MCP integration from Postman',",
+                  "    labels: ['mcp', 'postman', 'integration']",
+                  "  });",
+                  "",
+                  "  // Update request with MCP result",
+                  "  pm.request.body.raw = JSON.stringify({",
+                  "    issue: issue,",
+                  "    created_via: 'MCP',",
+                  "    timestamp: new Date().toISOString()",
+                  "  });",
+                  "",
+                  "  console.log('Created issue via MCP:', issue);",
+                  "} catch (error) {",
+                  "  console.error('MCP GitHub error:', error);",
+                  "} finally {",
+                  "  mcpClient.disconnect();",
+                  "}"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "File System MCP Integration",
+      "item": [
+        {
+          "name": "Read File Content",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/mcp/filesystem/read_file",
+              "host": ["{{base_url}}"],
+              "path": ["api", "mcp", "filesystem", "read_file"],
+              "query": [
+                {
+                  "key": "path",
+                  "value": "/path/to/file.txt"
+                }
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "exec": [
+                  "// Read file via MCP",
+                  "const mcpClient = new MCPClient(pm.environment.get('mcp_filesystem_url'));",
+                  "",
+                  "try {",
+                  "  await mcpClient.connect();",
+                  "  const fileContent = await mcpClient.call('filesystem/read_file', {",
+                  "    path: '/path/to/file.txt'",
+                  "  });",
+                  "",
+                  "  // Store file content for use in request",
+                  "  pm.environment.set('file_content', fileContent);",
+                  "  console.log('File content via MCP:', fileContent);",
+                  "} catch (error) {",
+                  "  console.error('MCP File System error:', error);",
+                  "} finally {",
+                  "  mcpClient.disconnect();",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Search Files",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"query\": \"*.json\",\n  \"directory\": \"/path/to/search\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/mcp/filesystem/search_files",
+              "host": ["{{base_url}}"],
+              "path": ["api", "mcp", "filesystem", "search_files"]
+            }
+          },
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "exec": [
+                  "// Search files via MCP",
+                  "const mcpClient = new MCPClient(pm.environment.get('mcp_filesystem_url'));",
+                  "",
+                  "try {",
+                  "  await mcpClient.connect();",
+                  "  const files = await mcpClient.call('filesystem/search_files', {",
+                  "    query: '*.json',",
+                  "    directory: '/path/to/search'",
+                  "  });",
+                  "",
+                  "  // Update request with search results",
+                  "  pm.request.body.raw = JSON.stringify({",
+                  "    files: files,",
+                  "    search_query: '*.json',",
+                  "    timestamp: new Date().toISOString()",
+                  "  });",
+                  "",
+                  "  console.log('Found files via MCP:', files);",
+                  "} catch (error) {",
+                  "  console.error('MCP File System error:', error);",
+                  "} finally {",
+                  "  mcpClient.disconnect();",
+                  "}"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Web Search MCP Integration",
+      "item": [
+        {
+          "name": "Search Web",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"query\": \"MCP Model Context Protocol\",\n  \"num_results\": 5\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/mcp/web_search/search",
+              "host": ["{{base_url}}"],
+              "path": ["api", "mcp", "web_search", "search"]
+            }
+          },
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "exec": [
+                  "// Web search via MCP",
+                  "const mcpClient = new MCPClient(pm.environment.get('mcp_web_search_url'));",
+                  "",
+                  "try {",
+                  "  await mcpClient.connect();",
+                  "  const searchResults = await mcpClient.call('web_search/search', {",
+                  "    query: 'MCP Model Context Protocol',",
+                  "    num_results: 5",
+                  "  });",
+                  "",
+                  "  // Use search results in request",
+                  "  pm.request.body.raw = JSON.stringify({",
+                  "    search_results: searchResults,",
+                  "    query: 'MCP Model Context Protocol',",
+                  "    timestamp: new Date().toISOString()",
+                  "  });",
+                  "",
+                  "  console.log('Search results via MCP:', searchResults);",
+                  "} catch (error) {",
+                  "  console.error('MCP Web Search error:', error);",
+                  "} finally {",
+                  "  mcpClient.disconnect();",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Get Weather",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/mcp/web_search/get_weather",
+              "host": ["{{base_url}}"],
+              "path": ["api", "mcp", "web_search", "get_weather"],
+              "query": [
+                {
+                  "key": "location",
+                  "value": "San Francisco, CA"
+                }
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "exec": [
+                  "// Get weather via MCP",
+                  "const mcpClient = new MCPClient(pm.environment.get('mcp_web_search_url'));",
+                  "",
+                  "try {",
+                  "  await mcpClient.connect();",
+                  "  const weather = await mcpClient.call('web_search/get_weather', {",
+                  "    location: 'San Francisco, CA'",
+                  "  });",
+                  "",
+                  "  // Store weather data",
+                  "  pm.environment.set('weather_data', JSON.stringify(weather));",
+                  "  console.log('Weather via MCP:', weather);",
+                  "} catch (error) {",
+                  "  console.error('MCP Web Search error:', error);",
+                  "} finally {",
+                  "  mcpClient.disconnect();",
+                  "}"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Database MCP Integration",
+      "item": [
+        {
+          "name": "Query Database",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"query\": \"SELECT * FROM users WHERE status = 'active'\",\n  \"database\": \"production\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/mcp/database/query",
+              "host": ["{{base_url}}"],
+              "path": ["api", "mcp", "database", "query"]
+            }
+          },
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "exec": [
+                  "// Database query via MCP",
+                  "const mcpClient = new MCPClient(pm.environment.get('mcp_database_url'));",
+                  "",
+                  "try {",
+                  "  await mcpClient.connect();",
+                  "  const results = await mcpClient.call('database/query', {",
+                  "    query: 'SELECT * FROM users WHERE status = \\'active\\'',",
+                  "    database: 'production'",
+                  "  });",
+                  "",
+                  "  // Use database results in request",
+                  "  pm.request.body.raw = JSON.stringify({",
+                  "    query_results: results,",
+                  "    query: 'SELECT * FROM users WHERE status = \\'active\\'',",
+                  "    timestamp: new Date().toISOString()",
+                  "  });",
+                  "",
+                  "  console.log('Database results via MCP:', results);",
+                  "} catch (error) {",
+                  "  console.error('MCP Database error:', error);",
+                  "} finally {",
+                  "  mcpClient.disconnect();",
+                  "}"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Multi-MCP Orchestration",
+      "item": [
+        {
+          "name": "Complex Workflow",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"workflow\": \"multi_mcp_integration\",\n  \"steps\": [\"github\", \"filesystem\", \"web_search\"]\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/mcp/orchestrate",
+              "host": ["{{base_url}}"],
+              "path": ["api", "mcp", "orchestrate"]
+            }
+          },
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "exec": [
+                  "// Multi-MCP orchestration",
+                  "const githubMCP = new MCPClient(pm.environment.get('mcp_github_url'));",
+                  "const filesystemMCP = new MCPClient(pm.environment.get('mcp_filesystem_url'));",
+                  "const webSearchMCP = new MCPClient(pm.environment.get('mcp_web_search_url'));",
+                  "",
+                  "try {",
+                  "  // Connect to all MCP servers",
+                  "  await Promise.all([",
+                  "    githubMCP.connect(),",
+                  "    filesystemMCP.connect(),",
+                  "    webSearchMCP.connect()",
+                  "  ]);",
+                  "",
+                  "  // Execute parallel MCP calls",
+                  "  const [repos, files, searchResults] = await Promise.all([",
+                  "    githubMCP.call('github/list_repositories', { owner: 'arun-gupta' }),",
+                  "    filesystemMCP.call('filesystem/search_files', { query: '*.json' }),",
+                  "    webSearchMCP.call('web_search/search', { query: 'MCP integration' })",
+                  "  ]);",
+                  "",
+                  "  // Combine results",
+                  "  const orchestratedData = {",
+                  "    repositories: repos,",
+                  "    files: files,",
+                  "    search_results: searchResults,",
+                  "    orchestrated_at: new Date().toISOString()",
+                  "  };",
+                  "",
+                  "  // Update request with orchestrated data",
+                  "  pm.request.body.raw = JSON.stringify(orchestratedData);",
+                  "",
+                  "  console.log('Multi-MCP orchestration completed:', orchestratedData);",
+                  "} catch (error) {",
+                  "  console.error('Multi-MCP orchestration error:', error);",
+                  "} finally {",
+                  "  // Disconnect from all MCP servers",
+                  "  githubMCP.disconnect();",
+                  "  filesystemMCP.disconnect();",
+                  "  webSearchMCP.disconnect();",
+                  "}"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

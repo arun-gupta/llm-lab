@@ -1,6 +1,6 @@
 'use client';
 
-import { Library, Plus, Search, Star, Download, Share2, Users, TrendingUp } from 'lucide-react';
+import { Library, Plus, Search, Star, Download, Share2, Users, TrendingUp, Code, Zap, Database, Globe } from 'lucide-react';
 
 export function CollectionsTab() {
   const features = [
@@ -75,6 +75,10 @@ export function CollectionsTab() {
             <Plus className="w-4 h-4" />
             <span>Create Collection</span>
           </button>
+          <button className="flex items-center space-x-2 px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">
+            <Code className="w-4 h-4" />
+            <span>MCP Integration</span>
+          </button>
           <button className="flex items-center space-x-2 px-6 py-3 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors">
             <Search className="w-4 h-4" />
             <span>Browse Gallery</span>
@@ -110,6 +114,136 @@ export function CollectionsTab() {
               <p className="text-xs text-gray-500">{category.count} collections</p>
             </div>
           ))}
+        </div>
+      </div>
+
+      {/* MCP Integration Section */}
+      <div className="bg-gradient-to-r from-blue-50 to-purple-50 rounded-lg p-8 mb-8">
+        <div className="text-center mb-8">
+          <div className="flex justify-center mb-4">
+            <div className="w-16 h-16 bg-gradient-to-r from-blue-600 to-purple-600 rounded-xl flex items-center justify-center">
+              <Code className="w-8 h-8 text-white" />
+            </div>
+          </div>
+          <h2 className="text-3xl font-bold text-gray-900 mb-4">MCP Server Integration</h2>
+          <p className="text-xl text-gray-600 max-w-3xl mx-auto">
+            Integrate popular MCP (Model Context Protocol) servers with Postman for enhanced API testing and automation.
+          </p>
+        </div>
+
+        {/* MCP Servers Grid */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+          <div className="bg-white rounded-lg p-6 border border-gray-200 hover:shadow-lg transition-shadow">
+            <div className="flex items-center space-x-3 mb-4">
+              <div className="w-10 h-10 bg-gray-800 rounded-lg flex items-center justify-center">
+                <Code className="w-5 h-5 text-white" />
+              </div>
+              <h3 className="font-semibold text-gray-900">GitHub MCP</h3>
+            </div>
+            <p className="text-sm text-gray-600 mb-4">Access repositories, create issues, search code</p>
+            <div className="text-xs text-gray-500">✅ Available</div>
+          </div>
+          <div className="bg-white rounded-lg p-6 border border-gray-200 hover:shadow-lg transition-shadow">
+            <div className="flex items-center space-x-3 mb-4">
+              <div className="w-10 h-10 bg-green-600 rounded-lg flex items-center justify-center">
+                <Database className="w-5 h-5 text-white" />
+              </div>
+              <h3 className="font-semibold text-gray-900">File System MCP</h3>
+            </div>
+            <p className="text-sm text-gray-600 mb-4">Read, write, and search files</p>
+            <div className="text-xs text-gray-500">✅ Available</div>
+          </div>
+          <div className="bg-white rounded-lg p-6 border border-gray-200 hover:shadow-lg transition-shadow">
+            <div className="flex items-center space-x-3 mb-4">
+              <div className="w-10 h-10 bg-blue-600 rounded-lg flex items-center justify-center">
+                <Globe className="w-5 h-5 text-white" />
+              </div>
+              <h3 className="font-semibold text-gray-900">Web Search MCP</h3>
+            </div>
+            <p className="text-sm text-gray-600 mb-4">Search web, get news, weather</p>
+            <div className="text-xs text-gray-500">✅ Available</div>
+          </div>
+          <div className="bg-white rounded-lg p-6 border border-gray-200 hover:shadow-lg transition-shadow">
+            <div className="flex items-center space-x-3 mb-4">
+              <div className="w-10 h-10 bg-purple-600 rounded-lg flex items-center justify-center">
+                <Database className="w-5 h-5 text-white" />
+              </div>
+              <h3 className="font-semibold text-gray-900">Database MCP</h3>
+            </div>
+            <p className="text-sm text-gray-600 mb-4">Query, insert, update, delete</p>
+            <div className="text-xs text-gray-500">✅ Available</div>
+          </div>
+        </div>
+
+        {/* MCP Features */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+          <div className="bg-white rounded-lg p-6 border border-gray-200">
+            <h3 className="font-semibold text-gray-900 mb-4">Key Features</h3>
+            <ul className="space-y-2 text-sm text-gray-600">
+              <li className="flex items-center space-x-2">
+                <Zap className="w-4 h-4 text-blue-600" />
+                <span>Dynamic test data generation</span>
+              </li>
+              <li className="flex items-center space-x-2">
+                <Zap className="w-4 h-4 text-blue-600" />
+                <span>Multi-MCP orchestration</span>
+              </li>
+              <li className="flex items-center space-x-2">
+                <Zap className="w-4 h-4 text-blue-600" />
+                <span>Real-time data validation</span>
+              </li>
+              <li className="flex items-center space-x-2">
+                <Zap className="w-4 h-4 text-blue-600" />
+                <span>Conditional test execution</span>
+              </li>
+            </ul>
+          </div>
+          <div className="bg-white rounded-lg p-6 border border-gray-200">
+            <h3 className="font-semibold text-gray-900 mb-4">Quick Start</h3>
+            <div className="space-y-3 text-sm text-gray-600">
+              <div className="flex items-center space-x-2">
+                <span className="w-6 h-6 bg-blue-100 text-blue-600 rounded-full flex items-center justify-center text-xs font-bold">1</span>
+                <span>Download MCP Integration collection</span>
+              </div>
+              <div className="flex items-center space-x-2">
+                <span className="w-6 h-6 bg-blue-100 text-blue-600 rounded-full flex items-center justify-center text-xs font-bold">2</span>
+                <span>Start MCP servers (GitHub, File System, etc.)</span>
+              </div>
+              <div className="flex items-center space-x-2">
+                <span className="w-6 h-6 bg-blue-100 text-blue-600 rounded-full flex items-center justify-center text-xs font-bold">3</span>
+                <span>Import collection and configure environment</span>
+              </div>
+              <div className="flex items-center space-x-2">
+                <span className="w-6 h-6 bg-blue-100 text-blue-600 rounded-full flex items-center justify-center text-xs font-bold">4</span>
+                <span>Start testing with MCP-powered requests</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Download Section */}
+        <div className="text-center">
+          <div className="flex justify-center space-x-4">
+            <button 
+              onClick={() => {
+                const link = document.createElement('a');
+                link.href = '/postman-collections/mcp-integration-demo.json';
+                link.download = 'mcp-integration-demo.json';
+                link.click();
+              }}
+              className="flex items-center space-x-2 px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+            >
+              <Download className="w-4 h-4" />
+              <span>Download MCP Collection</span>
+            </button>
+            <button 
+              onClick={() => window.open('/docs/MCP-POSTMAN-INTEGRATION.md', '_blank')}
+              className="flex items-center space-x-2 px-6 py-3 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors"
+            >
+              <Code className="w-4 h-4" />
+              <span>View Documentation</span>
+            </button>
+          </div>
         </div>
       </div>
 
