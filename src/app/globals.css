@@ -32,3 +32,27 @@ body {
   -webkit-box-orient: vertical;
   overflow: hidden;
 }
+
+/* Improved placeholder styling for better contrast */
+::placeholder {
+  color: #6b7280 !important; /* gray-500 - much more visible */
+  opacity: 1 !important;
+}
+
+/* Webkit browsers (Chrome, Safari, Edge) */
+::-webkit-input-placeholder {
+  color: #6b7280 !important;
+  opacity: 1 !important;
+}
+
+/* Firefox */
+::-moz-placeholder {
+  color: #6b7280 !important;
+  opacity: 1 !important;
+}
+
+/* Edge */
+::-ms-input-placeholder {
+  color: #6b7280 !important;
+  opacity: 1 !important;
+}

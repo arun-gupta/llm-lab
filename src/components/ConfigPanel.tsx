@@ -209,7 +209,7 @@ export function ConfigPanel({ isOpen, onClose, onConfigChange }: ConfigPanelProp
                 value={apiKeys.openai}
                 onChange={(e) => setApiKeys(prev => ({ ...prev, openai: e.target.value }))}
                 placeholder="sk-..."
-                className="w-full px-3 py-2 pr-20 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                className="w-full px-3 py-2 pr-20 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-900 placeholder-gray-500"
               />
               <div className="absolute right-2 top-1/2 transform -translate-y-1/2 flex items-center space-x-1">
                 {apiKeys.openai && (
@@ -259,7 +259,7 @@ export function ConfigPanel({ isOpen, onClose, onConfigChange }: ConfigPanelProp
                 value={apiKeys.anthropic}
                 onChange={(e) => setApiKeys(prev => ({ ...prev, anthropic: e.target.value }))}
                 placeholder="sk-ant-..."
-                className="w-full px-3 py-2 pr-20 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                className="w-full px-3 py-2 pr-20 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-900 placeholder-gray-500"
               />
               <div className="absolute right-2 top-1/2 transform -translate-y-1/2 flex items-center space-x-1">
                 {apiKeys.anthropic && (
@@ -309,7 +309,7 @@ export function ConfigPanel({ isOpen, onClose, onConfigChange }: ConfigPanelProp
                 value={apiKeys.postman}
                 onChange={(e) => setApiKeys(prev => ({ ...prev, postman: e.target.value }))}
                 placeholder="PMAK-..."
-                className="w-full px-3 py-2 pr-20 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                className="w-full px-3 py-2 pr-20 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-900 placeholder-gray-500"
               />
               <div className="absolute right-2 top-1/2 transform -translate-y-1/2 flex items-center space-x-1">
                 {apiKeys.postman && (

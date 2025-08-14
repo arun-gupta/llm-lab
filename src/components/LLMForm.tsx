@@ -190,7 +190,7 @@ export function LLMForm({ onResponsesChange, onLoadingChange, onProvidersChange,
               validate: (value) => value.trim().length > 0 || 'Prompt is required'
             })}
             rows={3}
-            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-900 placeholder-gray-500"
             placeholder="Enter your prompt here or try a sample below..."
           />
           {errors.prompt && (
@@ -207,7 +207,7 @@ export function LLMForm({ onResponsesChange, onLoadingChange, onProvidersChange,
             id="context"
             {...register('context')}
             rows={4}
-            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-900 placeholder-gray-500"
             placeholder="Add any context or background information that should be included with your prompt..."
           />
         </div>
