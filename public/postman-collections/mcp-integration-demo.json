@@ -285,7 +285,7 @@
                   "    ",
                   "    // Initialize MCP session",
                   "    const initResponse = await pm.sendRequest({",
-                  "      url: pm.request.url.raw,",
+                  "      url: 'https://api.githubcopilot.com/mcp/',",
                   "      method: 'POST',",
                   "      header: {",
                   "        'Content-Type': 'application/json',",
