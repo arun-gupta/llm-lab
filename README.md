@@ -87,6 +87,7 @@ POSTMAN_API_KEY=your_key_here
 
 # Optional (for GitHub MCP server integration):
 GITHUB_TOKEN=your_github_personal_access_token_here
+GITHUB_REPOS_COUNT=3
 ```
 
 **Get API Keys:** [OpenAI](https://platform.openai.com/) | [Anthropic](https://console.anthropic.com/) | [Postman](https://www.postman.com) | [GitHub](https://github.com/settings/tokens)
@@ -102,6 +103,7 @@ If you're using GitHub Codespaces, you can add your API keys in two ways:
    - `ANTHROPIC_API_KEY` 
    - `POSTMAN_API_KEY` (optional)
    - `GITHUB_TOKEN` (optional, for MCP integration)
+   - `GITHUB_REPOS_COUNT` (optional, default: 3, for GitHub MCP integration)
    - `NEXT_PUBLIC_BASE_URL` (set to your Codespaces URL)
 
 **Option 2: Direct File Edit**
