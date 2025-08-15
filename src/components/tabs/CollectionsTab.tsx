@@ -555,9 +555,6 @@ export function CollectionsTab() {
           </div>
         </div>
       </div>
-            </div>
-          </div>
-        </div>
       )}
 
       {/* Collection Preview Modal */}
