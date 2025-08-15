@@ -12,7 +12,8 @@
     "setup-mcp": "bash scripts/setup-mcp-servers.sh",
     "start-mcp": "bash ~/.mcp-servers/start-mcp-servers.sh",
     "stop-mcp": "bash ~/.mcp-servers/stop-mcp-servers.sh",
-    "status-mcp": "bash ~/.mcp-servers/status-mcp-servers.sh"
+    "status-mcp": "bash ~/.mcp-servers/status-mcp-servers.sh",
+    "test-mcp-cli": "bash scripts/test-github-mcp-cli.sh"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.57.0",

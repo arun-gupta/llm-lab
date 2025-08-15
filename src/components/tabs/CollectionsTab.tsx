@@ -499,6 +499,63 @@ export function CollectionsTab() {
         </div>
       )}
 
+      {/* Ultra-Fast MCP Test Collection */}
+      <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6 mb-8">
+        <div className="flex items-center justify-between mb-4">
+          <div className="flex items-center space-x-3">
+            <div className="w-10 h-10 bg-gradient-to-r from-red-500 to-orange-600 rounded-lg flex items-center justify-center">
+              <Zap className="w-5 h-5 text-white" />
+            </div>
+            <div>
+              <h3 className="text-lg font-semibold text-gray-900">Ultra-Fast MCP Test</h3>
+              <p className="text-sm text-gray-600">CLI-like performance with zero Postman overhead</p>
+            </div>
+          </div>
+          <button
+            onClick={() => {
+              const collectionUrl = `${window.location.origin}/postman-collections/ultra-fast-mcp.json`;
+              window.open(collectionUrl, '_blank');
+            }}
+            className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 transition-colors"
+          >
+            <Download className="w-4 h-4 mr-2" />
+            Download Collection
+          </button>
+        </div>
+        
+        <div className="bg-red-50 rounded-lg p-4 mb-4">
+          <h4 className="font-medium text-red-900 mb-2">⚡ Maximum Performance - Zero Overhead</h4>
+          <ul className="text-sm text-red-800 space-y-1">
+            <li>• <strong>No pre-request scripts</strong> - Zero JavaScript execution</li>
+            <li>• <strong>Static request bodies</strong> - No dynamic variable processing</li>
+            <li>• <strong>No session management</strong> - Direct API calls only</li>
+            <li>• <strong>No environment variable reads</strong> - Only GitHub token substitution</li>
+            <li>• <strong>Multiple repo counts</strong> - 3, 5, and 10 repos pre-configured</li>
+          </ul>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
+          <div className="bg-white border border-gray-200 rounded-lg p-4">
+            <h5 className="font-medium text-gray-900 mb-2">📋 What's Included</h5>
+            <ul className="text-gray-600 space-y-1">
+              <li>• Search 3 repositories (static)</li>
+              <li>• Search 5 repositories (static)</li>
+              <li>• Search 10 repositories (static)</li>
+              <li>• Get user info (static)</li>
+            </ul>
+          </div>
+          <div className="bg-white border border-gray-200 rounded-lg p-4">
+            <h5 className="font-medium text-gray-900 mb-2">🚀 Performance Benefits</h5>
+            <ul className="text-gray-600 space-y-1">
+              <li>• Fastest possible Postman performance</li>
+              <li>• No script execution delays</li>
+              <li>• Minimal memory usage</li>
+              <li>• Direct MCP protocol calls</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
       {/* Simplified MCP Test Collection */}
       <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6 mb-8">
         <div className="flex items-center justify-between mb-4">
@@ -553,6 +610,68 @@ export function CollectionsTab() {
               <li>• Direct MCP protocol calls</li>
             </ul>
           </div>
+        </div>
+      </div>
+
+      {/* Performance Comparison Section */}
+      <div className="bg-gradient-to-r from-blue-50 to-purple-50 rounded-xl p-6 mb-8">
+        <h3 className="text-xl font-semibold text-gray-900 mb-4">🚀 Performance Comparison</h3>
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+          <div className="bg-white rounded-lg p-4 border border-gray-200">
+            <div className="text-center">
+              <div className="w-8 h-8 bg-green-600 rounded-full flex items-center justify-center mx-auto mb-2">
+                <span className="text-white text-xs font-bold">CLI</span>
+              </div>
+              <h4 className="font-medium text-gray-900 text-sm">CLI Script</h4>
+              <p className="text-xs text-gray-600 mt-1">2-5 seconds</p>
+              <p className="text-xs text-gray-500">Maximum speed</p>
+            </div>
+          </div>
+          <div className="bg-white rounded-lg p-4 border border-gray-200">
+            <div className="text-center">
+              <div className="w-8 h-8 bg-red-600 rounded-full flex items-center justify-center mx-auto mb-2">
+                <span className="text-white text-xs font-bold">UF</span>
+              </div>
+              <h4 className="font-medium text-gray-900 text-sm">Ultra-Fast</h4>
+              <p className="text-xs text-gray-600 mt-1">5-10 seconds</p>
+              <p className="text-xs text-gray-500">Zero scripts</p>
+            </div>
+          </div>
+          <div className="bg-white rounded-lg p-4 border border-gray-200">
+            <div className="text-center">
+              <div className="w-8 h-8 bg-green-600 rounded-full flex items-center justify-center mx-auto mb-2">
+                <span className="text-white text-xs font-bold">S</span>
+              </div>
+              <h4 className="font-medium text-gray-900 text-sm">Simplified</h4>
+              <p className="text-xs text-gray-600 mt-1">10-15 seconds</p>
+              <p className="text-xs text-gray-500">Minimal scripts</p>
+            </div>
+          </div>
+          <div className="bg-white rounded-lg p-4 border border-gray-200">
+            <div className="text-center">
+              <div className="w-8 h-8 bg-gray-400 rounded-full flex items-center justify-center mx-auto mb-2">
+                <span className="text-white text-xs font-bold">C</span>
+              </div>
+              <h4 className="font-medium text-gray-900 text-sm">Complex</h4>
+              <p className="text-xs text-gray-600 mt-1">15-30 seconds</p>
+              <p className="text-xs text-gray-500">Full features</p>
+            </div>
+          </div>
+        </div>
+        <div className="mt-4 text-center">
+          <p className="text-sm text-gray-600 mb-2">
+            <strong>Recommendation:</strong> Use CLI for performance testing, Ultra-Fast Postman for development
+          </p>
+          <button
+            onClick={() => {
+              const scriptUrl = `${window.location.origin}/scripts/test-github-mcp-cli.sh`;
+              window.open(scriptUrl, '_blank');
+            }}
+            className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 transition-colors"
+          >
+            <Download className="w-4 h-4 mr-2" />
+            Download CLI Script
+          </button>
         </div>
       </div>
 

@@ -1,0 +1,148 @@
+{
+  "info": {
+    "name": "Ultra-Fast MCP Test",
+    "description": "CLI-like performance with zero Postman overhead - static request bodies, no scripts",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "github_token",
+      "value": "your_github_personal_access_token_here",
+      "type": "string"
+    }
+  ],
+  "item": [
+    {
+      "name": "GitHub MCP - Search 3 Repos (Static)",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          },
+          {
+            "key": "Accept",
+            "value": "application/vnd.github.v3+json"
+          },
+          {
+            "key": "X-MCP-Version",
+            "value": "1.0"
+          },
+          {
+            "key": "Authorization",
+            "value": "Bearer {{github_token}}"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"jsonrpc\": \"2.0\",\n  \"method\": \"tools/call\",\n  \"params\": {\n    \"name\": \"search_repositories\",\n    \"arguments\": {\n      \"query\": \"user:arun-gupta\",\n      \"perPage\": 3\n    }\n  },\n  \"id\": 1,\n  \"apiVersion\": \"2022-11-28\"\n}"
+        },
+        "url": {
+          "raw": "https://api.githubcopilot.com/mcp/",
+          "host": ["api.githubcopilot.com"],
+          "path": ["mcp"]
+        }
+      }
+    },
+    {
+      "name": "GitHub MCP - Search 5 Repos (Static)",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          },
+          {
+            "key": "Accept",
+            "value": "application/vnd.github.v3+json"
+          },
+          {
+            "key": "X-MCP-Version",
+            "value": "1.0"
+          },
+          {
+            "key": "Authorization",
+            "value": "Bearer {{github_token}}"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"jsonrpc\": \"2.0\",\n  \"method\": \"tools/call\",\n  \"params\": {\n    \"name\": \"search_repositories\",\n    \"arguments\": {\n      \"query\": \"user:arun-gupta\",\n      \"perPage\": 5\n    }\n  },\n  \"id\": 1,\n  \"apiVersion\": \"2022-11-28\"\n}"
+        },
+        "url": {
+          "raw": "https://api.githubcopilot.com/mcp/",
+          "host": ["api.githubcopilot.com"],
+          "path": ["mcp"]
+        }
+      }
+    },
+    {
+      "name": "GitHub MCP - Search 10 Repos (Static)",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          },
+          {
+            "key": "Accept",
+            "value": "application/vnd.github.v3+json"
+          },
+          {
+            "key": "X-MCP-Version",
+            "value": "1.0"
+          },
+          {
+            "key": "Authorization",
+            "value": "Bearer {{github_token}}"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"jsonrpc\": \"2.0\",\n  \"method\": \"tools/call\",\n  \"params\": {\n    \"name\": \"search_repositories\",\n    \"arguments\": {\n      \"query\": \"user:arun-gupta\",\n      \"perPage\": 10\n    }\n  },\n  \"id\": 1,\n  \"apiVersion\": \"2022-11-28\"\n}"
+        },
+        "url": {
+          "raw": "https://api.githubcopilot.com/mcp/",
+          "host": ["api.githubcopilot.com"],
+          "path": ["mcp"]
+        }
+      }
+    },
+    {
+      "name": "GitHub MCP - Get User Info (Static)",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          },
+          {
+            "key": "Accept",
+            "value": "application/vnd.github.v3+json"
+          },
+          {
+            "key": "X-MCP-Version",
+            "value": "1.0"
+          },
+          {
+            "key": "Authorization",
+            "value": "Bearer {{github_token}}"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"jsonrpc\": \"2.0\",\n  \"method\": \"tools/call\",\n  \"params\": {\n    \"name\": \"get_me\",\n    \"arguments\": {}\n  },\n  \"id\": 1,\n  \"apiVersion\": \"2022-11-28\"\n}"
+        },
+        "url": {
+          "raw": "https://api.githubcopilot.com/mcp/",
+          "host": ["api.githubcopilot.com"],
+          "path": ["mcp"]
+        }
+      }
+    }
+  ]
+}
