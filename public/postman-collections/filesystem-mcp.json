@@ -1,0 +1,482 @@
+{
+  "info": {
+    "name": "Filesystem MCP Server",
+    "description": "Filesystem MCP server integration for file and directory operations. Provides safe, controlled access to the local filesystem through the Model Context Protocol.\n\n🔧 **Setup Instructions:**\n1. Ensure the filesystem MCP server is running (npm run start-mcp)\n2. Set your `base_path` variable to the directory you want to work with\n3. Run requests in order for best results\n\n✅ **What You Get:**\n- Read and write files safely\n- List directory contents\n- Check file/directory existence\n- Get detailed file information\n- Create directories\n- Delete files/directories\n- Search for files by pattern\n\n🔒 **Security Features:**\n- Path validation prevents directory traversal\n- Configurable base path restricts access\n- Safe file operations with proper error handling",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "base_path",
+      "value": "/tmp",
+      "type": "string"
+    },
+    {
+      "key": "test_file_path",
+      "value": "/tmp/test-file.txt",
+      "type": "string"
+    },
+    {
+      "key": "test_directory_path",
+      "value": "/tmp/test-directory",
+      "type": "string"
+    }
+  ],
+  "item": [
+    {
+      "name": "1. List Directory Contents",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json",
+            "type": "text"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"jsonrpc\": \"2.0\",\n  \"id\": 1,\n  \"method\": \"tools/call\",\n  \"params\": {\n    \"name\": \"list_directory\",\n    \"arguments\": {\n      \"path\": \"{{base_path}}\"\n    }\n  }\n}"
+        },
+        "url": {
+          "raw": "http://localhost:3002",
+          "protocol": "http",
+          "host": ["localhost"],
+          "port": "3002"
+        }
+      },
+      "response": [],
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test(\"Status code is 200\", function () {",
+              "    pm.response.to.have.status(200);",
+              "});",
+              "",
+              "if (pm.response.code === 200) {",
+              "    try {",
+              "        const response = pm.response.json();",
+              "        if (response.result && response.result.content) {",
+              "            const items = JSON.parse(response.result.content[0].text);",
+              "            console.log('✅ Directory contents:', items.length, 'items');",
+              "            items.forEach(item => {",
+              "                console.log('   ' + (item.type === 'directory' ? '📁' : '📄') + ' ' + item.name);",
+              "            });",
+              "        }",
+              "    } catch (error) {",
+              "        console.log('⚠️ Error parsing response:', error.message);",
+              "    }",
+              "}"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ]
+    },
+    {
+      "name": "2. Check if Test File Exists",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json",
+            "type": "text"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"jsonrpc\": \"2.0\",\n  \"id\": 2,\n  \"method\": \"tools/call\",\n  \"params\": {\n    \"name\": \"file_exists\",\n    \"arguments\": {\n      \"path\": \"{{test_file_path}}\"\n    }\n  }\n}"
+        },
+        "url": {
+          "raw": "http://localhost:3002",
+          "protocol": "http",
+          "host": ["localhost"],
+          "port": "3002"
+        }
+      },
+      "response": [],
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test(\"Status code is 200\", function () {",
+              "    pm.response.to.have.status(200);",
+              "});",
+              "",
+              "if (pm.response.code === 200) {",
+              "    try {",
+              "        const response = pm.response.json();",
+              "        if (response.result && response.result.content) {",
+              "            const exists = response.result.content[0].text === 'true';",
+              "            console.log('✅ File exists:', exists);",
+              "            if (!exists) {",
+              "                console.log('   File does not exist, will create it in next step');",
+              "            }",
+              "        }",
+              "    } catch (error) {",
+              "        console.log('⚠️ Error parsing response:', error.message);",
+              "    }",
+              "}"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ]
+    },
+    {
+      "name": "3. Write Test File",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json",
+            "type": "text"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"jsonrpc\": \"2.0\",\n  \"id\": 3,\n  \"method\": \"tools/call\",\n  \"params\": {\n    \"name\": \"write_file\",\n    \"arguments\": {\n      \"path\": \"{{test_file_path}}\",\n      \"content\": \"Hello from Filesystem MCP Server!\\nThis is a test file created at \" + new Date().toISOString() + \"\\n\\nFeatures:\\n- Safe file operations\\n- Path validation\\n- Error handling\\n- JSON-RPC protocol\"\n    }\n  }\n}"
+        },
+        "url": {
+          "raw": "http://localhost:3002",
+          "protocol": "http",
+          "host": ["localhost"],
+          "port": "3002"
+        }
+      },
+      "response": [],
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test(\"Status code is 200\", function () {",
+              "    pm.response.to.have.status(200);",
+              "});",
+              "",
+              "if (pm.response.code === 200) {",
+              "    try {",
+              "        const response = pm.response.json();",
+              "        if (response.result && response.result.content) {",
+              "            console.log('✅ ' + response.result.content[0].text);",
+              "        }",
+              "    } catch (error) {",
+              "        console.log('⚠️ Error parsing response:', error.message);",
+              "    }",
+              "}"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ]
+    },
+    {
+      "name": "4. Read Test File",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json",
+            "type": "text"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"jsonrpc\": \"2.0\",\n  \"id\": 4,\n  \"method\": \"tools/call\",\n  \"params\": {\n    \"name\": \"read_file\",\n    \"arguments\": {\n      \"path\": \"{{test_file_path}}\"\n    }\n  }\n}"
+        },
+        "url": {
+          "raw": "http://localhost:3002",
+          "protocol": "http",
+          "host": ["localhost"],
+          "port": "3002"
+        }
+      },
+      "response": [],
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test(\"Status code is 200\", function () {",
+              "    pm.response.to.have.status(200);",
+              "});",
+              "",
+              "if (pm.response.code === 200) {",
+              "    try {",
+              "        const response = pm.response.json();",
+              "        if (response.result && response.result.content) {",
+              "            const content = response.result.content[0].text;",
+              "            console.log('✅ File content read successfully');",
+              "            console.log('   Content length:', content.length, 'characters');",
+              "            console.log('   Preview:', content.substring(0, 100) + '...');",
+              "        }",
+              "    } catch (error) {",
+              "        console.log('⚠️ Error parsing response:', error.message);",
+              "    }",
+              "}"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ]
+    },
+    {
+      "name": "5. Get File Information",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json",
+            "type": "text"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"jsonrpc\": \"2.0\",\n  \"id\": 5,\n  \"method\": \"tools/call\",\n  \"params\": {\n    \"name\": \"get_file_info\",\n    \"arguments\": {\n      \"path\": \"{{test_file_path}}\"\n    }\n  }\n}"
+        },
+        "url": {
+          "raw": "http://localhost:3002",
+          "protocol": "http",
+          "host": ["localhost"],
+          "port": "3002"
+        }
+      },
+      "response": [],
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test(\"Status code is 200\", function () {",
+              "    pm.response.to.have.status(200);",
+              "});",
+              "",
+              "if (pm.response.code === 200) {",
+              "    try {",
+              "        const response = pm.response.json();",
+              "        if (response.result && response.result.content) {",
+              "            const info = JSON.parse(response.result.content[0].text);",
+              "            console.log('✅ File information retrieved');",
+              "            console.log('   Path:', info.path);",
+              "            console.log('   Size:', info.size, 'bytes');",
+              "            console.log('   Is file:', info.isFile);",
+              "            console.log('   Is directory:', info.isDirectory);",
+              "            console.log('   Modified:', info.modified);",
+              "            console.log('   Permissions:', info.permissions);",
+              "        }",
+              "    } catch (error) {",
+              "        console.log('⚠️ Error parsing response:', error.message);",
+              "    }",
+              "}"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ]
+    },
+    {
+      "name": "6. Create Test Directory",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json",
+            "type": "text"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"jsonrpc\": \"2.0\",\n  \"id\": 6,\n  \"method\": \"tools/call\",\n  \"params\": {\n    \"name\": \"create_directory\",\n    \"arguments\": {\n      \"path\": \"{{test_directory_path}}\"\n    }\n  }\n}"
+        },
+        "url": {
+          "raw": "http://localhost:3002",
+          "protocol": "http",
+          "host": ["localhost"],
+          "port": "3002"
+        }
+      },
+      "response": [],
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test(\"Status code is 200\", function () {",
+              "    pm.response.to.have.status(200);",
+              "});",
+              "",
+              "if (pm.response.code === 200) {",
+              "    try {",
+              "        const response = pm.response.json();",
+              "        if (response.result && response.result.content) {",
+              "            console.log('✅ ' + response.result.content[0].text);",
+              "        }",
+              "    } catch (error) {",
+              "        console.log('⚠️ Error parsing response:', error.message);",
+              "    }",
+              "}"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ]
+    },
+    {
+      "name": "7. Search for Test Files",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json",
+            "type": "text"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"jsonrpc\": \"2.0\",\n  \"id\": 7,\n  \"method\": \"tools/call\",\n  \"params\": {\n    \"name\": \"search_files\",\n    \"arguments\": {\n      \"directory\": \"{{base_path}}\",\n      \"pattern\": \"test*\"\n    }\n  }\n}"
+        },
+        "url": {
+          "raw": "http://localhost:3002",
+          "protocol": "http",
+          "host": ["localhost"],
+          "port": "3002"
+        }
+      },
+      "response": [],
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test(\"Status code is 200\", function () {",
+              "    pm.response.to.have.status(200);",
+              "});",
+              "",
+              "if (pm.response.code === 200) {",
+              "    try {",
+              "        const response = pm.response.json();",
+              "        if (response.result && response.result.content) {",
+              "            const results = JSON.parse(response.result.content[0].text);",
+              "            console.log('✅ Search completed');",
+              "            console.log('   Found', results.length, 'files matching pattern');",
+              "            results.forEach(file => {",
+              "                console.log('   📄 ' + file);",
+              "            });",
+              "        }",
+              "    } catch (error) {",
+              "        console.log('⚠️ Error parsing response:', error.message);",
+              "    }",
+              "}"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ]
+    },
+    {
+      "name": "8. Cleanup - Delete Test File",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json",
+            "type": "text"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"jsonrpc\": \"2.0\",\n  \"id\": 8,\n  \"method\": \"tools/call\",\n  \"params\": {\n    \"name\": \"delete_file\",\n    \"arguments\": {\n      \"path\": \"{{test_file_path}}\"\n    }\n  }\n}"
+        },
+        "url": {
+          "raw": "http://localhost:3002",
+          "protocol": "http",
+          "host": ["localhost"],
+          "port": "3002"
+        }
+      },
+      "response": [],
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test(\"Status code is 200\", function () {",
+              "    pm.response.to.have.status(200);",
+              "});",
+              "",
+              "if (pm.response.code === 200) {",
+              "    try {",
+              "        const response = pm.response.json();",
+              "        if (response.result && response.result.content) {",
+              "            console.log('✅ ' + response.result.content[0].text);",
+              "        }",
+              "    } catch (error) {",
+              "        console.log('⚠️ Error parsing response:', error.message);",
+              "    }",
+              "}"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ]
+    },
+    {
+      "name": "9. Cleanup - Delete Test Directory",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json",
+            "type": "text"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"jsonrpc\": \"2.0\",\n  \"id\": 9,\n  \"method\": \"tools/call\",\n  \"params\": {\n    \"name\": \"delete_file\",\n    \"arguments\": {\n      \"path\": \"{{test_directory_path}}\"\n    }\n  }\n}"
+        },
+        "url": {
+          "raw": "http://localhost:3002",
+          "protocol": "http",
+          "host": ["localhost"],
+          "port": "3002"
+        }
+      },
+      "response": [],
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test(\"Status code is 200\", function () {",
+              "    pm.response.to.have.status(200);",
+              "});",
+              "",
+              "if (pm.response.code === 200) {",
+              "    try {",
+              "        const response = pm.response.json();",
+              "        if (response.result && response.result.content) {",
+              "            console.log('✅ ' + response.result.content[0].text);",
+              "            console.log('\\n🎉 Filesystem MCP Server test completed successfully!');",
+              "        }",
+              "    } catch (error) {",
+              "        console.log('⚠️ Error parsing response:', error.message);",
+              "    }",
+              "}"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ]
+    }
+  ]
+}

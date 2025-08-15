@@ -140,15 +140,77 @@ export function CollectionsTab() {
               Install GitHub MCP
             </button>
           </div>
-          <div className="bg-white rounded-lg p-6 border border-gray-200 hover:shadow-lg transition-shadow opacity-60">
+          <div className="bg-white rounded-lg p-6 border border-gray-200 hover:shadow-lg transition-shadow">
             <div className="flex items-center space-x-3 mb-4">
-              <div className="w-10 h-10 bg-gray-400 rounded-lg flex items-center justify-center">
+              <div className="w-10 h-10 bg-green-600 rounded-lg flex items-center justify-center">
                 <Database className="w-5 h-5 text-white" />
               </div>
-              <h3 className="font-semibold text-gray-900">File System MCP</h3>
+              <h3 className="font-semibold text-gray-900">Filesystem MCP</h3>
             </div>
-            <p className="text-sm text-gray-600 mb-4">Read, write, and search files</p>
-            <div className="text-xs text-gray-500">🚧 Coming Soon</div>
+            <p className="text-sm text-gray-600 mb-4">Safe file operations with read, write, search, and directory management</p>
+            <div className="text-xs text-gray-500 mb-4">✅ 8 comprehensive tools</div>
+            <div className="text-xs text-green-600 mb-4">🔒 Path validation & security</div>
+            <button
+              onClick={async () => {
+                try {
+                  // Fetch the collection JSON
+                  const response = await fetch('/postman-collections/filesystem-mcp.json');
+                  const collection = await response.json();
+                  
+                  // Create collection via Postman API
+                  const apiResponse = await fetch('/api/postman/create-collection', {
+                    method: 'POST',
+                    headers: {
+                      'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                      collection: collection,
+                      createInWeb: false, // Create in Desktop
+                    }),
+                  });
+                  
+                  const result = await apiResponse.json();
+                  
+                  if (result.success) {
+                    setDeploymentStatus({
+                      type: 'success',
+                      message: '✅ Filesystem MCP Collection created successfully in Postman Desktop!'
+                    });
+                  } else {
+                    // Fallback to download if API key not configured
+                    if (result.fallback) {
+                      const blob = new Blob([JSON.stringify(collection, null, 2)], {
+                        type: 'application/json',
+                      });
+                      const url = URL.createObjectURL(blob);
+                      const a = document.createElement('a');
+                      a.href = url;
+                      a.download = 'filesystem-mcp.json';
+                      document.body.appendChild(a);
+                      a.click();
+                      document.body.removeChild(a);
+                      URL.revokeObjectURL(url);
+                      setDeploymentStatus({
+                        type: 'success',
+                        message: 'Collection downloaded! Import it manually into Postman.'
+                      });
+                    } else {
+                      throw new Error(result.message || 'Failed to create collection');
+                    }
+                  }
+                } catch (error) {
+                  console.error('Error creating collection:', error);
+                  setDeploymentStatus({
+                    type: 'error',
+                    message: 'Failed to create collection. Try "Download & Import" instead.'
+                  });
+                }
+              }}
+              className="w-full inline-flex items-center justify-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 transition-colors"
+            >
+              <Database className="w-4 h-4 mr-2" />
+              Install Filesystem MCP
+            </button>
           </div>
           <div className="bg-white rounded-lg p-6 border border-gray-200 hover:shadow-lg transition-shadow opacity-60">
             <div className="flex items-center space-x-3 mb-4">

@@ -10,6 +10,7 @@
     "type-check": "tsc --noEmit",
     "postinstall": "bash scripts/setup-mcp-servers.sh",
     "setup-mcp": "bash scripts/setup-mcp-servers.sh",
+    "setup-filesystem-mcp": "bash scripts/setup-filesystem-mcp.sh",
     "start-mcp": "bash ~/.mcp-servers/start-mcp-servers.sh",
     "stop-mcp": "bash ~/.mcp-servers/stop-mcp-servers.sh",
     "status-mcp": "bash ~/.mcp-servers/status-mcp-servers.sh",
