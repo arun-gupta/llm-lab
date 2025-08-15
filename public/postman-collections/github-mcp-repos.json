@@ -92,6 +92,11 @@
             "key": "Authorization",
             "value": "Bearer {{github_token}}",
             "type": "text"
+          },
+          {
+            "key": "Mcp-Session-Id",
+            "value": "{{mcp_session_id}}",
+            "type": "text"
           }
         ],
         "body": {
@@ -147,6 +152,11 @@
           {
             "key": "Authorization",
             "value": "Bearer {{github_token}}",
+            "type": "text"
+          },
+          {
+            "key": "Mcp-Session-Id",
+            "value": "{{mcp_session_id}}",
             "type": "text"
           }
         ],
