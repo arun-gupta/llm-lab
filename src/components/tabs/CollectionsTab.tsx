@@ -158,14 +158,14 @@ export function CollectionsTab() {
               </div>
               <h3 className="font-semibold text-gray-900">GitHub MCP</h3>
             </div>
-            <p className="text-sm text-gray-600 mb-4">Get your personal GitHub repositories with MCP integration</p>
-            <div className="text-xs text-gray-500 mb-4">✅ Ready to use - just add your GitHub token</div>
-            <div className="text-xs text-blue-600 mb-4">🔧 Auto-detects your username from token</div>
+            <p className="text-sm text-gray-600 mb-4">Comprehensive repository analysis with issues, PRs, and gists</p>
+            <div className="text-xs text-gray-500 mb-4">✅ Complete GitHub MCP integration</div>
+            <div className="text-xs text-blue-600 mb-4">🔧 Repository health scoring and analytics</div>
             <button
               onClick={async () => {
                 try {
                   // Fetch the collection JSON
-                  const response = await fetch('/postman-collections/github-mcp-repos.json');
+                  const response = await fetch('/postman-collections/github-mcp-unified.json');
                   const collection = await response.json();
                   
                   // Create collection via Postman API
@@ -196,7 +196,7 @@ export function CollectionsTab() {
                       const url = URL.createObjectURL(blob);
                       const a = document.createElement('a');
                       a.href = url;
-                      a.download = 'github-mcp-repos.json';
+                      a.download = 'github-mcp-unified.json';
                       document.body.appendChild(a);
                       a.click();
                       document.body.removeChild(a);
@@ -220,7 +220,7 @@ export function CollectionsTab() {
               className="w-full inline-flex items-center justify-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-purple-600 hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500 transition-colors"
             >
               <Zap className="w-4 h-4 mr-2" />
-              Install GitHub Repos Collection
+              Install Unified GitHub Analysis
             </button>
           </div>
           <div className="bg-white rounded-lg p-6 border border-gray-200 hover:shadow-lg transition-shadow opacity-60">
