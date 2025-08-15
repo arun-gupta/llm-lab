@@ -557,6 +557,61 @@
           ]
         },
         {
+          "name": "Test GitHub MCP Server",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/github/test-mcp",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "github",
+                "test-mcp"
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('GitHub MCP Server is accessible', function () {",
+                  "  if (pm.response.code === 200) {",
+                  "    const result = pm.response.json();",
+                  "    if (result.success) {",
+                  "      console.log('✅ GitHub MCP Server is working!');",
+                  "      console.log('   Session ID:', result.details.sessionId);",
+                  "      console.log('   Available Tools:', result.details.availableTools);",
+                  "      console.log('   Sample Tools:', result.details.sampleTools.join(', '));",
+                  "      console.log('   User Login:', result.details.testResult.userLogin);",
+                  "      console.log('   User Name:', result.details.testResult.userName);",
+                  "      console.log('   Public Repos:', result.details.testResult.publicRepos);",
+                  "      console.log('   Followers:', result.details.testResult.followers);",
+                  "      pm.expect(result.success).to.be.true;",
+                  "      pm.expect(result.details.availableTools).to.be.greaterThan(0);",
+                  "    } else {",
+                  "      console.error('❌ GitHub MCP Server test failed:', result.message);",
+                  "      pm.expect.fail(result.error || 'MCP server test failed');",
+                  "    }",
+                  "  } else {",
+                  "    console.error('❌ Unexpected response:', pm.response.code);",
+                  "    pm.expect.fail('Unexpected response code: ' + pm.response.code);",
+                  "  }",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
           "name": "Create Issue with MCP",
           "request": {
             "method": "POST",
