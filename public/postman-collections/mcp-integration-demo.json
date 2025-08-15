@@ -226,7 +226,7 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"jsonrpc\": \"2.0\",\n  \"method\": \"tools/call\",\n  \"params\": {\n    \"name\": \"search_repositories\",\n    \"arguments\": {\n      \"query\": \"user:arun-gupta\",\n      \"perPage\": {{github_repos_count}}\n    }\n  },\n  \"id\": 1,\n  \"apiVersion\": \"2022-11-28\"\n}"
+              "raw": "{\n  \"jsonrpc\": \"2.0\",\n  \"method\": \"tools/call\",\n  \"params\": {\n    \"name\": \"search_repositories\",\n    \"arguments\": {\n      \"query\": \"user:arun-gupta\",\n      \"perPage\": 3\n    }\n  },\n  \"id\": 1,\n  \"apiVersion\": \"2022-11-28\"\n}"
             },
             "url": {
               "raw": "{{github_mcp_url}}",
@@ -241,11 +241,14 @@
                 "exec": [
                   "// GitHub Remote MCP Server Integration for Repository Search",
                   "try {",
+                  "  // Get base URL with fallback",
+                  "  const baseUrl = pm.environment.get('base_url') || 'http://localhost:3000';",
+                  "  ",
                   "  // Check if user wants to force mock data",
                   "  const forceMock = pm.environment.get('force_mock_data');",
                   "  if (forceMock === 'true') {",
                   "    console.log('🔧 Force mock data enabled. Using mock data.');",
-                  "    pm.request.url = pm.environment.get('base_url') + '/api/mock/github/repositories';",
+                  "    pm.request.url = baseUrl + '/api/mock/github/repositories';",
                   "    pm.request.method = 'POST';",
                   "    pm.request.body = { mode: 'raw', raw: JSON.stringify({}) };",
                   "    return;",
@@ -255,7 +258,7 @@
                   "  const githubToken = pm.environment.get('github_token');",
                   "  if (!githubToken || githubToken === 'your_github_personal_access_token_here' || githubToken === '{{github_token}}') {",
                   "    console.warn('GitHub token not configured or using placeholder. Using mock data instead.');",
-                  "    pm.request.url = pm.environment.get('base_url') + '/api/mock/github/repositories';",
+                  "    pm.request.url = baseUrl + '/api/mock/github/repositories';",
                   "    pm.request.method = 'POST';",
                   "    pm.request.body = { mode: 'raw', raw: JSON.stringify({}) };",
                   "    return;",
@@ -265,7 +268,7 @@
                   "  const lastTimeout = pm.environment.get('github_mcp_last_timeout');",
                   "  if (lastTimeout && (Date.now() - parseInt(lastTimeout)) < 300000) { // 5 minutes",
                   "    console.warn('Recent timeout detected. Using mock data to avoid slow response.');",
-                  "    pm.request.url = pm.environment.get('base_url') + '/api/mock/github/repositories';",
+                  "    pm.request.url = baseUrl + '/api/mock/github/repositories';",
                   "    pm.request.method = 'POST';",
                   "    pm.request.body = { mode: 'raw', raw: JSON.stringify({}) };",
                   "    return;",
@@ -297,9 +300,10 @@
                   "  console.log('   Per Page:', requestBody.params.arguments.perPage);",
                   "",
                   "} catch (error) {",
-                  "  console.error('❌ Error in pre-request script:', error);",
-                  "  // Fallback to mock data",
-                  "  pm.request.url = pm.environment.get('base_url') + '/api/mock/github/repositories';",
+                    "  console.error('❌ Error in pre-request script:', error);",
+  "  // Fallback to mock data",
+  "  const baseUrl = pm.environment.get('base_url') || 'http://localhost:3000';",
+  "  pm.request.url = baseUrl + '/api/mock/github/repositories';",
                   "  pm.request.method = 'POST';",
                   "  pm.request.body = { mode: 'raw', raw: JSON.stringify({}) };",
                   "}"
