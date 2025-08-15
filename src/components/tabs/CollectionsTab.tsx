@@ -521,10 +521,60 @@ export function CollectionsTab() {
           </div>
           <div className="flex space-x-2">
             <button
-              onClick={() => {
-                const collectionUrl = `${window.location.origin}/postman-collections/ultra-fast-mcp.json`;
-                const postmanUrl = `postman://import?url=${encodeURIComponent(collectionUrl)}`;
-                window.open(postmanUrl, '_blank');
+              onClick={async () => {
+                try {
+                  // Fetch the collection JSON
+                  const response = await fetch('/postman-collections/ultra-fast-mcp.json');
+                  const collection = await response.json();
+                  
+                  // Create collection via Postman API
+                  const apiResponse = await fetch('/api/postman/create-collection', {
+                    method: 'POST',
+                    headers: {
+                      'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                      collection: collection,
+                      createInWeb: false, // Create in Desktop
+                    }),
+                  });
+                  
+                  const result = await apiResponse.json();
+                  
+                  if (result.success) {
+                    setDeploymentStatus({
+                      type: 'success',
+                      message: 'Ultra-Fast Full Collection created successfully in Postman Desktop!'
+                    });
+                  } else {
+                    // Fallback to download if API key not configured
+                    if (result.fallback) {
+                      const blob = new Blob([JSON.stringify(collection, null, 2)], {
+                        type: 'application/json',
+                      });
+                      const url = URL.createObjectURL(blob);
+                      const a = document.createElement('a');
+                      a.href = url;
+                      a.download = 'ultra-fast-mcp.json';
+                      document.body.appendChild(a);
+                      a.click();
+                      document.body.removeChild(a);
+                      URL.revokeObjectURL(url);
+                      setDeploymentStatus({
+                        type: 'success',
+                        message: 'Collection downloaded! Import it manually into Postman.'
+                      });
+                    } else {
+                      throw new Error(result.message || 'Failed to create collection');
+                    }
+                  }
+                } catch (error) {
+                  console.error('Error creating collection:', error);
+                  setDeploymentStatus({
+                    type: 'error',
+                    message: 'Failed to create collection. Try "Download & Import" instead.'
+                  });
+                }
               }}
               className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 transition-colors"
             >
@@ -532,10 +582,60 @@ export function CollectionsTab() {
               Install in Postman
             </button>
             <button
-              onClick={() => {
-                const collectionUrl = `${window.location.origin}/postman-collections/ultra-fast-mcp-simple.json`;
-                const postmanUrl = `postman://import?url=${encodeURIComponent(collectionUrl)}`;
-                window.open(postmanUrl, '_blank');
+              onClick={async () => {
+                try {
+                  // Fetch the collection JSON
+                  const response = await fetch('/postman-collections/ultra-fast-mcp-simple.json');
+                  const collection = await response.json();
+                  
+                  // Create collection via Postman API
+                  const apiResponse = await fetch('/api/postman/create-collection', {
+                    method: 'POST',
+                    headers: {
+                      'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                      collection: collection,
+                      createInWeb: false, // Create in Desktop
+                    }),
+                  });
+                  
+                  const result = await apiResponse.json();
+                  
+                  if (result.success) {
+                    setDeploymentStatus({
+                      type: 'success',
+                      message: 'Ultra-Fast Simple Collection created successfully in Postman Desktop!'
+                    });
+                  } else {
+                    // Fallback to download if API key not configured
+                    if (result.fallback) {
+                      const blob = new Blob([JSON.stringify(collection, null, 2)], {
+                        type: 'application/json',
+                      });
+                      const url = URL.createObjectURL(blob);
+                      const a = document.createElement('a');
+                      a.href = url;
+                      a.download = 'ultra-fast-mcp-simple.json';
+                      document.body.appendChild(a);
+                      a.click();
+                      document.body.removeChild(a);
+                      URL.revokeObjectURL(url);
+                      setDeploymentStatus({
+                        type: 'success',
+                        message: 'Collection downloaded! Import it manually into Postman.'
+                      });
+                    } else {
+                      throw new Error(result.message || 'Failed to create collection');
+                    }
+                  }
+                } catch (error) {
+                  console.error('Error creating collection:', error);
+                  setDeploymentStatus({
+                    type: 'error',
+                    message: 'Failed to create collection. Try "Download & Import" instead.'
+                  });
+                }
               }}
               className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-orange-600 hover:bg-orange-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-orange-500 transition-colors"
             >
