@@ -338,60 +338,7 @@ export function CollectionsTab() {
         </div>
       </div>
 
-      {/* Gallery Preview */}
-      <div className="bg-gray-50 rounded-lg p-8 text-center">
-        <h2 className="text-2xl font-semibold text-gray-900 mb-4">Collection Gallery Preview</h2>
-        <p className="text-gray-600 mb-6">
-          The gallery will feature collections from the community, organized by category and popularity.
-        </p>
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
-          <div className="bg-white rounded-lg p-6 text-left">
-            <div className="flex items-center justify-between mb-3">
-              <h3 className="font-semibold text-gray-900">Content Generation Suite</h3>
-              <div className="flex items-center space-x-1">
-                <Star className="w-4 h-4 text-yellow-400 fill-current" />
-                <span className="text-sm text-gray-600">4.8</span>
-              </div>
-            </div>
-            <p className="text-sm text-gray-600 mb-3">Complete collection for blog posts, emails, and social media content</p>
-            <div className="flex items-center justify-between text-xs text-gray-500">
-              <span>By @promptmaster</span>
-              <span>2.4k downloads</span>
-            </div>
-          </div>
-          <div className="bg-white rounded-lg p-6 text-left">
-            <div className="flex items-center justify-between mb-3">
-              <h3 className="font-semibold text-gray-900">Code Review Assistant</h3>
-              <div className="flex items-center space-x-1">
-                <Star className="w-4 h-4 text-yellow-400 fill-current" />
-                <span className="text-sm text-gray-600">4.9</span>
-              </div>
-            </div>
-            <p className="text-sm text-gray-600 mb-3">Comprehensive code review and bug detection prompts</p>
-            <div className="flex items-center justify-between text-xs text-gray-500">
-              <span>By @devhelper</span>
-              <span>1.8k downloads</span>
-            </div>
-          </div>
-          <div className="bg-white rounded-lg p-6 text-left">
-            <div className="flex items-center justify-between mb-3">
-              <h3 className="font-semibold text-gray-900">Data Analysis Tools</h3>
-              <div className="flex items-center space-x-1">
-                <Star className="w-4 h-4 text-yellow-400 fill-current" />
-                <span className="text-sm text-gray-600">4.7</span>
-              </div>
-            </div>
-            <p className="text-sm text-gray-600 mb-3">Statistical analysis and data interpretation prompts</p>
-            <div className="flex items-center justify-between text-xs text-gray-500">
-              <span>By @dataanalyst</span>
-              <span>1.2k downloads</span>
-            </div>
-          </div>
-        </div>
-        <div className="text-gray-500 text-sm">
-          🚧 The public gallery is currently in development. Stay tuned for the launch!
-        </div>
-      </div>
+
 
 
 
