@@ -22,7 +22,7 @@
     },
     {
       "key": "force_real_mcp_data",
-      "value": "false",
+      "value": "true",
       "type": "string"
     },
     {

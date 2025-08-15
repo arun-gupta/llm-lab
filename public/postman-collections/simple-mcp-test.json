@@ -1,0 +1,69 @@
+{
+  "info": {
+    "name": "Simple MCP Test",
+    "description": "Simplified collection that mimics CLI performance",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "github_token",
+      "value": "your_github_personal_access_token_here",
+      "type": "string"
+    }
+  ],
+  "item": [
+    {
+      "name": "Direct GitHub MCP Call",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          },
+          {
+            "key": "Accept",
+            "value": "application/vnd.github.v3+json"
+          },
+          {
+            "key": "X-MCP-Version",
+            "value": "1.0"
+          },
+          {
+            "key": "Authorization",
+            "value": "Bearer {{github_token}}"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"jsonrpc\": \"2.0\",\n  \"method\": \"tools/call\",\n  \"params\": {\n    \"name\": \"search_repositories\",\n    \"arguments\": {\n      \"query\": \"user:arun-gupta\",\n      \"perPage\": 3\n    }\n  },\n  \"id\": 1,\n  \"apiVersion\": \"2022-11-28\"\n}"
+        },
+        "url": {
+          "raw": "https://api.githubcopilot.com/mcp/",
+          "host": ["api.githubcopilot.com"],
+          "path": ["mcp"]
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test('Response is valid', function () {",
+              "  pm.expect(pm.response.code).to.equal(200);",
+              "});",
+              "",
+              "if (pm.response.code === 200) {",
+              "  const response = pm.response.json();",
+              "  if (response.jsonrpc === '2.0' && response.result) {",
+              "    console.log('✅ Direct MCP call successful!');",
+              "    console.log('Response time:', pm.response.responseTime + 'ms');",
+              "  }",
+              "}"
+            ]
+          }
+        }
+      ]
+    }
+  ]
+}
