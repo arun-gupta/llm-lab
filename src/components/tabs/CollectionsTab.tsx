@@ -177,9 +177,9 @@ export function CollectionsTab() {
               </div>
               <h3 className="font-semibold text-gray-900">GitHub MCP</h3>
             </div>
-            <p className="text-sm text-gray-600 mb-4">Access repositories, create issues, search code</p>
-            <div className="text-xs text-gray-500 mb-4">✅ Available (with fallback)</div>
-            <div className="text-xs text-orange-600 mb-4">⚠️ May use mock data if slow</div>
+            <p className="text-sm text-gray-600 mb-4">Get your personal GitHub repositories with MCP integration</p>
+            <div className="text-xs text-gray-500 mb-4">✅ Ready to use - just add your GitHub token</div>
+            <div className="text-xs text-blue-600 mb-4">🔧 Auto-detects your username from token</div>
             <button
               onClick={async () => {
                 try {
@@ -239,7 +239,7 @@ export function CollectionsTab() {
               className="w-full inline-flex items-center justify-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-purple-600 hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500 transition-colors"
             >
               <Zap className="w-4 h-4 mr-2" />
-              Install Working Collection 🔧
+              Install GitHub Repos Collection
             </button>
           </div>
           <div className="bg-white rounded-lg p-6 border border-gray-200 hover:shadow-lg transition-shadow opacity-60">
