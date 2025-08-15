@@ -5,7 +5,7 @@ import { TabNavigation, TabType } from '@/components/TabNavigation';
 import { HomeTab } from '@/components/tabs/HomeTab';
 import { TestTab } from '@/components/tabs/TestTab';
 
-import { CollectionsTab } from '@/components/tabs/CollectionsTab';
+import { MCPTab } from '@/components/tabs/MCPTab';
 import { AnalyticsTab } from '@/components/tabs/AnalyticsTab';
 import { SettingsTab } from '@/components/tabs/SettingsTab';
 import { PostmanSetupGuide } from '@/components/PostmanSetupGuide';
@@ -125,7 +125,7 @@ export default function Home() {
         )}
 
         {activeTab === 'collections' && (
-          <CollectionsTab />
+          <MCPTab />
         )}
         {activeTab === 'analytics' && (
           <AnalyticsTab />

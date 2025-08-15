@@ -29,19 +29,35 @@ echo "✅ Node.js $(node -v) detected"
 echo "📦 Installing dependencies..."
 npm install
 
-# Install MCP servers for enhanced Postman integration
-echo "🔌 Setting up MCP servers for enhanced Postman integration..."
+# Install local MCP servers for enhanced Postman integration
+echo "🔌 Setting up local MCP servers for enhanced Postman integration..."
 if [ -f "scripts/setup-mcp-servers.sh" ]; then
     bash scripts/setup-mcp-servers.sh
-    echo "✅ MCP servers installed successfully"
-    echo "   • GitHub MCP Server: Port 3001"
+    echo "✅ Local MCP servers installed successfully"
+    echo "   • Local MCP Server Template: Port 3001"
     echo "   • File System MCP Server: Port 3002"
     echo "   • Web Search MCP Server: Port 3003"
     echo "   • Database MCP Server: Port 3004"
+    echo "   💡 Remote GitHub MCP: https://api.githubcopilot.com/mcp/ (no installation needed)"
     echo "   💡 You can manage MCP servers from the Settings tab in the UI"
     echo ""
 else
     echo "⚠️  MCP setup script not found, skipping MCP server installation"
+    echo ""
+fi
+
+# Set up HTTP filesystem MCP server for Postman integration
+echo "🌐 Setting up HTTP filesystem MCP server for Postman integration..."
+if [ -f "scripts/setup-http-filesystem-mcp.sh" ]; then
+    bash scripts/setup-http-filesystem-mcp.sh
+    echo "✅ HTTP filesystem MCP server installed successfully"
+    echo "   • HTTP Filesystem MCP Server: http://localhost:3002"
+    echo "   • Health check: http://localhost:3002/health"
+    echo "   • Tools endpoint: http://localhost:3002/tools"
+    echo "   💡 Import the 'Official Filesystem MCP (HTTP)' collection in Postman"
+    echo ""
+else
+    echo "⚠️  HTTP filesystem MCP setup script not found, skipping installation"
     echo ""
 fi
 
@@ -95,10 +111,25 @@ if ! grep -q "^OPENAI_API_KEY=sk-" .env.local 2>/dev/null && ! grep -q "^ANTHROP
     echo ""
 fi
 
-echo "🎯 Starting development server..."
+echo "🎯 Starting development server and MCP servers..."
 echo "   The app will open automatically in your browser"
 echo "   If it doesn't open, visit: http://localhost:3000"
+echo "   MCP servers will be available for Postman integration"
 echo ""
+
+# Start local MCP servers in background
+echo "🚀 Starting local MCP servers in background..."
+if [ -f "$HOME/.mcp-servers/start-mcp-servers.sh" ]; then
+    bash "$HOME/.mcp-servers/start-mcp-servers.sh" &
+    MCP_PID=$!
+    echo "✅ Local MCP servers started (PID: $MCP_PID)"
+    echo "   • HTTP Filesystem MCP: http://localhost:3002"
+    echo "   • Remote GitHub MCP: https://api.githubcopilot.com/mcp/ (no startup needed)"
+    echo ""
+else
+    echo "⚠️  MCP servers startup script not found"
+    echo ""
+fi
 
 # Function to open browser (works on macOS and Linux)
 open_browser() {

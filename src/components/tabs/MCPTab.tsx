@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react';
 import { Library, Plus, Search, Star, Download, Share2, Users, TrendingUp, Code, Zap, Database, Globe, X } from 'lucide-react';
 import { CollectionPreviewModal } from '../CollectionPreviewModal';
 
-export function CollectionsTab() {
+export function MCPTab() {
 
   const [showPreviewModal, setShowPreviewModal] = useState(false);
   const [showUltraFastModal, setShowUltraFastModal] = useState(false);
@@ -68,7 +68,7 @@ export function CollectionsTab() {
 
         {/* MCP Servers Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
-          <div className="bg-white rounded-lg p-6 border border-gray-200 hover:shadow-lg transition-shadow">
+          <div className="bg-white rounded-lg p-6 border border-gray-200 hover:shadow-lg transition-shadow flex flex-col">
             <div className="flex items-center space-x-3 mb-4">
               <div className="w-10 h-10 bg-gray-800 rounded-lg flex items-center justify-center">
                 <Code className="w-5 h-5 text-white" />
@@ -134,27 +134,27 @@ export function CollectionsTab() {
                   });
                 }
               }}
-              className="w-full inline-flex items-center justify-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-purple-600 hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500 transition-colors"
+              className="w-full inline-flex items-center justify-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-purple-600 hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500 transition-colors mt-auto"
             >
               <Zap className="w-4 h-4 mr-2" />
               Install GitHub MCP
             </button>
           </div>
-          <div className="bg-white rounded-lg p-6 border border-gray-200 hover:shadow-lg transition-shadow">
+          <div className="bg-white rounded-lg p-6 border border-gray-200 hover:shadow-lg transition-shadow flex flex-col">
             <div className="flex items-center space-x-3 mb-4">
               <div className="w-10 h-10 bg-green-600 rounded-lg flex items-center justify-center">
                 <Database className="w-5 h-5 text-white" />
               </div>
               <h3 className="font-semibold text-gray-900">Filesystem MCP</h3>
             </div>
-            <p className="text-sm text-gray-600 mb-4">Safe file operations with read, write, search, and directory management</p>
-            <div className="text-xs text-gray-500 mb-4">✅ 8 comprehensive tools</div>
-            <div className="text-xs text-green-600 mb-4">🔒 Path validation & security</div>
+            <p className="text-sm text-gray-600 mb-4">Official MCP server with HTTP wrapper for Postman integration</p>
+            <div className="text-xs text-gray-500 mb-4">✅ 11 official tools + HTTP API</div>
+            <div className="text-xs text-green-600 mb-4">🌐 HTTP wrapper for Postman</div>
             <button
               onClick={async () => {
                 try {
                   // Fetch the collection JSON
-                  const response = await fetch('/postman-collections/filesystem-mcp.json');
+                  const response = await fetch('/postman-collections/official-filesystem-mcp-fixed.json');
                   const collection = await response.json();
                   
                   // Create collection via Postman API
@@ -185,7 +185,7 @@ export function CollectionsTab() {
                       const url = URL.createObjectURL(blob);
                       const a = document.createElement('a');
                       a.href = url;
-                      a.download = 'filesystem-mcp.json';
+                      a.download = 'official-filesystem-mcp-fixed.json';
                       document.body.appendChild(a);
                       a.click();
                       document.body.removeChild(a);
@@ -206,7 +206,7 @@ export function CollectionsTab() {
                   });
                 }
               }}
-              className="w-full inline-flex items-center justify-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 transition-colors"
+              className="w-full inline-flex items-center justify-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 transition-colors mt-auto"
             >
               <Database className="w-4 h-4 mr-2" />
               Install Filesystem MCP
