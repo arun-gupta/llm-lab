@@ -180,35 +180,35 @@ export function CollectionsTab() {
               <div className="text-xs text-gray-500">✅ Available (with fallback)</div>
               <div className="text-xs text-orange-600 mt-1">⚠️ May use mock data if slow</div>
           </div>
-          <div className="bg-white rounded-lg p-6 border border-gray-200 hover:shadow-lg transition-shadow">
+          <div className="bg-white rounded-lg p-6 border border-gray-200 hover:shadow-lg transition-shadow opacity-60">
             <div className="flex items-center space-x-3 mb-4">
-              <div className="w-10 h-10 bg-green-600 rounded-lg flex items-center justify-center">
+              <div className="w-10 h-10 bg-gray-400 rounded-lg flex items-center justify-center">
                 <Database className="w-5 h-5 text-white" />
               </div>
               <h3 className="font-semibold text-gray-900">File System MCP</h3>
             </div>
             <p className="text-sm text-gray-600 mb-4">Read, write, and search files</p>
-            <div className="text-xs text-gray-500">✅ Available</div>
+            <div className="text-xs text-gray-500">🚧 Coming Soon</div>
           </div>
-          <div className="bg-white rounded-lg p-6 border border-gray-200 hover:shadow-lg transition-shadow">
+          <div className="bg-white rounded-lg p-6 border border-gray-200 hover:shadow-lg transition-shadow opacity-60">
             <div className="flex items-center space-x-3 mb-4">
-              <div className="w-10 h-10 bg-blue-600 rounded-lg flex items-center justify-center">
+              <div className="w-10 h-10 bg-gray-400 rounded-lg flex items-center justify-center">
                 <Globe className="w-5 h-5 text-white" />
               </div>
               <h3 className="font-semibold text-gray-900">Web Search MCP</h3>
             </div>
             <p className="text-sm text-gray-600 mb-4">Search web, get news, weather</p>
-            <div className="text-xs text-gray-500">✅ Available</div>
+            <div className="text-xs text-gray-500">🚧 Coming Soon</div>
           </div>
-          <div className="bg-white rounded-lg p-6 border border-gray-200 hover:shadow-lg transition-shadow">
+          <div className="bg-white rounded-lg p-6 border border-gray-200 hover:shadow-lg transition-shadow opacity-60">
             <div className="flex items-center space-x-3 mb-4">
-              <div className="w-10 h-10 bg-purple-600 rounded-lg flex items-center justify-center">
+              <div className="w-10 h-10 bg-gray-400 rounded-lg flex items-center justify-center">
                 <Database className="w-5 h-5 text-white" />
               </div>
               <h3 className="font-semibold text-gray-900">Database MCP</h3>
             </div>
             <p className="text-sm text-gray-600 mb-4">Query, insert, update, delete</p>
-            <div className="text-xs text-gray-500">✅ Available</div>
+            <div className="text-xs text-gray-500">🚧 Coming Soon</div>
           </div>
         </div>
 
@@ -255,8 +255,8 @@ export function CollectionsTab() {
                 <span>Run GitHub requests - uses mock data if MCP server is slow</span>
               </div>
               <div className="flex items-center space-x-2">
-                <span className="w-6 h-6 bg-blue-100 text-blue-600 rounded-full flex items-center justify-center text-xs font-bold">4</span>
-                <span>Start testing with MCP-powered requests</span>
+                <span className="w-6 h-6 bg-gray-100 text-gray-400 rounded-full flex items-center justify-center text-xs font-bold">5</span>
+                <span className="text-gray-500">Other MCP servers coming soon (File System, Web Search, Database)</span>
               </div>
             </div>
           </div>
