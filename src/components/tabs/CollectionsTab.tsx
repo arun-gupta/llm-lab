@@ -516,7 +516,7 @@ export function CollectionsTab() {
             </div>
             <div>
               <h3 className="text-lg font-semibold text-gray-900">Ultra-Fast MCP Test</h3>
-              <p className="text-sm text-gray-600">CLI-like performance with zero Postman overhead</p>
+              <p className="text-sm text-gray-600">CLI-like performance with minimal session management</p>
             </div>
           </div>
           <button
@@ -532,12 +532,12 @@ export function CollectionsTab() {
         </div>
         
         <div className="bg-red-50 rounded-lg p-4 mb-4">
-          <h4 className="font-medium text-red-900 mb-2">⚡ Maximum Performance - Zero Overhead</h4>
+          <h4 className="font-medium text-red-900 mb-2">⚡ Maximum Performance - Minimal Overhead</h4>
           <ul className="text-sm text-red-800 space-y-1">
-            <li>• <strong>No pre-request scripts</strong> - Zero JavaScript execution</li>
+            <li>• <strong>Minimal session management</strong> - One-time initialization</li>
             <li>• <strong>Static request bodies</strong> - No dynamic variable processing</li>
-            <li>• <strong>No session management</strong> - Direct API calls only</li>
-            <li>• <strong>No environment variable reads</strong> - Only GitHub token substitution</li>
+            <li>• <strong>Simple test scripts</strong> - Basic response validation only</li>
+            <li>• <strong>Session ID reuse</strong> - Stored in environment variables</li>
             <li>• <strong>Multiple repo counts</strong> - 3, 5, and 10 repos pre-configured</li>
           </ul>
         </div>
@@ -546,6 +546,7 @@ export function CollectionsTab() {
           <div className="bg-white border border-gray-200 rounded-lg p-4">
             <h5 className="font-medium text-gray-900 mb-2">📋 What's Included</h5>
             <ul className="text-gray-600 space-y-1">
+              <li>• Initialize MCP session (one-time)</li>
               <li>• Search 3 repositories (static)</li>
               <li>• Search 5 repositories (static)</li>
               <li>• Search 10 repositories (static)</li>
@@ -556,8 +557,8 @@ export function CollectionsTab() {
             <h5 className="font-medium text-gray-900 mb-2">🚀 Performance Benefits</h5>
             <ul className="text-gray-600 space-y-1">
               <li>• Fastest possible Postman performance</li>
-              <li>• No script execution delays</li>
-              <li>• Minimal memory usage</li>
+              <li>• Minimal script execution</li>
+              <li>• Session ID reuse for efficiency</li>
               <li>• Direct MCP protocol calls</li>
             </ul>
           </div>
