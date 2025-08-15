@@ -1,0 +1,100 @@
+{
+  "info": {
+    "name": "Ultra-Fast MCP Test (Simplified)",
+    "description": "Minimal headers, maximum performance - simplified for Postman compatibility",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "github_token",
+      "value": "your_github_personal_access_token_here",
+      "type": "string"
+    }
+  ],
+  "item": [
+    {
+      "name": "Initialize Session (Minimal)",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          },
+          {
+            "key": "Authorization",
+            "value": "Bearer {{github_token}}"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"jsonrpc\": \"2.0\",\n  \"method\": \"initialize\",\n  \"params\": {\n    \"protocolVersion\": \"2024-11-05\",\n    \"capabilities\": {\n      \"tools\": {}\n    },\n    \"clientInfo\": {\n      \"name\": \"postman-simple\",\n      \"version\": \"1.0.0\"\n    }\n  },\n  \"id\": 1\n}"
+        },
+        "url": {
+          "raw": "https://api.githubcopilot.com/mcp/",
+          "host": ["api.githubcopilot.com"],
+          "path": ["mcp"]
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "console.log('Response time:', pm.response.responseTime + 'ms');",
+              "if (pm.response.code === 200) {",
+              "  const sessionId = pm.response.headers.get('mcp-session-id');",
+              "  if (sessionId) {",
+              "    pm.environment.set('mcp_session_id', sessionId);",
+              "    console.log('✅ Session ID stored:', sessionId);",
+              "  }",
+              "}"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "Search 3 Repos (Minimal)",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          },
+          {
+            "key": "Authorization",
+            "value": "Bearer {{github_token}}"
+          },
+          {
+            "key": "Mcp-Session-Id",
+            "value": "{{mcp_session_id}}"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"jsonrpc\": \"2.0\",\n  \"method\": \"tools/call\",\n  \"params\": {\n    \"name\": \"search_repositories\",\n    \"arguments\": {\n      \"query\": \"user:arun-gupta\",\n      \"perPage\": 3\n    }\n  },\n  \"id\": 1,\n  \"apiVersion\": \"2022-11-28\"\n}"
+        },
+        "url": {
+          "raw": "https://api.githubcopilot.com/mcp/",
+          "host": ["api.githubcopilot.com"],
+          "path": ["mcp"]
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "console.log('Response time:', pm.response.responseTime + 'ms');",
+              "if (pm.response.code === 200) {",
+              "  console.log('✅ Repository search completed');",
+              "}"
+            ]
+          }
+        }
+      ]
+    }
+  ]
+}

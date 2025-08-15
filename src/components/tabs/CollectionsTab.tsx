@@ -519,16 +519,28 @@ export function CollectionsTab() {
               <p className="text-sm text-gray-600">CLI-like performance with minimal session management</p>
             </div>
           </div>
-          <button
-            onClick={() => {
-              const collectionUrl = `${window.location.origin}/postman-collections/ultra-fast-mcp.json`;
-              window.open(collectionUrl, '_blank');
-            }}
-            className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 transition-colors"
-          >
-            <Download className="w-4 h-4 mr-2" />
-            Download Collection
-          </button>
+          <div className="flex space-x-2">
+            <button
+              onClick={() => {
+                const collectionUrl = `${window.location.origin}/postman-collections/ultra-fast-mcp.json`;
+                window.open(collectionUrl, '_blank');
+              }}
+              className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 transition-colors"
+            >
+              <Download className="w-4 h-4 mr-2" />
+              Download Full
+            </button>
+            <button
+              onClick={() => {
+                const collectionUrl = `${window.location.origin}/postman-collections/ultra-fast-mcp-simple.json`;
+                window.open(collectionUrl, '_blank');
+              }}
+              className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-orange-600 hover:bg-orange-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-orange-500 transition-colors"
+            >
+              <Zap className="w-4 h-4 mr-2" />
+              Download Simple
+            </button>
+          </div>
         </div>
         
         <div className="bg-red-50 rounded-lg p-4 mb-4">
