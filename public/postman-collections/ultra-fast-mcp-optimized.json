@@ -1,13 +1,18 @@
 {
   "info": {
-    "name": "Ultra-Fast MCP Optimized",
-    "description": "Optimized MCP server integration with your auth token - faster session management and better error handling to avoid 31+ second delays.",
+    "name": "Ultra-Fast MCP Optimized - Your Repos",
+    "description": "Optimized MCP server integration that fetches YOUR personal GitHub repositories using your auth token. Faster session management and better error handling to avoid 31+ second delays.",
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
   },
   "variable": [
     {
       "key": "github_token",
       "value": "{{$randomUUID}}",
+      "type": "string"
+    },
+    {
+      "key": "github_username",
+      "value": "your-github-username",
       "type": "string"
     },
     {
@@ -94,7 +99,7 @@
       ]
     },
     {
-      "name": "Search Repos (3) - MCP Optimized",
+      "name": "Get My Repos (3) - MCP Optimized",
       "request": {
         "method": "POST",
         "header": [
@@ -116,7 +121,7 @@
         ],
         "body": {
           "mode": "raw",
-          "raw": "{\n  \"jsonrpc\": \"2.0\",\n  \"id\": 2,\n  \"method\": \"tools/call\",\n  \"params\": {\n    \"name\": \"search_repositories\",\n    \"arguments\": {\n      \"query\": \"stars:>1000\",\n      \"perPage\": 3,\n      \"sort\": \"stars\",\n      \"order\": \"desc\"\n    }\n  }\n}"
+          "raw": "{\n  \"jsonrpc\": \"2.0\",\n  \"id\": 2,\n  \"method\": \"tools/call\",\n  \"params\": {\n    \"name\": \"search_repositories\",\n    \"arguments\": {\n      \"query\": \"user:{{github_username}}\",\n      \"perPage\": 3,\n      \"sort\": \"updated\",\n      \"order\": \"desc\"\n    }\n  }\n}"
         },
         "url": {
           "raw": "https://api.githubcopilot.com/mcp/",
@@ -158,10 +163,11 @@
               "        const content = jsonData.result.content[0];",
               "        if (content.text) {",
               "            const data = JSON.parse(content.text);",
-              "            console.log('📊 Found', data.total_count, 'repositories');",
-              "            console.log('📋 Showing', data.items.length, 'repositories:');",
+              "            console.log('📊 Found', data.total_count, 'of your repositories');",
+              "            console.log('📋 Showing', data.items.length, 'repositories (most recently updated):');",
               "            data.items.forEach((repo, index) => {",
-              "                console.log(`${index + 1}. ${repo.full_name} (${repo.stargazers_count} stars)`);",
+              "                console.log(`${index + 1}. ${repo.full_name} (${repo.language || 'No language'})`);",
+              "                console.log(`   Updated: ${repo.updated_at}, Stars: ${repo.stargazers_count}`);",
               "            });",
               "        }",
               "    }",
@@ -179,7 +185,7 @@
       ]
     },
     {
-      "name": "Search Repos (5) - MCP Optimized",
+      "name": "Get My Repos (5) - MCP Optimized",
       "request": {
         "method": "POST",
         "header": [
@@ -201,7 +207,7 @@
         ],
         "body": {
           "mode": "raw",
-          "raw": "{\n  \"jsonrpc\": \"2.0\",\n  \"id\": 3,\n  \"method\": \"tools/call\",\n  \"params\": {\n    \"name\": \"search_repositories\",\n    \"arguments\": {\n      \"query\": \"language:javascript\",\n      \"perPage\": 5,\n      \"sort\": \"updated\",\n      \"order\": \"desc\"\n    }\n  }\n}"
+          "raw": "{\n  \"jsonrpc\": \"2.0\",\n  \"id\": 3,\n  \"method\": \"tools/call\",\n  \"params\": {\n    \"name\": \"search_repositories\",\n    \"arguments\": {\n      \"query\": \"user:{{github_username}}\",\n      \"perPage\": 5,\n      \"sort\": \"stars\",\n      \"order\": \"desc\"\n    }\n  }\n}"
         },
         "url": {
           "raw": "https://api.githubcopilot.com/mcp/",
@@ -243,10 +249,97 @@
               "        const content = jsonData.result.content[0];",
               "        if (content.text) {",
               "            const data = JSON.parse(content.text);",
-              "            console.log('📊 Found', data.total_count, 'JavaScript repositories');",
+              "            console.log('📊 Found', data.total_count, 'of your repositories');",
+              "            console.log('📋 Showing', data.items.length, 'repositories (by stars):');",
+              "            data.items.forEach((repo, index) => {",
+              "                console.log(`${index + 1}. ${repo.full_name} (${repo.language || 'No language'})`);",
+              "                console.log(`   Stars: ${repo.stargazers_count}, Forks: ${repo.forks_count}`);",
+              "            });",
+              "        }",
+              "    }",
+              "} catch (error) {",
+              "    console.log('❌ Error parsing response:', error.message);",
+              "}",
+              "",
+              "// Check response time",
+              "const responseTime = pm.response.responseTime;",
+              "console.log('⏱️ Response time:', responseTime + 'ms');"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Get My Repos (10) - MCP Optimized",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json",
+            "type": "text"
+          },
+          {
+            "key": "Authorization",
+            "value": "Bearer {{github_token}}",
+            "type": "text"
+          },
+          {
+            "key": "Mcp-Session-Id",
+            "value": "{{mcp_session_id}}",
+            "type": "text"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"jsonrpc\": \"2.0\",\n  \"id\": 4,\n  \"method\": \"tools/call\",\n  \"params\": {\n    \"name\": \"search_repositories\",\n    \"arguments\": {\n      \"query\": \"user:{{github_username}}\",\n      \"perPage\": 10,\n      \"sort\": \"created\",\n      \"order\": \"desc\"\n    }\n  }\n}"
+        },
+        "url": {
+          "raw": "https://api.githubcopilot.com/mcp/",
+          "protocol": "https",
+          "host": ["api", "githubcopilot", "com"],
+          "path": ["mcp", ""]
+        }
+      },
+      "response": [],
+      "event": [
+        {
+          "listen": "prerequest",
+          "script": {
+            "exec": [
+              "// Check if we have a session ID",
+              "const sessionId = pm.environment.get('mcp_session_id');",
+              "if (!sessionId) {",
+              "    console.log('⚠️ No session ID - run Initialize first');",
+              "    return;",
+              "}",
+              "",
+              "// Set timeout",
+              "pm.request.timeout = parseInt(pm.environment.get('mcp_timeout') || '10000');"
+            ],
+            "type": "text/javascript"
+          }
+        },
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test(\"Status code is 200\", function () {",
+              "    pm.response.to.have.status(200);",
+              "});",
+              "",
+              "try {",
+              "    const jsonData = pm.response.json();",
+              "    if (jsonData.result && jsonData.result.content) {",
+              "        const content = jsonData.result.content[0];",
+              "        if (content.text) {",
+              "            const data = JSON.parse(content.text);",
+              "            console.log('📊 Found', data.total_count, 'of your repositories');",
               "            console.log('📋 Showing', data.items.length, 'repositories:');",
               "            data.items.forEach((repo, index) => {",
-              "                console.log(`${index + 1}. ${repo.full_name} (${repo.language})`);",
+              "                console.log(`${index + 1}. ${repo.full_name} (${repo.language || 'No language'})`);",
+              "                console.log(`   Created: ${repo.created_at}, Stars: ${repo.stargazers_count}`);",
               "            });",
               "        }",
               "    }",
@@ -286,7 +379,7 @@
         ],
         "body": {
           "mode": "raw",
-          "raw": "{\n  \"jsonrpc\": \"2.0\",\n  \"id\": 4,\n  \"method\": \"tools/call\",\n  \"params\": {\n    \"name\": \"get_me\",\n    \"arguments\": {}\n  }\n}"
+          "raw": "{\n  \"jsonrpc\": \"2.0\",\n  \"id\": 5,\n  \"method\": \"tools/call\",\n  \"params\": {\n    \"name\": \"get_me\",\n    \"arguments\": {}\n  }\n}"
         },
         "url": {
           "raw": "https://api.githubcopilot.com/mcp/",
