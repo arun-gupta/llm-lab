@@ -75,9 +75,9 @@ export function CollectionsTab() {
               </div>
               <h3 className="font-semibold text-gray-900">GitHub MCP</h3>
             </div>
-            <p className="text-sm text-gray-600 mb-4">Comprehensive repository analysis with issues, PRs, and gists</p>
-            <div className="text-xs text-gray-500 mb-4">✅ Complete GitHub MCP integration</div>
-            <div className="text-xs text-blue-600 mb-4">🔧 Repository health scoring and analytics</div>
+            <p className="text-sm text-gray-600 mb-4">Fast repository analysis with user repos, issues, PRs, and health reports</p>
+            <div className="text-xs text-gray-500 mb-4">✅ 6 optimized MCP requests</div>
+            <div className="text-xs text-blue-600 mb-4">🔧 Environment variables for security</div>
             <button
               onClick={async () => {
                 try {
@@ -208,15 +208,15 @@ export function CollectionsTab() {
               </div>
               <div className="flex items-center space-x-2">
                 <span className="w-6 h-6 bg-blue-100 text-blue-600 rounded-full flex items-center justify-center text-xs font-bold">3</span>
-                <span>Run "Initialize MCP Session" to start</span>
+                <span>Run "Get User Repositories" to see all your repos</span>
               </div>
               <div className="flex items-center space-x-2">
                 <span className="w-6 h-6 bg-blue-100 text-blue-600 rounded-full flex items-center justify-center text-xs font-bold">4</span>
-                <span>Run "Complete Repository Analysis" for full data</span>
+                <span>Run "Get Repository Information" for specific repo details</span>
               </div>
               <div className="flex items-center space-x-2">
                 <span className="w-6 h-6 bg-blue-100 text-blue-600 rounded-full flex items-center justify-center text-xs font-bold">5</span>
-                <span>Run additional requests for issues, PRs, and gists</span>
+                <span>Run "Generate Repository Health Report" for comprehensive analysis</span>
               </div>
             </div>
           </div>

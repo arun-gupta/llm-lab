@@ -4,7 +4,7 @@ import { useState } from 'react';
 import { TabNavigation, TabType } from '@/components/TabNavigation';
 import { HomeTab } from '@/components/tabs/HomeTab';
 import { TestTab } from '@/components/tabs/TestTab';
-import { CompareTab } from '@/components/tabs/CompareTab';
+
 import { CollectionsTab } from '@/components/tabs/CollectionsTab';
 import { AnalyticsTab } from '@/components/tabs/AnalyticsTab';
 import { SettingsTab } from '@/components/tabs/SettingsTab';
@@ -123,9 +123,7 @@ export default function Home() {
         {activeTab === 'test' && (
           <TestTab onTabChange={setActiveTab} />
         )}
-        {activeTab === 'compare' && (
-          <CompareTab />
-        )}
+
         {activeTab === 'collections' && (
           <CollectionsTab />
         )}

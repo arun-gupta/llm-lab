@@ -4,7 +4,7 @@ import { useState } from 'react';
 import { LLMForm } from '../LLMForm';
 import { ResponseTabs } from '../ResponseTabs';
 import { LLMResponse } from '@/lib/llm-apis';
-import { TestTube, BarChart3, Save, Share2 } from 'lucide-react';
+import { TestTube, BarChart3, Save, Share2, TrendingUp, Zap, Clock, DollarSign, Target } from 'lucide-react';
 
 import { TabType } from '../TabNavigation';
 
@@ -17,7 +17,7 @@ export function TestTab({ onTabChange }: TestTabProps) {
   const [isLoading, setIsLoading] = useState(false);
   const [selectedProviders, setSelectedProviders] = useState<string[]>([]);
   const [formData, setFormData] = useState<{ prompt: string; context?: string } | null>(null);
-  const [activeTab, setActiveTab] = useState<'responses' | 'analytics'>('responses');
+  const [activeTab, setActiveTab] = useState<'responses' | 'analytics' | 'comparison'>('responses');
 
   const handleLoadingChange = (loading: boolean) => {
     setIsLoading(loading);
@@ -62,8 +62,16 @@ export function TestTab({ onTabChange }: TestTabProps) {
   };
 
   const handleCompareResults = () => {
-    // Navigate to compare tab with current results
-    onTabChange('compare');
+    setActiveTab('comparison');
+    setTimeout(() => {
+      const responsesElement = document.getElementById('responses-section');
+      if (responsesElement) {
+        responsesElement.scrollIntoView({ 
+          behavior: 'smooth', 
+          block: 'start' 
+        });
+      }
+    }, 100);
   };
 
   return (
@@ -72,9 +80,9 @@ export function TestTab({ onTabChange }: TestTabProps) {
       <div className="mb-8">
         <div className="flex items-center justify-between">
           <div>
-            <h1 className="text-3xl font-bold text-gray-900 mb-2">Test & Experiment</h1>
+            <h1 className="text-3xl font-bold text-gray-900 mb-2">Test & Compare</h1>
             <p className="text-gray-600">
-              Test and experiment with prompts across different providers and models with A/B testing capabilities.
+              Test prompts across different providers and models with A/B testing, side-by-side comparison, and performance benchmarking.
             </p>
           </div>
           <div className="flex space-x-3">
@@ -107,10 +115,10 @@ export function TestTab({ onTabChange }: TestTabProps) {
         </div>
       </div>
 
-      {/* A/B Testing Options */}
+      {/* Testing & Comparison Options */}
       <div className="mb-8">
-        <h2 className="text-xl font-semibold text-gray-900 mb-4">Experiment Options</h2>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <h2 className="text-xl font-semibold text-gray-900 mb-4">Testing & Comparison Options</h2>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
           <div className="bg-white border border-gray-200 rounded-lg p-4">
             <div className="flex items-center space-x-2 mb-2">
               <TestTube className="w-5 h-5 text-blue-600" />
@@ -122,20 +130,29 @@ export function TestTab({ onTabChange }: TestTabProps) {
           </div>
           <div className="bg-white border border-gray-200 rounded-lg p-4">
             <div className="flex items-center space-x-2 mb-2">
-              <TestTube className="w-5 h-5 text-green-600" />
-              <h3 className="font-medium text-gray-900">Model Testing</h3>
+              <BarChart3 className="w-5 h-5 text-green-600" />
+              <h3 className="font-medium text-gray-900">Side-by-Side Comparison</h3>
             </div>
             <p className="text-sm text-gray-600">
-              Compare different models within the same provider
+              Compare responses from multiple providers simultaneously
             </p>
           </div>
           <div className="bg-white border border-gray-200 rounded-lg p-4">
             <div className="flex items-center space-x-2 mb-2">
-              <TestTube className="w-5 h-5 text-purple-600" />
-              <h3 className="font-medium text-gray-900">Prompt Variations</h3>
+              <TrendingUp className="w-5 h-5 text-purple-600" />
+              <h3 className="font-medium text-gray-900">Performance Benchmarking</h3>
             </div>
             <p className="text-sm text-gray-600">
-              Test different prompt formulations and styles
+              Measure response times, costs, and quality metrics
+            </p>
+          </div>
+          <div className="bg-white border border-gray-200 rounded-lg p-4">
+            <div className="flex items-center space-x-2 mb-2">
+              <Zap className="w-5 h-5 text-orange-600" />
+              <h3 className="font-medium text-gray-900">Local vs Cloud</h3>
+            </div>
+            <p className="text-sm text-gray-600">
+              Compare Ollama local models with cloud providers
             </p>
           </div>
         </div>
@@ -169,24 +186,40 @@ export function TestTab({ onTabChange }: TestTabProps) {
         </div>
       </div>
 
-      {/* Future Features Placeholder */}
+      {/* Advanced Comparison Features */}
       <div className="mt-12">
-        <h2 className="text-xl font-semibold text-gray-900 mb-4">Coming Soon</h2>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                      <div className="bg-gray-50 rounded-lg p-6">
-              <h3 className="font-medium text-gray-900 mb-2">Advanced Experimentation</h3>
-              <p className="text-sm text-gray-600 mb-4">
-                Statistical significance testing, confidence intervals, and automated winner selection.
-              </p>
-              <div className="text-xs text-gray-500">🚧 In Development</div>
+        <h2 className="text-xl font-semibold text-gray-900 mb-4">Advanced Comparison Features</h2>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div className="bg-gray-50 rounded-lg p-6">
+            <div className="flex items-center space-x-2 mb-3">
+              <Clock className="w-5 h-5 text-blue-600" />
+              <h3 className="font-medium text-gray-900">Response Time Analysis</h3>
             </div>
-                      <div className="bg-gray-50 rounded-lg p-6">
-              <h3 className="font-medium text-gray-900 mb-2">Experiment Templates</h3>
-              <p className="text-sm text-gray-600 mb-4">
-                Pre-built experiment scenarios for common use cases like content generation, code review, etc.
-              </p>
-              <div className="text-xs text-gray-500">🚧 In Development</div>
+            <p className="text-sm text-gray-600 mb-4">
+              Detailed latency and throughput comparison with statistical analysis
+            </p>
+            <div className="text-xs text-gray-500">🚧 Coming Soon</div>
+          </div>
+          <div className="bg-gray-50 rounded-lg p-6">
+            <div className="flex items-center space-x-2 mb-3">
+              <DollarSign className="w-5 h-5 text-green-600" />
+              <h3 className="font-medium text-gray-900">Cost Analysis</h3>
             </div>
+            <p className="text-sm text-gray-600 mb-4">
+              Compare costs across different providers and models with budget tracking
+            </p>
+            <div className="text-xs text-gray-500">🚧 Coming Soon</div>
+          </div>
+          <div className="bg-gray-50 rounded-lg p-6">
+            <div className="flex items-center space-x-2 mb-3">
+              <Target className="w-5 h-5 text-purple-600" />
+              <h3 className="font-medium text-gray-900">Quality Assessment</h3>
+            </div>
+            <p className="text-sm text-gray-600 mb-4">
+              Automated quality scoring and comparison with consistency checks
+            </p>
+            <div className="text-xs text-gray-500">🚧 Coming Soon</div>
+          </div>
         </div>
       </div>
     </div>

@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import { Home, TestTube, BarChart3, Library, TrendingUp, Settings } from 'lucide-react';
 
-export type TabType = 'home' | 'test' | 'compare' | 'collections' | 'analytics' | 'settings';
+export type TabType = 'home' | 'test' | 'collections' | 'analytics' | 'settings';
 
 interface TabNavigationProps {
   activeTab: TabType;
@@ -19,15 +19,9 @@ const tabs = [
   },
   {
     id: 'test' as TabType,
-    label: 'Test',
+    label: 'Test & Compare',
     icon: TestTube,
-    description: 'Test prompts and A/B testing'
-  },
-  {
-    id: 'compare' as TabType,
-    label: 'Compare',
-    icon: BarChart3,
-    description: 'Side-by-side comparison and benchmarking'
+    description: 'Test prompts, A/B testing, and comparison'
   },
   {
     id: 'collections' as TabType,
