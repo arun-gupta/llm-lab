@@ -5,7 +5,7 @@ import { Library, Plus, Search, Star, Download, Share2, Users, TrendingUp, Code,
 import { CollectionPreviewModal } from '../CollectionPreviewModal';
 
 export function CollectionsTab() {
-  const [showInstallModal, setShowInstallModal] = useState(false);
+
   const [showPreviewModal, setShowPreviewModal] = useState(false);
   const [showUltraFastModal, setShowUltraFastModal] = useState(false);
   const [deploymentStatus, setDeploymentStatus] = useState<{ type: 'success' | 'error', message: string } | null>(null);
@@ -267,13 +267,6 @@ export function CollectionsTab() {
         <div className="text-center">
           <div className="flex justify-center space-x-4">
             <button 
-              onClick={() => setShowInstallModal(true)}
-              className="flex items-center space-x-2 px-6 py-3 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors"
-            >
-              <Zap className="w-4 h-4" />
-              <span>Install Working MCP Collection</span>
-            </button>
-            <button 
               onClick={() => window.open('/docs/MCP-POSTMAN-INTEGRATION.md', '_blank')}
               className="flex items-center space-x-2 px-6 py-3 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors"
             >
@@ -339,159 +332,7 @@ export function CollectionsTab() {
         </div>
       </div>
 
-      {/* Install Modal */}
-      {showInstallModal && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-white rounded-lg p-8 max-w-md w-full mx-4">
-            <div className="flex items-center justify-between mb-6">
-              <h3 className="text-xl font-semibold text-gray-900">Install MCP Collection</h3>
-              <button
-                onClick={() => setShowInstallModal(false)}
-                className="text-gray-400 hover:text-gray-600"
-              >
-                <X className="w-6 h-6" />
-              </button>
-            </div>
-            
-            <div className="space-y-4">
-              <p className="text-gray-600">
-                Choose how you'd like to install the MCP Integration collection:
-              </p>
-              
-              <div className="space-y-3">
-                <button
-                  onClick={() => {
-                    const link = document.createElement('a');
-                    link.href = '/postman-collections/mcp-integration-demo.json';
-                    link.download = 'mcp-integration-demo.json';
-                    link.click();
-                    setShowInstallModal(false);
-                  }}
-                  className="w-full flex items-center space-x-3 p-4 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors"
-                >
-                  <Download className="w-5 h-5 text-blue-600" />
-                  <div className="text-left">
-                    <div className="font-medium text-gray-900">Download & Import</div>
-                    <div className="text-sm text-gray-600">Download the collection file and import it manually</div>
-                  </div>
-                </button>
-                
-                <button
-                  onClick={() => {
-                    const collectionUrl = `${window.location.origin}/postman-collections/mcp-integration-demo.json`;
-                    const postmanUrl = `https://go.postman.co/import?url=${encodeURIComponent(collectionUrl)}`;
-                    window.open(postmanUrl, '_blank');
-                    setShowInstallModal(false);
-                  }}
-                  className="w-full flex items-center space-x-3 p-4 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors"
-                >
-                  <Code className="w-5 h-5 text-green-600" />
-                  <div className="text-left">
-                    <div className="font-medium text-gray-900">Postman Web</div>
-                    <div className="text-sm text-gray-600">Open directly in Postman Web browser</div>
-                  </div>
-                </button>
 
-                <button
-                  onClick={async () => {
-                    try {
-                      // Fetch the collection JSON
-                      const response = await fetch('/postman-collections/mcp-integration-demo.json');
-                      const collection = await response.json();
-                      
-                      // Create collection via Postman API
-                      const apiResponse = await fetch('/api/postman/create-collection', {
-                        method: 'POST',
-                        headers: {
-                          'Content-Type': 'application/json',
-                        },
-                        body: JSON.stringify({
-                          collection: collection,
-                          createInWeb: false, // Create in Desktop
-                        }),
-                      });
-                      
-                      const result = await apiResponse.json();
-                      
-                      if (result.success) {
-                        setDeploymentStatus({
-                          type: 'success',
-                          message: 'Collection created successfully in Postman Desktop!'
-                        });
-                      } else {
-                        throw new Error(result.message || 'Failed to create collection');
-                      }
-                    } catch (error) {
-                      console.error('Error creating collection:', error);
-                      setDeploymentStatus({
-                        type: 'error',
-                        message: 'Failed to create collection. Try "Download & Import" instead.'
-                      });
-                    }
-                    
-                    setShowInstallModal(false);
-                  }}
-                  className="w-full flex items-center space-x-3 p-4 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors"
-                >
-                  <Code className="w-5 h-5 text-orange-600" />
-                  <div className="text-left">
-                    <div className="font-medium text-gray-900">Direct API Creation</div>
-                    <div className="text-sm text-gray-600">Create collection directly in Postman Desktop via API</div>
-                  </div>
-                </button>
-
-                <button
-                  onClick={() => {
-                    const collectionUrl = `${window.location.origin}/postman-collections/mcp-integration-demo.json`;
-                    
-                    // Single attempt to open Postman Desktop
-                    try {
-                      // Try the most reliable URL scheme
-                      const postmanDesktopUrl = `postman://import?url=${encodeURIComponent(collectionUrl)}`;
-                      window.open(postmanDesktopUrl, '_blank');
-                      
-                      // Show immediate feedback
-                      setDeploymentStatus({
-                        type: 'success',
-                        message: 'Attempting to open Postman Desktop...'
-                      });
-                      
-                    } catch (error) {
-                      console.log('Postman Desktop URL scheme not supported');
-                      setDeploymentStatus({
-                        type: 'error',
-                        message: 'Could not open Postman Desktop. Try "Direct API Creation" instead.'
-                      });
-                    }
-                    
-                    setShowInstallModal(false);
-                  }}
-                  className="w-full flex items-center space-x-3 p-4 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors"
-                >
-                  <Code className="w-5 h-5 text-purple-600" />
-                  <div className="text-left">
-                    <div className="font-medium text-gray-900">Postman Desktop</div>
-                    <div className="text-sm text-gray-600">Open directly in Postman Desktop app (if installed)</div>
-                  </div>
-                </button>
-              </div>
-              
-              <div className="mt-6 p-4 bg-blue-50 rounded-lg">
-                <h4 className="font-medium text-blue-900 mb-2">💡 Installation Tips</h4>
-                <ul className="text-sm text-blue-800 space-y-1">
-                  <li>• <strong>Download & Import:</strong> Works everywhere, no security blocks</li>
-                  <li>• <strong>Direct API Creation:</strong> Best option - creates collection directly in Postman Desktop</li>
-                  <li>• <strong>Postman Desktop:</strong> Uses URL scheme (may not work in all browsers)</li>
-                  <li>• <strong>Postman Web:</strong> Works best in production environments</li>
-                </ul>
-                <p className="text-xs text-blue-700 mt-2">
-                  <strong>Recommended:</strong> Try "Direct API Creation" first for the best experience with Postman Desktop.
-                </p>
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
 
       {/* Working MCP Integration Collection */}
       <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6 mb-8">
