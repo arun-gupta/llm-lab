@@ -41,7 +41,7 @@
         ],
         "body": {
           "mode": "raw",
-          "raw": "{\n  \"jsonrpc\": \"2.0\",\n  \"method\": \"tools/call\",\n  \"params\": {\n    \"name\": \"search_repositories\",\n    \"arguments\": {\n      \"query\": \"user:arun-gupta\",\n      \"perPage\": {{github_repos_count}}\n    }\n  },\n  \"id\": 1,\n  \"apiVersion\": \"2022-11-28\"\n}"
+          "raw": "{\n  \"jsonrpc\": \"2.0\",\n  \"method\": \"tools/call\",\n  \"params\": {\n    \"name\": \"search_repositories\",\n    \"arguments\": {\n      \"query\": \"user:arun-gupta\",\n      \"perPage\": 3\n    }\n  },\n  \"id\": 1,\n  \"apiVersion\": \"2022-11-28\"\n}"
         },
         "url": {
           "raw": "https://api.githubcopilot.com/mcp/",
@@ -50,6 +50,40 @@
         }
       },
       "event": [
+        {
+          "listen": "prerequest",
+          "script": {
+            "exec": [
+              "// Simple pre-request script to handle variable substitution",
+              "try {",
+              "  // Get the repos count from environment",
+              "  const reposCount = pm.environment.get('github_repos_count') || '3';",
+              "  ",
+              "  // Create the request body with proper variable substitution",
+              "  const requestBody = {",
+              "    jsonrpc: '2.0',",
+              "    method: 'tools/call',",
+              "    params: {",
+              "      name: 'search_repositories',",
+              "      arguments: {",
+              "        query: 'user:arun-gupta',",
+              "        perPage: parseInt(reposCount)",
+              "      }",
+              "    },",
+              "    id: 1,",
+              "    apiVersion: '2022-11-28'",
+              "  };",
+              "  ",
+              "  // Set the request body",
+              "  pm.request.body.raw = JSON.stringify(requestBody, null, 2);",
+              "  ",
+              "  console.log('🔧 Request body updated with repos count:', reposCount);",
+              "} catch (error) {",
+              "  console.error('❌ Error in pre-request script:', error.message);",
+              "}"
+            ]
+          }
+        },
         {
           "listen": "test",
           "script": {
