@@ -266,7 +266,7 @@
                   "",
                   "  // Check for recent timeout",
                   "  const lastTimeout = pm.environment.get('github_mcp_last_timeout');",
-                  "  if (lastTimeout && (Date.now() - parseInt(lastTimeout)) < 300000) { // 5 minutes",
+                  "  if (lastTimeout && (Date.now() - parseInt(lastTimeout)) < 600000) { // 10 minutes",
                   "    console.warn('Recent timeout detected. Using mock data to avoid slow response.');",
                   "    pm.request.url = baseUrl + '/api/mock/github/repositories';",
                   "    pm.request.method = 'POST';",
@@ -435,7 +435,7 @@
                   "});",
                   "",
                   "// Set timeout flag if response is slow",
-                  "if (pm.response.responseTime > 15000) {",
+                  "if (pm.response.responseTime > 60000) { // 60 seconds",
                   "  pm.environment.set('github_mcp_last_timeout', Date.now().toString());",
                   "  console.warn('⚠️ Slow response detected. Setting timeout flag.');",
                   "}"
