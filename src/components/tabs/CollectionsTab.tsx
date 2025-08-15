@@ -302,19 +302,19 @@ export function CollectionsTab() {
             <div className="space-y-3 text-sm text-gray-600">
               <div className="flex items-center space-x-2">
                 <span className="w-6 h-6 bg-blue-100 text-blue-600 rounded-full flex items-center justify-center text-xs font-bold">1</span>
-                <span>Install MCP Integration collection in Postman</span>
+                <span>Install GitHub MCP collection in Postman</span>
               </div>
               <div className="flex items-center space-x-2">
                 <span className="w-6 h-6 bg-blue-100 text-blue-600 rounded-full flex items-center justify-center text-xs font-bold">2</span>
-                <span>GitHub token is pre-configured and ready to use</span>
+                <span>Set your GitHub token and username variables</span>
               </div>
               <div className="flex items-center space-x-2">
                 <span className="w-6 h-6 bg-blue-100 text-blue-600 rounded-full flex items-center justify-center text-xs font-bold">3</span>
-                <span>Test GitHub token with "Test GitHub Token" request</span>
+                <span>Run "Initialize MCP Session" to start</span>
               </div>
               <div className="flex items-center space-x-2">
                 <span className="w-6 h-6 bg-blue-100 text-blue-600 rounded-full flex items-center justify-center text-xs font-bold">4</span>
-                <span>Run GitHub requests - uses mock data if MCP server is slow</span>
+                <span>Run "Get My Repositories" to fetch your repos</span>
               </div>
               <div className="flex items-center space-x-2">
                 <span className="w-6 h-6 bg-gray-100 text-gray-400 rounded-full flex items-center justify-center text-xs font-bold">5</span>
