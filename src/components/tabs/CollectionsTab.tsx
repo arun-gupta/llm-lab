@@ -267,25 +267,11 @@ export function CollectionsTab() {
         <div className="text-center">
           <div className="flex justify-center space-x-4">
             <button 
-              onClick={() => setShowPreviewModal(true)}
-              className="flex items-center space-x-2 px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
-            >
-              <Download className="w-4 h-4" />
-              <span>Preview & Deploy (Complex)</span>
-            </button>
-            <button 
-              onClick={() => setShowUltraFastModal(true)}
-              className="flex items-center space-x-2 px-6 py-3 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors"
+              onClick={() => setShowInstallModal(true)}
+              className="flex items-center space-x-2 px-6 py-3 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors"
             >
               <Zap className="w-4 h-4" />
-              <span>Preview & Deploy (Ultra-Fast)</span>
-            </button>
-            <button 
-              onClick={() => setShowInstallModal(true)}
-              className="flex items-center space-x-2 px-6 py-3 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors"
-            >
-              <Code className="w-4 h-4" />
-              <span>Quick Install</span>
+              <span>Install Working MCP Collection</span>
             </button>
             <button 
               onClick={() => window.open('/docs/MCP-POSTMAN-INTEGRATION.md', '_blank')}
