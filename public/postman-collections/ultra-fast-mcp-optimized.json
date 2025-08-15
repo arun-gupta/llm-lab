@@ -1,7 +1,7 @@
 {
   "info": {
     "name": "Ultra-Fast MCP Optimized - Your Repos",
-    "description": "Optimized MCP server integration that fetches YOUR personal GitHub repositories using your auth token. Faster session management and better error handling to avoid 31+ second delays.",
+    "description": "Optimized MCP server integration that automatically fetches YOUR personal GitHub repositories. The collection automatically gets your username from your auth token, so you only need to set your GitHub token. Faster session management and better error handling to avoid 31+ second delays.\n\n🔧 **Setup Instructions:**\n1. Set your `github_token` variable to your GitHub Personal Access Token\n2. Run 'Initialize MCP Session' first\n3. Run 'Get My User Info First' to automatically set your username\n4. Then run any of the repository requests to get your personal repos\n\n✅ **No manual username setup required!**",
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
   },
   "variable": [
@@ -99,6 +99,95 @@
       ]
     },
     {
+      "name": "Get My User Info First",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json",
+            "type": "text"
+          },
+          {
+            "key": "Authorization",
+            "value": "Bearer {{github_token}}",
+            "type": "text"
+          },
+          {
+            "key": "Mcp-Session-Id",
+            "value": "{{mcp_session_id}}",
+            "type": "text"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"jsonrpc\": \"2.0\",\n  \"id\": 2,\n  \"method\": \"tools/call\",\n  \"params\": {\n    \"name\": \"get_me\",\n    \"arguments\": {}\n  }\n}"
+        },
+        "url": {
+          "raw": "https://api.githubcopilot.com/mcp/",
+          "protocol": "https",
+          "host": ["api", "githubcopilot", "com"],
+          "path": ["mcp", ""]
+        }
+      },
+      "response": [],
+      "event": [
+        {
+          "listen": "prerequest",
+          "script": {
+            "exec": [
+              "// Check if we have a session ID",
+              "const sessionId = pm.environment.get('mcp_session_id');",
+              "if (!sessionId) {",
+              "    console.log('⚠️ No session ID - run Initialize first');",
+              "    return;",
+              "}",
+              "",
+              "// Set timeout",
+              "pm.request.timeout = parseInt(pm.environment.get('mcp_timeout') || '10000');"
+            ],
+            "type": "text/javascript"
+          }
+        },
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test(\"Status code is 200\", function () {",
+              "    pm.response.to.have.status(200);",
+              "});",
+              "",
+              "try {",
+              "    const jsonData = pm.response.json();",
+              "    if (jsonData.result && jsonData.result.content) {",
+              "        const content = jsonData.result.content[0];",
+              "        if (content.text) {",
+              "            const data = JSON.parse(content.text);",
+              "            console.log('👤 User Info:');",
+              "            console.log('   Login:', data.login);",
+              "            console.log('   ID:', data.id);",
+              "            console.log('   Name:', data.name || 'N/A');",
+              "            console.log('   Email:', data.email || 'N/A');",
+              "",
+              "            // Set the username for other requests",
+              "            pm.environment.set('github_username', data.login);",
+              "            console.log('✅ Set github_username to:', data.login);",
+              "        }",
+              "    }",
+              "} catch (error) {",
+              "    console.log('❌ Error parsing response:', error.message);",
+              "}",
+              "",
+              "// Check response time",
+              "const responseTime = pm.response.responseTime;",
+              "console.log('⏱️ Response time:', responseTime + 'ms');"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ]
+    },
+    {
       "name": "Get My Repos (3) - MCP Optimized",
       "request": {
         "method": "POST",
@@ -121,7 +210,7 @@
         ],
         "body": {
           "mode": "raw",
-          "raw": "{\n  \"jsonrpc\": \"2.0\",\n  \"id\": 2,\n  \"method\": \"tools/call\",\n  \"params\": {\n    \"name\": \"search_repositories\",\n    \"arguments\": {\n      \"query\": \"user:{{github_username}}\",\n      \"perPage\": 3,\n      \"sort\": \"updated\",\n      \"order\": \"desc\"\n    }\n  }\n}"
+          "raw": "{\n  \"jsonrpc\": \"2.0\",\n  \"id\": 3,\n  \"method\": \"tools/call\",\n  \"params\": {\n    \"name\": \"search_repositories\",\n    \"arguments\": {\n      \"query\": \"user:{{github_username}}\",\n      \"perPage\": 3,\n      \"sort\": \"updated\",\n      \"order\": \"desc\"\n    }\n  }\n}"
         },
         "url": {
           "raw": "https://api.githubcopilot.com/mcp/",
@@ -207,7 +296,7 @@
         ],
         "body": {
           "mode": "raw",
-          "raw": "{\n  \"jsonrpc\": \"2.0\",\n  \"id\": 3,\n  \"method\": \"tools/call\",\n  \"params\": {\n    \"name\": \"search_repositories\",\n    \"arguments\": {\n      \"query\": \"user:{{github_username}}\",\n      \"perPage\": 5,\n      \"sort\": \"stars\",\n      \"order\": \"desc\"\n    }\n  }\n}"
+          "raw": "{\n  \"jsonrpc\": \"2.0\",\n  \"id\": 4,\n  \"method\": \"tools/call\",\n  \"params\": {\n    \"name\": \"search_repositories\",\n    \"arguments\": {\n      \"query\": \"user:{{github_username}}\",\n      \"perPage\": 5,\n      \"sort\": \"stars\",\n      \"order\": \"desc\"\n    }\n  }\n}"
         },
         "url": {
           "raw": "https://api.githubcopilot.com/mcp/",
@@ -293,7 +382,7 @@
         ],
         "body": {
           "mode": "raw",
-          "raw": "{\n  \"jsonrpc\": \"2.0\",\n  \"id\": 4,\n  \"method\": \"tools/call\",\n  \"params\": {\n    \"name\": \"search_repositories\",\n    \"arguments\": {\n      \"query\": \"user:{{github_username}}\",\n      \"perPage\": 10,\n      \"sort\": \"created\",\n      \"order\": \"desc\"\n    }\n  }\n}"
+          "raw": "{\n  \"jsonrpc\": \"2.0\",\n  \"id\": 5,\n  \"method\": \"tools/call\",\n  \"params\": {\n    \"name\": \"search_repositories\",\n    \"arguments\": {\n      \"query\": \"user:{{github_username}}\",\n      \"perPage\": 10,\n      \"sort\": \"created\",\n      \"order\": \"desc\"\n    }\n  }\n}"
         },
         "url": {
           "raw": "https://api.githubcopilot.com/mcp/",
@@ -379,7 +468,7 @@
         ],
         "body": {
           "mode": "raw",
-          "raw": "{\n  \"jsonrpc\": \"2.0\",\n  \"id\": 5,\n  \"method\": \"tools/call\",\n  \"params\": {\n    \"name\": \"get_me\",\n    \"arguments\": {}\n  }\n}"
+          "raw": "{\n  \"jsonrpc\": \"2.0\",\n  \"id\": 6,\n  \"method\": \"tools/call\",\n  \"params\": {\n    \"name\": \"get_me\",\n    \"arguments\": {}\n  }\n}"
         },
         "url": {
           "raw": "https://api.githubcopilot.com/mcp/",
