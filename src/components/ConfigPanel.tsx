@@ -16,12 +16,19 @@ interface ApiKeys {
   github: string;
 }
 
+interface GitHubSettings {
+  reposCount: number;
+}
+
 export function ConfigPanel({ isOpen, onClose, onConfigChange }: ConfigPanelProps) {
   const [apiKeys, setApiKeys] = useState<ApiKeys>({
     openai: '',
     anthropic: '',
     postman: '',
     github: ''
+  });
+  const [githubSettings, setGithubSettings] = useState<GitHubSettings>({
+    reposCount: 3
   });
   const [showKeys, setShowKeys] = useState<{ [key in keyof ApiKeys]: boolean }>({
     openai: false,
@@ -39,10 +46,11 @@ export function ConfigPanel({ isOpen, onClose, onConfigChange }: ConfigPanelProp
     github: false
   });
 
-  // Load existing API keys on mount
+  // Load existing API keys and settings on mount
   useEffect(() => {
     if (isOpen) {
       loadApiKeys();
+      loadGitHubSettings();
     }
   }, [isOpen]);
 
@@ -63,13 +71,28 @@ export function ConfigPanel({ isOpen, onClose, onConfigChange }: ConfigPanelProp
     }
   };
 
+  const loadGitHubSettings = async () => {
+    try {
+      const response = await fetch('/api/github/settings');
+      if (response.ok) {
+        const settings = await response.json();
+        setGithubSettings({
+          reposCount: settings.reposCount || 3
+        });
+      }
+    } catch (error) {
+      console.log('No existing GitHub settings found, using defaults');
+    }
+  };
+
   const handleSave = async () => {
     setIsSaving(true);
     setSaveStatus('idle');
     setStatusMessage('');
 
     try {
-      const response = await fetch('/api/config/keys', {
+      // Save API keys
+      const keysResponse = await fetch('/api/config/keys', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -77,9 +100,18 @@ export function ConfigPanel({ isOpen, onClose, onConfigChange }: ConfigPanelProp
         body: JSON.stringify(apiKeys),
       });
 
-      if (response.ok) {
+      // Save GitHub settings
+      const settingsResponse = await fetch('/api/github/settings', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(githubSettings),
+      });
+
+      if (keysResponse.ok && settingsResponse.ok) {
         setSaveStatus('success');
-        setStatusMessage('API keys saved successfully!');
+        setStatusMessage('Configuration saved successfully!');
         onConfigChange?.();
         
         // Clear success message after 3 seconds
@@ -88,11 +120,11 @@ export function ConfigPanel({ isOpen, onClose, onConfigChange }: ConfigPanelProp
           setStatusMessage('');
         }, 3000);
       } else {
-        throw new Error('Failed to save API keys');
+        throw new Error('Failed to save configuration');
       }
     } catch (error) {
       setSaveStatus('error');
-      setStatusMessage('Failed to save API keys. Please try again.');
+      setStatusMessage('Failed to save configuration. Please try again.');
     } finally {
       setIsSaving(false);
     }
@@ -394,6 +426,28 @@ export function ConfigPanel({ isOpen, onClose, onConfigChange }: ConfigPanelProp
             </div>
             <p className="text-xs text-gray-500">
               Get your token from <a href="https://github.com/settings/tokens" target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline">GitHub Settings</a> (requires 'repo' scope for MCP integration)
+            </p>
+          </div>
+
+          {/* GitHub Settings */}
+          <div className="space-y-3">
+            <div className="flex items-center justify-between">
+              <label className="block text-sm font-medium text-gray-700">
+                Number of Repositories to Fetch
+              </label>
+            </div>
+            <div className="relative">
+              <input
+                type="number"
+                min="1"
+                max="100"
+                value={githubSettings.reposCount}
+                onChange={(e) => setGithubSettings(prev => ({ ...prev, reposCount: parseInt(e.target.value) || 3 }))}
+                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-900"
+              />
+            </div>
+            <p className="text-xs text-gray-500">
+              Number of repositories to fetch when testing GitHub MCP integration (1-100)
             </p>
           </div>
 

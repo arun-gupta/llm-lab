@@ -21,6 +21,11 @@
       "type": "string"
     },
     {
+      "key": "github_repos_count",
+      "value": "3",
+      "type": "string"
+    },
+    {
       "key": "github_mcp_url",
       "value": "https://api.githubcopilot.com/mcp/",
       "type": "string"
