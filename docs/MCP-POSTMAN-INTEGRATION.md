@@ -14,9 +14,25 @@ MCP (Model Context Protocol) allows AI models to interact with external tools an
 ## 📦 Popular MCP Servers
 
 ### 1. **GitHub MCP Server**
-- **URL**: `ws://localhost:3001`
-- **Tools**: List repositories, create issues, search code, get pull requests
+- **URL**: `https://api.githubcopilot.com/mcp/`
+- **Tools**: Comprehensive GitHub API access
 - **Use Cases**: Test GitHub API integrations, create test issues, fetch repository data
+
+**Available GitHub MCP Endpoints:**
+- **Repositories**: `https://api.githubcopilot.com/mcp/x/repos`
+- **Issues**: `https://api.githubcopilot.com/mcp/x/issues`
+- **Pull Requests**: `https://api.githubcopilot.com/mcp/x/pull_requests`
+- **Actions**: `https://api.githubcopilot.com/mcp/x/actions`
+- **Notifications**: `https://api.githubcopilot.com/mcp/x/notifications`
+- **Organizations**: `https://api.githubcopilot.com/mcp/x/orgs`
+- **Users**: `https://api.githubcopilot.com/mcp/x/users`
+- **Gists**: `https://api.githubcopilot.com/mcp/x/gists`
+- **Discussions**: `https://api.githubcopilot.com/mcp/x/discussions`
+- **Dependabot**: `https://api.githubcopilot.com/mcp/x/dependabot`
+- **Code Security**: `https://api.githubcopilot.com/mcp/x/code_security`
+- **Secret Protection**: `https://api.githubcopilot.com/mcp/x/secret_protection`
+- **Experiments**: `https://api.githubcopilot.com/mcp/x/experiments`
+- **Copilot**: `https://api.githubcopilot.com/mcp/x/copilot`
 
 ### 2. **File System MCP Server**
 - **URL**: `ws://localhost:3002`
@@ -69,17 +85,17 @@ mcp-server-database --port 3004
 
 ## 📝 Usage Examples
 
-### Example 1: GitHub Integration
+### Example 1: GitHub Repository Integration
 
 ```javascript
 // Pre-request Script
-const mcpClient = new MCPClient(pm.environment.get('mcp_github_url'));
+const mcpClient = new MCPClient('https://api.githubcopilot.com/mcp/');
 
 try {
   await mcpClient.connect();
-  const repos = await mcpClient.call('github/list_repositories', {
-    owner: 'arun-gupta',
-    type: 'all'
+  const repos = await mcpClient.call('search_repositories', {
+    query: 'user:arun-gupta',
+    perPage: 10
   });
 
   // Use repository data in request
@@ -89,6 +105,59 @@ try {
   });
 } catch (error) {
   console.error('MCP GitHub error:', error);
+} finally {
+  mcpClient.disconnect();
+}
+```
+
+### Example 2: GitHub Issues Integration
+
+```javascript
+// Pre-request Script
+const mcpClient = new MCPClient('https://api.githubcopilot.com/mcp/');
+
+try {
+  await mcpClient.connect();
+  const issues = await mcpClient.call('github_list_issues', {
+    owner: 'arun-gupta',
+    repo: 'llm-lab',
+    state: 'open'
+  });
+
+  // Use issues data in request
+  pm.request.body.raw = JSON.stringify({
+    open_issues: issues,
+    count: issues.length,
+    timestamp: new Date().toISOString()
+  });
+} catch (error) {
+  console.error('MCP GitHub Issues error:', error);
+} finally {
+  mcpClient.disconnect();
+}
+```
+
+### Example 3: GitHub Actions Integration
+
+```javascript
+// Pre-request Script
+const mcpClient = new MCPClient('https://api.githubcopilot.com/mcp/');
+
+try {
+  await mcpClient.connect();
+  const workflows = await mcpClient.call('github_list_workflows', {
+    owner: 'arun-gupta',
+    repo: 'llm-lab'
+  });
+
+  // Use workflows data in request
+  pm.request.body.raw = JSON.stringify({
+    workflows: workflows,
+    active_workflows: workflows.filter(w => w.state === 'active'),
+    timestamp: new Date().toISOString()
+  });
+} catch (error) {
+  console.error('MCP GitHub Actions error:', error);
 } finally {
   mcpClient.disconnect();
 }
