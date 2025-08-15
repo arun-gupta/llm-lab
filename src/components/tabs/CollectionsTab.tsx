@@ -515,194 +515,11 @@ export function CollectionsTab() {
               <Zap className="w-5 h-5 text-white" />
             </div>
             <div>
-              <h3 className="text-lg font-semibold text-gray-900">Ultra-Fast MCP Test</h3>
-              <p className="text-sm text-gray-600">CLI-like performance with minimal session management</p>
+              <h3 className="text-lg font-semibold text-gray-900">✅ Working MCP Integration</h3>
+              <p className="text-sm text-gray-600">Optimized collection that fetches your personal GitHub repositories</p>
             </div>
           </div>
           <div className="flex space-x-2">
-            <button
-              onClick={async () => {
-                try {
-                  // Fetch the collection JSON
-                  const response = await fetch('/postman-collections/ultra-fast-mcp.json');
-                  const collection = await response.json();
-                  
-                  // Create collection via Postman API
-                  const apiResponse = await fetch('/api/postman/create-collection', {
-                    method: 'POST',
-                    headers: {
-                      'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({
-                      collection: collection,
-                      createInWeb: false, // Create in Desktop
-                    }),
-                  });
-                  
-                  const result = await apiResponse.json();
-                  
-                  if (result.success) {
-                    setDeploymentStatus({
-                      type: 'success',
-                      message: 'Ultra-Fast Full Collection created successfully in Postman Desktop!'
-                    });
-                  } else {
-                    // Fallback to download if API key not configured
-                    if (result.fallback) {
-                      const blob = new Blob([JSON.stringify(collection, null, 2)], {
-                        type: 'application/json',
-                      });
-                      const url = URL.createObjectURL(blob);
-                      const a = document.createElement('a');
-                      a.href = url;
-                      a.download = 'ultra-fast-mcp.json';
-                      document.body.appendChild(a);
-                      a.click();
-                      document.body.removeChild(a);
-                      URL.revokeObjectURL(url);
-                      setDeploymentStatus({
-                        type: 'success',
-                        message: 'Collection downloaded! Import it manually into Postman.'
-                      });
-                    } else {
-                      throw new Error(result.message || 'Failed to create collection');
-                    }
-                  }
-                } catch (error) {
-                  console.error('Error creating collection:', error);
-                  setDeploymentStatus({
-                    type: 'error',
-                    message: 'Failed to create collection. Try "Download & Import" instead.'
-                  });
-                }
-              }}
-              className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 transition-colors"
-            >
-              <Download className="w-4 h-4 mr-2" />
-              Install in Postman
-            </button>
-            <button
-              onClick={async () => {
-                try {
-                  // Fetch the collection JSON
-                  const response = await fetch('/postman-collections/ultra-fast-mcp-simple.json');
-                  const collection = await response.json();
-                  
-                  // Create collection via Postman API
-                  const apiResponse = await fetch('/api/postman/create-collection', {
-                    method: 'POST',
-                    headers: {
-                      'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({
-                      collection: collection,
-                      createInWeb: false, // Create in Desktop
-                    }),
-                  });
-                  
-                  const result = await apiResponse.json();
-                  
-                  if (result.success) {
-                    setDeploymentStatus({
-                      type: 'success',
-                      message: 'Ultra-Fast Simple Collection created successfully in Postman Desktop!'
-                    });
-                  } else {
-                    // Fallback to download if API key not configured
-                    if (result.fallback) {
-                      const blob = new Blob([JSON.stringify(collection, null, 2)], {
-                        type: 'application/json',
-                      });
-                      const url = URL.createObjectURL(blob);
-                      const a = document.createElement('a');
-                      a.href = url;
-                      a.download = 'ultra-fast-mcp-simple.json';
-                      document.body.appendChild(a);
-                      a.click();
-                      document.body.removeChild(a);
-                      URL.revokeObjectURL(url);
-                      setDeploymentStatus({
-                        type: 'success',
-                        message: 'Collection downloaded! Import it manually into Postman.'
-                      });
-                    } else {
-                      throw new Error(result.message || 'Failed to create collection');
-                    }
-                  }
-                } catch (error) {
-                  console.error('Error creating collection:', error);
-                  setDeploymentStatus({
-                    type: 'error',
-                    message: 'Failed to create collection. Try "Download & Import" instead.'
-                  });
-                }
-              }}
-              className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-orange-600 hover:bg-orange-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-orange-500 transition-colors"
-            >
-              <Zap className="w-4 h-4 mr-2" />
-              Install in Postman
-            </button>
-            <button
-              onClick={async () => {
-                try {
-                  // Fetch the collection JSON
-                  const response = await fetch('/postman-collections/ultra-fast-mcp-direct.json');
-                  const collection = await response.json();
-                  
-                  // Create collection via Postman API
-                  const apiResponse = await fetch('/api/postman/create-collection', {
-                    method: 'POST',
-                    headers: {
-                      'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({
-                      collection: collection,
-                      createInWeb: false, // Create in Desktop
-                    }),
-                  });
-                  
-                  const result = await apiResponse.json();
-                  
-                  if (result.success) {
-                    setDeploymentStatus({
-                      type: 'success',
-                      message: 'Ultra-Fast Direct API Collection created successfully in Postman Desktop!'
-                    });
-                  } else {
-                    // Fallback to download if API key not configured
-                    if (result.fallback) {
-                      const blob = new Blob([JSON.stringify(collection, null, 2)], {
-                        type: 'application/json',
-                      });
-                      const url = URL.createObjectURL(blob);
-                      const a = document.createElement('a');
-                      a.href = url;
-                      a.download = 'ultra-fast-mcp-direct.json';
-                      document.body.appendChild(a);
-                      a.click();
-                      document.body.removeChild(a);
-                      URL.revokeObjectURL(url);
-                      setDeploymentStatus({
-                        type: 'success',
-                        message: 'Collection downloaded! Import it manually into Postman.'
-                      });
-                    } else {
-                      throw new Error(result.message || 'Failed to create collection');
-                    }
-                  }
-                } catch (error) {
-                  console.error('Error creating collection:', error);
-                  setDeploymentStatus({
-                    type: 'error',
-                    message: 'Failed to create collection. Try "Download & Import" instead.'
-                  });
-                }
-              }}
-              className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 transition-colors"
-            >
-              <Zap className="w-4 h-4 mr-2" />
-              Install Direct API ⚡
-            </button>
             <button
               onClick={async () => {
                 try {
@@ -727,7 +544,7 @@ export function CollectionsTab() {
                   if (result.success) {
                     setDeploymentStatus({
                       type: 'success',
-                      message: 'Ultra-Fast MCP Optimized Collection created successfully in Postman Desktop!'
+                      message: '✅ MCP Optimized Collection created successfully in Postman Desktop!'
                     });
                   } else {
                     // Fallback to download if API key not configured
@@ -759,47 +576,26 @@ export function CollectionsTab() {
                   });
                 }
               }}
-              className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-purple-600 hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500 transition-colors"
+              className="inline-flex items-center px-6 py-3 border border-transparent text-base font-medium rounded-md text-white bg-purple-600 hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500 transition-colors shadow-lg"
             >
-              <Zap className="w-4 h-4 mr-2" />
-              Install MCP Optimized 🔧
+              <Zap className="w-5 h-5 mr-2" />
+              Install MCP Optimized Collection 🔧
             </button>
           </div>
         </div>
         
-        <div className="bg-gradient-to-r from-red-50 via-purple-50 to-green-50 rounded-lg p-4 mb-4">
-          <h4 className="font-medium text-gray-900 mb-2">⚡ Performance Solutions - Choose Your Speed</h4>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <div className="bg-red-50 rounded p-3">
-              <h5 className="font-medium text-red-900 mb-2">🚀 MCP Protocol (Red/Orange)</h5>
-              <ul className="text-sm text-red-800 space-y-1">
-                <li>• <strong>Minimal session management</strong> - One-time initialization</li>
-                <li>• <strong>Static request bodies</strong> - No dynamic processing</li>
-                <li>• <strong>Session ID reuse</strong> - Stored in environment</li>
-                <li>• <strong>Multiple repo counts</strong> - 3, 5, and 10 repos</li>
-                <li>• <strong>May have delays</strong> - 31+ second initialization</li>
-              </ul>
-            </div>
-            <div className="bg-purple-50 rounded p-3">
-              <h5 className="font-medium text-purple-900 mb-2">🔧 MCP Optimized (Purple) - YOUR TOKEN</h5>
-              <ul className="text-sm text-purple-800 space-y-1">
-                <li>• <strong>Uses your auth token</strong> - Real GitHub access</li>
-                <li>• <strong>Optimized session management</strong> - Faster initialization</li>
-                <li>• <strong>10-second timeout</strong> - Quick failure detection</li>
-                <li>• <strong>Better error handling</strong> - Clear feedback</li>
-                <li>• <strong>MCP protocol benefits</strong> - Full MCP features</li>
-              </ul>
-            </div>
-            <div className="bg-green-50 rounded p-3">
-              <h5 className="font-medium text-green-900 mb-2">⚡ Direct API (Green) - MAXIMUM SPEED</h5>
-              <ul className="text-sm text-green-800 space-y-1">
-                <li>• <strong>No MCP protocol</strong> - Direct GitHub API calls</li>
-                <li>• <strong>No session initialization</strong> - Instant response</li>
-                <li>• <strong>No streaming responses</strong> - Standard JSON</li>
-                <li>• <strong>Maximum speed</strong> - Sub-second responses</li>
-                <li>• <strong>Same functionality</strong> - Real GitHub data</li>
-              </ul>
-            </div>
+        <div className="bg-purple-50 rounded-lg p-4 mb-4">
+          <h4 className="font-medium text-purple-900 mb-2">✅ Working Solution - MCP Optimized Collection</h4>
+          <div className="text-sm text-purple-800 space-y-2">
+            <p><strong>🎯 Perfect for your use case:</strong> Fetches your personal GitHub repositories using your auth token with optimized performance.</p>
+            <ul className="space-y-1">
+              <li>• <strong>Automatic username detection</strong> - No manual setup required</li>
+              <li>• <strong>Uses your GitHub token</strong> - Real authentication and access</li>
+              <li>• <strong>Optimized session management</strong> - Fast initialization</li>
+              <li>• <strong>10-second timeout</strong> - Quick feedback if issues occur</li>
+              <li>• <strong>Clear error handling</strong> - Helpful debugging information</li>
+              <li>• <strong>Multiple repository views</strong> - 3, 5, and 10 repos with different sorting</li>
+            </ul>
           </div>
         </div>
 
