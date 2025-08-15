@@ -32,47 +32,16 @@ cp .env.local.example .env.local
 npm run dev
 ```
 
-### **MCP Server Integration (Auto-Installed)**
+### **MCP Server Integration**
 
-MCP (Model Context Protocol) server infrastructure is **automatically installed** during setup for enhanced Postman integration:
+LLM Lab includes **MCP (Model Context Protocol) server integration** for enhanced Postman automation:
 
-**Local Infrastructure:**
-- **Local MCP Server Template** (Port 3001): Basic MCP server for testing
+- **GitHub MCP Server**: Access repositories, create issues, search code
+- **Local MCP Servers**: File system, web search, database integration
+- **Auto-installed**: MCP infrastructure is set up automatically
+- **Postman Collections**: Ready-to-use collections for MCP integration
 
-**Remote GitHub MCP Servers (Always Available):**
-- **GitHub MCP Server**: https://api.githubcopilot.com/mcp/
-- **GitHub Repositories**: https://api.githubcopilot.com/mcp/x/repos
-- **GitHub Issues**: https://api.githubcopilot.com/mcp/x/issues
-- **GitHub Pull Requests**: https://api.githubcopilot.com/mcp/x/pull_requests
-- **GitHub Actions**: https://api.githubcopilot.com/mcp/x/actions
-- **GitHub Notifications**: https://api.githubcopilot.com/mcp/x/notifications
-- **GitHub Organizations**: https://api.githubcopilot.com/mcp/x/orgs
-- **GitHub Users**: https://api.githubcopilot.com/mcp/x/users
-- **GitHub Gists**: https://api.githubcopilot.com/mcp/x/gists
-- **GitHub Discussions**: https://api.githubcopilot.com/mcp/x/discussions
-- **GitHub Dependabot**: https://api.githubcopilot.com/mcp/x/dependabot
-- **GitHub Code Security**: https://api.githubcopilot.com/mcp/x/code_security
-- **GitHub Secret Protection**: https://api.githubcopilot.com/mcp/x/secret_protection
-- **GitHub Experiments**: https://api.githubcopilot.com/mcp/x/experiments
-- **GitHub Copilot**: https://api.githubcopilot.com/mcp/x/copilot
-
-**✅ GitHub Token Pre-configured**: The project includes a working GitHub Personal Access Token for testing MCP server integration.
-
-**Management:**
-- **UI Management**: Go to Settings → MCP Server Management
-- **Command Line**: Use npm scripts for quick access
-  ```bash
-  npm run start-mcp    # Start local server
-  npm run stop-mcp     # Stop local server
-  npm run status-mcp   # Check status
-  ```
-
-**Authentication:**
-- **Local Server**: No authentication required
-- **Remote GitHub Servers**: Uses GitHub authentication (pre-configured token with 'repo' scope)
-
-**Documentation:**
-- [GitHub MCP Server Documentation](https://github.com/github/github-mcp-server/blob/main/docs/remote-server.md)
+**📖 Documentation**: [MCP-Postman Integration Guide](docs/MCP-POSTMAN-INTEGRATION.md)
 
 ## 🔑 Required API Keys
 
@@ -87,7 +56,6 @@ POSTMAN_API_KEY=your_key_here
 
 # Optional (for GitHub MCP server integration):
 GITHUB_TOKEN=your_github_personal_access_token_here
-GITHUB_REPOS_COUNT=3
 ```
 
 **Get API Keys:** [OpenAI](https://platform.openai.com/) | [Anthropic](https://console.anthropic.com/) | [Postman](https://www.postman.com) | [GitHub](https://github.com/settings/tokens)
@@ -103,7 +71,6 @@ If you're using GitHub Codespaces, you can add your API keys in two ways:
    - `ANTHROPIC_API_KEY` 
    - `POSTMAN_API_KEY` (optional)
    - `GITHUB_TOKEN` (optional, for MCP integration)
-   - `GITHUB_REPOS_COUNT` (optional, default: 3, for GitHub MCP integration)
    - `NEXT_PUBLIC_BASE_URL` (set to your Codespaces URL)
 
 **Option 2: Direct File Edit**
@@ -125,7 +92,7 @@ If you're using GitHub Codespaces, you can add your API keys in two ways:
 - 🔧 **Environment variables** for secure API key management
 - 📈 **Analytics** and performance insights
 - 🏗️ **Tabbed interface** for organized workflow
-- 🔌 **Auto-installed MCP servers** for enhanced Postman automation
+- 🔌 **MCP server integration** for enhanced Postman automation
 
 ## 🎯 Postman Integration
 
