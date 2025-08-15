@@ -1,0 +1,191 @@
+{
+  "info": {
+    "name": "GitHub MCP - My Repositories",
+    "description": "Simple MCP integration to fetch your personal GitHub repositories. Just set your GitHub token and run the requests in order.\n\n🔧 **Setup Instructions:**\n1. Set your `github_token` variable to your GitHub Personal Access Token\n2. Run 'Initialize MCP Session' first\n3. Run 'Get My User Info' to automatically set your username\n4. Run 'Get My Repositories' to fetch your repos\n\n✅ **Simple and focused - no redundant endpoints!**",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "github_token",
+      "value": "{{$randomUUID}}",
+      "type": "string"
+    },
+    {
+      "key": "github_username",
+      "value": "your-github-username",
+      "type": "string"
+    },
+    {
+      "key": "mcp_session_id",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "repo_limit",
+      "value": "10",
+      "type": "string"
+    }
+  ],
+  "item": [
+    {
+      "name": "Initialize MCP Session",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json",
+            "type": "text"
+          },
+          {
+            "key": "Authorization",
+            "value": "Bearer {{github_token}}",
+            "type": "text"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"jsonrpc\": \"2.0\",\n  \"id\": 1,\n  \"method\": \"initialize\",\n  \"params\": {\n    \"protocolVersion\": \"2024-11-05\",\n    \"capabilities\": {\n      \"tools\": {}\n    },\n    \"clientInfo\": {\n      \"name\": \"postman-mcp-client\",\n      \"version\": \"1.0.0\"\n    }\n  }\n}"
+        },
+        "url": {
+          "raw": "https://api.githubcopilot.com/mcp/",
+          "protocol": "https",
+          "host": ["api", "githubcopilot", "com"],
+          "path": ["mcp", ""]
+        }
+      },
+      "response": [],
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test(\"Status code is 200\", function () {",
+              "    pm.response.to.have.status(200);",
+              "});",
+              "",
+              "// Extract session ID from response headers",
+              "const sessionId = pm.response.headers.get('mcp-session-id');",
+              "if (sessionId) {",
+              "    pm.environment.set('mcp_session_id', sessionId);",
+              "    console.log('✅ MCP Session initialized:', sessionId);",
+              "} else {",
+              "    console.log('⚠️ No session ID found in response');",
+              "}"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Get My User Info",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json",
+            "type": "text"
+          },
+          {
+            "key": "Authorization",
+            "value": "Bearer {{github_token}}",
+            "type": "text"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"jsonrpc\": \"2.0\",\n  \"id\": 2,\n  \"method\": \"tools/call\",\n  \"params\": {\n    \"name\": \"github_get_user\",\n    \"arguments\": {}\n  }\n}"
+        },
+        "url": {
+          "raw": "https://api.githubcopilot.com/mcp/",
+          "protocol": "https",
+          "host": ["api", "githubcopilot", "com"],
+          "path": ["mcp", ""]
+        }
+      },
+      "response": [],
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test(\"Status code is 200\", function () {",
+              "    pm.response.to.have.status(200);",
+              "});",
+              "",
+              "// Parse response and extract username",
+              "const response = pm.response.json();",
+              "if (response.result && response.result.content) {",
+              "    try {",
+              "        const userData = JSON.parse(response.result.content[0].text);",
+              "        if (userData.login) {",
+              "            pm.environment.set('github_username', userData.login);",
+              "            console.log('✅ Username set:', userData.login);",
+              "        }",
+              "    } catch (e) {",
+              "        console.log('⚠️ Could not parse user data');",
+              "    }",
+              "}"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Get My Repositories",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json",
+            "type": "text"
+          },
+          {
+            "key": "Authorization",
+            "value": "Bearer {{github_token}}",
+            "type": "text"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"jsonrpc\": \"2.0\",\n  \"id\": 3,\n  \"method\": \"tools/call\",\n  \"params\": {\n    \"name\": \"github_list_repositories\",\n    \"arguments\": {\n      \"username\": \"{{github_username}}\",\n      \"limit\": {{repo_limit}}\n    }\n  }\n}"
+        },
+        "url": {
+          "raw": "https://api.githubcopilot.com/mcp/",
+          "protocol": "https",
+          "host": ["api", "githubcopilot", "com"],
+          "path": ["mcp", ""]
+        }
+      },
+      "response": [],
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test(\"Status code is 200\", function () {",
+              "    pm.response.to.have.status(200);",
+              "});",
+              "",
+              "// Parse and display repository count",
+              "const response = pm.response.json();",
+              "if (response.result && response.result.content) {",
+              "    try {",
+              "        const repos = JSON.parse(response.result.content[0].text);",
+              "        console.log('✅ Found', repos.length, 'repositories');",
+              "    } catch (e) {",
+              "        console.log('⚠️ Could not parse repository data');",
+              "    }",
+              "}"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ]
+    }
+  ]
+}

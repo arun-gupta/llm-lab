@@ -184,7 +184,7 @@ export function CollectionsTab() {
               onClick={async () => {
                 try {
                   // Fetch the collection JSON
-                  const response = await fetch('/postman-collections/ultra-fast-mcp-optimized.json');
+                  const response = await fetch('/postman-collections/github-mcp-repos.json');
                   const collection = await response.json();
                   
                   // Create collection via Postman API
@@ -215,7 +215,7 @@ export function CollectionsTab() {
                       const url = URL.createObjectURL(blob);
                       const a = document.createElement('a');
                       a.href = url;
-                      a.download = 'ultra-fast-mcp-optimized.json';
+                      a.download = 'github-mcp-repos.json';
                       document.body.appendChild(a);
                       a.click();
                       document.body.removeChild(a);
