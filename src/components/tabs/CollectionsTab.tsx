@@ -499,6 +499,67 @@ export function CollectionsTab() {
         </div>
       )}
 
+      {/* Simplified MCP Test Collection */}
+      <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6 mb-8">
+        <div className="flex items-center justify-between mb-4">
+          <div className="flex items-center space-x-3">
+            <div className="w-10 h-10 bg-gradient-to-r from-green-500 to-emerald-600 rounded-lg flex items-center justify-center">
+              <Zap className="w-5 h-5 text-white" />
+            </div>
+            <div>
+              <h3 className="text-lg font-semibold text-gray-900">Simplified MCP Test</h3>
+              <p className="text-sm text-gray-600">CLI-like performance with minimal scripts</p>
+            </div>
+          </div>
+          <button
+            onClick={() => {
+              const collectionUrl = `${window.location.origin}/postman-collections/simple-mcp-test.json`;
+              window.open(collectionUrl, '_blank');
+            }}
+            className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 transition-colors"
+          >
+            <Download className="w-4 h-4 mr-2" />
+            Download Collection
+          </button>
+        </div>
+        
+        <div className="bg-gray-50 rounded-lg p-4 mb-4">
+          <h4 className="font-medium text-gray-900 mb-2">🚀 Why This Collection is Faster</h4>
+          <ul className="text-sm text-gray-700 space-y-1">
+            <li>• <strong>No complex pre-request scripts</strong> - Direct API calls like CLI</li>
+            <li>• <strong>No session management</strong> - Removes MCP session overhead</li>
+            <li>• <strong>No timeout logic</strong> - No fallback to mock data</li>
+            <li>• <strong>No environment variable processing</strong> - Minimal variable substitution</li>
+            <li>• <strong>Direct GitHub MCP server calls</strong> - No proxy or middleware</li>
+          </ul>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
+          <div className="bg-white border border-gray-200 rounded-lg p-4">
+            <h5 className="font-medium text-gray-900 mb-2">📋 What's Included</h5>
+            <ul className="text-gray-600 space-y-1">
+              <li>• Single repository search request</li>
+              <li>• Configurable repository count</li>
+              <li>• Simple response parsing</li>
+              <li>• Basic error handling</li>
+            </ul>
+          </div>
+          <div className="bg-white border border-gray-200 rounded-lg p-4">
+            <h5 className="font-medium text-gray-900 mb-2">⚡ Performance Benefits</h5>
+            <ul className="text-gray-600 space-y-1">
+              <li>• Faster response times</li>
+              <li>• Less memory usage</li>
+              <li>• No script execution delays</li>
+              <li>• Direct MCP protocol calls</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Collection Preview Modal */}
       <CollectionPreviewModal
         isOpen={showPreviewModal}

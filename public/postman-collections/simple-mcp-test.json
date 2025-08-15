@@ -1,13 +1,18 @@
 {
   "info": {
     "name": "Simple MCP Test",
-    "description": "Simplified collection that mimics CLI performance",
+    "description": "Simplified collection that mimics CLI performance by removing complex scripts",
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
   },
   "variable": [
     {
       "key": "github_token",
       "value": "your_github_personal_access_token_here",
+      "type": "string"
+    },
+    {
+      "key": "github_repos_count",
+      "value": "3",
       "type": "string"
     }
   ],
@@ -36,7 +41,7 @@
         ],
         "body": {
           "mode": "raw",
-          "raw": "{\n  \"jsonrpc\": \"2.0\",\n  \"method\": \"tools/call\",\n  \"params\": {\n    \"name\": \"search_repositories\",\n    \"arguments\": {\n      \"query\": \"user:arun-gupta\",\n      \"perPage\": 3\n    }\n  },\n  \"id\": 1,\n  \"apiVersion\": \"2022-11-28\"\n}"
+          "raw": "{\n  \"jsonrpc\": \"2.0\",\n  \"method\": \"tools/call\",\n  \"params\": {\n    \"name\": \"search_repositories\",\n    \"arguments\": {\n      \"query\": \"user:arun-gupta\",\n      \"perPage\": {{github_repos_count}}\n    }\n  },\n  \"id\": 1,\n  \"apiVersion\": \"2022-11-28\"\n}"
         },
         "url": {
           "raw": "https://api.githubcopilot.com/mcp/",
@@ -58,6 +63,25 @@
               "  if (response.jsonrpc === '2.0' && response.result) {",
               "    console.log('✅ Direct MCP call successful!');",
               "    console.log('Response time:', pm.response.responseTime + 'ms');",
+              "    ",
+              "    // Parse and display repository data",
+              "    if (response.result.content && response.result.content.length > 0) {",
+              "      try {",
+              "        const contentText = response.result.content[0].text;",
+              "        const reposData = JSON.parse(contentText);",
+              "        console.log('📊 Repositories found:', reposData.total_count || 0);",
+              "        console.log('📋 Items returned:', reposData.items ? reposData.items.length : 0);",
+              "        ",
+              "        if (reposData.items && reposData.items.length > 0) {",
+              "          console.log('📋 Sample repositories:');",
+              "          reposData.items.slice(0, 3).forEach((repo, index) => {",
+              "            console.log(`   ${index + 1}. ${repo.full_name} (${repo.language || 'N/A'})`);",
+              "          });",
+              "        }",
+              "      } catch (e) {",
+              "        console.log('📄 Raw response received');",
+              "      }",
+              "    }",
               "  }",
               "}"
             ]
