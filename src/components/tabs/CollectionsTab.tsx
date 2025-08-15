@@ -538,7 +538,7 @@ export function CollectionsTab() {
               className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-orange-600 hover:bg-orange-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-orange-500 transition-colors"
             >
               <Zap className="w-4 h-4 mr-2" />
-              Download Simple
+              Install in Postman
             </button>
           </div>
         </div>
