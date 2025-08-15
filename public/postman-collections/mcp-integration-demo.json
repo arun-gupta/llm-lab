@@ -21,6 +21,11 @@
       "type": "string"
     },
     {
+      "key": "force_real_mcp_data",
+      "value": "false",
+      "type": "string"
+    },
+    {
       "key": "github_repos_count",
       "value": "3",
       "type": "string"
@@ -252,9 +257,16 @@
                   "    pm.request.method = 'POST';",
                   "    pm.request.body = { mode: 'raw', raw: JSON.stringify({}) };",
                   "    return;",
-                  "  }",
-                  "",
-                  "  // Check if GitHub token is configured",
+                    "  }",
+  "",
+  "  // Check if user wants to force real MCP data",
+  "  const forceReal = pm.environment.get('force_real_mcp_data');",
+  "  if (forceReal === 'true') {",
+  "    console.log('🔧 Force real MCP data enabled. Clearing timeout flag.');",
+  "    pm.environment.unset('github_mcp_last_timeout');",
+  "  }",
+  "",
+  "  // Check if GitHub token is configured",
                   "  const githubToken = pm.environment.get('github_token');",
                   "  if (!githubToken || githubToken === 'your_github_personal_access_token_here' || githubToken === '{{github_token}}') {",
                   "    console.warn('GitHub token not configured or using placeholder. Using mock data instead.');",
