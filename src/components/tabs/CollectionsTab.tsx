@@ -642,18 +642,93 @@ export function CollectionsTab() {
               <Zap className="w-4 h-4 mr-2" />
               Install in Postman
             </button>
+            <button
+              onClick={async () => {
+                try {
+                  // Fetch the collection JSON
+                  const response = await fetch('/postman-collections/ultra-fast-mcp-direct.json');
+                  const collection = await response.json();
+                  
+                  // Create collection via Postman API
+                  const apiResponse = await fetch('/api/postman/create-collection', {
+                    method: 'POST',
+                    headers: {
+                      'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                      collection: collection,
+                      createInWeb: false, // Create in Desktop
+                    }),
+                  });
+                  
+                  const result = await apiResponse.json();
+                  
+                  if (result.success) {
+                    setDeploymentStatus({
+                      type: 'success',
+                      message: 'Ultra-Fast Direct API Collection created successfully in Postman Desktop!'
+                    });
+                  } else {
+                    // Fallback to download if API key not configured
+                    if (result.fallback) {
+                      const blob = new Blob([JSON.stringify(collection, null, 2)], {
+                        type: 'application/json',
+                      });
+                      const url = URL.createObjectURL(blob);
+                      const a = document.createElement('a');
+                      a.href = url;
+                      a.download = 'ultra-fast-mcp-direct.json';
+                      document.body.appendChild(a);
+                      a.click();
+                      document.body.removeChild(a);
+                      URL.revokeObjectURL(url);
+                      setDeploymentStatus({
+                        type: 'success',
+                        message: 'Collection downloaded! Import it manually into Postman.'
+                      });
+                    } else {
+                      throw new Error(result.message || 'Failed to create collection');
+                    }
+                  }
+                } catch (error) {
+                  console.error('Error creating collection:', error);
+                  setDeploymentStatus({
+                    type: 'error',
+                    message: 'Failed to create collection. Try "Download & Import" instead.'
+                  });
+                }
+              }}
+              className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 transition-colors"
+            >
+              <Zap className="w-4 h-4 mr-2" />
+              Install Direct API ⚡
+            </button>
           </div>
         </div>
         
-        <div className="bg-red-50 rounded-lg p-4 mb-4">
-          <h4 className="font-medium text-red-900 mb-2">⚡ Maximum Performance - Minimal Overhead</h4>
-          <ul className="text-sm text-red-800 space-y-1">
-            <li>• <strong>Minimal session management</strong> - One-time initialization</li>
-            <li>• <strong>Static request bodies</strong> - No dynamic variable processing</li>
-            <li>• <strong>Simple test scripts</strong> - Basic response validation only</li>
-            <li>• <strong>Session ID reuse</strong> - Stored in environment variables</li>
-            <li>• <strong>Multiple repo counts</strong> - 3, 5, and 10 repos pre-configured</li>
-          </ul>
+        <div className="bg-gradient-to-r from-red-50 to-green-50 rounded-lg p-4 mb-4">
+          <h4 className="font-medium text-gray-900 mb-2">⚡ Performance Solutions - Choose Your Speed</h4>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="bg-red-50 rounded p-3">
+              <h5 className="font-medium text-red-900 mb-2">🚀 MCP Protocol (Red/Orange)</h5>
+              <ul className="text-sm text-red-800 space-y-1">
+                <li>• <strong>Minimal session management</strong> - One-time initialization</li>
+                <li>• <strong>Static request bodies</strong> - No dynamic processing</li>
+                <li>• <strong>Session ID reuse</strong> - Stored in environment</li>
+                <li>• <strong>Multiple repo counts</strong> - 3, 5, and 10 repos</li>
+              </ul>
+            </div>
+            <div className="bg-green-50 rounded p-3">
+              <h5 className="font-medium text-green-900 mb-2">⚡ Direct API (Green) - RECOMMENDED</h5>
+              <ul className="text-sm text-green-800 space-y-1">
+                <li>• <strong>No MCP protocol</strong> - Direct GitHub API calls</li>
+                <li>• <strong>No session initialization</strong> - Instant response</li>
+                <li>• <strong>No streaming responses</strong> - Standard JSON</li>
+                <li>• <strong>Maximum speed</strong> - Sub-second responses</li>
+                <li>• <strong>Same functionality</strong> - Real GitHub data</li>
+              </ul>
+            </div>
+          </div>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
