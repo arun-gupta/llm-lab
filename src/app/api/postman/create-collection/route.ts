@@ -14,6 +14,12 @@ export async function POST(request: NextRequest) {
   try {
     const { collection, environment, createInWeb = true } = await request.json();
 
+    console.log('Creating Postman collection:', {
+      collectionName: collection.info?.name,
+      createInWeb,
+      hasEnvironment: !!environment
+    });
+
     // Create collection first
     const collectionResponse = await fetch('https://api.getpostman.com/collections', {
       method: 'POST',
@@ -28,9 +34,14 @@ export async function POST(request: NextRequest) {
 
     if (!collectionResponse.ok) {
       const errorData = await collectionResponse.json();
+      console.error('Postman API error:', {
+        status: collectionResponse.status,
+        statusText: collectionResponse.statusText,
+        error: errorData
+      });
       return NextResponse.json({ 
         success: false, 
-        message: 'Failed to create collection in Postman',
+        message: `Failed to create collection in Postman: ${collectionResponse.status} ${collectionResponse.statusText}`,
         error: errorData,
         fallback: true 
       });
@@ -87,8 +98,9 @@ export async function POST(request: NextRequest) {
     console.error('Error creating Postman collection:', error);
     return NextResponse.json({ 
       success: false, 
-      message: 'Error creating Postman collection',
-      fallback: true 
+      message: `Error creating Postman collection: ${error instanceof Error ? error.message : 'Unknown error'}`,
+      fallback: true,
+      error: error instanceof Error ? error.message : 'Unknown error'
     });
   }
 }
