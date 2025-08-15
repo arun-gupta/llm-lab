@@ -6,7 +6,7 @@ import { CheckCircle, XCircle, AlertCircle } from 'lucide-react';
 interface ApiKeyStatus {
   openai: 'configured' | 'missing' | 'invalid' | 'loading';
   anthropic: 'configured' | 'missing' | 'invalid' | 'loading';
-  postman: 'configured' | 'missing' | 'invalid' | 'loading';
+  ollama: 'configured' | 'missing' | 'invalid' | 'loading';
 }
 
 interface ApiKeyStatusIndicatorProps {
@@ -18,7 +18,7 @@ export function ApiKeyStatusIndicator({ onStatusChange, refreshTrigger }: ApiKey
   const [status, setStatus] = useState<ApiKeyStatus>({
     openai: 'loading',
     anthropic: 'loading',
-    postman: 'loading'
+    ollama: 'loading'
   });
 
   useEffect(() => {
@@ -34,7 +34,7 @@ export function ApiKeyStatusIndicator({ onStatusChange, refreshTrigger }: ApiKey
         const newStatus: ApiKeyStatus = {
           openai: data.openai ? 'configured' : 'missing',
           anthropic: data.anthropic ? 'configured' : 'missing',
-          postman: data.postman ? 'configured' : 'missing'
+          ollama: data.ollama ? 'configured' : 'missing'
         };
         
         setStatus(newStatus);
@@ -45,7 +45,7 @@ export function ApiKeyStatusIndicator({ onStatusChange, refreshTrigger }: ApiKey
         setStatus({
           openai: 'missing',
           anthropic: 'missing',
-          postman: 'missing'
+          ollama: 'missing'
         });
       }
     };
@@ -105,11 +105,11 @@ export function ApiKeyStatusIndicator({ onStatusChange, refreshTrigger }: ApiKey
         {getStatusIcon(status.anthropic)}
       </div>
       
-      {/* Postman */}
-      <div className="flex items-center space-x-2" title={`Postman: ${getStatusText(status.postman)}`}>
+      {/* Ollama */}
+      <div className="flex items-center space-x-2" title={`Ollama: ${getStatusText(status.ollama)}`}>
         <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
-        <span className="text-xs font-medium text-gray-700">Postman</span>
-        {getStatusIcon(status.postman)}
+        <span className="text-xs font-medium text-gray-700">Ollama</span>
+        {getStatusIcon(status.ollama)}
       </div>
     </div>
   );

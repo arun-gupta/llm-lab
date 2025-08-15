@@ -6,12 +6,30 @@ const ENV_FILE_PATH = path.join(process.cwd(), '.env.local');
 
 export async function GET() {
   try {
+    // Check if Ollama is running locally
+    let ollamaStatus = 'missing';
+    try {
+      const ollamaResponse = await fetch('http://localhost:11434/api/tags', {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
+      if (ollamaResponse.ok) {
+        ollamaStatus = 'configured';
+      }
+    } catch (error) {
+      // Ollama is not running or not accessible
+      ollamaStatus = 'missing';
+    }
+
     // Check if .env.local exists
     if (!fs.existsSync(ENV_FILE_PATH)) {
       return NextResponse.json({
         openai: '',
         anthropic: '',
-        postman: ''
+        ollama: ollamaStatus,
+        github: ''
       });
     }
 
@@ -30,7 +48,7 @@ export async function GET() {
     return NextResponse.json({
       openai: keys.OPENAI_API_KEY || '',
       anthropic: keys.ANTHROPIC_API_KEY || '',
-      postman: keys.POSTMAN_API_KEY || '',
+      ollama: ollamaStatus,
       github: keys.GITHUB_TOKEN || ''
     });
   } catch (error) {
@@ -44,7 +62,7 @@ export async function GET() {
 
 export async function POST(request: NextRequest) {
   try {
-    const { openai, anthropic, postman, github } = await request.json();
+    const { openai, anthropic, github } = await request.json();
 
     // Validate API key formats
     if (openai && !openai.startsWith('sk-')) {
@@ -61,12 +79,7 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    if (postman && postman.length < 10) {
-      return NextResponse.json(
-        { error: 'Postman API key seems too short' },
-        { status: 400 }
-      );
-    }
+
 
     if (github && !github.startsWith('ghp_') && !github.startsWith('github_pat_')) {
       return NextResponse.json(
@@ -95,7 +108,6 @@ export async function POST(request: NextRequest) {
     // Update with new values
     if (openai) envVars.OPENAI_API_KEY = openai;
     if (anthropic) envVars.ANTHROPIC_API_KEY = anthropic;
-    if (postman) envVars.POSTMAN_API_KEY = postman;
     if (github) envVars.GITHUB_TOKEN = github;
 
     // Remove empty values

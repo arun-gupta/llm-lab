@@ -77,7 +77,7 @@ export default function Home() {
               </div>
               <div>
                 <h1 className="text-xl font-bold text-gray-900">LLM Lab</h1>
-                <p className="text-xs text-gray-600">Test and compare LLMs with Postman integration and analytics</p>
+                <p className="text-xs text-gray-600">Use Postman to test & compare LLMs and MCP integration</p>
               </div>
             </button>
             
@@ -140,8 +140,8 @@ export default function Home() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
           <div className="text-center text-gray-600">
             <p className="text-sm">
-              Built for LLM experimentation, comparison, and optimization. 
-              Test, compare, and analyze performance across OpenAI, Anthropic, and local Ollama models.
+              Use Postman to test & compare LLMs with MCP integration. 
+              Built for unified experimentation across OpenAI, Anthropic, and Ollama.
             </p>
           </div>
         </div>
