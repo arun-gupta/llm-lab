@@ -19,44 +19,7 @@ export function CollectionsTab() {
       return () => clearTimeout(timer);
     }
   }, [deploymentStatus]);
-  const features = [
-    {
-      icon: Library,
-      title: 'Public Collection Gallery',
-      description: 'Browse and discover shared collections from the community',
-      status: '🚧 Coming Soon'
-    },
-    {
-      icon: Plus,
-      title: 'Create Collections',
-      description: 'Generate Postman collections from your test results',
-      status: '✅ Available'
-    },
-    {
-      icon: Search,
-      title: 'Search & Filter',
-      description: 'Find collections by provider, use case, or popularity',
-      status: '🚧 Coming Soon'
-    },
-    {
-      icon: Star,
-      title: 'Rate & Review',
-      description: 'Rate collections and leave helpful reviews',
-      status: '🚧 Coming Soon'
-    },
-    {
-      icon: Download,
-      title: 'One-Click Import',
-      description: 'Import collections directly to Postman with one click',
-      status: '🚧 Coming Soon'
-    },
-    {
-      icon: Share2,
-      title: 'Share Collections',
-      description: 'Share your collections with the community',
-      status: '🚧 Coming Soon'
-    }
-  ];
+
 
 
 
@@ -83,74 +46,28 @@ export function CollectionsTab() {
           </div>
         </div>
       )}
-      {/* Header */}
-      <div className="text-center mb-12">
-        <div className="flex justify-center mb-6">
-          <div className="w-16 h-16 bg-gradient-to-r from-purple-600 to-pink-600 rounded-xl flex items-center justify-center">
-            <Library className="w-8 h-8 text-white" />
-          </div>
-        </div>
-        <h1 className="text-4xl font-bold text-gray-900 mb-4">
-          Collections Gallery
-        </h1>
-        <p className="text-xl text-gray-600 max-w-3xl mx-auto">
-          Discover, create, and share Postman collections for LLM testing. Browse community collections or create your own.
-        </p>
-      </div>
 
-      {/* Quick Actions */}
-      <div className="flex justify-center mb-8">
-        <div className="flex space-x-4">
-          <button className="flex items-center space-x-2 px-6 py-3 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors">
-            <Plus className="w-4 h-4" />
-            <span>Create Collection</span>
-          </button>
-          <button className="flex items-center space-x-2 px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">
-            <Code className="w-4 h-4" />
-            <span>MCP Integration</span>
-          </button>
-          <button className="flex items-center space-x-2 px-6 py-3 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors">
-            <Search className="w-4 h-4" />
-            <span>Browse Gallery</span>
-          </button>
-        </div>
-      </div>
 
-      {/* Features Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-12">
-        {features.map((feature, index) => {
-          const Icon = feature.icon;
-          return (
-            <div key={index} className="bg-white border border-gray-200 rounded-lg p-6 hover:shadow-lg transition-shadow">
-              <div className="flex items-center space-x-3 mb-4">
-                <Icon className="w-6 h-6 text-purple-600" />
-                <h3 className="font-semibold text-gray-900">{feature.title}</h3>
-              </div>
-              <p className="text-gray-600 text-sm mb-4">{feature.description}</p>
-              <div className="text-xs text-gray-500 font-medium">{feature.status}</div>
-            </div>
-          );
-        })}
-      </div>
+
 
 
 
       {/* MCP Integration Section */}
-      <div className="bg-gradient-to-r from-blue-50 to-purple-50 rounded-lg p-8 mb-8">
-        <div className="text-center mb-8">
-          <div className="flex justify-center mb-4">
-            <div className="w-16 h-16 bg-gradient-to-r from-blue-600 to-purple-600 rounded-xl flex items-center justify-center">
-              <Code className="w-8 h-8 text-white" />
+      <div className="bg-gradient-to-r from-blue-50 to-purple-50 rounded-lg p-6">
+        <div className="text-center mb-6">
+          <div className="flex justify-center mb-3">
+            <div className="w-12 h-12 bg-gradient-to-r from-blue-600 to-purple-600 rounded-xl flex items-center justify-center">
+              <Code className="w-6 h-6 text-white" />
             </div>
           </div>
-          <h2 className="text-3xl font-bold text-gray-900 mb-4">MCP Server Integration</h2>
-          <p className="text-xl text-gray-600 max-w-3xl mx-auto">
+          <h2 className="text-2xl font-bold text-gray-900 mb-2">MCP Server Integration</h2>
+          <p className="text-lg text-gray-600 max-w-2xl mx-auto">
             Integrate popular MCP (Model Context Protocol) servers with Postman for enhanced API testing and automation.
           </p>
         </div>
 
         {/* MCP Servers Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
           <div className="bg-white rounded-lg p-6 border border-gray-200 hover:shadow-lg transition-shadow">
             <div className="flex items-center space-x-3 mb-4">
               <div className="w-10 h-10 bg-gray-800 rounded-lg flex items-center justify-center">
@@ -220,7 +137,7 @@ export function CollectionsTab() {
               className="w-full inline-flex items-center justify-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-purple-600 hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500 transition-colors"
             >
               <Zap className="w-4 h-4 mr-2" />
-              Install Unified GitHub Analysis
+              Install GitHub MCP
             </button>
           </div>
           <div className="bg-white rounded-lg p-6 border border-gray-200 hover:shadow-lg transition-shadow opacity-60">
@@ -256,7 +173,7 @@ export function CollectionsTab() {
         </div>
 
         {/* MCP Features */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
           <div className="bg-white rounded-lg p-6 border border-gray-200">
             <h3 className="font-semibold text-gray-900 mb-4">Key Features</h3>
             <ul className="space-y-2 text-sm text-gray-600">
@@ -287,7 +204,7 @@ export function CollectionsTab() {
               </div>
               <div className="flex items-center space-x-2">
                 <span className="w-6 h-6 bg-blue-100 text-blue-600 rounded-full flex items-center justify-center text-xs font-bold">2</span>
-                <span>Set your GitHub token and username variables</span>
+                <span>Set your GitHub token and repository variables</span>
               </div>
               <div className="flex items-center space-x-2">
                 <span className="w-6 h-6 bg-blue-100 text-blue-600 rounded-full flex items-center justify-center text-xs font-bold">3</span>
@@ -295,11 +212,11 @@ export function CollectionsTab() {
               </div>
               <div className="flex items-center space-x-2">
                 <span className="w-6 h-6 bg-blue-100 text-blue-600 rounded-full flex items-center justify-center text-xs font-bold">4</span>
-                <span>Run "Get My Repositories" to fetch your repos</span>
+                <span>Run "Complete Repository Analysis" for full data</span>
               </div>
               <div className="flex items-center space-x-2">
-                <span className="w-6 h-6 bg-gray-100 text-gray-400 rounded-full flex items-center justify-center text-xs font-bold">5</span>
-                <span className="text-gray-500">Other MCP servers coming soon (File System, Web Search, Database)</span>
+                <span className="w-6 h-6 bg-blue-100 text-blue-600 rounded-full flex items-center justify-center text-xs font-bold">5</span>
+                <span>Run additional requests for issues, PRs, and gists</span>
               </div>
             </div>
           </div>

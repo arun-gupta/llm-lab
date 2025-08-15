@@ -31,9 +31,9 @@ const tabs = [
   },
   {
     id: 'collections' as TabType,
-    label: 'Collections',
+    label: 'MCP',
     icon: Library,
-    description: 'Public gallery and collection management'
+    description: 'Model Context Protocol integrations and collections'
   },
   {
     id: 'analytics' as TabType,

@@ -1,13 +1,13 @@
 {
   "info": {
-    "name": "GitHub MCP - Comprehensive Repository Analysis",
-    "description": "Comprehensive GitHub MCP integration to analyze repositories, issues, pull requests, and gists. Perfect for repository health checks and analytics.\n\n🔧 **Setup Instructions:**\n1. Set your `github_token` variable to your GitHub Personal Access Token\n2. Set your `repo_owner` and `repo_name` variables\n3. Set `top_n_gists` to control how many gists to fetch\n4. Run requests in order for best results\n\n✅ **What You Get:**\n- Repository information and statistics\n- Recent issues (open and closed)\n- Active pull requests\n- Top N gists from the user\n- Comprehensive repository health report",
+    "name": "MCP - GitHub Repository Analysis",
+    "description": "Model Context Protocol (MCP) integration for GitHub. Analyze repositories, issues, pull requests, and gists using GitHub's MCP server.\n\n🔧 **Setup Instructions:**\n1. Set your `github_token` variable to your GitHub Personal Access Token\n2. Set your `repo_owner` and `repo_name` variables\n3. Set `top_n_gists` to control how many gists to fetch\n4. Run requests in order for best results\n\n✅ **What You Get:**\n- Repository information and statistics via MCP\n- Recent issues (open and closed) via MCP\n- Active pull requests via MCP\n- Top N gists from the user via MCP\n- Comprehensive repository health report via MCP\n\n🚀 **MCP Features:**\n- Automatic session management\n- Robust error handling\n- Cross-request data sharing\n- Real-time GitHub data via MCP protocol",
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
   },
   "variable": [
     {
       "key": "github_token",
-      "value": "your_github_personal_access_token_here",
+      "value": "{{github_token}}",
       "type": "string"
     },
     {
@@ -20,11 +20,7 @@
       "value": "llm-lab",
       "type": "string"
     },
-    {
-      "key": "top_n_gists",
-      "value": "5",
-      "type": "string"
-    },
+    
     {
       "key": "mcp_session_id",
       "value": "",
@@ -33,15 +29,10 @@
   ],
   "item": [
     {
-      "name": "1. Initialize MCP Session",
+      "name": "1. Initialize MCP Session (Optional)",
       "request": {
         "method": "POST",
         "header": [
-          {
-            "key": "Content-Type",
-            "value": "application/json",
-            "type": "text"
-          },
           {
             "key": "Authorization",
             "value": "Bearer {{github_token}}",
@@ -84,7 +75,7 @@
       ]
     },
     {
-      "name": "2. Get Repository Information",
+      "name": "2. Get User Repositories",
       "request": {
         "method": "POST",
         "header": [
@@ -106,7 +97,76 @@
         ],
         "body": {
           "mode": "raw",
-          "raw": "{\n  \"jsonrpc\": \"2.0\",\n  \"id\": 2,\n  \"method\": \"tools/call\",\n  \"params\": {\n    \"name\": \"search_repositories\",\n    \"arguments\": {\n      \"query\": \"repo:{{repo_owner}}/{{repo_name}}\",\n      \"perPage\": 1\n    }\n  }\n}"
+          "raw": "{\n  \"jsonrpc\": \"2.0\",\n  \"id\": 2,\n  \"method\": \"tools/call\",\n  \"params\": {\n    \"name\": \"search_repositories\",\n    \"arguments\": {\n      \"query\": \"user:{{repo_owner}}\",\n      \"perPage\": 5\n    }\n  }\n}"
+        },
+        "url": {
+          "raw": "https://api.githubcopilot.com/mcp/",
+          "protocol": "https",
+          "host": ["api", "githubcopilot", "com"],
+          "path": ["mcp", ""]
+        }
+      },
+      "response": [],
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test(\"Status code is 200\", function () {",
+              "    pm.response.to.have.status(200);",
+              "});",
+              "",
+              "// Parse and display repositories information",
+              "const response = pm.response.json();",
+              "if (response.result && response.result.content) {",
+              "    try {",
+              "        const reposData = JSON.parse(response.result.content[0].text);",
+              "        console.log('✅ Found', reposData.total_count, 'repositories for', pm.environment.get('repo_owner'));",
+              "        ",
+              "        if (reposData.items && reposData.items.length > 0) {",
+              "            // Show repository details",
+              "            reposData.items.forEach((repo, index) => {",
+              "                console.log(`   Repo ${index + 1}: ${repo.name || repo.full_name} (${repo.stargazers_count} stars)`);",
+              "                console.log(`      Description: ${repo.description || 'No description'}`);",
+              "                console.log(`      Language: ${repo.language || 'Multiple'}`);",
+              "            });",
+              "        } else {",
+              "            console.log('   No repositories found for this user');",
+              "        }",
+              "    } catch (e) {",
+              "        console.log('⚠️ Could not parse repositories data');",
+              "    }",
+              "}"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ]
+    },
+    {
+      "name": "3. Get Repository Information",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json",
+            "type": "text"
+          },
+          {
+            "key": "Authorization",
+            "value": "Bearer {{github_token}}",
+            "type": "text"
+          },
+          {
+            "key": "Mcp-Session-Id",
+            "value": "{{mcp_session_id}}",
+            "type": "text"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"jsonrpc\": \"2.0\",\n  \"id\": 3,\n  \"method\": \"tools/call\",\n  \"params\": {\n    \"name\": \"search_repositories\",\n    \"arguments\": {\n      \"query\": \"repo:{{repo_owner}}/{{repo_name}}\",\n      \"perPage\": 1\n    }\n  }\n}"
         },
         "url": {
           "raw": "https://api.githubcopilot.com/mcp/",
@@ -129,9 +189,9 @@
               "const response = pm.response.json();",
               "if (response.result && response.result.content) {",
               "    try {",
-              "        const repos = JSON.parse(response.result.content[0].text);",
-              "        if (repos.length > 0) {",
-              "            const repo = repos[0];",
+              "        const reposData = JSON.parse(response.result.content[0].text);",
+              "        if (reposData.items && reposData.items.length > 0) {",
+              "            const repo = reposData.items[0];",
               "            console.log('✅ Repository found:', repo.full_name);",
               "            console.log('   Description:', repo.description);",
               "            console.log('   Stars:', repo.stargazers_count);",
@@ -153,7 +213,7 @@
       ]
     },
     {
-      "name": "3. Get Repository Issues",
+      "name": "4. Get Repository Issues",
       "request": {
         "method": "POST",
         "header": [
@@ -175,7 +235,7 @@
         ],
         "body": {
           "mode": "raw",
-          "raw": "{\n  \"jsonrpc\": \"2.0\",\n  \"id\": 3,\n  \"method\": \"tools/call\",\n  \"params\": {\n    \"name\": \"search_issues\",\n    \"arguments\": {\n      \"query\": \"repo:{{repo_owner}}/{{repo_name}} is:issue\",\n      \"perPage\": 10\n    }\n  }\n}"
+          "raw": "{\n  \"jsonrpc\": \"2.0\",\n  \"id\": 4,\n  \"method\": \"tools/call\",\n  \"params\": {\n    \"name\": \"search_issues\",\n    \"arguments\": {\n      \"query\": \"repo:{{repo_owner}}/{{repo_name}} is:issue\",\n      \"perPage\": 10\n    }\n  }\n}"
         },
         "url": {
           "raw": "https://api.githubcopilot.com/mcp/",
@@ -198,19 +258,23 @@
               "const response = pm.response.json();",
               "if (response.result && response.result.content) {",
               "    try {",
-              "        const issues = JSON.parse(response.result.content[0].text);",
-              "        console.log('✅ Found', issues.length, 'issues');",
+              "        const issuesData = JSON.parse(response.result.content[0].text);",
+              "        console.log('✅ Found', issuesData.total_count, 'issues');",
               "        ",
-              "        const openIssues = issues.filter(issue => issue.state === 'open');",
-              "        const closedIssues = issues.filter(issue => issue.state === 'closed');",
-              "        ",
-              "        console.log('   Open issues:', openIssues.length);",
-              "        console.log('   Closed issues:', closedIssues.length);",
-              "        ",
-              "        // Show recent issues",
-              "        issues.slice(0, 3).forEach((issue, index) => {",
-              "            console.log(`   Issue ${index + 1}: ${issue.title} (${issue.state})`);",
-              "        });",
+              "        if (issuesData.items && issuesData.items.length > 0) {",
+              "            const openIssues = issuesData.items.filter(issue => issue.state === 'open');",
+              "            const closedIssues = issuesData.items.filter(issue => issue.state === 'closed');",
+              "            ",
+              "            console.log('   Open issues:', openIssues.length);",
+              "            console.log('   Closed issues:', closedIssues.length);",
+              "            ",
+              "            // Show recent issues",
+              "            issuesData.items.slice(0, 3).forEach((issue, index) => {",
+              "                console.log(`   Issue ${index + 1}: ${issue.title} (${issue.state})`);",
+              "            });",
+              "        } else {",
+              "            console.log('   No issues found in this repository');",
+              "        }",
               "    } catch (e) {",
               "        console.log('⚠️ Could not parse issues data');",
               "    }",
@@ -222,7 +286,7 @@
       ]
     },
     {
-      "name": "4. Get Pull Requests",
+      "name": "5. Get Pull Requests",
       "request": {
         "method": "POST",
         "header": [
@@ -244,7 +308,7 @@
         ],
         "body": {
           "mode": "raw",
-          "raw": "{\n  \"jsonrpc\": \"2.0\",\n  \"id\": 4,\n  \"method\": \"tools/call\",\n  \"params\": {\n    \"name\": \"search_issues\",\n    \"arguments\": {\n      \"query\": \"repo:{{repo_owner}}/{{repo_name}} is:pr\",\n      \"perPage\": 10\n    }\n  }\n}"
+          "raw": "{\n  \"jsonrpc\": \"2.0\",\n  \"id\": 5,\n  \"method\": \"tools/call\",\n  \"params\": {\n    \"name\": \"search_issues\",\n    \"arguments\": {\n      \"query\": \"repo:{{repo_owner}}/{{repo_name}} is:pr\",\n      \"perPage\": 10\n    }\n  }\n}"
         },
         "url": {
           "raw": "https://api.githubcopilot.com/mcp/",
@@ -267,86 +331,25 @@
               "const response = pm.response.json();",
               "if (response.result && response.result.content) {",
               "    try {",
-              "        const prs = JSON.parse(response.result.content[0].text);",
-              "        console.log('✅ Found', prs.length, 'pull requests');",
+              "        const prsData = JSON.parse(response.result.content[0].text);",
+              "        console.log('✅ Found', prsData.total_count, 'pull requests');",
               "        ",
-              "        const openPRs = prs.filter(pr => pr.state === 'open');",
-              "        const closedPRs = prs.filter(pr => pr.state === 'closed');",
-              "        ",
-              "        console.log('   Open PRs:', openPRs.length);",
-              "        console.log('   Closed PRs:', closedPRs.length);",
-              "        ",
-              "        // Show recent PRs",
-              "        prs.slice(0, 3).forEach((pr, index) => {",
-              "            console.log(`   PR ${index + 1}: ${pr.title} (${pr.state})`);",
-              "        });",
+              "        if (prsData.items && prsData.items.length > 0) {",
+              "            const openPRs = prsData.items.filter(pr => pr.state === 'open');",
+              "            const closedPRs = prsData.items.filter(pr => pr.state === 'closed');",
+              "            ",
+              "            console.log('   Open PRs:', openPRs.length);",
+              "            console.log('   Closed PRs:', closedPRs.length);",
+              "            ",
+              "            // Show recent PRs",
+              "            prsData.items.slice(0, 3).forEach((pr, index) => {",
+              "                console.log(`   PR ${index + 1}: ${pr.title} (${pr.state})`);",
+              "            });",
+              "        } else {",
+              "            console.log('   No pull requests found in this repository');",
+              "        }",
               "    } catch (e) {",
               "        console.log('⚠️ Could not parse pull requests data');",
-              "    }",
-              "}"
-            ],
-            "type": "text/javascript"
-          }
-        }
-      ]
-    },
-    {
-      "name": "5. Get Top N Gists",
-      "request": {
-        "method": "POST",
-        "header": [
-          {
-            "key": "Content-Type",
-            "value": "application/json",
-            "type": "text"
-          },
-          {
-            "key": "Authorization",
-            "value": "Bearer {{github_token}}",
-            "type": "text"
-          },
-          {
-            "key": "Mcp-Session-Id",
-            "value": "{{mcp_session_id}}",
-            "type": "text"
-          }
-        ],
-        "body": {
-          "mode": "raw",
-          "raw": "{\n  \"jsonrpc\": \"2.0\",\n  \"id\": 5,\n  \"method\": \"tools/call\",\n  \"params\": {\n    \"name\": \"search_repositories\",\n    \"arguments\": {\n      \"query\": \"user:{{repo_owner}} gist\",\n      \"perPage\": {{top_n_gists}}\n    }\n  }\n}"
-        },
-        "url": {
-          "raw": "https://api.githubcopilot.com/mcp/",
-          "protocol": "https",
-          "host": ["api", "githubcopilot", "com"],
-          "path": ["mcp", ""]
-        }
-      },
-      "response": [],
-      "event": [
-        {
-          "listen": "test",
-          "script": {
-            "exec": [
-              "pm.test(\"Status code is 200\", function () {",
-              "    pm.response.to.have.status(200);",
-              "});",
-              "",
-              "// Parse and display gists information",
-              "const response = pm.response.json();",
-              "if (response.result && response.result.content) {",
-              "    try {",
-              "        const gists = JSON.parse(response.result.content[0].text);",
-              "        console.log('✅ Found', gists.length, 'top gists for', pm.environment.get('repo_owner'));",
-              "        ",
-              "        // Show gist details",
-              "        gists.forEach((gist, index) => {",
-              "            console.log(`   Gist ${index + 1}: ${gist.name || gist.full_name} (${gist.stargazers_count} stars)`);",
-              "            console.log(`      Description: ${gist.description || 'No description'}`);",
-              "            console.log(`      Language: ${gist.language || 'Multiple'}`);",
-              "        });",
-              "    } catch (e) {",
-              "        console.log('⚠️ Could not parse gists data');",
               "    }",
               "}"
             ],
@@ -401,9 +404,9 @@
               "const response = pm.response.json();",
               "if (response.result && response.result.content) {",
               "    try {",
-              "        const repos = JSON.parse(response.result.content[0].text);",
-              "        if (repos.length > 0) {",
-              "            const repo = repos[0];",
+              "        const reposData = JSON.parse(response.result.content[0].text);",
+              "        if (reposData.items && reposData.items.length > 0) {",
+              "            const repo = reposData.items[0];",
               "            ",
               "            console.log('📊 REPOSITORY HEALTH REPORT');",
               "            console.log('========================');",
