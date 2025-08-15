@@ -7,6 +7,7 @@ import { CollectionPreviewModal } from '../CollectionPreviewModal';
 export function CollectionsTab() {
   const [showInstallModal, setShowInstallModal] = useState(false);
   const [showPreviewModal, setShowPreviewModal] = useState(false);
+  const [showUltraFastModal, setShowUltraFastModal] = useState(false);
   const [deploymentStatus, setDeploymentStatus] = useState<{ type: 'success' | 'error', message: string } | null>(null);
 
   // Auto-dismiss notification after 5 seconds
@@ -270,7 +271,14 @@ export function CollectionsTab() {
               className="flex items-center space-x-2 px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
             >
               <Download className="w-4 h-4" />
-              <span>Preview & Deploy</span>
+              <span>Preview & Deploy (Complex)</span>
+            </button>
+            <button 
+              onClick={() => setShowUltraFastModal(true)}
+              className="flex items-center space-x-2 px-6 py-3 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors"
+            >
+              <Zap className="w-4 h-4" />
+              <span>Preview & Deploy (Ultra-Fast)</span>
             </button>
             <button 
               onClick={() => setShowInstallModal(true)}
@@ -675,7 +683,7 @@ export function CollectionsTab() {
         </div>
       </div>
 
-      {/* Collection Preview Modal */}
+      {/* Collection Preview Modal - Complex */}
       <CollectionPreviewModal
         isOpen={showPreviewModal}
         onClose={() => setShowPreviewModal(false)}
@@ -758,6 +766,91 @@ Collection URL: ${result.collectionUrl}${githubToken ? '\n\n🔑 GitHub token ha
           setShowPreviewModal(false);
         }}
         collectionUrl="/postman-collections/mcp-integration-demo.json"
+      />
+
+      {/* Collection Preview Modal - Ultra-Fast */}
+      <CollectionPreviewModal
+        isOpen={showUltraFastModal}
+        onClose={() => setShowUltraFastModal(false)}
+        onDeploy={async (collection, collectionName, createInWeb, githubToken) => {
+                      try {
+              // Update collection with GitHub token if provided
+              if (githubToken) {
+                // Update the github_token variable in the collection
+                if (collection.variable) {
+                  const githubTokenVar = collection.variable.find(v => v.key === 'github_token');
+                  if (githubTokenVar) {
+                    githubTokenVar.value = githubToken;
+                  } else {
+                    collection.variable.push({
+                      key: 'github_token',
+                      value: githubToken,
+                      type: 'string'
+                    });
+                  }
+                }
+              }
+
+              // Create collection via Postman API
+              const apiResponse = await fetch('/api/postman/create-collection', {
+                method: 'POST',
+                headers: {
+                  'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                  collection: collection,
+                  createInWeb: createInWeb,
+                }),
+              });
+            
+            const result = await apiResponse.json();
+            
+                          if (result.success) {
+                // Show success message
+                const successMessage = `✅ Ultra-Fast Collection "${collectionName}" created successfully in Postman ${createInWeb ? 'Web' : 'Desktop'}!
+              
+Collection URL: ${result.collectionUrl}${githubToken ? '\n\n🔑 GitHub token has been configured in the collection!' : '\n\n⚠️ Remember to configure your GitHub token in Postman for GitHub MCP integration.'}`;
+
+              if (!createInWeb) {
+                // For Desktop deployment, try to open Postman Desktop once
+                try {
+                  // Single attempt to open Postman Desktop with the collection
+                  const postmanDesktopUrl = `postman://import?url=${encodeURIComponent(result.collectionUrl)}`;
+                  window.open(postmanDesktopUrl, '_blank');
+                  
+                  setDeploymentStatus({
+                    type: 'success',
+                    message: `Ultra-Fast Collection "${collectionName}" created! Opening Postman Desktop...`
+                  });
+                } catch (error) {
+                  console.log('Postman Desktop URL scheme not supported');
+                  setDeploymentStatus({
+                    type: 'success',
+                    message: `Ultra-Fast Collection "${collectionName}" created! Open Postman Desktop to view it.`
+                  });
+                }
+              } else {
+                // For Web deployment, open in browser
+                window.open(result.collectionUrl, '_blank');
+                setDeploymentStatus({
+                  type: 'success',
+                  message: `Ultra-Fast Collection "${collectionName}" created! Opening Postman Web...`
+                });
+              }
+            } else {
+              throw new Error(result.message || 'Failed to create collection');
+            }
+          } catch (error) {
+            console.error('Error creating collection:', error);
+            setDeploymentStatus({
+              type: 'error',
+              message: 'Failed to create collection. Try "Quick Install" instead.'
+            });
+          }
+          
+          setShowUltraFastModal(false);
+        }}
+        collectionUrl="/postman-collections/ultra-fast-mcp.json"
       />
     </div>
   );
