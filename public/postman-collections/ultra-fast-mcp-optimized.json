@@ -1,0 +1,352 @@
+{
+  "info": {
+    "name": "Ultra-Fast MCP Optimized",
+    "description": "Optimized MCP server integration with your auth token - faster session management and better error handling to avoid 31+ second delays.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "github_token",
+      "value": "{{$randomUUID}}",
+      "type": "string"
+    },
+    {
+      "key": "mcp_session_id",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "mcp_timeout",
+      "value": "10000",
+      "type": "string"
+    }
+  ],
+  "item": [
+    {
+      "name": "Initialize MCP Session (Optimized)",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json",
+            "type": "text"
+          },
+          {
+            "key": "Authorization",
+            "value": "Bearer {{github_token}}",
+            "type": "text"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"jsonrpc\": \"2.0\",\n  \"id\": 1,\n  \"method\": \"initialize\",\n  \"params\": {\n    \"protocolVersion\": \"2024-11-05\",\n    \"capabilities\": {\n      \"tools\": {}\n    },\n    \"clientInfo\": {\n      \"name\": \"postman-mcp-client\",\n      \"version\": \"1.0.0\"\n    }\n  }\n}"
+        },
+        "url": {
+          "raw": "https://api.githubcopilot.com/mcp/",
+          "protocol": "https",
+          "host": ["api", "githubcopilot", "com"],
+          "path": ["mcp", ""]
+        }
+      },
+      "response": [],
+      "event": [
+        {
+          "listen": "prerequest",
+          "script": {
+            "exec": [
+              "// Set a shorter timeout for faster failure detection",
+              "pm.request.timeout = parseInt(pm.environment.get('mcp_timeout') || '10000');",
+              "",
+              "// Clear any existing session ID",
+              "pm.environment.set('mcp_session_id', '');"
+            ],
+            "type": "text/javascript"
+          }
+        },
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test(\"Status code is 200\", function () {",
+              "    pm.response.to.have.status(200);",
+              "});",
+              "",
+              "// Extract session ID from response headers",
+              "const sessionId = pm.response.headers.get('mcp-session-id');",
+              "if (sessionId) {",
+              "    pm.environment.set('mcp_session_id', sessionId);",
+              "    console.log('✅ MCP Session initialized:', sessionId);",
+              "} else {",
+              "    console.log('⚠️ No session ID found in response');",
+              "}",
+              "",
+              "// Check response time",
+              "const responseTime = pm.response.responseTime;",
+              "console.log('⏱️ Response time:', responseTime + 'ms');",
+              "if (responseTime > 5000) {",
+              "    console.log('⚠️ Slow response - consider using Direct API collection');",
+              "}"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Search Repos (3) - MCP Optimized",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json",
+            "type": "text"
+          },
+          {
+            "key": "Authorization",
+            "value": "Bearer {{github_token}}",
+            "type": "text"
+          },
+          {
+            "key": "Mcp-Session-Id",
+            "value": "{{mcp_session_id}}",
+            "type": "text"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"jsonrpc\": \"2.0\",\n  \"id\": 2,\n  \"method\": \"tools/call\",\n  \"params\": {\n    \"name\": \"search_repositories\",\n    \"arguments\": {\n      \"query\": \"stars:>1000\",\n      \"perPage\": 3,\n      \"sort\": \"stars\",\n      \"order\": \"desc\"\n    }\n  }\n}"
+        },
+        "url": {
+          "raw": "https://api.githubcopilot.com/mcp/",
+          "protocol": "https",
+          "host": ["api", "githubcopilot", "com"],
+          "path": ["mcp", ""]
+        }
+      },
+      "response": [],
+      "event": [
+        {
+          "listen": "prerequest",
+          "script": {
+            "exec": [
+              "// Check if we have a session ID",
+              "const sessionId = pm.environment.get('mcp_session_id');",
+              "if (!sessionId) {",
+              "    console.log('⚠️ No session ID - run Initialize first');",
+              "    return;",
+              "}",
+              "",
+              "// Set timeout",
+              "pm.request.timeout = parseInt(pm.environment.get('mcp_timeout') || '10000');"
+            ],
+            "type": "text/javascript"
+          }
+        },
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test(\"Status code is 200\", function () {",
+              "    pm.response.to.have.status(200);",
+              "});",
+              "",
+              "try {",
+              "    const jsonData = pm.response.json();",
+              "    if (jsonData.result && jsonData.result.content) {",
+              "        const content = jsonData.result.content[0];",
+              "        if (content.text) {",
+              "            const data = JSON.parse(content.text);",
+              "            console.log('📊 Found', data.total_count, 'repositories');",
+              "            console.log('📋 Showing', data.items.length, 'repositories:');",
+              "            data.items.forEach((repo, index) => {",
+              "                console.log(`${index + 1}. ${repo.full_name} (${repo.stargazers_count} stars)`);",
+              "            });",
+              "        }",
+              "    }",
+              "} catch (error) {",
+              "    console.log('❌ Error parsing response:', error.message);",
+              "}",
+              "",
+              "// Check response time",
+              "const responseTime = pm.response.responseTime;",
+              "console.log('⏱️ Response time:', responseTime + 'ms');"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Search Repos (5) - MCP Optimized",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json",
+            "type": "text"
+          },
+          {
+            "key": "Authorization",
+            "value": "Bearer {{github_token}}",
+            "type": "text"
+          },
+          {
+            "key": "Mcp-Session-Id",
+            "value": "{{mcp_session_id}}",
+            "type": "text"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"jsonrpc\": \"2.0\",\n  \"id\": 3,\n  \"method\": \"tools/call\",\n  \"params\": {\n    \"name\": \"search_repositories\",\n    \"arguments\": {\n      \"query\": \"language:javascript\",\n      \"perPage\": 5,\n      \"sort\": \"updated\",\n      \"order\": \"desc\"\n    }\n  }\n}"
+        },
+        "url": {
+          "raw": "https://api.githubcopilot.com/mcp/",
+          "protocol": "https",
+          "host": ["api", "githubcopilot", "com"],
+          "path": ["mcp", ""]
+        }
+      },
+      "response": [],
+      "event": [
+        {
+          "listen": "prerequest",
+          "script": {
+            "exec": [
+              "// Check if we have a session ID",
+              "const sessionId = pm.environment.get('mcp_session_id');",
+              "if (!sessionId) {",
+              "    console.log('⚠️ No session ID - run Initialize first');",
+              "    return;",
+              "}",
+              "",
+              "// Set timeout",
+              "pm.request.timeout = parseInt(pm.environment.get('mcp_timeout') || '10000');"
+            ],
+            "type": "text/javascript"
+          }
+        },
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test(\"Status code is 200\", function () {",
+              "    pm.response.to.have.status(200);",
+              "});",
+              "",
+              "try {",
+              "    const jsonData = pm.response.json();",
+              "    if (jsonData.result && jsonData.result.content) {",
+              "        const content = jsonData.result.content[0];",
+              "        if (content.text) {",
+              "            const data = JSON.parse(content.text);",
+              "            console.log('📊 Found', data.total_count, 'JavaScript repositories');",
+              "            console.log('📋 Showing', data.items.length, 'repositories:');",
+              "            data.items.forEach((repo, index) => {",
+              "                console.log(`${index + 1}. ${repo.full_name} (${repo.language})`);",
+              "            });",
+              "        }",
+              "    }",
+              "} catch (error) {",
+              "    console.log('❌ Error parsing response:', error.message);",
+              "}",
+              "",
+              "// Check response time",
+              "const responseTime = pm.response.responseTime;",
+              "console.log('⏱️ Response time:', responseTime + 'ms');"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Get User Info - MCP Optimized",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json",
+            "type": "text"
+          },
+          {
+            "key": "Authorization",
+            "value": "Bearer {{github_token}}",
+            "type": "text"
+          },
+          {
+            "key": "Mcp-Session-Id",
+            "value": "{{mcp_session_id}}",
+            "type": "text"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"jsonrpc\": \"2.0\",\n  \"id\": 4,\n  \"method\": \"tools/call\",\n  \"params\": {\n    \"name\": \"get_me\",\n    \"arguments\": {}\n  }\n}"
+        },
+        "url": {
+          "raw": "https://api.githubcopilot.com/mcp/",
+          "protocol": "https",
+          "host": ["api", "githubcopilot", "com"],
+          "path": ["mcp", ""]
+        }
+      },
+      "response": [],
+      "event": [
+        {
+          "listen": "prerequest",
+          "script": {
+            "exec": [
+              "// Check if we have a session ID",
+              "const sessionId = pm.environment.get('mcp_session_id');",
+              "if (!sessionId) {",
+              "    console.log('⚠️ No session ID - run Initialize first');",
+              "    return;",
+              "}",
+              "",
+              "// Set timeout",
+              "pm.request.timeout = parseInt(pm.environment.get('mcp_timeout') || '10000');"
+            ],
+            "type": "text/javascript"
+          }
+        },
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test(\"Status code is 200\", function () {",
+              "    pm.response.to.have.status(200);",
+              "});",
+              "",
+              "try {",
+              "    const jsonData = pm.response.json();",
+              "    if (jsonData.result && jsonData.result.content) {",
+              "        const content = jsonData.result.content[0];",
+              "        if (content.text) {",
+              "            const data = JSON.parse(content.text);",
+              "            console.log('👤 User Info:');",
+              "            console.log('   Login:', data.login);",
+              "            console.log('   ID:', data.id);",
+              "            console.log('   Name:', data.name || 'N/A');",
+              "            console.log('   Email:', data.email || 'N/A');",
+              "        }",
+              "    }",
+              "} catch (error) {",
+              "    console.log('❌ Error parsing response:', error.message);",
+              "}",
+              "",
+              "// Check response time",
+              "const responseTime = pm.response.responseTime;",
+              "console.log('⏱️ Response time:', responseTime + 'ms');"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ]
+    }
+  ]
+}
