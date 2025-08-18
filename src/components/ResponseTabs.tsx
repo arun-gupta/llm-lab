@@ -418,17 +418,17 @@ export function ResponseTabs({
                   <div className="space-y-3">
                     <div className="flex justify-between">
                       <span className="text-sm text-gray-600">Success Rate</span>
-                      <span className="text-sm font-medium">
+                      <span className="text-sm font-semibold text-gray-900">
                         {((analytics.successfulResponses / analytics.totalResponses) * 100).toFixed(1)}%
                       </span>
                     </div>
                     <div className="flex justify-between">
                       <span className="text-sm text-gray-600">Avg Latency</span>
-                      <span className="text-sm font-medium">{Math.round(analytics.avgLatency)}ms</span>
+                      <span className="text-sm font-semibold text-gray-900">{Math.round(analytics.avgLatency)}ms</span>
                     </div>
                     <div className="flex justify-between">
                       <span className="text-sm text-gray-600">Fastest Response</span>
-                      <span className="text-sm font-medium text-xs">
+                      <span className="text-sm font-semibold text-gray-900 text-xs">
                         {analytics.performanceRanking[0]?.provider.split(' ')[0]} ({analytics.performanceRanking[0]?.latency}ms)
                       </span>
                     </div>
@@ -443,15 +443,15 @@ export function ResponseTabs({
                   <div className="space-y-3">
                     <div className="flex justify-between">
                       <span className="text-sm text-gray-600">Total Tokens</span>
-                      <span className="text-sm font-medium">{analytics.totalTokens.toLocaleString()}</span>
+                      <span className="text-sm font-semibold text-gray-900">{analytics.totalTokens.toLocaleString()}</span>
                     </div>
                     <div className="flex justify-between">
                       <span className="text-sm text-gray-600">Avg per Response</span>
-                      <span className="text-sm font-medium">{Math.round(analytics.avgTokens)}</span>
+                      <span className="text-sm font-semibold text-gray-900">{Math.round(analytics.avgTokens)}</span>
                     </div>
                     <div className="flex justify-between">
                       <span className="text-sm text-gray-600">Most Efficient</span>
-                      <span className="text-sm font-medium text-xs">
+                      <span className="text-sm font-semibold text-gray-900 text-xs">
                         {analytics.efficiencyRanking[0]?.provider.split(' ')[0]}
                       </span>
                     </div>
@@ -466,19 +466,19 @@ export function ResponseTabs({
                   <div className="space-y-3">
                     <div className="flex justify-between">
                       <span className="text-sm text-gray-600">Total Cost</span>
-                      <span className="text-sm font-medium">
+                      <span className="text-sm font-semibold text-gray-900">
                         ${analytics.totalCost < 0.01 ? '<$0.01' : analytics.totalCost.toFixed(4)}
                       </span>
                     </div>
                     <div className="flex justify-between">
                       <span className="text-sm text-gray-600">Most Expensive</span>
-                      <span className="text-sm font-medium text-xs">
+                      <span className="text-sm font-semibold text-gray-900 text-xs">
                         {responses[analytics.costEstimates.indexOf(Math.max(...analytics.costEstimates))]?.provider.split(' ')[0]}
                       </span>
                     </div>
                     <div className="flex justify-between">
                       <span className="text-sm text-gray-600">Monthly (1k/day)</span>
-                      <span className="text-sm font-medium">
+                      <span className="text-sm font-semibold text-gray-900">
                         ${(analytics.totalCost * 30000).toFixed(2)}
                       </span>
                     </div>
@@ -493,17 +493,17 @@ export function ResponseTabs({
                   <div className="space-y-3">
                     <div className="flex justify-between">
                       <span className="text-sm text-gray-600">Avg Word Count</span>
-                      <span className="text-sm font-medium">{Math.round(analytics.avgWordCount)}</span>
+                      <span className="text-sm font-semibold text-gray-900">{Math.round(analytics.avgWordCount)}</span>
                     </div>
                     <div className="flex justify-between">
                       <span className="text-sm text-gray-600">Similarity</span>
-                      <span className="text-sm font-medium">
+                      <span className="text-sm font-semibold text-gray-900">
                         {(analytics.avgSimilarity * 100).toFixed(1)}%
                       </span>
                     </div>
                     <div className="flex justify-between">
                       <span className="text-sm text-gray-600">Length Range</span>
-                      <span className="text-sm font-medium">
+                      <span className="text-sm font-semibold text-gray-900">
                         {analytics.shortestResponse}-{analytics.longestResponse}
                       </span>
                     </div>
@@ -524,11 +524,11 @@ export function ResponseTabs({
                     <div className="space-y-2">
                       <div className="flex justify-between text-sm">
                         <span className="text-gray-600">Average</span>
-                        <span className="font-medium">{(analytics.avgCompleteness * 100).toFixed(1)}%</span>
+                        <span className="font-semibold text-gray-900">{(analytics.avgCompleteness * 100).toFixed(1)}%</span>
                       </div>
                       <div className="flex justify-between text-sm">
                         <span className="text-gray-600">Best</span>
-                        <span className="font-medium text-xs">
+                        <span className="font-semibold text-gray-900 text-xs">
                           {analytics.bestCompleteness.provider.split(' ')[0]} ({(analytics.bestCompleteness.completeness * 100).toFixed(1)}%)
                         </span>
                       </div>
@@ -543,7 +543,7 @@ export function ResponseTabs({
                                   style={{ width: `${metric.completeness * 100}%` }}
                                 ></div>
                               </div>
-                              <span>{(metric.completeness * 100).toFixed(0)}%</span>
+                              <span className="font-medium text-gray-900">{(metric.completeness * 100).toFixed(0)}%</span>
                             </div>
                           </div>
                         ))}
@@ -560,11 +560,11 @@ export function ResponseTabs({
                     <div className="space-y-2">
                       <div className="flex justify-between text-sm">
                         <span className="text-gray-600">Avg Grade Level</span>
-                        <span className="font-medium">{analytics.avgReadability.toFixed(1)}</span>
+                        <span className="font-semibold text-gray-900">{analytics.avgReadability.toFixed(1)}</span>
                       </div>
                       <div className="flex justify-between text-sm">
                         <span className="text-gray-600">Most Readable</span>
-                        <span className="font-medium text-xs">
+                        <span className="font-semibold text-gray-900 text-xs">
                           {analytics.bestReadability.provider.split(' ')[0]} (Grade {analytics.bestReadability.readability.toFixed(1)})
                         </span>
                       </div>
@@ -579,7 +579,7 @@ export function ResponseTabs({
                                   style={{ width: `${Math.min(100, (20 - metric.readability) * 5)}%` }}
                                 ></div>
                               </div>
-                              <span>Grade {metric.readability.toFixed(1)}</span>
+                              <span className="font-medium text-gray-900">Grade {metric.readability.toFixed(1)}</span>
                             </div>
                           </div>
                         ))}
@@ -596,11 +596,11 @@ export function ResponseTabs({
                     <div className="space-y-2">
                       <div className="flex justify-between text-sm">
                         <span className="text-gray-600">Average</span>
-                        <span className="font-medium">{(analytics.avgStructure * 100).toFixed(1)}%</span>
+                        <span className="font-semibold text-gray-900">{(analytics.avgStructure * 100).toFixed(1)}%</span>
                       </div>
                       <div className="flex justify-between text-sm">
                         <span className="text-gray-600">Best</span>
-                        <span className="font-medium text-xs">
+                        <span className="font-semibold text-gray-900 text-xs">
                           {analytics.bestStructure.provider.split(' ')[0]} ({(analytics.bestStructure.structure * 100).toFixed(1)}%)
                         </span>
                       </div>
@@ -615,7 +615,7 @@ export function ResponseTabs({
                                   style={{ width: `${metric.structure * 100}%` }}
                                 ></div>
                               </div>
-                              <span>{(metric.structure * 100).toFixed(0)}%</span>
+                              <span className="font-medium text-gray-900">{(metric.structure * 100).toFixed(0)}%</span>
                             </div>
                           </div>
                         ))}
