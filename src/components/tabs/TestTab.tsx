@@ -3,8 +3,9 @@
 import { useState } from 'react';
 import { LLMForm } from '../LLMForm';
 import { ResponseTabs } from '../ResponseTabs';
+import { SavedComparisons } from '../SavedComparisons';
 import { LLMResponse } from '@/lib/llm-apis';
-import { Clock, DollarSign, Target } from 'lucide-react';
+import { Clock, DollarSign, Target, History } from 'lucide-react';
 
 import { TabType } from '../TabNavigation';
 
@@ -18,6 +19,7 @@ export function TestTab({ onTabChange }: TestTabProps) {
   const [selectedProviders, setSelectedProviders] = useState<string[]>([]);
   const [formData, setFormData] = useState<{ prompt: string; context?: string } | null>(null);
   const [activeTab, setActiveTab] = useState<'responses' | 'analytics' | 'comparison'>('responses');
+  const [showSavedComparisons, setShowSavedComparisons] = useState(false);
 
   const handleLoadingChange = (loading: boolean) => {
     setIsLoading(loading);
@@ -70,11 +72,20 @@ export function TestTab({ onTabChange }: TestTabProps) {
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
       {/* Header */}
       <div className="mb-8">
-        <div>
-          <h1 className="text-3xl font-bold text-gray-900 mb-2">Test & Compare</h1>
-          <p className="text-gray-600">
-            Test prompts across different providers and models with A/B testing, side-by-side comparison, and performance benchmarking.
-          </p>
+        <div className="flex items-center justify-between">
+          <div>
+            <h1 className="text-3xl font-bold text-gray-900 mb-2">Test & Compare</h1>
+            <p className="text-gray-600">
+              Test prompts across different providers and models with A/B testing, side-by-side comparison, and performance benchmarking.
+            </p>
+          </div>
+          <button
+            onClick={() => setShowSavedComparisons(true)}
+            className="flex items-center space-x-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+          >
+            <History className="w-4 h-4" />
+            <span>View Saved Comparisons</span>
+          </button>
         </div>
       </div>
 
@@ -144,6 +155,12 @@ export function TestTab({ onTabChange }: TestTabProps) {
           </div>
         </div>
       </div>
+
+      {/* Saved Comparisons Modal */}
+      <SavedComparisons
+        isOpen={showSavedComparisons}
+        onClose={() => setShowSavedComparisons(false)}
+      />
     </div>
   );
 }

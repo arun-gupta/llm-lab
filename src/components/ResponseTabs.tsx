@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import { ResponseCard } from './ResponseCard';
 import { LLMResponse } from '@/lib/llm-apis';
-import { BarChart3, MessageSquare, Clock, Zap, DollarSign, Target, Loader2, Download } from 'lucide-react';
+import { BarChart3, MessageSquare, Clock, Zap, DollarSign, Target, Loader2, Download, Save } from 'lucide-react';
 import React from 'react'; // Added missing import for React.useEffect
 import { generatePostmanCollection } from '@/lib/postman';
 
@@ -28,6 +28,7 @@ export function ResponseTabs({
 }: ResponseTabsProps) {
   const [internalActiveTab, setInternalActiveTab] = useState<'responses' | 'analytics'>('responses');
   const [downloading, setDownloading] = useState(false);
+  const [saving, setSaving] = useState(false);
   
   // Use external activeTab if provided, otherwise use internal state
   const activeTab = externalActiveTab !== undefined ? externalActiveTab : internalActiveTab;
@@ -68,6 +69,50 @@ export function ResponseTabs({
       console.error('Failed to create Postman collection:', error);
     } finally {
       setDownloading(false);
+    }
+  };
+
+  const saveComparison = async () => {
+    if (responses.length === 0) return;
+    
+    setSaving(true);
+    try {
+      const comparisonData = {
+        id: Date.now().toString(),
+        timestamp: new Date().toISOString(),
+        prompt,
+        context,
+        selectedProviders,
+        responses,
+        analytics: calculateAnalytics(),
+        metadata: {
+          totalResponses: responses.length,
+          successfulResponses: responses.filter(r => !r.error).length,
+          totalTokens: responses.reduce((sum, r) => sum + (r.tokens?.total || 0), 0),
+          avgLatency: responses.reduce((sum, r) => sum + r.latency, 0) / responses.length
+        }
+      };
+
+      const response = await fetch('/api/comparisons/save', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(comparisonData),
+      });
+
+      if (response.ok) {
+        const result = await response.json();
+        console.log('Comparison saved successfully:', result);
+        // You could add a toast notification here
+      } else {
+        throw new Error('Failed to save comparison');
+      }
+    } catch (error) {
+      console.error('Failed to save comparison:', error);
+      // You could add an error toast notification here
+    } finally {
+      setSaving(false);
     }
   };
 
@@ -386,8 +431,16 @@ export function ResponseTabs({
                 </div>
               ))}
               
-              {/* Postman Collection Button */}
-              <div className="flex justify-center pt-6">
+              {/* Action Buttons */}
+              <div className="flex justify-center space-x-4 pt-6">
+                <button
+                  onClick={saveComparison}
+                  disabled={saving}
+                  className="flex items-center space-x-2 px-6 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors shadow-sm"
+                >
+                  <Save className="w-5 h-5" />
+                  <span>{saving ? 'Saving...' : 'Save Comparison'}</span>
+                </button>
                 <button
                   onClick={createPostmanCollectionForComparison}
                   disabled={downloading}
