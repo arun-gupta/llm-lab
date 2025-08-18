@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
-import { Send, Loader2, Lightbulb } from 'lucide-react';
+import { Send, Loader2, Lightbulb, PenTool, Code, TrendingUp, FileText, BarChart3, GraduationCap } from 'lucide-react';
 import { ProviderSelector } from './ProviderSelector';
 import { ResponseCard } from './ResponseCard';
 import { ResponseTabs } from './ResponseTabs';
@@ -87,37 +87,49 @@ export function LLMForm({ onResponsesChange, onLoadingChange, onProvidersChange,
     }
   }, [promptValue, errors.prompt, clearErrors]);
 
-  // Sample prompts for quick testing
+  // Sample prompts for quick testing with icons
   const samplePrompts = [
     {
       title: "Creative Writing",
       prompt: "Write a short story about a robot who discovers emotions for the first time.",
-      context: "The story should be suitable for young adults and have a hopeful ending."
+      context: "The story should be suitable for young adults and have a hopeful ending.",
+      icon: PenTool,
+      color: "text-purple-600"
     },
     {
       title: "Code Explanation",
       prompt: "Explain how async/await works in JavaScript with a simple example.",
-      context: "Assume the reader is familiar with basic JavaScript but new to asynchronous programming."
+      context: "Assume the reader is familiar with basic JavaScript but new to asynchronous programming.",
+      icon: Code,
+      color: "text-blue-600"
     },
     {
       title: "Business Analysis",
       prompt: "What are the key factors to consider when launching a SaaS product in 2024?",
-      context: "Focus on market research, pricing strategies, and customer acquisition."
+      context: "Focus on market research, pricing strategies, and customer acquisition.",
+      icon: TrendingUp,
+      color: "text-green-600"
     },
     {
       title: "Technical Documentation",
       prompt: "Write API documentation for a user authentication endpoint.",
-      context: "Include request/response examples, error codes, and security considerations."
+      context: "Include request/response examples, error codes, and security considerations.",
+      icon: FileText,
+      color: "text-orange-600"
     },
     {
       title: "Data Analysis",
       prompt: "Analyze the pros and cons of remote work for software development teams.",
-      context: "Consider productivity, collaboration, work-life balance, and company culture."
+      context: "Consider productivity, collaboration, work-life balance, and company culture.",
+      icon: BarChart3,
+      color: "text-indigo-600"
     },
     {
       title: "Educational Content",
       prompt: "Explain quantum computing in simple terms that a high school student could understand.",
-      context: "Use analogies and avoid complex mathematical formulas."
+      context: "Use analogies and avoid complex mathematical formulas.",
+      icon: GraduationCap,
+      color: "text-red-600"
     }
   ];
 
@@ -218,18 +230,35 @@ export function LLMForm({ onResponsesChange, onLoadingChange, onProvidersChange,
             <Lightbulb className="w-5 h-5 text-yellow-500" />
             <h3 className="text-sm font-medium text-gray-700">Try Sample Prompts</h3>
           </div>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
-            {samplePrompts.map((sample, index) => (
-              <button
-                key={index}
-                type="button"
-                onClick={() => loadSamplePrompt(sample)}
-                className="text-left p-3 border border-gray-200 rounded-lg hover:border-blue-300 hover:bg-blue-50 transition-colors"
-              >
-                <div className="font-medium text-sm text-gray-900 mb-1">{sample.title}</div>
-                <div className="text-xs text-gray-600 line-clamp-2">{sample.prompt}</div>
-              </button>
-            ))}
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            {samplePrompts.map((sample, index) => {
+              const IconComponent = sample.icon;
+              return (
+                <button
+                  key={index}
+                  type="button"
+                  onClick={() => loadSamplePrompt(sample)}
+                  className="group text-left p-4 border border-gray-200 rounded-lg hover:border-blue-300 hover:bg-blue-50 transition-all duration-200 hover:shadow-sm"
+                >
+                  <div className="flex items-start space-x-3">
+                    <div className={`flex-shrink-0 mt-0.5 ${sample.color}`}>
+                      <IconComponent className="w-5 h-5" />
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <div className="font-medium text-sm text-gray-900 mb-2 group-hover:text-blue-700 transition-colors">
+                        {sample.title}
+                      </div>
+                      <div className="text-xs text-gray-600 leading-relaxed">
+                        {sample.prompt.length > 80 
+                          ? `${sample.prompt.substring(0, 80)}...` 
+                          : sample.prompt
+                        }
+                      </div>
+                    </div>
+                  </div>
+                </button>
+              );
+            })}
           </div>
         </div>
 
