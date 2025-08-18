@@ -75,60 +75,10 @@ print_info "This is important for security - only allow access to directories yo
 # Default directories
 DEFAULT_DIRS="/tmp $HOME/Desktop"
 
-# Ask user for custom directories
-echo ""
-read -p "Do you want to configure custom accessible directories? (y/N): " -n 1 -r
-echo ""
-
-if [[ $REPLY =~ ^[Yy]$ ]]; then
-    print_step "Configuring custom accessible directories"
-    echo ""
-    print_info "Enter the directories you want to allow access to (one per line, empty line to finish):"
-    print_info "Examples: /tmp, $HOME/Documents, $HOME/Downloads"
-    print_warning "Only enter directories you trust - the MCP server will have read/write access to these!"
-    echo ""
-    
-    CUSTOM_DIRS=""
-    while true; do
-        read -p "Directory path (or empty to finish): " dir_path
-        if [ -z "$dir_path" ]; then
-            break
-        fi
-        
-        # Validate directory exists
-        if [ ! -d "$dir_path" ]; then
-            print_warning "Directory '$dir_path' does not exist. Create it? (y/N): "
-            read -n 1 -r create_dir
-            echo ""
-            if [[ $create_dir =~ ^[Yy]$ ]]; then
-                mkdir -p "$dir_path"
-                print_success "Created directory: $dir_path"
-            else
-                print_warning "Skipping directory: $dir_path"
-                continue
-            fi
-        fi
-        
-        # Add to custom directories
-        if [ -z "$CUSTOM_DIRS" ]; then
-            CUSTOM_DIRS="$dir_path"
-        else
-            CUSTOM_DIRS="$CUSTOM_DIRS $dir_path"
-        fi
-        print_success "Added: $dir_path"
-    done
-    
-    if [ -n "$CUSTOM_DIRS" ]; then
-        ALLOWED_DIRS="$CUSTOM_DIRS"
-        print_success "Custom directories configured: $ALLOWED_DIRS"
-    else
-        ALLOWED_DIRS="$DEFAULT_DIRS"
-        print_info "No custom directories specified, using defaults: $ALLOWED_DIRS"
-    fi
-else
-    ALLOWED_DIRS="$DEFAULT_DIRS"
-    print_info "Using default directories: $ALLOWED_DIRS"
-fi
+# Use default directories automatically for quickstart
+ALLOWED_DIRS="$DEFAULT_DIRS"
+print_info "Using default directories: $ALLOWED_DIRS"
+print_info "You can edit filesystem-mcp-config.env later to customize directories"
 
 # Save configuration
 print_step "Saving configuration"
