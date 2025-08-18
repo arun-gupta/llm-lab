@@ -171,6 +171,18 @@ export function LLMForm({ onResponsesChange, onLoadingChange, onProvidersChange,
       }
 
       const result = await response.json();
+      console.log('LLMForm received response:', result);
+      console.log('Responses array:', result.responses);
+      console.log('Response count:', result.responses?.length);
+      result.responses?.forEach((resp: any, index: number) => {
+        console.log(`Response ${index}:`, {
+          provider: resp.provider,
+          content: resp.content?.substring(0, 100) + '...',
+          contentLength: resp.content?.length,
+          hasError: !!resp.error
+        });
+      });
+      
       setResponses(result.responses);
       onResponsesChange(result.responses);
     } catch (err) {

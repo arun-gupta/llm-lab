@@ -76,6 +76,17 @@ export async function callOpenAI(prompt: string, context?: string, model: string
     
     const content = response.choices?.[0]?.message?.content;
     
+    // Debug logging to troubleshoot "No response received" issue
+    console.log('=== OpenAI Response Debug ===');
+    console.log('Model:', model);
+    console.log('Response choices:', response.choices);
+    console.log('First choice:', response.choices?.[0]);
+    console.log('First choice message:', response.choices?.[0]?.message);
+    console.log('Content:', content);
+    console.log('Content type:', typeof content);
+    console.log('Content length:', content?.length);
+    console.log('===========================');
+    
     return {
       provider: `OpenAI (${model})`,
       content: content || 'No response received',
