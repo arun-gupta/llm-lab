@@ -67,7 +67,7 @@ export function MCPTab() {
         </div>
 
         {/* MCP Servers Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-6">
           <div className="bg-white rounded-lg p-6 border border-gray-200 hover:shadow-lg transition-shadow flex flex-col">
             <div className="flex items-center space-x-3 mb-4">
               <div className="w-10 h-10 bg-gray-800 rounded-lg flex items-center justify-center">
@@ -222,15 +222,77 @@ export function MCPTab() {
             <p className="text-sm text-gray-600 mb-4">Search web, get news, weather</p>
             <div className="text-xs text-gray-500">🚧 Coming Soon</div>
           </div>
-          <div className="bg-white rounded-lg p-6 border border-gray-200 hover:shadow-lg transition-shadow opacity-60">
+          <div className="bg-white rounded-lg p-6 border border-gray-200 hover:shadow-lg transition-shadow flex flex-col">
             <div className="flex items-center space-x-3 mb-4">
-              <div className="w-10 h-10 bg-gray-400 rounded-lg flex items-center justify-center">
+              <div className="w-10 h-10 bg-blue-600 rounded-lg flex items-center justify-center">
                 <Database className="w-5 h-5 text-white" />
               </div>
-              <h3 className="font-semibold text-gray-900">Database MCP</h3>
+              <h3 className="font-semibold text-gray-900">SQLite MCP</h3>
             </div>
-            <p className="text-sm text-gray-600 mb-4">Query, insert, update, delete</p>
-            <div className="text-xs text-gray-500">🚧 Coming Soon</div>
+            <p className="text-sm text-gray-600 mb-4">Database operations with SQLite MCP server and HTTP wrapper</p>
+            <div className="text-xs text-gray-500 mb-4">✅ 15 database tools + HTTP API</div>
+            <div className="text-xs text-blue-600 mb-4">🐳 Docker ready with sample DB</div>
+            <button
+              onClick={async () => {
+                try {
+                  // Fetch the collection JSON
+                  const response = await fetch('/postman-collections/sqlite-mcp-server.json');
+                  const collection = await response.json();
+                  
+                  // Create collection via Postman API
+                  const apiResponse = await fetch('/api/postman/create-collection', {
+                    method: 'POST',
+                    headers: {
+                      'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                      collection: collection,
+                      createInWeb: false, // Create in Desktop
+                    }),
+                  });
+                  
+                  const result = await apiResponse.json();
+                  
+                  if (result.success) {
+                    setDeploymentStatus({
+                      type: 'success',
+                      message: '✅ SQLite MCP Collection created successfully in Postman Desktop!'
+                    });
+                  } else {
+                    // Fallback to download if API key not configured
+                    if (result.fallback) {
+                      const blob = new Blob([JSON.stringify(collection, null, 2)], {
+                        type: 'application/json',
+                      });
+                      const url = URL.createObjectURL(blob);
+                      const a = document.createElement('a');
+                      a.href = url;
+                      a.download = 'sqlite-mcp-server.json';
+                      document.body.appendChild(a);
+                      a.click();
+                      document.body.removeChild(a);
+                      URL.revokeObjectURL(url);
+                      setDeploymentStatus({
+                        type: 'success',
+                        message: 'Collection downloaded! Import it manually into Postman.'
+                      });
+                    } else {
+                      throw new Error(result.message || 'Failed to create collection');
+                    }
+                  }
+                } catch (error) {
+                  console.error('Error creating collection:', error);
+                  setDeploymentStatus({
+                    type: 'error',
+                    message: 'Failed to create collection. Try "Download & Import" instead.'
+                  });
+                }
+              }}
+              className="w-full inline-flex items-center justify-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors mt-auto"
+            >
+              <Zap className="w-4 h-4 mr-2" />
+              Install SQLite MCP
+            </button>
           </div>
         </div>
 
@@ -262,23 +324,23 @@ export function MCPTab() {
             <div className="space-y-3 text-sm text-gray-600">
               <div className="flex items-center space-x-2">
                 <span className="w-6 h-6 bg-blue-100 text-blue-600 rounded-full flex items-center justify-center text-xs font-bold">1</span>
-                <span>Install GitHub MCP collection in Postman</span>
+                <span>Install any MCP collection (GitHub, Filesystem, or SQLite)</span>
               </div>
               <div className="flex items-center space-x-2">
                 <span className="w-6 h-6 bg-blue-100 text-blue-600 rounded-full flex items-center justify-center text-xs font-bold">2</span>
-                <span>Set your GitHub token and repository variables</span>
+                <span>Set up the corresponding MCP server (see collection descriptions)</span>
               </div>
               <div className="flex items-center space-x-2">
                 <span className="w-6 h-6 bg-blue-100 text-blue-600 rounded-full flex items-center justify-center text-xs font-bold">3</span>
-                <span>Run "Get User Repositories" to see all your repos</span>
+                <span>Run "Health Check" to verify server connectivity</span>
               </div>
               <div className="flex items-center space-x-2">
                 <span className="w-6 h-6 bg-blue-100 text-blue-600 rounded-full flex items-center justify-center text-xs font-bold">4</span>
-                <span>Run "Get Repository Information" for specific repo details</span>
+                <span>Execute the available tools for your use case</span>
               </div>
               <div className="flex items-center space-x-2">
                 <span className="w-6 h-6 bg-blue-100 text-blue-600 rounded-full flex items-center justify-center text-xs font-bold">5</span>
-                <span>Run "Generate Repository Health Report" for comprehensive analysis</span>
+                <span>Combine multiple MCP servers for advanced workflows</span>
               </div>
             </div>
           </div>

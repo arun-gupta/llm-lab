@@ -1,0 +1,372 @@
+{
+  "info": {
+    "name": "SQLite MCP Server",
+    "description": "Model Context Protocol (MCP) integration for SQLite database operations. Interact with SQLite databases through a standardized MCP interface.\n\n🔧 **Setup Instructions:**\n1. Clone and setup: git clone https://github.com/arun-gupta/sqlite-mcp-server\n2. Run quickstart: ./quickstart.sh (creates sample DB + starts HTTP server)\n3. Import this collection and test database operations\n\n✅ **Available Tools:**\n- list_tables - List all tables in the database\n- describe_table - Get detailed table schema\n- run_query - Execute SELECT queries safely\n- insert_data - Insert new records\n- update_data - Update existing records\n- delete_data - Delete records\n- get_table_info - Get table statistics\n\n🔒 **Security Features:**\n- SELECT-only queries in run_query tool\n- Parameterized statements prevent SQL injection\n- Input validation against schemas\n- Non-root Docker user for security\n\n🌐 **HTTP Endpoints:**\n- GET /health - Health check\n- GET /info - Server information\n- GET /tools - List available MCP tools\n- GET /tables - List all tables\n- GET /tables/{table} - Get table schema\n- POST /query - Execute queries\n- POST /insert - Insert data\n- POST /update - Update data\n- POST /delete - Delete data\n\n📊 **Sample Database:**\n- users table (id, name, email, created_at)\n- categories table (id, name, description)\n- posts table (id, title, content, user_id, category_id)\n\n🐳 **Docker Ready:**\n- Pre-built image: arungupta/sqlite-mcp-server\n- Docker scripts for easy deployment\n- MCP Catalog compatible",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:4000",
+      "type": "string"
+    }
+  ],
+  "item": [
+    {
+      "name": "Health Check",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/health",
+          "host": ["{{baseUrl}}"],
+          "path": ["health"]
+        }
+      },
+      "response": [],
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test(\"Status code is 200\", function () {",
+              "    pm.response.to.have.status(200);",
+              "});",
+              "",
+              "if (pm.response.code === 200) {",
+              "    try {",
+              "        const response = pm.response.json();",
+              "        console.log('✅ SQLite MCP Server is healthy');",
+              "        console.log('   Status:', response.status);",
+              "        console.log('   Database:', response.database);",
+              "        console.log('   Timestamp:', response.timestamp);",
+              "    } catch (error) {",
+              "        console.log('⚠️ Error parsing response:', error.message);",
+              "    }",
+              "}"
+            ],
+            "type": "text-javascript"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Server Info",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/info",
+          "host": ["{{baseUrl}}"],
+          "path": ["info"]
+        }
+      }
+    },
+    {
+      "name": "List Tools",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/tools",
+          "host": ["{{baseUrl}}"],
+          "path": ["tools"]
+        }
+      }
+    },
+    {
+      "name": "List Tables",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/tables",
+          "host": ["{{baseUrl}}"],
+          "path": ["tables"]
+        }
+      },
+      "response": [],
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test(\"Status code is 200\", function () {",
+              "    pm.response.to.have.status(200);",
+              "});",
+              "",
+              "if (pm.response.code === 200) {",
+              "    try {",
+              "        const response = pm.response.json();",
+              "        if (response.tables && response.tables.length > 0) {",
+              "            console.log('✅ Found', response.tables.length, 'tables:');",
+              "            response.tables.forEach(table => {",
+              "                console.log('   📊 ' + table.name);",
+              "            });",
+              "        } else {",
+              "            console.log('⚠️ No tables found in database');",
+              "        }",
+              "    } catch (error) {",
+              "        console.log('⚠️ Error parsing response:', error.message);",
+              "    }",
+              "}"
+            ],
+            "type": "text-javascript"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Describe Table",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/tables/users",
+          "host": ["{{baseUrl}}"],
+          "path": ["tables", "users"]
+        }
+      }
+    },
+    {
+      "name": "Run Query",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"query\": \"SELECT * FROM users LIMIT 5\"\n}"
+        },
+        "url": {
+          "raw": "{{baseUrl}}/query",
+          "host": ["{{baseUrl}}"],
+          "path": ["query"]
+        }
+      },
+      "response": [],
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test(\"Status code is 200\", function () {",
+              "    pm.response.to.have.status(200);",
+              "});",
+              "",
+              "if (pm.response.code === 200) {",
+              "    try {",
+              "        const response = pm.response.json();",
+              "        if (response.results && response.results.length > 0) {",
+              "            console.log('✅ Found', response.results.length, 'users:');",
+              "            response.results.forEach(user => {",
+              "                console.log('   👤 ' + user.name + ' (' + user.email + ')');",
+              "            });",
+              "        } else {",
+              "            console.log('⚠️ No users found');",
+              "        }",
+              "    } catch (error) {",
+              "        console.log('⚠️ Error parsing response:', error.message);",
+              "    }",
+              "}"
+            ],
+            "type": "text-javascript"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Insert Row",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"data\": {\n    \"name\": \"Test User for Delete\",\n    \"email\": \"test-delete@example.com\"\n  }\n}"
+        },
+        "url": {
+          "raw": "{{baseUrl}}/tables/users/insert",
+          "host": ["{{baseUrl}}"],
+          "path": ["tables", "users", "insert"]
+        }
+      }
+    },
+    {
+      "name": "Update Row",
+      "request": {
+        "method": "PUT",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"data\": {\n    \"email\": \"john.updated@example.com\"\n  },\n  \"where\": {\n    \"id\": 1\n  }\n}"
+        },
+        "url": {
+          "raw": "{{baseUrl}}/tables/users/update",
+          "host": ["{{baseUrl}}"],
+          "path": ["tables", "users", "update"]
+        }
+      }
+    },
+    {
+      "name": "Delete Row",
+      "request": {
+        "method": "DELETE",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"where\": {\n    \"email\": \"test-delete@example.com\"\n  }\n}"
+        },
+        "url": {
+          "raw": "{{baseUrl}}/tables/users/delete",
+          "host": ["{{baseUrl}}"],
+          "path": ["tables", "users", "delete"]
+        }
+      }
+    },
+    {
+      "name": "Execute Tool - List Tables",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"arguments\": {}\n}"
+        },
+        "url": {
+          "raw": "{{baseUrl}}/tools/list_tables",
+          "host": ["{{baseUrl}}"],
+          "path": ["tools", "list_tables"]
+        }
+      }
+    },
+    {
+      "name": "Execute Tool - Describe Table",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"arguments\": {\n    \"table_name\": \"posts\"\n  }\n}"
+        },
+        "url": {
+          "raw": "{{baseUrl}}/tools/describe_table",
+          "host": ["{{baseUrl}}"],
+          "path": ["tools", "describe_table"]
+        }
+      }
+    },
+    {
+      "name": "Execute Tool - Run Query",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"arguments\": {\n    \"query\": \"SELECT p.title, u.name FROM posts p JOIN users u ON p.user_id = u.id\"\n  }\n}"
+        },
+        "url": {
+          "raw": "{{baseUrl}}/tools/run_query",
+          "host": ["{{baseUrl}}"],
+          "path": ["tools", "run_query"]
+        }
+      }
+    },
+    {
+      "name": "Execute Tool - Insert Row",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"arguments\": {\n    \"table_name\": \"categories\",\n    \"data\": {\n      \"name\": \"Science\",\n      \"description\": \"Scientific articles and research\"\n    }\n  }\n}"
+        },
+        "url": {
+          "raw": "{{baseUrl}}/tools/insert_row",
+          "host": ["{{baseUrl}}"],
+          "path": ["tools", "insert_row"]
+        }
+      }
+    },
+    {
+      "name": "Execute Tool - Update Row",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"arguments\": {\n    \"table_name\": \"categories\",\n    \"data\": {\n      \"description\": \"Updated description for Science category\"\n    },\n    \"where\": {\n      \"name\": \"Science\"\n    }\n  }\n}"
+        },
+        "url": {
+          "raw": "{{baseUrl}}/tools/update_row",
+          "host": ["{{baseUrl}}"],
+          "path": ["tools", "update_row"]
+        }
+      }
+    },
+    {
+      "name": "Execute Tool - Delete Row",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"arguments\": {\n    \"table_name\": \"categories\",\n    \"where\": {\n      \"name\": \"Science\"\n    }\n  }\n}"
+        },
+        "url": {
+          "raw": "{{baseUrl}}/tools/delete_row",
+          "host": ["{{baseUrl}}"],
+          "path": ["tools", "delete_row"]
+        }
+      }
+    }
+  ]
+}
