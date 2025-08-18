@@ -3,13 +3,14 @@
 import { Settings, Key, Globe, Bell, User, Shield, Download, Upload, Server } from 'lucide-react';
 import { ConfigPanel } from '../ConfigPanel';
 import { MCPServerManager } from '../MCPServerManager';
+import { MCPSettingsPanel } from '../MCPSettingsPanel';
 import { ApiKeyStatusIndicator } from '../ApiKeyStatusIndicator';
 import { useState } from 'react';
 
 export function SettingsTab() {
   const [showConfigPanel, setShowConfigPanel] = useState(false);
-
   const [showMCPServerManager, setShowMCPServerManager] = useState(false);
+  const [showMCPSettingsPanel, setShowMCPSettingsPanel] = useState(false);
 
   const settingsSections = [
     {
@@ -28,6 +29,14 @@ export function SettingsTab() {
       action: () => setShowMCPServerManager(true),
       status: '✅ Available',
       bgColor: 'bg-green-50 border-green-200'
+    },
+    {
+      icon: Settings,
+      title: 'MCP Settings',
+      description: 'Configure token limits and MCP-specific settings',
+      action: () => setShowMCPSettingsPanel(true),
+      status: '✅ Available',
+      bgColor: 'bg-purple-50 border-purple-200'
     },
     {
       icon: Globe,
@@ -194,6 +203,14 @@ export function SettingsTab() {
             </div>
           </div>
         </div>
+      )}
+
+      {/* MCP Settings Panel */}
+      {showMCPSettingsPanel && (
+        <MCPSettingsPanel
+          isOpen={showMCPSettingsPanel}
+          onClose={() => setShowMCPSettingsPanel(false)}
+        />
       )}
     </div>
   );

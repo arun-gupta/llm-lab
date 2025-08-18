@@ -16,15 +16,7 @@ interface ApiKeys {
   github: string;
 }
 
-interface GitHubSettings {
-  reposCount: number;
-}
 
-interface TokenLimits {
-  gpt5Streaming: number;
-  gpt5NonStreaming: number;
-  otherModels: number;
-}
 
 export function ConfigPanel({ isOpen, onClose, onConfigChange }: ConfigPanelProps) {
   const [apiKeys, setApiKeys] = useState<ApiKeys>({
@@ -33,14 +25,7 @@ export function ConfigPanel({ isOpen, onClose, onConfigChange }: ConfigPanelProp
     postman: '',
     github: ''
   });
-  const [githubSettings, setGithubSettings] = useState<GitHubSettings>({
-    reposCount: 3
-  });
-  const [tokenLimits, setTokenLimits] = useState<TokenLimits>({
-    gpt5Streaming: 2000,
-    gpt5NonStreaming: 500,
-    otherModels: 1000
-  });
+
   const [showKeys, setShowKeys] = useState<{ [key in keyof ApiKeys]: boolean }>({
     openai: false,
     anthropic: false,
@@ -57,12 +42,10 @@ export function ConfigPanel({ isOpen, onClose, onConfigChange }: ConfigPanelProp
     github: false
   });
 
-  // Load existing API keys and settings on mount
+  // Load existing API keys on mount
   useEffect(() => {
     if (isOpen) {
       loadApiKeys();
-      loadGitHubSettings();
-      loadTokenLimits();
     }
   }, [isOpen]);
 
@@ -83,35 +66,9 @@ export function ConfigPanel({ isOpen, onClose, onConfigChange }: ConfigPanelProp
     }
   };
 
-  const loadGitHubSettings = async () => {
-    try {
-      const response = await fetch('/api/github/settings');
-      if (response.ok) {
-        const settings = await response.json();
-        setGithubSettings({
-          reposCount: settings.reposCount || 3
-        });
-      }
-    } catch (error) {
-      console.log('No existing GitHub settings found, using defaults');
-    }
-  };
 
-  const loadTokenLimits = async () => {
-    try {
-      const response = await fetch('/api/config/token-limits');
-      if (response.ok) {
-        const limits = await response.json();
-        setTokenLimits({
-          gpt5Streaming: limits.gpt5Streaming || 2000,
-          gpt5NonStreaming: limits.gpt5NonStreaming || 500,
-          otherModels: limits.otherModels || 1000
-        });
-      }
-    } catch (error) {
-      console.log('No existing token limits found, using defaults');
-    }
-  };
+
+
 
   const handleSave = async () => {
     setIsSaving(true);
@@ -128,25 +85,7 @@ export function ConfigPanel({ isOpen, onClose, onConfigChange }: ConfigPanelProp
         body: JSON.stringify(apiKeys),
       });
 
-      // Save GitHub settings
-      const settingsResponse = await fetch('/api/github/settings', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(githubSettings),
-      });
-
-      // Save token limits
-      const tokenLimitsResponse = await fetch('/api/config/token-limits', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(tokenLimits),
-      });
-
-      if (keysResponse.ok && settingsResponse.ok && tokenLimitsResponse.ok) {
+      if (keysResponse.ok) {
         setSaveStatus('success');
         setStatusMessage('Configuration saved successfully!');
         onConfigChange?.();
@@ -249,8 +188,8 @@ export function ConfigPanel({ isOpen, onClose, onConfigChange }: ConfigPanelProp
               <Settings className="w-6 h-6 text-blue-600" />
             </div>
             <div>
-              <h2 className="text-xl font-semibold text-gray-900">Configuration</h2>
-              <p className="text-sm text-gray-600">Configure API keys and MCP settings</p>
+              <h2 className="text-xl font-semibold text-gray-900">API Configuration</h2>
+              <p className="text-sm text-gray-600">Configure your API keys for LLM providers</p>
             </div>
           </div>
           <button
@@ -476,104 +415,7 @@ export function ConfigPanel({ isOpen, onClose, onConfigChange }: ConfigPanelProp
             </div>
           </div>
 
-          {/* MCP Settings Section */}
-          <div>
-            <h3 className="text-lg font-medium text-gray-900 mb-4 flex items-center">
-              <Settings className="w-5 h-5 mr-2 text-green-600" />
-              MCP Settings
-            </h3>
-            <div className="space-y-6">
-              {/* GitHub MCP Settings */}
-              <div className="space-y-3">
-                <div className="flex items-center justify-between">
-                  <label className="block text-sm font-medium text-gray-700">
-                    Number of Repositories to Fetch
-                  </label>
-                </div>
-                <div className="relative">
-                  <input
-                    type="number"
-                    min="1"
-                    max="100"
-                    value={githubSettings.reposCount}
-                    onChange={(e) => setGithubSettings(prev => ({ ...prev, reposCount: parseInt(e.target.value) || 3 }))}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-900"
-                  />
-                </div>
-                <p className="text-xs text-gray-500">
-                  Number of repositories to fetch when testing GitHub MCP integration (1-100)
-                </p>
-              </div>
 
-              {/* Token Limits Settings */}
-              <div className="space-y-4">
-                <h4 className="text-sm font-medium text-gray-700">Token Limits</h4>
-                
-                <div className="space-y-3">
-                  <div className="flex items-center justify-between">
-                    <label className="block text-sm font-medium text-gray-700">
-                      GPT-5 Streaming
-                    </label>
-                  </div>
-                  <div className="relative">
-                    <input
-                      type="number"
-                      min="100"
-                      max="4000"
-                      value={tokenLimits.gpt5Streaming}
-                      onChange={(e) => setTokenLimits(prev => ({ ...prev, gpt5Streaming: parseInt(e.target.value) || 1500 }))}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-900"
-                    />
-                  </div>
-                  <p className="text-xs text-gray-500">
-                    Token limit for GPT-5 models using streaming (100-4000)
-                  </p>
-                </div>
-
-                <div className="space-y-3">
-                  <div className="flex items-center justify-between">
-                    <label className="block text-sm font-medium text-gray-700">
-                      GPT-5 Non-Streaming
-                    </label>
-                  </div>
-                  <div className="relative">
-                    <input
-                      type="number"
-                      min="50"
-                      max="2000"
-                      value={tokenLimits.gpt5NonStreaming}
-                      onChange={(e) => setTokenLimits(prev => ({ ...prev, gpt5NonStreaming: parseInt(e.target.value) || 100 }))}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-900"
-                    />
-                  </div>
-                  <p className="text-xs text-gray-500">
-                    Token limit for GPT-5 models without streaming (50-2000)
-                  </p>
-                </div>
-
-                <div className="space-y-3">
-                  <div className="flex items-center justify-between">
-                    <label className="block text-sm font-medium text-gray-700">
-                      Other Models
-                    </label>
-                  </div>
-                  <div className="relative">
-                    <input
-                      type="number"
-                      min="100"
-                      max="4000"
-                      value={tokenLimits.otherModels}
-                      onChange={(e) => setTokenLimits(prev => ({ ...prev, otherModels: parseInt(e.target.value) || 1000 }))}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-900"
-                    />
-                  </div>
-                  <p className="text-xs text-gray-500">
-                    Token limit for other models (GPT-4, Claude, etc.) (100-4000)
-                  </p>
-                </div>
-              </div>
-            </div>
-          </div>
 
           {/* Status Message */}
           {statusMessage && (
