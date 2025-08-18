@@ -514,108 +514,128 @@ export function ResponseTabs({
           ) : (
             <div className="space-y-8">
               {/* Performance Overview */}
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-                <div className="space-y-4">
-                  <h4 className="font-medium text-gray-900 flex items-center space-x-2">
-                    <Clock className="w-4 h-4" />
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                <div className="bg-white border border-gray-200 rounded-lg p-6">
+                  <h4 className="font-semibold text-gray-900 flex items-center space-x-3 mb-6">
+                    <div className="w-8 h-8 bg-blue-100 rounded-lg flex items-center justify-center">
+                      <Clock className="w-4 h-4 text-blue-600" />
+                    </div>
                     <span>Performance</span>
                   </h4>
-                  <div className="space-y-3">
-                    <div className="flex justify-between">
-                      <span className="text-sm text-gray-600">Success Rate</span>
-                      <span className="text-sm font-semibold text-gray-900">
+                  <div className="space-y-4">
+                    <div className="flex justify-between items-center py-2 border-b border-gray-100">
+                      <span className="text-gray-600">Success Rate</span>
+                      <span className="font-semibold text-gray-900 text-lg">
                         {((analytics.successfulResponses / analytics.totalResponses) * 100).toFixed(1)}%
                       </span>
                     </div>
-                    <div className="flex justify-between">
-                      <span className="text-sm text-gray-600">Avg Latency</span>
-                      <span className="text-sm font-semibold text-gray-900">{Math.round(analytics.avgLatency)}ms</span>
+                    <div className="flex justify-between items-center py-2 border-b border-gray-100">
+                      <span className="text-gray-600">Avg Latency</span>
+                      <span className="font-semibold text-gray-900 text-lg">{Math.round(analytics.avgLatency)}ms</span>
                     </div>
-                    <div className="flex justify-between">
-                      <span className="text-sm text-gray-600">Fastest Response</span>
-                      <span className="text-sm font-semibold text-gray-900 text-xs">
-                        {analytics.performanceRanking[0]?.provider.split(' ')[0]} ({analytics.performanceRanking[0]?.latency}ms)
-                      </span>
+                    <div className="flex justify-between items-center py-2">
+                      <span className="text-gray-600">Fastest Response</span>
+                      <div className="text-right">
+                        <div className="font-semibold text-gray-900">{analytics.performanceRanking[0]?.provider.split(' ')[0]}</div>
+                        <div className="text-sm text-gray-500">{analytics.performanceRanking[0]?.latency}ms</div>
+                      </div>
                     </div>
                   </div>
                 </div>
 
-                <div className="space-y-4">
-                  <h4 className="font-medium text-gray-900 flex items-center space-x-2">
-                    <Zap className="w-4 h-4" />
+                <div className="bg-white border border-gray-200 rounded-lg p-6">
+                  <h4 className="font-semibold text-gray-900 flex items-center space-x-3 mb-6">
+                    <div className="w-8 h-8 bg-green-100 rounded-lg flex items-center justify-center">
+                      <Zap className="w-4 h-4 text-green-600" />
+                    </div>
                     <span>Token Usage</span>
                   </h4>
-                  <div className="space-y-3">
-                    <div className="flex justify-between">
-                      <span className="text-sm text-gray-600">Total Tokens</span>
-                      <span className="text-sm font-semibold text-gray-900">{analytics.totalTokens.toLocaleString()}</span>
+                  <div className="space-y-4">
+                    <div className="flex justify-between items-center py-2 border-b border-gray-100">
+                      <span className="text-gray-600">Total Tokens</span>
+                      <span className="font-semibold text-gray-900 text-lg">{analytics.totalTokens.toLocaleString()}</span>
                     </div>
-                    <div className="flex justify-between">
-                      <span className="text-sm text-gray-600">Avg per Response</span>
-                      <span className="text-sm font-semibold text-gray-900">{Math.round(analytics.avgTokens)}</span>
+                    <div className="flex justify-between items-center py-2 border-b border-gray-100">
+                      <span className="text-gray-600">Avg per Response</span>
+                      <span className="font-semibold text-gray-900 text-lg">{Math.round(analytics.avgTokens)}</span>
                     </div>
-                    <div className="flex justify-between">
-                      <span className="text-sm text-gray-600">Most Efficient</span>
-                      <span className="text-sm font-semibold text-gray-900 text-xs">
-                        {analytics.efficiencyRanking[0]?.provider.split(' ')[0]}
-                      </span>
+                    <div className="flex justify-between items-center py-2">
+                      <span className="text-gray-600">Most Efficient</span>
+                      <div className="text-right">
+                        <div className="font-semibold text-gray-900">{analytics.efficiencyRanking[0]?.provider.split(' ')[0]}</div>
+                        <div className="text-sm text-gray-500">Lowest token usage</div>
+                      </div>
                     </div>
                   </div>
                 </div>
 
-                <div className="space-y-4">
-                  <h4 className="font-medium text-gray-900 flex items-center space-x-2">
-                    <DollarSign className="w-4 h-4" />
+                <div className="bg-white border border-gray-200 rounded-lg p-6">
+                  <h4 className="font-semibold text-gray-900 flex items-center space-x-3 mb-6">
+                    <div className="w-8 h-8 bg-purple-100 rounded-lg flex items-center justify-center">
+                      <DollarSign className="w-4 h-4 text-purple-600" />
+                    </div>
                     <span>Cost Analysis</span>
                   </h4>
-                  <div className="space-y-3">
-                    <div className="flex justify-between">
-                      <span className="text-sm text-gray-600">Total Cost</span>
-                      <span className="text-sm font-semibold text-gray-900">
+                  <div className="space-y-4">
+                    <div className="flex justify-between items-center py-2 border-b border-gray-100">
+                      <span className="text-gray-600">Total Cost</span>
+                      <span className="font-semibold text-gray-900 text-lg">
                         ${analytics.totalCost < 0.0001 ? '<$0.0001' : analytics.totalCost.toFixed(6)}
                       </span>
                     </div>
-                    <div className="flex justify-between">
-                      <span className="text-sm text-gray-600">Most Expensive</span>
-                      <span className="text-sm font-semibold text-gray-900 text-xs">
-                        {(() => {
-                          const maxCostIndex = analytics.costEstimates.indexOf(Math.max(...analytics.costEstimates));
-                          const maxCost = analytics.costEstimates[maxCostIndex];
-                          const provider = responses[maxCostIndex]?.provider.split(' ')[0] || 'Unknown';
-                          return maxCost > 0 ? `${provider} ($${maxCost.toFixed(6)})` : 'All Free';
-                        })()}
-                      </span>
+                    <div className="flex justify-between items-center py-2 border-b border-gray-100">
+                      <span className="text-gray-600">Most Expensive</span>
+                      <div className="text-right">
+                        <div className="font-semibold text-gray-900">
+                          {(() => {
+                            const maxCostIndex = analytics.costEstimates.indexOf(Math.max(...analytics.costEstimates));
+                            const maxCost = analytics.costEstimates[maxCostIndex];
+                            const provider = responses[maxCostIndex]?.provider.split(' ')[0] || 'Unknown';
+                            return maxCost > 0 ? provider : 'All Free';
+                          })()}
+                        </div>
+                        <div className="text-sm text-gray-500">
+                          {(() => {
+                            const maxCostIndex = analytics.costEstimates.indexOf(Math.max(...analytics.costEstimates));
+                            const maxCost = analytics.costEstimates[maxCostIndex];
+                            return maxCost > 0 ? `$${maxCost.toFixed(6)}` : 'No cost';
+                          })()}
+                        </div>
+                      </div>
                     </div>
-                    <div className="flex justify-between">
-                      <span className="text-sm text-gray-600">Monthly (1k/day)</span>
-                      <span className="text-sm font-semibold text-gray-900">
+                    <div className="flex justify-between items-center py-2">
+                      <span className="text-gray-600">Monthly (1k/day)</span>
+                      <span className="font-semibold text-gray-900 text-lg">
                         ${(analytics.totalCost * 30000) < 0.01 ? '<$0.01' : (analytics.totalCost * 30000).toFixed(4)}
                       </span>
                     </div>
                   </div>
                 </div>
 
-                <div className="space-y-4">
-                  <h4 className="font-medium text-gray-900 flex items-center space-x-2">
-                    <Target className="w-4 h-4" />
+                <div className="bg-white border border-gray-200 rounded-lg p-6">
+                  <h4 className="font-semibold text-gray-900 flex items-center space-x-3 mb-6">
+                    <div className="w-8 h-8 bg-orange-100 rounded-lg flex items-center justify-center">
+                      <Target className="w-4 h-4 text-orange-600" />
+                    </div>
                     <span>Content Analysis</span>
                   </h4>
-                  <div className="space-y-3">
-                    <div className="flex justify-between">
-                      <span className="text-sm text-gray-600">Avg Word Count</span>
-                      <span className="text-sm font-semibold text-gray-900">{Math.round(analytics.avgWordCount)}</span>
+                  <div className="space-y-4">
+                    <div className="flex justify-between items-center py-2 border-b border-gray-100">
+                      <span className="text-gray-600">Avg Word Count</span>
+                      <span className="font-semibold text-gray-900 text-lg">{Math.round(analytics.avgWordCount)}</span>
                     </div>
-                    <div className="flex justify-between">
-                      <span className="text-sm text-gray-600">Similarity</span>
-                      <span className="text-sm font-semibold text-gray-900">
+                    <div className="flex justify-between items-center py-2 border-b border-gray-100">
+                      <span className="text-gray-600">Similarity</span>
+                      <span className="font-semibold text-gray-900 text-lg">
                         {(analytics.avgSimilarity * 100).toFixed(1)}%
                       </span>
                     </div>
-                    <div className="flex justify-between">
-                      <span className="text-sm text-gray-600">Length Range</span>
-                      <span className="text-sm font-semibold text-gray-900">
-                        {analytics.shortestResponse}-{analytics.longestResponse}
-                      </span>
+                    <div className="flex justify-between items-center py-2">
+                      <span className="text-gray-600">Length Range</span>
+                      <div className="text-right">
+                        <div className="font-semibold text-gray-900">{analytics.shortestResponse}-{analytics.longestResponse}</div>
+                        <div className="text-sm text-gray-500">characters</div>
+                      </div>
                     </div>
                   </div>
                 </div>
