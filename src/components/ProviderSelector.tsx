@@ -42,6 +42,7 @@ const staticProviders: Provider[] = [
     models: [
       { id: 'gpt-5', name: 'GPT-5', description: 'Latest flagship model with advanced capabilities', cost: 'high', featured: true },
       { id: 'gpt-5-mini', name: 'GPT-5 Mini', description: 'Fast and efficient GPT-5 variant', cost: 'medium', featured: true },
+      { id: 'gpt-5-nano', name: 'GPT-5 Nano', description: 'Lightweight and fast GPT-5 variant', cost: 'low', featured: true },
       { id: 'gpt-4-turbo', name: 'GPT-4 Turbo', description: 'Legacy model', cost: 'high', featured: false },
       { id: 'gpt-3.5-turbo', name: 'GPT-3.5 Turbo', description: 'Legacy model', cost: 'low', featured: false },
     ]
