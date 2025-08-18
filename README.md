@@ -72,6 +72,20 @@ GITHUB_TOKEN=your_github_personal_access_token_here
 
 **Get API Keys:** [OpenAI](https://platform.openai.com/) | [Anthropic](https://console.anthropic.com/) | [Postman](https://www.postman.com) | [GitHub](https://github.com/settings/tokens)
 
+### **🚀 GPT-5 Streaming Support**
+
+**Important**: GPT-5 models use streaming for optimal performance and content generation. To use GPT-5 models:
+
+1. **Verify your OpenAI organization** at [https://platform.openai.com/settings/organization/general](https://platform.openai.com/settings/organization/general)
+2. **Click "Verify Organization"** and wait up to 15 minutes for access to propagate
+3. **Ensure your API key** has access to GPT-5 models
+
+**Why streaming?** GPT-5 models require streaming to capture partial content and avoid empty responses. This enables:
+- ✅ **Actual content generation** instead of empty responses
+- ✅ **Better token utilization** with balanced limits
+- ✅ **Graceful truncation handling** for long responses
+- ✅ **Real-time content capture** as it's generated
+
 ### **🔑 Setting Up API Keys in Codespaces**
 
 If you're using GitHub Codespaces, you can add your API keys in two ways:
@@ -132,6 +146,7 @@ If you're using GitHub Codespaces, you can add your API keys in two ways:
 ✅ **Complete**: Postman integration, UI, error handling, success celebrations  
 ✅ **Features**: Custom collection names, collection preview, status indicators  
 ✅ **MCP Integration**: GitHub, Filesystem, and SQLite MCP servers with Postman collections  
+✅ **GPT-5 Streaming**: Implemented streaming for GPT-5 models to fix empty response issues  
 
 ## 🛠️ Usage
 
