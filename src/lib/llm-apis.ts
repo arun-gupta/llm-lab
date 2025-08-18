@@ -52,7 +52,7 @@ export async function callOpenAI(prompt: string, context?: string, model: string
     
     // Add timeout to individual provider calls - increased for Codespaces and GPT-5 models
     const baseTimeoutMs = process.env.CODESPACES ? 45000 : 20000; // 45 seconds for Codespaces, 20 for local
-    const timeoutMs = model.startsWith('gpt-5') ? 60000 : baseTimeoutMs; // 60 seconds for GPT-5 models
+    const timeoutMs = model.startsWith('gpt-5') ? 120000 : baseTimeoutMs; // 120 seconds for GPT-5 models
     
     // Use max_completion_tokens for GPT-5 models, max_tokens for others
     const tokenParam = model.startsWith('gpt-5') ? 'max_completion_tokens' : 'max_tokens';
@@ -274,7 +274,7 @@ export async function callAllProviders(request: LLMRequest): Promise<LLMResponse
   // Increase timeout if any GPT-5 models are being used
   const hasGPT5 = request.providers.some(p => p.includes('gpt-5'));
   const baseTimeoutMs = process.env.CODESPACES ? 60000 : 25000; // 60 seconds for Codespaces, 25 for local
-  const timeoutMs = hasGPT5 ? 90000 : baseTimeoutMs; // 90 seconds if GPT-5 is involved
+  const timeoutMs = hasGPT5 ? 150000 : baseTimeoutMs; // 150 seconds if GPT-5 is involved
   
   const timeoutPromise = new Promise<LLMResponse[]>((_, reject) => {
     setTimeout(() => reject(new Error('Request timeout')), timeoutMs);
