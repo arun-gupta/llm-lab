@@ -67,6 +67,8 @@ export async function callOpenAI(prompt: string, context?: string, model: string
           },
         ],
         [tokenParam]: model.startsWith('gpt-5') ? 100 : 1000,
+        temperature: model.startsWith('gpt-5') ? 0.7 : 0.7,
+        top_p: model.startsWith('gpt-5') ? 1 : 1,
       }),
       new Promise((_, reject) => 
         setTimeout(() => reject(new Error('OpenAI request timeout')), timeoutMs)
@@ -258,7 +260,18 @@ export async function callAllProviders(request: LLMRequest): Promise<LLMResponse
     if (provider.startsWith('openai:')) {
       const model = provider.replace('openai:', '');
       console.log('Calling OpenAI with model:', model);
-      promises.push(callOpenAI(request.prompt, request.context, model));
+      // Temporarily skip GPT-5 models due to empty response issue
+      if (model.startsWith('gpt-5')) {
+        console.log('Skipping GPT-5 model due to empty response issue');
+        promises.push(Promise.resolve({
+          provider: `OpenAI (${model})`,
+          content: 'GPT-5 models currently experiencing issues. Please try GPT-4o or other models.',
+          latency: 0,
+          error: 'GPT-5 models returning empty responses - temporary issue'
+        }));
+      } else {
+        promises.push(callOpenAI(request.prompt, request.context, model));
+      }
     } else if (provider.startsWith('anthropic:')) {
       const model = provider.replace('anthropic:', '');
       console.log('Calling Anthropic with model:', model);
