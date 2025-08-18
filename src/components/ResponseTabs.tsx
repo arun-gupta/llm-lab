@@ -153,9 +153,25 @@ export function ResponseTabs({
       else if (provider.includes('claude-3-haiku')) costPer1M = 0.25;
       else if (provider.includes('ollama')) costPer1M = 0; // Local models are free
 
-      return (r.tokens.total / 1000000) * costPer1M;
+      const cost = (r.tokens.total / 1000000) * costPer1M;
+      
+      // Debug logging for cost calculation
+      console.log(`Cost calculation for ${r.provider}:`, {
+        tokens: r.tokens.total,
+        costPer1M,
+        calculatedCost: cost,
+        provider: r.provider
+      });
+      
+      return cost;
     });
     const totalCost = costEstimates.reduce((sum, cost) => sum + cost, 0);
+    
+    console.log('Cost analysis:', {
+      costEstimates,
+      totalCost,
+      responses: responses.map(r => ({ provider: r.provider, tokens: r.tokens?.total }))
+    });
 
     // Response similarity (basic Jaccard similarity for words)
     const calculateSimilarity = (text1: string, text2: string) => {
@@ -556,19 +572,24 @@ export function ResponseTabs({
                     <div className="flex justify-between">
                       <span className="text-sm text-gray-600">Total Cost</span>
                       <span className="text-sm font-semibold text-gray-900">
-                        ${analytics.totalCost < 0.01 ? '<$0.01' : analytics.totalCost.toFixed(4)}
+                        ${analytics.totalCost < 0.0001 ? '<$0.0001' : analytics.totalCost.toFixed(6)}
                       </span>
                     </div>
                     <div className="flex justify-between">
                       <span className="text-sm text-gray-600">Most Expensive</span>
                       <span className="text-sm font-semibold text-gray-900 text-xs">
-                        {responses[analytics.costEstimates.indexOf(Math.max(...analytics.costEstimates))]?.provider.split(' ')[0]}
+                        {(() => {
+                          const maxCostIndex = analytics.costEstimates.indexOf(Math.max(...analytics.costEstimates));
+                          const maxCost = analytics.costEstimates[maxCostIndex];
+                          const provider = responses[maxCostIndex]?.provider.split(' ')[0] || 'Unknown';
+                          return maxCost > 0 ? `${provider} ($${maxCost.toFixed(6)})` : 'All Free';
+                        })()}
                       </span>
                     </div>
                     <div className="flex justify-between">
                       <span className="text-sm text-gray-600">Monthly (1k/day)</span>
                       <span className="text-sm font-semibold text-gray-900">
-                        ${(analytics.totalCost * 30000).toFixed(2)}
+                        ${(analytics.totalCost * 30000) < 0.01 ? '<$0.01' : (analytics.totalCost * 30000).toFixed(4)}
                       </span>
                     </div>
                   </div>
