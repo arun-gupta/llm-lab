@@ -11,321 +11,121 @@ MCP (Model Context Protocol) allows AI models to interact with external tools an
 - **Enhance test data generation** with real-time information
 - **Create dynamic test scenarios** based on external conditions
 
-## 📦 Popular MCP Servers
+## 📦 Available MCP Servers
 
 ### 1. **GitHub MCP Server**
 - **URL**: `https://api.githubcopilot.com/mcp/`
-- **Tools**: Comprehensive GitHub API access
-- **Use Cases**: Test GitHub API integrations, create test issues, fetch repository data
+- **Tools**: Repository analysis, issues, pull requests, gists
+- **Use Cases**: Test GitHub API integrations, analyze repositories, fetch user data
 
-**Available GitHub MCP Endpoints:**
-- **Repositories**: `https://api.githubcopilot.com/mcp/x/repos`
-- **Issues**: `https://api.githubcopilot.com/mcp/x/issues`
-- **Pull Requests**: `https://api.githubcopilot.com/mcp/x/pull_requests`
-- **Actions**: `https://api.githubcopilot.com/mcp/x/actions`
-- **Notifications**: `https://api.githubcopilot.com/mcp/x/notifications`
-- **Organizations**: `https://api.githubcopilot.com/mcp/x/orgs`
-- **Users**: `https://api.githubcopilot.com/mcp/x/users`
-- **Gists**: `https://api.githubcopilot.com/mcp/x/gists`
-- **Discussions**: `https://api.githubcopilot.com/mcp/x/discussions`
-- **Dependabot**: `https://api.githubcopilot.com/mcp/x/dependabot`
-- **Code Security**: `https://api.githubcopilot.com/mcp/x/code_security`
-- **Secret Protection**: `https://api.githubcopilot.com/mcp/x/secret_protection`
-- **Experiments**: `https://api.githubcopilot.com/mcp/x/experiments`
-- **Copilot**: `https://api.githubcopilot.com/mcp/x/copilot`
+**Available GitHub MCP Tools:**
+- `search_repositories` - Search user repositories
+- `github_get_repo` - Get repository information
+- `github_list_issues` - List repository issues
+- `github_list_pull_requests` - List pull requests
+- `github_get_top_gists` - Get user's top gists
+- `github_analyze_repo_health` - Comprehensive repository health analysis
 
-### 2. **File System MCP Server**
-- **URL**: `ws://localhost:3002`
-- **Tools**: Read files, write files, list directories, search files
+### 2. **Filesystem MCP Server**
+- **URL**: `http://localhost:3002`
+- **Tools**: File and directory operations
 - **Use Cases**: Read test data files, write test results, search for configuration files
 
-### 3. **Web Search MCP Server**
-- **URL**: `ws://localhost:3003`
-- **Tools**: Web search, get news, get weather
-- **Use Cases**: Get current information for tests, validate against real-time data
+**Available Filesystem MCP Tools:**
+- `list_directory` - List directory contents
+- `read_text_file` - Read file contents as text
+- `read_media_file` - Read image/audio files (base64)
+- `write_file` - Write content to file
+- `edit_file` - Make selective edits with pattern matching
+- `create_directory` - Create directory
+- `move_file` - Move/rename files and directories
+- `search_files` - Search for files by partial name
+- `get_file_info` - Get detailed file metadata
+- `list_allowed_directories` - List accessible directories
 
-### 4. **Database MCP Server**
-- **URL**: `ws://localhost:3004`
-- **Tools**: Query database, insert data, update records, delete records
+### 3. **SQLite MCP Server**
+- **URL**: `http://localhost:4000`
+- **Tools**: Database operations with SQLite
 - **Use Cases**: Test database integrations, generate test data, validate database state
+
+**Available SQLite MCP Tools:**
+- `list_tables` - List all tables in the database
+- `describe_table` - Get detailed table schema
+- `run_query` - Execute SELECT queries safely
+- `insert_data` - Insert new records
+- `update_data` - Update existing records
+- `delete_data` - Delete records
+- `get_table_info` - Get table statistics
 
 ## 🛠️ Setup Instructions
 
-### 1. Install MCP Servers
+### 1. **GitHub MCP Server**
+No setup required - uses GitHub Copilot's MCP API directly.
+
+**Prerequisites:**
+- GitHub Personal Access Token (PAT)
+- Repository owner and name variables
+
+### 2. **Filesystem MCP Server**
+
+**Option A: Use the setup script (Recommended)**
+```bash
+# Run the setup script from the main project
+./scripts/setup-http-filesystem-mcp.sh
+```
+
+This script will:
+- Set up an HTTP wrapper around the official filesystem MCP server
+- Configure directory access permissions
+- Start the server on port 3002
+- Create necessary configuration files
+
+**Option B: Manual setup with official MCP server**
+```bash
+# Run the official filesystem MCP setup script
+./scripts/setup-official-filesystem-mcp.sh
+
+# This will:
+# - Clone the official MCP servers repository
+# - Build the filesystem server
+# - Set up HTTP wrapper
+# - Configure allowed directories
+```
+
+**Option C: Quick start with existing setup**
+```bash
+# If you already have the setup scripts, just run:
+./scripts/setup-http-filesystem-mcp.sh
+
+# The script will guide you through:
+# - Directory access configuration
+# - Server startup
+# - Health check verification
+```
+
+### 3. **SQLite MCP Server**
 
 ```bash
-# Install popular MCP servers
-npm install -g @modelcontextprotocol/server-github
-npm install -g @modelcontextprotocol/server-filesystem
-npm install -g @modelcontextprotocol/server-web-search
-npm install -g @modelcontextprotocol/server-database
+# Create data directory
+mkdir -p data
+
+# Run Docker container
+docker run -d \
+  --name sqlite-mcp \
+  -v $(pwd)/data:/data \
+  -p 4000:4000 \
+  arungupta/sqlite-mcp-server
 ```
 
-### 2. Start MCP Servers
+**Docker Commands:**
+- **Start**: `docker run -d --name sqlite-mcp -v $(pwd)/data:/data -p 4000:4000 arungupta/sqlite-mcp-server`
+- **Stop**: `docker stop sqlite-mcp && docker rm sqlite-mcp`
+- **Logs**: `docker logs sqlite-mcp`
+- **Shell**: `docker exec -it sqlite-mcp sh`
 
-```bash
-# Start GitHub MCP server
-mcp-server-github --port 3001
 
-# Start File System MCP server
-mcp-server-filesystem --port 3002
 
-# Start Web Search MCP server
-mcp-server-web-search --port 3003
 
-# Start Database MCP server
-mcp-server-database --port 3004
-```
-
-### 3. Import Postman Collection
-
-1. Download the `MCP Integration Demo` collection
-2. Import it into Postman
-3. Set up environment variables for MCP server URLs
-
-## 📝 Usage Examples
-
-### Example 1: GitHub Repository Integration
-
-```javascript
-// Pre-request Script
-const mcpClient = new MCPClient('https://api.githubcopilot.com/mcp/');
-
-try {
-  await mcpClient.connect();
-  const repos = await mcpClient.call('search_repositories', {
-    query: 'user:arun-gupta',
-    perPage: 10
-  });
-
-  // Use repository data in request
-  pm.request.body.raw = JSON.stringify({
-    repositories: repos,
-    timestamp: new Date().toISOString()
-  });
-} catch (error) {
-  console.error('MCP GitHub error:', error);
-} finally {
-  mcpClient.disconnect();
-}
-```
-
-### Example 2: GitHub Issues Integration
-
-```javascript
-// Pre-request Script
-const mcpClient = new MCPClient('https://api.githubcopilot.com/mcp/');
-
-try {
-  await mcpClient.connect();
-  const issues = await mcpClient.call('github_list_issues', {
-    owner: 'arun-gupta',
-    repo: 'llm-lab',
-    state: 'open'
-  });
-
-  // Use issues data in request
-  pm.request.body.raw = JSON.stringify({
-    open_issues: issues,
-    count: issues.length,
-    timestamp: new Date().toISOString()
-  });
-} catch (error) {
-  console.error('MCP GitHub Issues error:', error);
-} finally {
-  mcpClient.disconnect();
-}
-```
-
-### Example 3: GitHub Actions Integration
-
-```javascript
-// Pre-request Script
-const mcpClient = new MCPClient('https://api.githubcopilot.com/mcp/');
-
-try {
-  await mcpClient.connect();
-  const workflows = await mcpClient.call('github_list_workflows', {
-    owner: 'arun-gupta',
-    repo: 'llm-lab'
-  });
-
-  // Use workflows data in request
-  pm.request.body.raw = JSON.stringify({
-    workflows: workflows,
-    active_workflows: workflows.filter(w => w.state === 'active'),
-    timestamp: new Date().toISOString()
-  });
-} catch (error) {
-  console.error('MCP GitHub Actions error:', error);
-} finally {
-  mcpClient.disconnect();
-}
-```
-
-### Example 2: File System Integration
-
-```javascript
-// Pre-request Script
-const mcpClient = new MCPClient(pm.environment.get('mcp_filesystem_url'));
-
-try {
-  await mcpClient.connect();
-  const fileContent = await mcpClient.call('filesystem/read_file', {
-    path: '/path/to/test-data.json'
-  });
-
-  // Use file content in request
-  pm.request.body.raw = fileContent;
-} catch (error) {
-  console.error('MCP File System error:', error);
-} finally {
-  mcpClient.disconnect();
-}
-```
-
-### Example 3: Web Search Integration
-
-```javascript
-// Pre-request Script
-const mcpClient = new MCPClient(pm.environment.get('mcp_web_search_url'));
-
-try {
-  await mcpClient.connect();
-  const searchResults = await mcpClient.call('web_search/search', {
-    query: 'API testing best practices',
-    num_results: 5
-  });
-
-  // Use search results in request
-  pm.request.body.raw = JSON.stringify({
-    search_results: searchResults,
-    query: 'API testing best practices'
-  });
-} catch (error) {
-  console.error('MCP Web Search error:', error);
-} finally {
-  mcpClient.disconnect();
-}
-```
-
-### Example 4: Multi-MCP Orchestration
-
-```javascript
-// Pre-request Script
-const githubMCP = new MCPClient(pm.environment.get('mcp_github_url'));
-const filesystemMCP = new MCPClient(pm.environment.get('mcp_filesystem_url'));
-const webSearchMCP = new MCPClient(pm.environment.get('mcp_web_search_url'));
-
-try {
-  // Connect to all MCP servers
-  await Promise.all([
-    githubMCP.connect(),
-    filesystemMCP.connect(),
-    webSearchMCP.connect()
-  ]);
-
-  // Execute parallel MCP calls
-  const [repos, files, searchResults] = await Promise.all([
-    githubMCP.call('github/list_repositories', { owner: 'arun-gupta' }),
-    filesystemMCP.call('filesystem/search_files', { query: '*.json' }),
-    webSearchMCP.call('web_search/search', { query: 'MCP integration' })
-  ]);
-
-  // Combine results
-  const orchestratedData = {
-    repositories: repos,
-    files: files,
-    search_results: searchResults,
-    orchestrated_at: new Date().toISOString()
-  };
-
-  // Use orchestrated data in request
-  pm.request.body.raw = JSON.stringify(orchestratedData);
-} catch (error) {
-  console.error('Multi-MCP orchestration error:', error);
-} finally {
-  // Disconnect from all MCP servers
-  githubMCP.disconnect();
-  filesystemMCP.disconnect();
-  webSearchMCP.disconnect();
-}
-```
-
-## 🔧 Advanced Features
-
-### 1. **Dynamic Test Data Generation**
-
-```javascript
-// Generate test data based on current conditions
-const weatherMCP = new MCPClient(pm.environment.get('mcp_web_search_url'));
-
-try {
-  await weatherMCP.connect();
-  const weather = await weatherMCP.call('web_search/get_weather', {
-    location: 'San Francisco, CA'
-  });
-
-  // Adjust test parameters based on weather
-  if (weather.temperature > 80) {
-    pm.environment.set('test_mode', 'summer');
-  } else {
-    pm.environment.set('test_mode', 'winter');
-  }
-} finally {
-  weatherMCP.disconnect();
-}
-```
-
-### 2. **Conditional Test Execution**
-
-```javascript
-// Execute tests based on external conditions
-const githubMCP = new MCPClient(pm.environment.get('mcp_github_url'));
-
-try {
-  await githubMCP.connect();
-  const issues = await githubMCP.call('github/list_issues', {
-    owner: 'arun-gupta',
-    repo: 'llm-lab',
-    state: 'open'
-  });
-
-  // Only run tests if there are open issues
-  if (issues.length > 0) {
-    pm.test('Should handle open issues', function() {
-      pm.expect(issues.length).to.be.greaterThan(0);
-    });
-  }
-} finally {
-  githubMCP.disconnect();
-}
-```
-
-### 3. **Real-time Data Validation**
-
-```javascript
-// Validate API responses against real-time data
-const webSearchMCP = new MCPClient(pm.environment.get('mcp_web_search_url'));
-
-try {
-  await webSearchMCP.connect();
-  const currentInfo = await webSearchMCP.call('web_search/search', {
-    query: 'current API status'
-  });
-
-  // Test response validation
-  pm.test('Response should match current information', function() {
-    const response = pm.response.json();
-    pm.expect(response.timestamp).to.be.closeTo(
-      new Date().getTime(),
-      60000 // Within 1 minute
-    );
-  });
-} finally {
-  webSearchMCP.disconnect();
-}
-```
 
 ## 🎯 Best Practices
 
@@ -334,37 +134,57 @@ try {
 - Implement fallback mechanisms for when MCP servers are unavailable
 - Log errors for debugging
 
+```javascript
+try {
+  const response = await fetch(mcpUrl, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(mcpRequest)
+  });
+  
+  if (!response.ok) {
+    throw new Error(`MCP request failed: ${response.status}`);
+  }
+  
+  return await response.json();
+} catch (error) {
+  console.error('MCP Error:', error);
+  // Fallback to default data or skip test
+  pm.test.skip('MCP server unavailable');
+}
+```
+
 ### 2. **Connection Management**
-- Always disconnect from MCP servers after use
-- Use connection pooling for frequent calls
+- Use appropriate timeout values for MCP requests
 - Implement retry logic for failed connections
+- Handle connection errors gracefully
 
 ### 3. **Performance Optimization**
 - Use parallel MCP calls when possible
 - Cache frequently used data
-- Minimize the number of MCP server connections
+- Minimize the number of MCP server requests
 
 ### 4. **Security**
-- Use environment variables for MCP server URLs
-- Implement authentication for sensitive MCP servers
+- Use environment variables for sensitive data (tokens, URLs)
 - Validate MCP server responses before use
+- Implement proper authentication for MCP servers
 
 ## 🔍 Troubleshooting
 
 ### Common Issues
 
 1. **Connection Refused**
-   - Ensure MCP servers are running
-   - Check port numbers and URLs
-   - Verify firewall settings
+   - Ensure MCP servers are running on correct ports
+   - Check firewall settings
+   - Verify server URLs in environment variables
 
 2. **Authentication Errors**
-   - Check API keys and tokens
+   - Check GitHub token validity
    - Verify MCP server configuration
    - Ensure proper permissions
 
 3. **Timeout Errors**
-   - Increase timeout values
+   - Increase timeout values in Postman settings
    - Check network connectivity
    - Optimize MCP server performance
 
@@ -372,26 +192,43 @@ try {
 
 ```javascript
 // Enable detailed logging
-console.log('MCP Server URL:', pm.environment.get('mcp_github_url'));
-console.log('MCP Call Parameters:', params);
-console.log('MCP Response:', response);
+console.log('MCP Server URL:', pm.environment.get('mcp_server_url'));
+console.log('MCP Request:', pm.request.body.raw);
+console.log('MCP Response:', pm.response.json());
 ```
+
+## 📚 Available Collections
+
+### 1. **GitHub MCP Collection**
+- **File**: `public/postman-collections/github-mcp-unified.json`
+- **Features**: Repository analysis, issues, PRs, gists, health reports
+- **Setup**: Requires GitHub Personal Access Token
+
+### 2. **Filesystem MCP Collection**
+- **File**: `public/postman-collections/official-filesystem-mcp-fixed.json`
+- **Features**: File operations, directory listing, search, metadata
+- **Setup**: Requires HTTP filesystem MCP server on port 3002
+
+### 3. **SQLite MCP Collection**
+- **File**: `public/postman-collections/sqlite-mcp-server.json`
+- **Features**: Database operations, CRUD, queries, statistics
+- **Setup**: Requires Docker container on port 4000
+
+## 🚀 Quick Start
+
+1. **Install any MCP collection** from the MCP tab in the application
+2. **Set up the corresponding MCP server** (see setup instructions above)
+3. **Run "Health Check"** to verify server connectivity
+4. **Execute the available tools** for your use case
+5. **Combine multiple MCP servers** for advanced workflows
 
 ## 📚 Additional Resources
 
 - [MCP Protocol Documentation](https://modelcontextprotocol.io/)
 - [Postman Scripting Documentation](https://learning.postman.com/docs/writing-scripts/script-references/postman-sandbox-api-reference/)
-- [MCP Server Examples](https://github.com/modelcontextprotocol/servers)
-
-## 🤝 Contributing
-
-To contribute to MCP-Postman integration:
-
-1. Fork the repository
-2. Create a feature branch
-3. Add new MCP server integrations
-4. Update documentation
-5. Submit a pull request
+- [GitHub MCP Server](https://github.com/arun-gupta/sqlite-mcp-server)
+- [Filesystem MCP Server](https://github.com/modelcontextprotocol/servers/tree/main/servers/filesystem)
+- [SQLite MCP Server](https://github.com/arun-gupta/sqlite-mcp-server)
 
 ---
 
