@@ -218,13 +218,13 @@ export function ProviderSelector({
         <div className="flex flex-wrap gap-2">
           <button
             onClick={selectAll}
-            className="text-xs px-2 py-1 bg-gray-100 hover:bg-gray-200 rounded transition-colors"
+            className="text-xs px-3 py-1.5 bg-blue-50 hover:bg-blue-100 text-blue-700 border border-blue-200 rounded transition-colors font-medium"
           >
             Select All
           </button>
           <button
             onClick={selectNone}
-            className="text-xs px-2 py-1 bg-gray-100 hover:bg-gray-200 rounded transition-colors"
+            className="text-xs px-3 py-1.5 bg-gray-50 hover:bg-gray-100 text-gray-700 border border-gray-200 rounded transition-colors font-medium"
           >
             Clear All
           </button>
