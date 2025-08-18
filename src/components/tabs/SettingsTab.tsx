@@ -1,6 +1,6 @@
 'use client';
 
-import { Settings, Key, Globe, Bell, User, Shield, Download, Upload, Server } from 'lucide-react';
+import { Settings, Key, Server } from 'lucide-react';
 import { ConfigPanel } from '../ConfigPanel';
 import { MCPServerManager } from '../MCPServerManager';
 import { MCPSettingsPanel } from '../MCPSettingsPanel';
@@ -37,41 +37,6 @@ export function SettingsTab() {
       action: () => setShowMCPSettingsPanel(true),
       status: '✅ Available',
       bgColor: 'bg-purple-50 border-purple-200'
-    },
-    {
-      icon: Globe,
-      title: 'Environment Settings',
-      description: 'Configure base URLs and environment variables',
-      action: () => console.log('Environment settings coming soon...'),
-      status: '🚧 Coming Soon'
-    },
-    {
-      icon: Bell,
-      title: 'Notifications',
-      description: 'Set up alerts for usage limits and performance issues',
-      action: () => console.log('Notifications coming soon...'),
-      status: '🚧 Coming Soon'
-    },
-    {
-      icon: User,
-      title: 'User Preferences',
-      description: 'Customize your experience and default settings',
-      action: () => console.log('User preferences coming soon...'),
-      status: '🚧 Coming Soon'
-    },
-    {
-      icon: Shield,
-      title: 'Security & Privacy',
-      description: 'Manage data retention and security settings',
-      action: () => console.log('Security settings coming soon...'),
-      status: '🚧 Coming Soon'
-    },
-    {
-      icon: Download,
-      title: 'Data Export',
-      description: 'Export your test results and analytics data',
-      action: () => console.log('Data export coming soon...'),
-      status: '🚧 Coming Soon'
     }
   ];
 
@@ -123,55 +88,7 @@ export function SettingsTab() {
         })}
       </div>
 
-      {/* Quick Actions */}
-      <div className="mb-12">
-        <h2 className="text-2xl font-semibold text-gray-900 mb-6">Quick Actions</h2>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <div className="bg-white border border-gray-200 rounded-lg p-6">
-            <h3 className="font-semibold text-gray-900 mb-4">API Key Status</h3>
-            <div className="space-y-3">
-              <div className="flex items-center justify-between">
-                <span className="text-sm text-gray-600">OpenAI</span>
-                <span className="text-sm text-green-600 font-medium">✓ Configured</span>
-              </div>
-              <div className="flex items-center justify-between">
-                <span className="text-sm text-gray-600">Anthropic</span>
-                <span className="text-sm text-green-600 font-medium">✓ Configured</span>
-              </div>
-              <div className="flex items-center justify-between">
-                <span className="text-sm text-gray-600">Postman</span>
-                <span className="text-sm text-green-600 font-medium">✓ Configured</span>
-              </div>
-            </div>
-            <button
-              onClick={() => setShowConfigPanel(true)}
-              className="mt-4 w-full px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
-            >
-              Manage API Keys
-            </button>
-          </div>
-          <div className="bg-white border border-gray-200 rounded-lg p-6">
-            <h3 className="font-semibold text-gray-900 mb-4">Application Info</h3>
-            <div className="space-y-3">
-              <div className="flex items-center justify-between">
-                <span className="text-sm text-gray-600">Version</span>
-                <span className="text-sm font-medium">1.0.0</span>
-              </div>
-              <div className="flex items-center justify-between">
-                <span className="text-sm text-gray-600">Environment</span>
-                <span className="text-sm font-medium">Production</span>
-              </div>
-              <div className="flex items-center justify-between">
-                <span className="text-sm text-gray-600">Last Updated</span>
-                <span className="text-sm font-medium">Today</span>
-              </div>
-            </div>
-            <button className="mt-4 w-full px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors">
-              Check for Updates
-            </button>
-          </div>
-        </div>
-      </div>
+
 
 
 
