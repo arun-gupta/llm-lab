@@ -164,10 +164,10 @@ export async function callOpenAIStreaming(prompt: string, context?: string, mode
     const tokenParam = model.startsWith('gpt-5') ? 'max_completion_tokens' : 'max_tokens';
     
     const tokenLimits = loadTokenLimits();
-    // Use different token limits for nano vs mini
+    // Use higher token limits for nano to account for its different streaming behavior
     let tokenLimit = tokenLimits.gpt5Streaming;
     if (model === 'gpt-5-nano') {
-      tokenLimit = Math.min(tokenLimit, 1000); // Lower limit for nano
+      tokenLimit = Math.max(tokenLimit, 1500); // Higher limit for nano (1500-2000 range)
     }
     
     console.log('=== GPT-5 Streaming Debug ===');
@@ -198,23 +198,44 @@ export async function callOpenAIStreaming(prompt: string, context?: string, mode
     let content = '';
     let totalTokens = 0;
     
-    // Collect all chunks from the stream
+    // Collect all chunks from the stream - improved for nano's streaming behavior
     let chunkCount = 0;
+    let hasContent = false;
+    let finishReason = null;
+    
     for await (const chunk of stream) {
       chunkCount++;
       const delta = chunk.choices[0]?.delta?.content;
+      finishReason = chunk.choices[0]?.finish_reason;
+      
+      // Log every chunk for debugging
+      console.log(`Chunk ${chunkCount}:`, {
+        delta: delta ? `${delta.length} chars` : 'null',
+        finish_reason: finishReason,
+        hasContent: !!delta
+      });
+      
       if (delta) {
         content += delta;
-        console.log(`Chunk ${chunkCount}: Received ${delta.length} characters`);
+        hasContent = true;
+        console.log(`Chunk ${chunkCount}: Received "${delta}"`);
       }
+      
       // Track token usage if available
       if (chunk.usage) {
         totalTokens = chunk.usage.total_tokens || totalTokens;
+      }
+      
+      // For nano, also check finish_reason to see if it's hitting length limit
+      if (finishReason === 'length') {
+        console.log(`Model ${model} hit length limit at chunk ${chunkCount}`);
       }
     }
     
     console.log(`Total chunks received: ${chunkCount}`);
     console.log(`Final content length: ${content.length}`);
+    console.log(`Has content: ${hasContent}`);
+    console.log(`Finish reason: ${finishReason}`);
 
     const latency = Date.now() - startTime;
     
@@ -226,7 +247,9 @@ export async function callOpenAIStreaming(prompt: string, context?: string, mode
     
     return {
       provider: `OpenAI (${model})`,
-      content: content || 'No response received',
+      content: content || (finishReason === 'length' && !hasContent ? 
+        'Response was cut off due to token limit. Try increasing the token limit for GPT-5 nano.' : 
+        'No response received'),
       latency,
       tokens: {
         prompt: 0, // We don't have exact breakdown in streaming
@@ -396,10 +419,7 @@ export async function callAllProviders(request: LLMRequest): Promise<LLMResponse
     if (provider.startsWith('openai:')) {
       const model = provider.replace('openai:', '');
       console.log('Calling OpenAI with model:', model);
-      if (model === 'gpt-5-nano') {
-        console.log('Calling GPT-5 nano with non-streaming approach');
-        promises.push(callOpenAI(request.prompt, request.context, model));
-      } else if (model.startsWith('gpt-5')) {
+      if (model.startsWith('gpt-5')) {
         console.log('Calling GPT-5 with streaming approach');
         promises.push(callOpenAIStreaming(request.prompt, request.context, model));
       } else {
