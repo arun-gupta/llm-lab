@@ -186,7 +186,7 @@ export function ProviderSelector({
       name: "🦙 Local + Cloud",
       description: "Compare local with cloud",
       models: availableOllamaModels.length > 0 
-        ? ["openai:gpt-5-mini", `ollama:${availableOllamaModels[0].name}`]
+        ? ["openai:gpt-5-mini", "anthropic:claude-4-haiku-20241022", `ollama:${availableOllamaModels[0].name}`]
         : ["openai:gpt-5-mini", "anthropic:claude-4-haiku-20241022"]
     },
     {
