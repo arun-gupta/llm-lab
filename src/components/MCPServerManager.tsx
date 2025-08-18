@@ -25,7 +25,7 @@ export function MCPServerManager({ className = '' }: MCPServerManagerProps) {
     },
     {
       name: 'SQLite MCP Server',
-      port: 3003,
+      port: 4000,
       status: 'stopped',
       description: 'Database operations with Docker HTTP mode for Postman integration'
     },
@@ -294,7 +294,7 @@ export function MCPServerManager({ className = '' }: MCPServerManagerProps) {
           npm run setup-mcp
         </div>
         <p className="text-xs text-blue-700 mt-2">
-          <strong>SQLite MCP Server:</strong> Use Docker: <code className="bg-gray-200 px-1 rounded">docker run -p 3003:3003 arungupta/sqlite-mcp-server</code>
+          <strong>SQLite MCP Server:</strong> Use Docker: <code className="bg-gray-200 px-1 rounded">docker run -p 4000:4000 arungupta/sqlite-mcp-server</code>
         </p>
         <p className="text-xs text-blue-700 mt-1">
           <strong>Filesystem MCP Server:</strong> Run: <code className="bg-gray-200 px-1 rounded">./scripts/setup-http-filesystem-mcp.sh</code>
