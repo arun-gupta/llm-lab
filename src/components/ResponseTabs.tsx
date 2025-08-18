@@ -781,22 +781,22 @@ export function ResponseTabs({
                             <div className="text-sm text-gray-500">{(analytics.bestCompleteness.completeness * 100).toFixed(1)}%</div>
                           </div>
                         </div>
-                        <div className="space-y-3">
+                                                <div className="space-y-3">
                           {analytics.qualityMetrics.map((metric, index) => (
-                            <div key={index} className="flex justify-between items-center py-2">
-                              <span className="text-gray-600">{metric.provider}</span>
-                            <div className="flex items-center space-x-3">
-                              <div className="w-16 bg-gray-200 rounded-full h-2">
+                            <div key={index} className="py-2">
+                              <div className="flex justify-between items-center mb-1">
+                                <span className="text-gray-600 text-sm truncate mr-2">{metric.provider}</span>
+                                <span className="font-medium text-gray-900 text-sm whitespace-nowrap">{(metric.completeness * 100).toFixed(0)}%</span>
+                              </div>
+                              <div className="w-full bg-gray-200 rounded-full h-2">
                                 <div
                                   className="bg-green-500 h-2 rounded-full"
                                   style={{ width: `${metric.completeness * 100}%` }}
                                 ></div>
                               </div>
-                              <span className="font-medium text-gray-900 text-sm">{(metric.completeness * 100).toFixed(0)}%</span>
                             </div>
-                          </div>
-                        ))}
-                      </div>
+                          ))}
+                        </div>
                     </div>
                   </div>
 
@@ -820,22 +820,22 @@ export function ResponseTabs({
                             <div className="text-sm text-gray-500">Grade {analytics.bestReadability.readability.toFixed(1)}</div>
                           </div>
                         </div>
-                        <div className="space-y-3">
+                                                <div className="space-y-3">
                           {analytics.qualityMetrics.map((metric, index) => (
-                            <div key={index} className="flex justify-between items-center py-2">
-                              <span className="text-gray-600">{metric.provider}</span>
-                            <div className="flex items-center space-x-3">
-                              <div className="w-16 bg-gray-200 rounded-full h-2">
+                            <div key={index} className="py-2">
+                              <div className="flex justify-between items-center mb-1">
+                                <span className="text-gray-600 text-sm truncate mr-2">{metric.provider}</span>
+                                <span className="font-medium text-gray-900 text-sm whitespace-nowrap">Grade {metric.readability.toFixed(1)}</span>
+                              </div>
+                              <div className="w-full bg-gray-200 rounded-full h-2">
                                 <div
                                   className="bg-blue-500 h-2 rounded-full"
                                   style={{ width: `${Math.min(100, (20 - metric.readability) * 5)}%` }}
                                 ></div>
                               </div>
-                              <span className="font-medium text-gray-900 text-sm">Grade {metric.readability.toFixed(1)}</span>
                             </div>
-                          </div>
-                        ))}
-                      </div>
+                          ))}
+                        </div>
                     </div>
                   </div>
 
@@ -859,22 +859,22 @@ export function ResponseTabs({
                             <div className="text-sm text-gray-500">{(analytics.bestStructure.structure * 100).toFixed(1)}%</div>
                           </div>
                         </div>
-                        <div className="space-y-3">
+                                                <div className="space-y-3">
                           {analytics.qualityMetrics.map((metric, index) => (
-                            <div key={index} className="flex justify-between items-center py-2">
-                              <span className="text-gray-600">{metric.provider}</span>
-                            <div className="flex items-center space-x-3">
-                              <div className="w-16 bg-gray-200 rounded-full h-2">
+                            <div key={index} className="py-2">
+                              <div className="flex justify-between items-center mb-1">
+                                <span className="text-gray-600 text-sm truncate mr-2">{metric.provider}</span>
+                                <span className="font-medium text-gray-900 text-sm whitespace-nowrap">{(metric.structure * 100).toFixed(0)}%</span>
+                              </div>
+                              <div className="w-full bg-gray-200 rounded-full h-2">
                                 <div
                                   className="bg-purple-500 h-2 rounded-full"
                                   style={{ width: `${metric.structure * 100}%` }}
                                 ></div>
                               </div>
-                              <span className="font-medium text-gray-900 text-sm">{(metric.structure * 100).toFixed(0)}%</span>
                             </div>
-                          </div>
-                        ))}
-                      </div>
+                          ))}
+                        </div>
                     </div>
                   </div>
                 </div>
