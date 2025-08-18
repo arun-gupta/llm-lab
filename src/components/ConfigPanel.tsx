@@ -212,8 +212,8 @@ export function ConfigPanel({ isOpen, onClose, onConfigChange }: ConfigPanelProp
               <Settings className="w-6 h-6 text-blue-600" />
             </div>
             <div>
-              <h2 className="text-xl font-semibold text-gray-900">API Configuration</h2>
-              <p className="text-sm text-gray-600">Configure your API keys for LLM providers</p>
+              <h2 className="text-xl font-semibold text-gray-900">Configuration</h2>
+              <p className="text-sm text-gray-600">Configure API keys and MCP settings</p>
             </div>
           </div>
           <button
@@ -229,6 +229,13 @@ export function ConfigPanel({ isOpen, onClose, onConfigChange }: ConfigPanelProp
 
         {/* Content */}
         <div className="p-6 space-y-6">
+          {/* API Configuration Section */}
+          <div>
+            <h3 className="text-lg font-medium text-gray-900 mb-4 flex items-center">
+              <Key className="w-5 h-5 mr-2 text-blue-600" />
+              API Keys
+            </h3>
+            <div className="space-y-6">
           {/* OpenAI */}
           <div className="space-y-3">
             <div className="flex items-center justify-between">
@@ -429,26 +436,38 @@ export function ConfigPanel({ isOpen, onClose, onConfigChange }: ConfigPanelProp
             </p>
           </div>
 
-          {/* GitHub Settings */}
-          <div className="space-y-3">
-            <div className="flex items-center justify-between">
-              <label className="block text-sm font-medium text-gray-700">
-                Number of Repositories to Fetch
-              </label>
             </div>
-            <div className="relative">
-              <input
-                type="number"
-                min="1"
-                max="100"
-                value={githubSettings.reposCount}
-                onChange={(e) => setGithubSettings(prev => ({ ...prev, reposCount: parseInt(e.target.value) || 3 }))}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-900"
-              />
+          </div>
+
+          {/* MCP Settings Section */}
+          <div>
+            <h3 className="text-lg font-medium text-gray-900 mb-4 flex items-center">
+              <Settings className="w-5 h-5 mr-2 text-green-600" />
+              MCP Settings
+            </h3>
+            <div className="space-y-6">
+              {/* GitHub MCP Settings */}
+              <div className="space-y-3">
+                <div className="flex items-center justify-between">
+                  <label className="block text-sm font-medium text-gray-700">
+                    Number of Repositories to Fetch
+                  </label>
+                </div>
+                <div className="relative">
+                  <input
+                    type="number"
+                    min="1"
+                    max="100"
+                    value={githubSettings.reposCount}
+                    onChange={(e) => setGithubSettings(prev => ({ ...prev, reposCount: parseInt(e.target.value) || 3 }))}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-900"
+                  />
+                </div>
+                <p className="text-xs text-gray-500">
+                  Number of repositories to fetch when testing GitHub MCP integration (1-100)
+                </p>
+              </div>
             </div>
-            <p className="text-xs text-gray-500">
-              Number of repositories to fetch when testing GitHub MCP integration (1-100)
-            </p>
           </div>
 
           {/* Status Message */}
