@@ -91,21 +91,21 @@ export function LLMForm({ onResponsesChange, onLoadingChange, onProvidersChange,
   const samplePrompts = [
     {
       title: "Creative Writing",
-      prompt: "Write a short story about a robot who discovers emotions for the first time.",
+      prompt: "Write a short story about a robot discovering emotions for the first time.",
       context: "The story should be suitable for young adults and have a hopeful ending.",
       icon: PenTool,
       color: "text-purple-600"
     },
     {
       title: "Code Explanation",
-      prompt: "Explain how async/await works in JavaScript with a simple example.",
+      prompt: "Explain async/await in JavaScript with a simple example.",
       context: "Assume the reader is familiar with basic JavaScript but new to asynchronous programming.",
       icon: Code,
       color: "text-blue-600"
     },
     {
       title: "Business Analysis",
-      prompt: "What are the key factors to consider when launching a SaaS product in 2024?",
+      prompt: "Key factors for launching a SaaS product in 2024.",
       context: "Focus on market research, pricing strategies, and customer acquisition.",
       icon: TrendingUp,
       color: "text-green-600"
@@ -119,14 +119,14 @@ export function LLMForm({ onResponsesChange, onLoadingChange, onProvidersChange,
     },
     {
       title: "Data Analysis",
-      prompt: "Analyze the pros and cons of remote work for software development teams.",
+      prompt: "Analyze remote work pros and cons for software development teams.",
       context: "Consider productivity, collaboration, work-life balance, and company culture.",
       icon: BarChart3,
       color: "text-indigo-600"
     },
     {
       title: "Educational Content",
-      prompt: "Explain quantum computing in simple terms that a high school student could understand.",
+      prompt: "Explain quantum computing in simple terms for high school students.",
       context: "Use analogies and avoid complex mathematical formulas.",
       icon: GraduationCap,
       color: "text-red-600"
@@ -226,13 +226,16 @@ export function LLMForm({ onResponsesChange, onLoadingChange, onProvidersChange,
 
         {/* Sample Prompts */}
         <div>
-          <div className="flex items-center space-x-2 mb-6">
-            <div className="w-8 h-8 bg-gradient-to-r from-yellow-400 to-orange-500 rounded-lg flex items-center justify-center">
-              <Lightbulb className="w-4 h-4 text-white" />
+          <div className="flex items-center space-x-3 mb-6">
+            <div className="w-10 h-10 bg-gradient-to-r from-yellow-400 to-orange-500 rounded-xl flex items-center justify-center shadow-sm">
+              <Lightbulb className="w-5 h-5 text-white" />
             </div>
-            <h3 className="text-lg font-semibold text-gray-900">Try Sample Prompts</h3>
+            <div>
+              <h3 className="text-xl font-bold text-gray-900">Try Sample Prompts</h3>
+              <p className="text-sm text-gray-600">Click any card to load a sample prompt</p>
+            </div>
           </div>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {samplePrompts.map((sample, index) => {
               const IconComponent = sample.icon;
               return (
@@ -240,26 +243,36 @@ export function LLMForm({ onResponsesChange, onLoadingChange, onProvidersChange,
                   key={index}
                   type="button"
                   onClick={() => loadSamplePrompt(sample)}
-                  className="group relative overflow-hidden bg-white border border-gray-200 rounded-xl p-5 hover:border-blue-300 hover:shadow-lg hover:shadow-blue-100 transition-all duration-300 hover:-translate-y-1"
+                  className="group relative bg-white border-2 border-gray-100 rounded-2xl p-6 hover:border-blue-200 hover:shadow-xl hover:shadow-blue-50 transition-all duration-300 hover:-translate-y-2 text-left"
                 >
-                  {/* Gradient background on hover */}
-                  <div className="absolute inset-0 bg-gradient-to-br from-blue-50 to-indigo-50 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+                  {/* Subtle gradient overlay */}
+                  <div className="absolute inset-0 bg-gradient-to-br from-blue-50/50 to-indigo-50/50 opacity-0 group-hover:opacity-100 transition-opacity duration-300 rounded-2xl" />
                   
                   {/* Content */}
                   <div className="relative z-10">
-                    <div className="flex items-center space-x-3 mb-3">
-                      <div className={`w-10 h-10 rounded-lg bg-gradient-to-br ${sample.color.replace('text-', 'bg-').replace('-600', '-100')} flex items-center justify-center`}>
-                        <IconComponent className={`w-5 h-5 ${sample.color}`} />
+                    {/* Icon and Title */}
+                    <div className="flex items-start space-x-4 mb-4">
+                      <div className={`w-12 h-12 rounded-xl bg-gradient-to-br ${sample.color.replace('text-', 'bg-').replace('-600', '-100')} flex items-center justify-center shadow-sm`}>
+                        <IconComponent className={`w-6 h-6 ${sample.color}`} />
                       </div>
-                      <h4 className="font-semibold text-gray-900 group-hover:text-blue-700 transition-colors">
-                        {sample.title}
-                      </h4>
+                      <div className="flex-1 min-w-0">
+                        <h4 className="font-bold text-gray-900 text-base group-hover:text-blue-700 transition-colors leading-tight">
+                          {sample.title}
+                        </h4>
+                      </div>
                     </div>
-                    <p className="text-sm text-gray-600 leading-relaxed line-clamp-3">
+                    
+                    {/* Description */}
+                    <p className="text-sm text-gray-600 leading-relaxed mb-4">
                       {sample.prompt}
                     </p>
-                    <div className="mt-3 flex items-center text-xs text-blue-600 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                      <span>Click to try →</span>
+                    
+                    {/* Call to action */}
+                    <div className="flex items-center justify-between">
+                      <span className="text-xs font-medium text-blue-600 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                        Click to try →
+                      </span>
+                      <div className="w-2 h-2 bg-blue-500 rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
                     </div>
                   </div>
                 </button>
