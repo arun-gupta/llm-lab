@@ -33,6 +33,13 @@ body {
   overflow: hidden;
 }
 
+.line-clamp-3 {
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
 /* Improved placeholder styling for better contrast */
 ::placeholder {
   color: #6b7280 !important; /* gray-500 - much more visible */

@@ -226,11 +226,13 @@ export function LLMForm({ onResponsesChange, onLoadingChange, onProvidersChange,
 
         {/* Sample Prompts */}
         <div>
-          <div className="flex items-center space-x-2 mb-4">
-            <Lightbulb className="w-5 h-5 text-yellow-500" />
-            <h3 className="text-sm font-medium text-gray-700">Try Sample Prompts</h3>
+          <div className="flex items-center space-x-2 mb-6">
+            <div className="w-8 h-8 bg-gradient-to-r from-yellow-400 to-orange-500 rounded-lg flex items-center justify-center">
+              <Lightbulb className="w-4 h-4 text-white" />
+            </div>
+            <h3 className="text-lg font-semibold text-gray-900">Try Sample Prompts</h3>
           </div>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
             {samplePrompts.map((sample, index) => {
               const IconComponent = sample.icon;
               return (
@@ -238,22 +240,26 @@ export function LLMForm({ onResponsesChange, onLoadingChange, onProvidersChange,
                   key={index}
                   type="button"
                   onClick={() => loadSamplePrompt(sample)}
-                  className="group text-left p-4 border border-gray-200 rounded-lg hover:border-blue-300 hover:bg-blue-50 transition-all duration-200 hover:shadow-sm"
+                  className="group relative overflow-hidden bg-white border border-gray-200 rounded-xl p-5 hover:border-blue-300 hover:shadow-lg hover:shadow-blue-100 transition-all duration-300 hover:-translate-y-1"
                 >
-                  <div className="flex items-start space-x-3">
-                    <div className={`flex-shrink-0 mt-0.5 ${sample.color}`}>
-                      <IconComponent className="w-5 h-5" />
-                    </div>
-                    <div className="flex-1 min-w-0">
-                      <div className="font-medium text-sm text-gray-900 mb-2 group-hover:text-blue-700 transition-colors">
+                  {/* Gradient background on hover */}
+                  <div className="absolute inset-0 bg-gradient-to-br from-blue-50 to-indigo-50 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+                  
+                  {/* Content */}
+                  <div className="relative z-10">
+                    <div className="flex items-center space-x-3 mb-3">
+                      <div className={`w-10 h-10 rounded-lg bg-gradient-to-br ${sample.color.replace('text-', 'bg-').replace('-600', '-100')} flex items-center justify-center`}>
+                        <IconComponent className={`w-5 h-5 ${sample.color}`} />
+                      </div>
+                      <h4 className="font-semibold text-gray-900 group-hover:text-blue-700 transition-colors">
                         {sample.title}
-                      </div>
-                      <div className="text-xs text-gray-600 leading-relaxed">
-                        {sample.prompt.length > 80 
-                          ? `${sample.prompt.substring(0, 80)}...` 
-                          : sample.prompt
-                        }
-                      </div>
+                      </h4>
+                    </div>
+                    <p className="text-sm text-gray-600 leading-relaxed line-clamp-3">
+                      {sample.prompt}
+                    </p>
+                    <div className="mt-3 flex items-center text-xs text-blue-600 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                      <span>Click to try →</span>
                     </div>
                   </div>
                 </button>
