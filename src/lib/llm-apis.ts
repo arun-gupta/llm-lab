@@ -76,6 +76,17 @@ export async function callOpenAI(prompt: string, context?: string, model: string
     
     const content = response.choices?.[0]?.message?.content;
     
+    // Debug: Log the raw response to see what's actually being returned
+    console.log('=== Raw OpenAI Response Debug ===');
+    console.log('Full response object:', JSON.stringify(response, null, 2));
+    console.log('Choices array:', response.choices);
+    console.log('First choice:', response.choices?.[0]);
+    console.log('Message object:', response.choices?.[0]?.message);
+    console.log('Raw content:', response.choices?.[0]?.message?.content);
+    console.log('Content type:', typeof response.choices?.[0]?.message?.content);
+    console.log('Content length:', response.choices?.[0]?.message?.content?.length);
+    console.log('==================================');
+    
     return {
       provider: `OpenAI (${model})`,
       content: content || 'No response received',
