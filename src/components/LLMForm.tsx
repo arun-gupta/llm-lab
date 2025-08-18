@@ -24,6 +24,7 @@ export function LLMForm({ onResponsesChange, onLoadingChange, onProvidersChange,
   const [selectedProviders, setSelectedProviders] = useState<string[]>([]);
   const [ollamaModels, setOllamaModels] = useState<string[]>([]);
   const [isInitialized, setIsInitialized] = useState(false);
+  const [showAllPrompts, setShowAllPrompts] = useState(false);
 
   // Check for Ollama models on mount and set default providers
   useEffect(() => {
@@ -235,50 +236,55 @@ export function LLMForm({ onResponsesChange, onLoadingChange, onProvidersChange,
               <p className="text-sm text-gray-600">Click any card to load a sample prompt</p>
             </div>
           </div>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {samplePrompts.map((sample, index) => {
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            {(showAllPrompts ? samplePrompts : samplePrompts.slice(0, 3)).map((sample, index) => {
               const IconComponent = sample.icon;
               return (
                 <button
                   key={index}
                   type="button"
                   onClick={() => loadSamplePrompt(sample)}
-                  className="group relative bg-white border-2 border-gray-100 rounded-2xl p-6 hover:border-blue-200 hover:shadow-xl hover:shadow-blue-50 transition-all duration-300 hover:-translate-y-2 text-left"
+                  className="group relative bg-white border border-gray-200 rounded-xl p-4 hover:border-blue-300 hover:shadow-lg hover:shadow-blue-50 transition-all duration-300 hover:-translate-y-1 text-left"
                 >
-                  {/* Subtle gradient overlay */}
-                  <div className="absolute inset-0 bg-gradient-to-br from-blue-50/50 to-indigo-50/50 opacity-0 group-hover:opacity-100 transition-opacity duration-300 rounded-2xl" />
-                  
                   {/* Content */}
                   <div className="relative z-10">
                     {/* Icon and Title */}
-                    <div className="flex items-start space-x-4 mb-4">
-                      <div className={`w-12 h-12 rounded-xl bg-gradient-to-br ${sample.color.replace('text-', 'bg-').replace('-600', '-100')} flex items-center justify-center shadow-sm`}>
-                        <IconComponent className={`w-6 h-6 ${sample.color}`} />
+                    <div className="flex items-center space-x-3 mb-3">
+                      <div className={`w-10 h-10 rounded-lg bg-gradient-to-br ${sample.color.replace('text-', 'bg-').replace('-600', '-100')} flex items-center justify-center`}>
+                        <IconComponent className={`w-5 h-5 ${sample.color}`} />
                       </div>
-                      <div className="flex-1 min-w-0">
-                        <h4 className="font-bold text-gray-900 text-base group-hover:text-blue-700 transition-colors leading-tight">
-                          {sample.title}
-                        </h4>
-                      </div>
+                      <h4 className="font-semibold text-gray-900 text-sm group-hover:text-blue-700 transition-colors">
+                        {sample.title}
+                      </h4>
                     </div>
                     
                     {/* Description */}
-                    <p className="text-sm text-gray-600 leading-relaxed mb-4">
+                    <p className="text-xs text-gray-600 leading-relaxed line-clamp-2">
                       {sample.prompt}
                     </p>
-                    
-                    {/* Call to action */}
-                    <div className="flex items-center justify-between">
-                      <span className="text-xs font-medium text-blue-600 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                        Click to try →
-                      </span>
-                      <div className="w-2 h-2 bg-blue-500 rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-                    </div>
                   </div>
                 </button>
               );
             })}
           </div>
+          
+          {/* Show More/Less Button */}
+          {samplePrompts.length > 3 && (
+            <div className="flex justify-center mt-6">
+              <button
+                type="button"
+                onClick={() => setShowAllPrompts(!showAllPrompts)}
+                className="flex items-center space-x-2 px-4 py-2 text-sm font-medium text-blue-600 hover:text-blue-700 hover:bg-blue-50 rounded-lg transition-colors"
+              >
+                <span>{showAllPrompts ? 'Show Less' : 'Show More'}</span>
+                <div className={`w-4 h-4 transition-transform duration-200 ${showAllPrompts ? 'rotate-180' : ''}`}>
+                  <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                  </svg>
+                </div>
+              </button>
+            </div>
+          )}
         </div>
 
         {/* Submit Button */}
