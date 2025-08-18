@@ -682,7 +682,7 @@ export function ResponseTabs({
                     <div className="flex justify-between items-center py-2 border-b border-gray-100">
                       <span className="text-gray-600">Total Cost</span>
                       <span className="font-semibold text-gray-900 text-lg">
-                        ${analytics.totalCost < 0.0001 ? '<$0.0001' : analytics.totalCost.toFixed(6)}
+                        ${analytics.totalCost.toFixed(8)}
                       </span>
                     </div>
                     <div className="flex justify-between items-center py-2 border-b border-gray-100">
@@ -700,7 +700,7 @@ export function ResponseTabs({
                           {(() => {
                             const maxCostIndex = analytics.costEstimates.indexOf(Math.max(...analytics.costEstimates));
                             const maxCost = analytics.costEstimates[maxCostIndex];
-                            return maxCost > 0 ? `$${maxCost.toFixed(6)}` : 'No cost';
+                            return maxCost > 0 ? `$${maxCost.toFixed(8)}` : 'No cost';
                           })()}
                         </div>
                       </div>
@@ -708,7 +708,7 @@ export function ResponseTabs({
                     <div className="flex justify-between items-center py-2">
                       <span className="text-gray-600">Monthly (1k/day)</span>
                       <span className="font-semibold text-gray-900 text-lg">
-                        ${(analytics.totalCost * 30000) < 0.01 ? '<$0.01' : (analytics.totalCost * 30000).toFixed(4)}
+                        ${(analytics.totalCost * 30000).toFixed(6)}
                       </span>
                     </div>
                   </div>
@@ -745,37 +745,43 @@ export function ResponseTabs({
 
               {/* Quality Analysis Section */}
               <div className="mt-8">
-                <h4 className="font-medium text-gray-900 mb-4">Quality Analysis</h4>
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <h4 className="font-semibold text-gray-900 mb-6 flex items-center space-x-2">
+                  <Target className="w-5 h-5 text-indigo-600" />
+                  <span>Quality Analysis</span>
+                </h4>
+                <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
                   {/* Completeness */}
-                  <div className="bg-gray-50 rounded-lg p-4">
-                    <h5 className="font-medium text-gray-800 mb-3 flex items-center space-x-2">
-                      <Target className="w-4 h-4" />
+                  <div className="bg-white border border-gray-200 rounded-lg p-6">
+                    <h5 className="font-semibold text-gray-900 flex items-center space-x-3 mb-6">
+                      <div className="w-8 h-8 bg-green-100 rounded-lg flex items-center justify-center">
+                        <Target className="w-4 h-4 text-green-600" />
+                      </div>
                       <span>Completeness</span>
                     </h5>
-                    <div className="space-y-2">
-                      <div className="flex justify-between text-sm">
+                    <div className="space-y-4">
+                      <div className="flex justify-between items-center py-2 border-b border-gray-100">
                         <span className="text-gray-600">Average</span>
-                        <span className="font-semibold text-gray-900">{(analytics.avgCompleteness * 100).toFixed(1)}%</span>
+                        <span className="font-semibold text-gray-900 text-lg">{(analytics.avgCompleteness * 100).toFixed(1)}%</span>
                       </div>
-                      <div className="flex justify-between text-sm">
+                      <div className="flex justify-between items-center py-2 border-b border-gray-100">
                         <span className="text-gray-600">Best</span>
-                        <span className="font-semibold text-gray-900 text-xs">
-                          {analytics.bestCompleteness.provider.split(' ')[0]} ({(analytics.bestCompleteness.completeness * 100).toFixed(1)}%)
-                        </span>
+                        <div className="text-right">
+                          <div className="font-semibold text-gray-900">{analytics.bestCompleteness.provider.split(' ')[0]}</div>
+                          <div className="text-sm text-gray-500">{(analytics.bestCompleteness.completeness * 100).toFixed(1)}%</div>
+                        </div>
                       </div>
-                      <div className="space-y-1">
+                      <div className="space-y-3">
                         {analytics.qualityMetrics.map((metric, index) => (
-                          <div key={index} className="flex justify-between text-xs">
-                            <span className="text-gray-500">{metric.provider.split(' ')[0]}</span>
-                            <div className="flex items-center space-x-2">
-                              <div className="w-12 bg-gray-200 rounded-full h-1.5">
+                          <div key={index} className="flex justify-between items-center py-2">
+                            <span className="text-gray-600">{metric.provider.split(' ')[0]}</span>
+                            <div className="flex items-center space-x-3">
+                              <div className="w-16 bg-gray-200 rounded-full h-2">
                                 <div
-                                  className="bg-green-500 h-1.5 rounded-full"
+                                  className="bg-green-500 h-2 rounded-full"
                                   style={{ width: `${metric.completeness * 100}%` }}
                                 ></div>
                               </div>
-                              <span className="font-medium text-gray-900">{(metric.completeness * 100).toFixed(0)}%</span>
+                              <span className="font-medium text-gray-900 text-sm">{(metric.completeness * 100).toFixed(0)}%</span>
                             </div>
                           </div>
                         ))}
@@ -784,34 +790,37 @@ export function ResponseTabs({
                   </div>
 
                   {/* Readability */}
-                  <div className="bg-gray-50 rounded-lg p-4">
-                    <h5 className="font-medium text-gray-800 mb-3 flex items-center space-x-2">
-                      <MessageSquare className="w-4 h-4" />
+                  <div className="bg-white border border-gray-200 rounded-lg p-6">
+                    <h5 className="font-semibold text-gray-900 flex items-center space-x-3 mb-6">
+                      <div className="w-8 h-8 bg-blue-100 rounded-lg flex items-center justify-center">
+                        <MessageSquare className="w-4 h-4 text-blue-600" />
+                      </div>
                       <span>Readability</span>
                     </h5>
-                    <div className="space-y-2">
-                      <div className="flex justify-between text-sm">
+                    <div className="space-y-4">
+                      <div className="flex justify-between items-center py-2 border-b border-gray-100">
                         <span className="text-gray-600">Avg Grade Level</span>
-                        <span className="font-semibold text-gray-900">{analytics.avgReadability.toFixed(1)}</span>
+                        <span className="font-semibold text-gray-900 text-lg">{analytics.avgReadability.toFixed(1)}</span>
                       </div>
-                      <div className="flex justify-between text-sm">
+                      <div className="flex justify-between items-center py-2 border-b border-gray-100">
                         <span className="text-gray-600">Most Readable</span>
-                        <span className="font-semibold text-gray-900 text-xs">
-                          {analytics.bestReadability.provider.split(' ')[0]} (Grade {analytics.bestReadability.readability.toFixed(1)})
-                        </span>
+                        <div className="text-right">
+                          <div className="font-semibold text-gray-900">{analytics.bestReadability.provider.split(' ')[0]}</div>
+                          <div className="text-sm text-gray-500">Grade {analytics.bestReadability.readability.toFixed(1)}</div>
+                        </div>
                       </div>
-                      <div className="space-y-1">
+                      <div className="space-y-3">
                         {analytics.qualityMetrics.map((metric, index) => (
-                          <div key={index} className="flex justify-between text-xs">
-                            <span className="text-gray-500">{metric.provider.split(' ')[0]}</span>
-                            <div className="flex items-center space-x-2">
-                              <div className="w-12 bg-gray-200 rounded-full h-1.5">
+                          <div key={index} className="flex justify-between items-center py-2">
+                            <span className="text-gray-600">{metric.provider.split(' ')[0]}</span>
+                            <div className="flex items-center space-x-3">
+                              <div className="w-16 bg-gray-200 rounded-full h-2">
                                 <div
-                                  className="bg-blue-500 h-1.5 rounded-full"
+                                  className="bg-blue-500 h-2 rounded-full"
                                   style={{ width: `${Math.min(100, (20 - metric.readability) * 5)}%` }}
                                 ></div>
                               </div>
-                              <span className="font-medium text-gray-900">Grade {metric.readability.toFixed(1)}</span>
+                              <span className="font-medium text-gray-900 text-sm">Grade {metric.readability.toFixed(1)}</span>
                             </div>
                           </div>
                         ))}
@@ -820,34 +829,37 @@ export function ResponseTabs({
                   </div>
 
                   {/* Structure Quality */}
-                  <div className="bg-gray-50 rounded-lg p-4">
-                    <h5 className="font-medium text-gray-800 mb-3 flex items-center space-x-2">
-                      <BarChart3 className="w-4 h-4" />
+                  <div className="bg-white border border-gray-200 rounded-lg p-6">
+                    <h5 className="font-semibold text-gray-900 flex items-center space-x-3 mb-6">
+                      <div className="w-8 h-8 bg-purple-100 rounded-lg flex items-center justify-center">
+                        <BarChart3 className="w-4 h-4 text-purple-600" />
+                      </div>
                       <span>Structure</span>
                     </h5>
-                    <div className="space-y-2">
-                      <div className="flex justify-between text-sm">
+                    <div className="space-y-4">
+                      <div className="flex justify-between items-center py-2 border-b border-gray-100">
                         <span className="text-gray-600">Average</span>
-                        <span className="font-semibold text-gray-900">{(analytics.avgStructure * 100).toFixed(1)}%</span>
+                        <span className="font-semibold text-gray-900 text-lg">{(analytics.avgStructure * 100).toFixed(1)}%</span>
                       </div>
-                      <div className="flex justify-between text-sm">
+                      <div className="flex justify-between items-center py-2 border-b border-gray-100">
                         <span className="text-gray-600">Best</span>
-                        <span className="font-semibold text-gray-900 text-xs">
-                          {analytics.bestStructure.provider.split(' ')[0]} ({(analytics.bestStructure.structure * 100).toFixed(1)}%)
-                        </span>
+                        <div className="text-right">
+                          <div className="font-semibold text-gray-900">{analytics.bestStructure.provider.split(' ')[0]}</div>
+                          <div className="text-sm text-gray-500">{(analytics.bestStructure.structure * 100).toFixed(1)}%</div>
+                        </div>
                       </div>
-                      <div className="space-y-1">
+                      <div className="space-y-3">
                         {analytics.qualityMetrics.map((metric, index) => (
-                          <div key={index} className="flex justify-between text-xs">
-                            <span className="text-gray-500">{metric.provider.split(' ')[0]}</span>
-                            <div className="flex items-center space-x-2">
-                              <div className="w-12 bg-gray-200 rounded-full h-1.5">
+                          <div key={index} className="flex justify-between items-center py-2">
+                            <span className="text-gray-600">{metric.provider.split(' ')[0]}</span>
+                            <div className="flex items-center space-x-3">
+                              <div className="w-16 bg-gray-200 rounded-full h-2">
                                 <div
-                                  className="bg-purple-500 h-1.5 rounded-full"
+                                  className="bg-purple-500 h-2 rounded-full"
                                   style={{ width: `${metric.structure * 100}%` }}
                                 ></div>
                               </div>
-                              <span className="font-medium text-gray-900">{(metric.structure * 100).toFixed(0)}%</span>
+                              <span className="font-medium text-gray-900 text-sm">{(metric.structure * 100).toFixed(0)}%</span>
                             </div>
                           </div>
                         ))}
