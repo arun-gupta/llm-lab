@@ -228,6 +228,8 @@ export async function callOpenAIStreaming(prompt: string, context?: string, mode
         finalUsage = chunk.usage;
         totalTokens = chunk.usage.total_tokens || totalTokens;
         console.log(`Chunk ${chunkCount}: Usage data received:`, chunk.usage);
+      } else {
+        console.log(`Chunk ${chunkCount}: No usage data in chunk`);
       }
       
       // For nano, also check finish_reason to see if it's hitting length limit
@@ -248,6 +250,7 @@ export async function callOpenAIStreaming(prompt: string, context?: string, mode
     console.log('Content preview:', content.substring(0, 200) + '...');
     console.log('Total tokens used:', totalTokens);
     console.log('Final usage data:', finalUsage);
+    console.log('Has usage data:', !!finalUsage);
     console.log('Tokens breakdown:', {
       prompt: finalUsage?.prompt_tokens || 0,
       completion: finalUsage?.completion_tokens || totalTokens,
@@ -255,6 +258,14 @@ export async function callOpenAIStreaming(prompt: string, context?: string, mode
     });
     console.log('================================');
     
+    // Fallback token estimation if usage data is not available
+    let estimatedTokens = 0;
+    if (!finalUsage && content && content.length > 0) {
+      // Rough estimation: ~4 characters per token for English text
+      estimatedTokens = Math.ceil(content.length / 4);
+      console.log(`No usage data received, estimating tokens: ${estimatedTokens} (from ${content.length} chars)`);
+    }
+
     return {
       provider: `OpenAI (${model})`,
       content: content || (finishReason === 'length' && !hasContent ? 
@@ -263,11 +274,11 @@ export async function callOpenAIStreaming(prompt: string, context?: string, mode
       latency,
       tokens: {
         prompt: finalUsage?.prompt_tokens || 0,
-        completion: finalUsage?.completion_tokens || totalTokens,
-        total: finalUsage?.total_tokens || totalTokens,
+        completion: finalUsage?.completion_tokens || (finalUsage ? finalUsage.total_tokens : estimatedTokens),
+        total: finalUsage?.total_tokens || estimatedTokens,
       },
       // Add truncation warning if content seems incomplete
-      truncationWarning: content && content.length > 0 && totalTokens >= 1400 ? 
+      truncationWarning: content && content.length > 0 && (finalUsage?.total_tokens || estimatedTokens) >= 1400 ? 
         'Response may be truncated. Consider increasing token limit or using a shorter prompt for complete responses.' : undefined
     };
   } catch (error) {
