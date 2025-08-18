@@ -26,8 +26,8 @@ const loadTokenLimits = () => {
   
   // Return defaults if file doesn't exist or error
   return {
-    gpt5Streaming: 1500,
-    gpt5NonStreaming: 100,
+    gpt5Streaming: 2000,
+    gpt5NonStreaming: 500,
     otherModels: 1000
   };
 };
@@ -62,8 +62,8 @@ export async function POST(request: NextRequest) {
     
     // Validate limits
     const validatedLimits = {
-      gpt5Streaming: Math.max(100, Math.min(4000, limits.gpt5Streaming || 1500)),
-      gpt5NonStreaming: Math.max(50, Math.min(2000, limits.gpt5NonStreaming || 100)),
+      gpt5Streaming: Math.max(100, Math.min(4000, limits.gpt5Streaming || 2000)),
+      gpt5NonStreaming: Math.max(50, Math.min(2000, limits.gpt5NonStreaming || 500)),
       otherModels: Math.max(100, Math.min(4000, limits.otherModels || 1000))
     };
     

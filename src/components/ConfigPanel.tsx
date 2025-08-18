@@ -37,8 +37,8 @@ export function ConfigPanel({ isOpen, onClose, onConfigChange }: ConfigPanelProp
     reposCount: 3
   });
   const [tokenLimits, setTokenLimits] = useState<TokenLimits>({
-    gpt5Streaming: 1500,
-    gpt5NonStreaming: 100,
+    gpt5Streaming: 2000,
+    gpt5NonStreaming: 500,
     otherModels: 1000
   });
   const [showKeys, setShowKeys] = useState<{ [key in keyof ApiKeys]: boolean }>({
@@ -103,8 +103,8 @@ export function ConfigPanel({ isOpen, onClose, onConfigChange }: ConfigPanelProp
       if (response.ok) {
         const limits = await response.json();
         setTokenLimits({
-          gpt5Streaming: limits.gpt5Streaming || 1500,
-          gpt5NonStreaming: limits.gpt5NonStreaming || 100,
+          gpt5Streaming: limits.gpt5Streaming || 2000,
+          gpt5NonStreaming: limits.gpt5NonStreaming || 500,
           otherModels: limits.otherModels || 1000
         });
       }

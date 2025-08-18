@@ -62,8 +62,8 @@ const loadTokenLimits = () => {
   
   // Return defaults if file doesn't exist or error
   return {
-    gpt5Streaming: 1500,
-    gpt5NonStreaming: 100,
+    gpt5Streaming: 2000,
+    gpt5NonStreaming: 500,
     otherModels: 1000
   };
 };
@@ -83,6 +83,13 @@ export async function callOpenAI(prompt: string, context?: string, model: string
     
     const tokenLimits = loadTokenLimits();
     const tokenLimit = model.startsWith('gpt-5') ? tokenLimits.gpt5NonStreaming : tokenLimits.otherModels;
+    
+    console.log('=== OpenAI Debug ===');
+    console.log('Model:', model);
+    console.log('Token parameter:', tokenParam);
+    console.log('Token limit:', tokenLimit);
+    console.log('Token limits config:', tokenLimits);
+    console.log('================================');
     
     const response = await Promise.race([
       openai.chat.completions.create({
@@ -163,6 +170,7 @@ export async function callOpenAIStreaming(prompt: string, context?: string, mode
     console.log('Using streaming for GPT-5 model:', model);
     console.log('Token parameter:', tokenParam);
     console.log('Token limit:', tokenLimit);
+    console.log('Token limits config:', tokenLimits);
     console.log('================================');
     
     const stream = await Promise.race([
