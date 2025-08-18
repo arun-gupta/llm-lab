@@ -4,7 +4,7 @@ import { useState } from 'react';
 import { LLMForm } from '../LLMForm';
 import { ResponseTabs } from '../ResponseTabs';
 import { LLMResponse } from '@/lib/llm-apis';
-import { BarChart3, Save, Share2, Clock, DollarSign, Target } from 'lucide-react';
+import { Clock, DollarSign, Target } from 'lucide-react';
 
 import { TabType } from '../TabNavigation';
 
@@ -51,67 +51,17 @@ export function TestTab({ onTabChange }: TestTabProps) {
     }
   };
 
-  const handleSaveTest = () => {
-    // TODO: Implement save test functionality
-    console.log('Save test functionality coming soon...');
-  };
 
-  const handleShareResults = () => {
-    // TODO: Implement share results functionality
-    console.log('Share results functionality coming soon...');
-  };
-
-  const handleCompareResults = () => {
-    setActiveTab('comparison');
-    setTimeout(() => {
-      const responsesElement = document.getElementById('responses-section');
-      if (responsesElement) {
-        responsesElement.scrollIntoView({ 
-          behavior: 'smooth', 
-          block: 'start' 
-        });
-      }
-    }, 100);
-  };
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
       {/* Header */}
       <div className="mb-8">
-        <div className="flex items-center justify-between">
-          <div>
-            <h1 className="text-3xl font-bold text-gray-900 mb-2">Test & Compare</h1>
-            <p className="text-gray-600">
-              Test prompts across different providers and models with A/B testing, side-by-side comparison, and performance benchmarking.
-            </p>
-          </div>
-          <div className="flex space-x-3">
-            {responses.length > 0 && (
-              <>
-                <button
-                  onClick={handleSaveTest}
-                  className="flex items-center space-x-2 px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors"
-                >
-                  <Save className="w-4 h-4" />
-                  <span>Save Test</span>
-                </button>
-                <button
-                  onClick={handleShareResults}
-                  className="flex items-center space-x-2 px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors"
-                >
-                  <Share2 className="w-4 h-4" />
-                  <span>Share</span>
-                </button>
-                <button
-                  onClick={handleCompareResults}
-                  className="flex items-center space-x-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
-                >
-                  <BarChart3 className="w-4 h-4" />
-                  <span>Compare</span>
-                </button>
-              </>
-            )}
-          </div>
+        <div>
+          <h1 className="text-3xl font-bold text-gray-900 mb-2">Test & Compare</h1>
+          <p className="text-gray-600">
+            Test prompts across different providers and models with A/B testing, side-by-side comparison, and performance benchmarking.
+          </p>
         </div>
       </div>
 
