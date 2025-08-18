@@ -42,14 +42,14 @@ export function LLMForm({ onResponsesChange, onLoadingChange, onProvidersChange,
           onProvidersChange?.(allLocalModels);
         } else {
           // Fallback to a single cloud provider if no Ollama models
-          setSelectedProviders(['openai:gpt-5-mini']);
-          onProvidersChange?.(['openai:gpt-5-mini']);
+          setSelectedProviders(['openai:gpt-5-mini', 'anthropic:claude-4-haiku-20241022']);
+          onProvidersChange?.(['openai:gpt-5-mini', 'anthropic:claude-4-haiku-20241022']);
         }
       } catch (error) {
         console.log('Ollama not available, using cloud provider as default');
         // Fallback to a single cloud provider if Ollama is not available
-        setSelectedProviders(['openai:gpt-5-mini']);
-        onProvidersChange?.(['openai:gpt-5-mini']);
+        setSelectedProviders(['openai:gpt-5-mini', 'anthropic:claude-4-haiku-20241022']);
+        onProvidersChange?.(['openai:gpt-5-mini', 'anthropic:claude-4-haiku-20241022']);
       } finally {
         setIsInitialized(true);
       }

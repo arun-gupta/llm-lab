@@ -56,8 +56,11 @@ const staticProviders: Provider[] = [
     color: 'border-blue-200 bg-blue-50', 
     type: 'api',
     models: [
-      { id: 'claude-3-5-sonnet-20241022', name: 'Claude 3.5 Sonnet', description: 'Most intelligent model', cost: 'high' },
-      { id: 'claude-3-5-haiku-20241022', name: 'Claude 3.5 Haiku', description: 'Fastest model', cost: 'low' },
+      { id: 'claude-4-sonnet-20241022', name: 'Claude 4 Sonnet', description: 'Latest flagship model with advanced reasoning', cost: 'high' },
+      { id: 'claude-4-haiku-20241022', name: 'Claude 4 Haiku', description: 'Fast and efficient Claude 4 variant', cost: 'medium' },
+      { id: 'claude-4-opus-20241022', name: 'Claude 4 Opus', description: 'Most powerful Claude 4 for complex tasks', cost: 'high' },
+      { id: 'claude-3-5-sonnet-20241022', name: 'Claude 3.5 Sonnet', description: 'Previous generation flagship', cost: 'high' },
+      { id: 'claude-3-5-haiku-20241022', name: 'Claude 3.5 Haiku', description: 'Fastest previous generation model', cost: 'low' },
       { id: 'claude-3-opus-20240229', name: 'Claude 3 Opus', description: 'Powerful model for complex tasks', cost: 'high' },
       { id: 'claude-3-haiku-20240307', name: 'Claude 3 Haiku', description: 'Fast and cost-effective', cost: 'low' },
     ]
@@ -155,19 +158,19 @@ export function ProviderSelector({
     {
       name: "Budget",
       description: "Fast, cost-effective models",
-      models: ["openai:gpt-5-nano", "anthropic:claude-3-haiku-20240307"]
+      models: ["openai:gpt-5-nano", "anthropic:claude-4-haiku-20241022"]
     },
     {
       name: "Premium", 
       description: "Best performance models",
-      models: ["openai:gpt-4o", "anthropic:claude-3-5-sonnet-20241022"]
+      models: ["openai:gpt-5", "anthropic:claude-4-sonnet-20241022"]
     },
     {
       name: "Local vs Cloud",
       description: "Compare local Ollama with cloud APIs",
       models: availableOllamaModels.length > 0 
         ? ["openai:gpt-5-mini", `ollama:${availableOllamaModels[0].name}`]
-        : ["openai:gpt-5-mini", "anthropic:claude-3-haiku-20240307"]
+        : ["openai:gpt-5-mini", "anthropic:claude-4-haiku-20241022"]
     },
     {
       name: "All Local",
@@ -189,7 +192,12 @@ export function ProviderSelector({
     {
       name: "Anthropic Compare",
       description: "Compare Anthropic models", 
-      models: ["anthropic:claude-3-5-sonnet-20241022", "anthropic:claude-3-haiku-20240307"]
+      models: ["anthropic:claude-4-sonnet-20241022", "anthropic:claude-4-haiku-20241022"]
+    },
+    {
+      name: "Claude 4 Suite",
+      description: "Compare all Claude 4 variants",
+      models: ["anthropic:claude-4-opus-20241022", "anthropic:claude-4-sonnet-20241022", "anthropic:claude-4-haiku-20241022"]
     }
   ];
 

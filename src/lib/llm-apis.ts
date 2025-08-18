@@ -91,7 +91,7 @@ export async function callOpenAI(prompt: string, context?: string, model: string
   }
 }
 
-export async function callAnthropic(prompt: string, context?: string, model: string = 'claude-3-haiku-20240307'): Promise<LLMResponse> {
+export async function callAnthropic(prompt: string, context?: string, model: string = 'claude-4-haiku-20241022'): Promise<LLMResponse> {
   const startTime = Date.now();
   
   try {

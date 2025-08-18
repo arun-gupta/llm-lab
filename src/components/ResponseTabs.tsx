@@ -75,6 +75,9 @@ export function ResponseTabs({
       else if (provider.includes('gpt-4o')) costPer1M = 5.0;
       else if (provider.includes('gpt-4')) costPer1M = 30.0;
       else if (provider.includes('gpt-3.5')) costPer1M = 0.5;
+      else if (provider.includes('claude-4-opus')) costPer1M = 20.0;
+      else if (provider.includes('claude-4-sonnet')) costPer1M = 5.0;
+      else if (provider.includes('claude-4-haiku')) costPer1M = 0.75;
       else if (provider.includes('claude-3.5-sonnet')) costPer1M = 3.0;
       else if (provider.includes('claude-3.5-haiku')) costPer1M = 0.25;
       else if (provider.includes('claude-3-opus')) costPer1M = 15.0;
