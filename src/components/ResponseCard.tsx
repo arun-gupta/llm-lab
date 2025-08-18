@@ -105,11 +105,21 @@ export function ResponseCard({ response, prompt, context }: ResponseCardProps) {
             <p className="text-red-800 text-sm">{response.error}</p>
           </div>
         ) : (
-          <div className="bg-white border border-gray-200 rounded-md p-4">
-            <pre className="whitespace-pre-wrap text-sm text-gray-800 font-mono">
-              {response.content}
-            </pre>
-          </div>
+          <>
+            <div className="bg-white border border-gray-200 rounded-md p-4">
+              <pre className="whitespace-pre-wrap text-sm text-gray-800 font-mono">
+                {response.content}
+              </pre>
+            </div>
+            {response.truncationWarning && (
+              <div className="mt-3 bg-yellow-50 border border-yellow-200 rounded-md p-3">
+                <div className="flex items-center space-x-2">
+                  <AlertCircle className="w-4 h-4 text-yellow-600" />
+                  <p className="text-yellow-800 text-sm">{response.truncationWarning}</p>
+                </div>
+              </div>
+            )}
+          </>
         )}
       </div>
 

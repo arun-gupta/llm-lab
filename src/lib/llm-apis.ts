@@ -11,6 +11,7 @@ export interface LLMResponse {
     total: number;
   };
   error?: string;
+  truncationWarning?: string;
 }
 
 export interface LLMRequest {
@@ -90,7 +91,9 @@ export async function callOpenAI(prompt: string, context?: string, model: string
     
     return {
       provider: `OpenAI (${model})`,
-      content: content || (response.choices?.[0]?.finish_reason === 'length' ? 'Response was cut off due to token limit. Try a shorter prompt.' : 'No response received'),
+      content: content || (response.choices?.[0]?.finish_reason === 'length' ? 
+        'Response was cut off due to token limit. Try a shorter prompt or increase the token limit for longer responses.' : 
+        'No response received'),
       latency,
       tokens: {
         prompt: response.usage?.prompt_tokens || 0,
@@ -182,6 +185,9 @@ export async function callOpenAIStreaming(prompt: string, context?: string, mode
         completion: totalTokens,
         total: totalTokens,
       },
+      // Add truncation warning if content seems incomplete
+      truncationWarning: content && content.length > 0 && totalTokens >= 1400 ? 
+        'Response may be truncated. Consider increasing token limit or using a shorter prompt for complete responses.' : undefined
     };
   } catch (error) {
     console.log('=== GPT-5 Streaming Error ===');
