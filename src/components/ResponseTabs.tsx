@@ -96,8 +96,6 @@ export function ResponseTabs({
 
       if (provider.includes('gpt-5-mini')) costPer1M = 0.50;
       else if (provider.includes('gpt-5')) costPer1M = 10.0;
-      else if (provider.includes('gpt-4o-mini')) costPer1M = 0.15;
-      else if (provider.includes('gpt-4o')) costPer1M = 5.0;
       else if (provider.includes('gpt-4')) costPer1M = 30.0;
       else if (provider.includes('gpt-3.5')) costPer1M = 0.5;
       else if (provider.includes('claude-4-opus')) costPer1M = 20.0;

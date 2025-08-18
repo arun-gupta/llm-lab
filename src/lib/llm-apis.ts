@@ -53,9 +53,6 @@ export async function callOpenAI(prompt: string, context?: string, model: string
     // Add timeout to individual provider calls - increased for Codespaces
     const timeoutMs = process.env.CODESPACES ? 45000 : 20000; // 45 seconds for Codespaces, 20 for local
     
-    // Use max_completion_tokens for GPT-5 models, max_tokens for others
-    const tokenParam = model.startsWith('gpt-5') ? 'max_completion_tokens' : 'max_tokens';
-    
     const response = await Promise.race([
       openai.chat.completions.create({
         model: model,
@@ -65,7 +62,7 @@ export async function callOpenAI(prompt: string, context?: string, model: string
             content: fullPrompt,
           },
         ],
-        [tokenParam]: 1000,
+        max_tokens: 1000,
       }),
       new Promise((_, reject) => 
         setTimeout(() => reject(new Error('OpenAI request timeout')), timeoutMs)
@@ -75,17 +72,6 @@ export async function callOpenAI(prompt: string, context?: string, model: string
     const latency = Date.now() - startTime;
     
     const content = response.choices?.[0]?.message?.content;
-    
-    // Debug logging to troubleshoot "No response received" issue
-    console.log('=== OpenAI Response Debug ===');
-    console.log('Model:', model);
-    console.log('Response choices:', response.choices);
-    console.log('First choice:', response.choices?.[0]);
-    console.log('First choice message:', response.choices?.[0]?.message);
-    console.log('Content:', content);
-    console.log('Content type:', typeof content);
-    console.log('Content length:', content?.length);
-    console.log('===========================');
     
     return {
       provider: `OpenAI (${model})`,
