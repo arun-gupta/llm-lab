@@ -67,7 +67,7 @@ export function MCPTab() {
         </div>
 
         {/* MCP Servers Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
           <div className="bg-white rounded-lg p-6 border border-gray-200 hover:shadow-lg transition-shadow flex flex-col">
             <div className="flex items-center space-x-3 mb-4">
               <div className="w-10 h-10 bg-gray-800 rounded-lg flex items-center justify-center">
@@ -212,16 +212,6 @@ export function MCPTab() {
               Install Filesystem MCP
             </button>
           </div>
-          <div className="bg-white rounded-lg p-6 border border-gray-200 hover:shadow-lg transition-shadow opacity-60">
-            <div className="flex items-center space-x-3 mb-4">
-              <div className="w-10 h-10 bg-gray-400 rounded-lg flex items-center justify-center">
-                <Globe className="w-5 h-5 text-white" />
-              </div>
-              <h3 className="font-semibold text-gray-900">Web Search MCP</h3>
-            </div>
-            <p className="text-sm text-gray-600 mb-4">Search web, get news, weather</p>
-            <div className="text-xs text-gray-500">🚧 Coming Soon</div>
-          </div>
           <div className="bg-white rounded-lg p-6 border border-gray-200 hover:shadow-lg transition-shadow flex flex-col">
             <div className="flex items-center space-x-3 mb-4">
               <div className="w-10 h-10 bg-blue-600 rounded-lg flex items-center justify-center">
@@ -229,9 +219,9 @@ export function MCPTab() {
               </div>
               <h3 className="font-semibold text-gray-900">SQLite MCP</h3>
             </div>
-            <p className="text-sm text-gray-600 mb-4">Database operations with SQLite MCP server and HTTP wrapper</p>
+            <p className="text-sm text-gray-600 mb-4">Database operations with pre-built Docker image and HTTP wrapper</p>
             <div className="text-xs text-gray-500 mb-4">✅ 15 database tools + HTTP API</div>
-            <div className="text-xs text-blue-600 mb-4">🐳 Docker ready with sample DB</div>
+            <div className="text-xs text-blue-600 mb-4">🐳 One-command Docker setup</div>
             <button
               onClick={async () => {
                 try {
@@ -293,6 +283,16 @@ export function MCPTab() {
               <Zap className="w-4 h-4 mr-2" />
               Install SQLite MCP
             </button>
+          </div>
+          <div className="bg-white rounded-lg p-6 border border-gray-200 hover:shadow-lg transition-shadow opacity-60">
+            <div className="flex items-center space-x-3 mb-4">
+              <div className="w-10 h-10 bg-gray-400 rounded-lg flex items-center justify-center">
+                <Globe className="w-5 h-5 text-white" />
+              </div>
+              <h3 className="font-semibold text-gray-900">Web Search MCP</h3>
+            </div>
+            <p className="text-sm text-gray-600 mb-4">Search web, get news, weather</p>
+            <div className="text-xs text-gray-500">🚧 Coming Soon</div>
           </div>
         </div>
 

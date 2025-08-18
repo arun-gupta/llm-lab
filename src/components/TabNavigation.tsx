@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import { Home, TestTube, BarChart3, Library, TrendingUp, Settings } from 'lucide-react';
 
-export type TabType = 'home' | 'test' | 'collections' | 'analytics' | 'settings';
+export type TabType = 'home' | 'test' | 'collections' | 'settings';
 
 interface TabNavigationProps {
   activeTab: TabType;
@@ -28,12 +28,6 @@ const tabs = [
     label: 'MCP',
     icon: Library,
     description: 'Model Context Protocol integrations and collections'
-  },
-  {
-    id: 'analytics' as TabType,
-    label: 'Analytics',
-    icon: TrendingUp,
-    description: 'Performance insights and reports'
   },
   {
     id: 'settings' as TabType,

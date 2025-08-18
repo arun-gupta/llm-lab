@@ -6,24 +6,21 @@ import { HomeTab } from '@/components/tabs/HomeTab';
 import { TestTab } from '@/components/tabs/TestTab';
 
 import { MCPTab } from '@/components/tabs/MCPTab';
-import { AnalyticsTab } from '@/components/tabs/AnalyticsTab';
+
 import { SettingsTab } from '@/components/tabs/SettingsTab';
 import { PostmanSetupGuide } from '@/components/PostmanSetupGuide';
-import { ApiKeyStatusIndicator } from '@/components/ApiKeyStatusIndicator';
+
 import { CollectionPreview } from '@/components/CollectionPreview';
 import { SuccessCelebration } from '@/components/SuccessCelebration';
-import { ConfigPanel } from '@/components/ConfigPanel';
 import { LLMResponse } from '@/lib/llm-apis';
 import { generatePostmanCollection, createPostmanCollection } from '@/lib/postman';
-import { Download, Zap, Globe, Code, Github, Settings } from 'lucide-react';
+import { Download, Zap, Globe, Code, Github } from 'lucide-react';
 
 export default function Home() {
   // Tab navigation state
   const [activeTab, setActiveTab] = useState<TabType>('home');
   
-  // API key status state
-  const [apiKeyStatus, setApiKeyStatus] = useState<any>({});
-  const [apiKeyRefreshTrigger, setApiKeyRefreshTrigger] = useState(0);
+
   
   // Postman integration states
   const [showPostmanSetup, setShowPostmanSetup] = useState(false);
@@ -38,20 +35,9 @@ export default function Home() {
   // Track if we've shown the Postman connected celebration
   const [hasShownPostmanConnected, setHasShownPostmanConnected] = useState(false);
 
-  // Config panel state
-  const [showConfigPanel, setShowConfigPanel] = useState(false);
 
-  const handleApiKeyStatusChange = (status: any) => {
-    setApiKeyStatus(status);
-    
-    // Show celebration when Postman is first connected
-    if (status.postman === 'configured' && !hasShownPostmanConnected) {
-      setHasShownPostmanConnected(true);
-      setCelebrationType('postman-connected');
-      setCelebrationData({});
-      setShowSuccessCelebration(true);
-    }
-  };
+
+
 
   const handleHomeClick = () => {
     // Navigate to home tab
@@ -82,20 +68,6 @@ export default function Home() {
             </button>
             
             <div className="flex items-center space-x-3">
-              <ApiKeyStatusIndicator 
-                onStatusChange={handleApiKeyStatusChange} 
-                refreshTrigger={apiKeyRefreshTrigger}
-              />
-              
-              <button
-                onClick={() => setShowConfigPanel(true)}
-                className="flex items-center space-x-2 px-3 py-2 text-sm bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors"
-                title="Configure API Keys"
-              >
-                <Settings className="w-4 h-4" />
-                <span>Configure</span>
-              </button>
-              
               <a
                 href="https://github.com/arun-gupta/llm-prompt-lab"
                 target="_blank"
@@ -118,7 +90,7 @@ export default function Home() {
       {/* Tab Content */}
       <main className="pt-8">
         {activeTab === 'home' && (
-          <HomeTab onTabChange={setActiveTab} apiKeyStatus={apiKeyStatus} />
+          <HomeTab onTabChange={setActiveTab} />
         )}
         {activeTab === 'test' && (
           <TestTab onTabChange={setActiveTab} />
@@ -127,9 +99,7 @@ export default function Home() {
         {activeTab === 'collections' && (
           <MCPTab />
         )}
-        {activeTab === 'analytics' && (
-          <AnalyticsTab />
-        )}
+
         {activeTab === 'settings' && (
           <SettingsTab />
         )}
@@ -172,22 +142,7 @@ export default function Home() {
         data={celebrationData}
       />
 
-      {/* Config Panel */}
-      <ConfigPanel
-        isOpen={showConfigPanel}
-        onClose={() => {
-          setShowConfigPanel(false);
-          // Refresh API key status after config panel closes
-          setApiKeyRefreshTrigger(prev => prev + 1);
-        }}
-        onConfigChange={() => {
-          // Refresh Postman status when config changes
-          if (typeof window !== 'undefined') {
-            // Trigger a page refresh to pick up new environment variables
-            window.location.reload();
-          }
-        }}
-      />
+
     </div>
   );
 }

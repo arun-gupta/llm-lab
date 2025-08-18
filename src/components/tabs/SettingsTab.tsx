@@ -3,6 +3,7 @@
 import { Settings, Key, Globe, Bell, User, Shield, Download, Upload, Server } from 'lucide-react';
 import { ConfigPanel } from '../ConfigPanel';
 import { MCPServerManager } from '../MCPServerManager';
+import { ApiKeyStatusIndicator } from '../ApiKeyStatusIndicator';
 import { useState } from 'react';
 
 export function SettingsTab() {
@@ -16,14 +17,17 @@ export function SettingsTab() {
       title: 'API Configuration',
       description: 'Manage your API keys and provider settings',
       action: () => setShowConfigPanel(true),
-      status: '✅ Available'
+      status: '✅ Available',
+      showStatus: true,
+      bgColor: 'bg-blue-50 border-blue-200'
     },
     {
       icon: Server,
       title: 'MCP Server Management',
       description: 'Start, stop, and monitor MCP servers for enhanced Postman integration',
       action: () => setShowMCPServerManager(true),
-      status: '✅ Available'
+      status: '✅ Available',
+      bgColor: 'bg-green-50 border-green-200'
     },
     {
       icon: Globe,
@@ -79,6 +83,8 @@ export function SettingsTab() {
         </p>
       </div>
 
+
+
       {/* Settings Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-12">
         {settingsSections.map((section, index) => {
@@ -87,13 +93,21 @@ export function SettingsTab() {
             <button
               key={index}
               onClick={section.action}
-              className="bg-white border border-gray-200 rounded-lg p-6 text-left hover:shadow-lg transition-shadow hover:border-gray-300"
+              className={`${section.bgColor || 'bg-white border-gray-200'} border rounded-lg p-6 text-left hover:shadow-lg transition-shadow hover:border-gray-300`}
             >
               <div className="flex items-center space-x-3 mb-4">
                 <Icon className="w-6 h-6 text-gray-600" />
                 <h3 className="font-semibold text-gray-900">{section.title}</h3>
               </div>
               <p className="text-gray-600 text-sm mb-4">{section.description}</p>
+              {section.showStatus && (
+                <div className="mb-4">
+                  <ApiKeyStatusIndicator 
+                    onStatusChange={() => {}} 
+                    refreshTrigger={0}
+                  />
+                </div>
+              )}
               <div className="text-xs text-gray-500 font-medium">{section.status}</div>
             </button>
           );
@@ -150,26 +164,7 @@ export function SettingsTab() {
         </div>
       </div>
 
-      {/* Advanced Settings Placeholder */}
-      <div className="bg-gray-50 rounded-lg p-8">
-        <h2 className="text-2xl font-semibold text-gray-900 mb-6 text-center">Advanced Settings Coming Soon</h2>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <div className="bg-white rounded-lg p-6">
-            <h3 className="font-medium text-gray-900 mb-2">Team Management</h3>
-            <p className="text-sm text-gray-600 mb-4">
-              Invite team members, manage roles, and collaborate on collections and analytics.
-            </p>
-            <div className="text-xs text-gray-500">🚧 In Development</div>
-          </div>
-          <div className="bg-white rounded-lg p-6">
-            <h3 className="font-medium text-gray-900 mb-2">Integration Settings</h3>
-            <p className="text-sm text-gray-600 mb-4">
-              Configure integrations with other tools and platforms for seamless workflows.
-            </p>
-            <div className="text-xs text-gray-500">🚧 In Development</div>
-          </div>
-        </div>
-      </div>
+
 
       {/* Config Panel */}
       <ConfigPanel

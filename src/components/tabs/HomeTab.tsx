@@ -1,6 +1,6 @@
 'use client';
 
-import { Zap, TestTube, BarChart3, Library, TrendingUp, Settings, ArrowRight, Play, Code } from 'lucide-react';
+import { Zap, TestTube, BarChart3, Library, Settings, ArrowRight, Play, Code } from 'lucide-react';
 import { ApiKeyStatusIndicator } from '../ApiKeyStatusIndicator';
 
 import { TabType } from '../TabNavigation';
@@ -26,13 +26,7 @@ export function HomeTab({ onTabChange, apiKeyStatus }: HomeTabProps) {
       action: () => onTabChange('collections'),
       color: 'bg-purple-500 hover:bg-purple-600'
     },
-    {
-      title: 'View Analytics',
-      description: 'Performance insights and usage reports',
-      icon: TrendingUp,
-      action: () => onTabChange('analytics'),
-      color: 'bg-orange-500 hover:bg-orange-600'
-    }
+
   ];
 
   return (
@@ -52,7 +46,7 @@ export function HomeTab({ onTabChange, apiKeyStatus }: HomeTabProps) {
       {/* Quick Actions */}
       <div className="mb-8">
         <h2 className="text-xl font-semibold text-gray-900 mb-4">Quick Actions</h2>
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           {quickActions.map((action, index) => {
             const Icon = action.icon;
             return (
