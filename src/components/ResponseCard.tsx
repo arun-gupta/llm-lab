@@ -27,34 +27,22 @@ export function ResponseCard({ response, prompt, context }: ResponseCardProps) {
   };
 
   const getProviderColor = (provider: string) => {
-    switch (provider.toLowerCase()) {
-      case 'openai':
-        return 'border-green-200 bg-green-50';
-      case 'anthropic':
-        return 'border-blue-200 bg-blue-50';
-      case 'cohere':
-        return 'border-purple-200 bg-purple-50';
-      case 'mistral':
-        return 'border-orange-200 bg-orange-50';
-      default:
-        return 'border-gray-200 bg-gray-50';
-    }
+    const lowerProvider = provider.toLowerCase();
+    if (lowerProvider.includes('openai')) return 'border-green-200 bg-green-50';
+    if (lowerProvider.includes('anthropic')) return 'border-blue-200 bg-blue-50';
+    if (lowerProvider.includes('cohere')) return 'border-purple-200 bg-purple-50';
+    if (lowerProvider.includes('mistral')) return 'border-orange-200 bg-orange-50';
+    return 'border-gray-200 bg-gray-50';
   };
 
   const getProviderIcon = (provider: string) => {
-    switch (provider.toLowerCase()) {
-      case 'openai':
-        return '🤖';
-      case 'anthropic':
-        return '🧠';
-      case 'cohere':
-        return '⚡';
-      case 'mistral':
-        return '🌪️';
-      default:
-        if (provider.toLowerCase().includes('ollama')) return '🦙';
-        return '🤖';
-    }
+    const lowerProvider = provider.toLowerCase();
+    if (lowerProvider.includes('openai')) return '🤖';
+    if (lowerProvider.includes('anthropic')) return '🧠';
+    if (lowerProvider.includes('cohere')) return '⚡';
+    if (lowerProvider.includes('mistral')) return '🌪️';
+    if (lowerProvider.includes('ollama')) return '🦙';
+    return '🤖';
   };
 
   return (
