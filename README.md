@@ -216,7 +216,7 @@ Content-Type: application/json
 {
   "prompt": "Your prompt here",
   "context": "Optional context",
-  "providers": ["openai:gpt-4o", "anthropic:claude-3-5-sonnet"]
+  "providers": ["openai:gpt-5", "anthropic:claude-3-5-sonnet"]
 }
 ```
 

@@ -44,7 +44,7 @@ const anthropic = new Anthropic({
   apiKey: process.env.ANTHROPIC_API_KEY,
 });
 
-export async function callOpenAI(prompt: string, context?: string, model: string = 'gpt-4o-mini'): Promise<LLMResponse> {
+export async function callOpenAI(prompt: string, context?: string, model: string = 'gpt-5-mini'): Promise<LLMResponse> {
   const startTime = Date.now();
   
   try {

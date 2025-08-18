@@ -652,7 +652,7 @@ function getProviderRequestBody(provider: string, prompt: string, context?: stri
 
   if (provider.toLowerCase().includes('openai')) {
     return {
-      model: 'gpt-4o-mini',
+      model: 'gpt-5-mini',
       messages: [
         {
           role: 'user',
@@ -696,7 +696,7 @@ function getProviderRequestBody(provider: string, prompt: string, context?: stri
 
   // Fallback to OpenAI format
   return {
-    model: 'gpt-4o-mini',
+    model: 'gpt-5-mini',
     messages: [
       {
         role: 'user',

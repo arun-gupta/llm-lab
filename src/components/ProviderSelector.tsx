@@ -40,6 +40,9 @@ const staticProviders: Provider[] = [
     color: 'border-green-200 bg-green-50', 
     type: 'api',
     models: [
+      { id: 'gpt-5', name: 'GPT-5', description: 'Latest flagship model with advanced capabilities', cost: 'high' },
+      { id: 'gpt-5-mini', name: 'GPT-5 Mini', description: 'Fast and efficient GPT-5 variant', cost: 'medium' },
+      { id: 'gpt-5-nano', name: 'GPT-5 Nano', description: 'Lightweight GPT-5 for quick tasks', cost: 'low' },
       { id: 'gpt-4o', name: 'GPT-4o', description: 'Most capable, multimodal flagship model', cost: 'high' },
       { id: 'gpt-4o-mini', name: 'GPT-4o Mini', description: 'Affordable, intelligent small model', cost: 'low' },
       { id: 'gpt-4-turbo', name: 'GPT-4 Turbo', description: 'Previous generation flagship', cost: 'high' },
@@ -152,7 +155,7 @@ export function ProviderSelector({
     {
       name: "Budget",
       description: "Fast, cost-effective models",
-      models: ["openai:gpt-4o-mini", "anthropic:claude-3-haiku-20240307"]
+      models: ["openai:gpt-5-nano", "anthropic:claude-3-haiku-20240307"]
     },
     {
       name: "Premium", 
@@ -163,8 +166,8 @@ export function ProviderSelector({
       name: "Local vs Cloud",
       description: "Compare local Ollama with cloud APIs",
       models: availableOllamaModels.length > 0 
-        ? ["openai:gpt-4o-mini", `ollama:${availableOllamaModels[0].name}`]
-        : ["openai:gpt-4o-mini", "anthropic:claude-3-haiku-20240307"]
+        ? ["openai:gpt-5-mini", `ollama:${availableOllamaModels[0].name}`]
+        : ["openai:gpt-5-mini", "anthropic:claude-3-haiku-20240307"]
     },
     {
       name: "All Local",
@@ -176,7 +179,12 @@ export function ProviderSelector({
     {
       name: "OpenAI Compare",
       description: "Compare OpenAI models",
-      models: ["openai:gpt-4o", "openai:gpt-4o-mini"]
+      models: ["openai:gpt-5", "openai:gpt-5-mini", "openai:gpt-5-nano"]
+    },
+    {
+      name: "GPT-5 Suite",
+      description: "Compare all GPT-5 variants",
+      models: ["openai:gpt-5", "openai:gpt-5-mini", "openai:gpt-5-nano"]
     },
     {
       name: "Anthropic Compare",
