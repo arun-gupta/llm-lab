@@ -116,6 +116,92 @@ export async function callOpenAI(prompt: string, context?: string, model: string
   }
 }
 
+export async function callOpenAIStreaming(prompt: string, context?: string, model: string = 'gpt-5-mini'): Promise<LLMResponse> {
+  const startTime = Date.now();
+  
+  try {
+    const fullPrompt = context ? `${context}\n\n${prompt}` : prompt;
+    
+    // Add timeout to individual provider calls - increased for Codespaces and GPT-5 models
+    const baseTimeoutMs = process.env.CODESPACES ? 45000 : 20000; // 45 seconds for Codespaces, 20 for local
+    const timeoutMs = model.startsWith('gpt-5') ? 60000 : baseTimeoutMs; // 60 seconds for GPT-5 models
+    
+    // Use max_completion_tokens for GPT-5 models, max_tokens for others
+    const tokenParam = model.startsWith('gpt-5') ? 'max_completion_tokens' : 'max_tokens';
+    
+    console.log('=== GPT-5 Streaming Debug ===');
+    console.log('Using streaming for GPT-5 model:', model);
+    console.log('Token parameter:', tokenParam);
+    console.log('Token limit: 1500');
+    console.log('================================');
+    
+    const stream = await Promise.race([
+      openai.chat.completions.create({
+        model: model,
+        messages: [
+          {
+            role: 'user',
+            content: fullPrompt,
+          },
+        ],
+        [tokenParam]: 1500, // Balanced token limit for GPT-5
+        temperature: 0.7,
+        top_p: 1,
+        stream: true, // Enable streaming
+      }),
+      new Promise((_, reject) => 
+        setTimeout(() => reject(new Error('OpenAI streaming request timeout')), timeoutMs)
+      )
+    ]) as any;
+
+    let content = '';
+    let totalTokens = 0;
+    
+    // Collect all chunks from the stream
+    for await (const chunk of stream) {
+      const delta = chunk.choices[0]?.delta?.content;
+      if (delta) {
+        content += delta;
+      }
+      // Track token usage if available
+      if (chunk.usage) {
+        totalTokens = chunk.usage.total_tokens || totalTokens;
+      }
+    }
+
+    const latency = Date.now() - startTime;
+    
+    console.log('=== GPT-5 Streaming Results ===');
+    console.log('Final content length:', content.length);
+    console.log('Content preview:', content.substring(0, 200) + '...');
+    console.log('Total tokens used:', totalTokens);
+    console.log('================================');
+    
+    return {
+      provider: `OpenAI (${model})`,
+      content: content || 'No response received',
+      latency,
+      tokens: {
+        prompt: 0, // We don't have exact breakdown in streaming
+        completion: totalTokens,
+        total: totalTokens,
+      },
+    };
+  } catch (error) {
+    console.log('=== GPT-5 Streaming Error ===');
+    console.log('Error occurred in callOpenAIStreaming:', error);
+    console.log('Error message:', error instanceof Error ? error.message : 'Unknown error');
+    console.log('================================');
+    
+    return {
+      provider: `OpenAI (${model})`,
+      content: 'No response received',
+      latency: Date.now() - startTime,
+      error: error instanceof Error ? error.message : 'Unknown error occurred',
+    };
+  }
+}
+
 export async function callAnthropic(prompt: string, context?: string, model: string = 'claude-3-5-haiku-20241022'): Promise<LLMResponse> {
   const startTime = Date.now();
   
@@ -260,18 +346,12 @@ export async function callAllProviders(request: LLMRequest): Promise<LLMResponse
     if (provider.startsWith('openai:')) {
       const model = provider.replace('openai:', '');
       console.log('Calling OpenAI with model:', model);
-      // Temporarily skip GPT-5 models due to empty response issue
-      if (model.startsWith('gpt-5')) {
-        console.log('Skipping GPT-5 model due to empty response issue');
-        promises.push(Promise.resolve({
-          provider: `OpenAI (${model})`,
-          content: 'GPT-5 models currently experiencing issues. Please try GPT-4o or other models.',
-          latency: 0,
-          error: 'GPT-5 models returning empty responses - temporary issue'
-        }));
-      } else {
-        promises.push(callOpenAI(request.prompt, request.context, model));
-      }
+          if (model.startsWith('gpt-5')) {
+      console.log('Calling GPT-5 with streaming approach');
+      promises.push(callOpenAIStreaming(request.prompt, request.context, model));
+    } else {
+      promises.push(callOpenAI(request.prompt, request.context, model));
+    }
     } else if (provider.startsWith('anthropic:')) {
       const model = provider.replace('anthropic:', '');
       console.log('Calling Anthropic with model:', model);
