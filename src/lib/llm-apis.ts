@@ -67,8 +67,6 @@ export async function callOpenAI(prompt: string, context?: string, model: string
           },
         ],
         [tokenParam]: model.startsWith('gpt-5') ? 100 : 1000,
-        temperature: model.startsWith('gpt-5') ? 0.7 : 0.7,
-        top_p: model.startsWith('gpt-5') ? 1 : 1,
       }),
       new Promise((_, reject) => 
         setTimeout(() => reject(new Error('OpenAI request timeout')), timeoutMs)
@@ -145,8 +143,6 @@ export async function callOpenAIStreaming(prompt: string, context?: string, mode
           },
         ],
         [tokenParam]: 1500, // Balanced token limit for GPT-5
-        temperature: 0.7,
-        top_p: 1,
         stream: true, // Enable streaming
       }),
       new Promise((_, reject) => 
