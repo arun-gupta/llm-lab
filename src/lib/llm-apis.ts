@@ -66,7 +66,7 @@ export async function callOpenAI(prompt: string, context?: string, model: string
             content: fullPrompt,
           },
         ],
-        [tokenParam]: model.startsWith('gpt-5') ? 2000 : 1000,
+        [tokenParam]: model.startsWith('gpt-5') ? 1000 : 1000,
       }),
       new Promise((_, reject) => 
         setTimeout(() => reject(new Error('OpenAI request timeout')), timeoutMs)
