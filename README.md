@@ -15,6 +15,7 @@ Click the button at the top of this README to open LLM Lab in GitHub Codespaces.
 - 🌐 **Forward port 3000** automatically
 - 📋 **Show detailed logs** during setup (use Cmd/Ctrl + Shift + P → "View Creation Log")
 - 💻 **Use 4-core machine** with 8GB RAM for optimal LLM performance
+- 🔌 **Optional MCP setup** for enhanced Postman integration
 
 ### **Option 2: Local Development**
 ```bash
@@ -30,6 +31,16 @@ npm install
 cp .env.local.example .env.local
 # Add your API keys to .env.local
 npm run dev
+```
+
+### **MCP Server Setup (Optional)**
+```bash
+# Set up Filesystem MCP server
+./scripts/setup-http-filesystem-mcp.sh
+
+# Set up SQLite MCP server (requires Docker)
+mkdir -p data
+docker run -d --name sqlite-mcp-http -p 4000:4000 -v $(pwd)/data:/data -e SERVER_MODE=http -e HTTP_PORT=4000 arungupta/sqlite-mcp-server
 ```
 
 ### **MCP Server Integration**
