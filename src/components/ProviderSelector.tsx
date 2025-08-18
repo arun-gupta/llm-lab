@@ -40,13 +40,13 @@ const staticProviders: Provider[] = [
     color: 'border-green-200 bg-green-50', 
     type: 'api',
     models: [
-      { id: 'gpt-5', name: 'GPT-5', description: 'Latest flagship model with advanced capabilities', cost: 'high' },
-      { id: 'gpt-5-mini', name: 'GPT-5 Mini', description: 'Fast and efficient GPT-5 variant', cost: 'medium' },
-      { id: 'gpt-5-nano', name: 'GPT-5 Nano', description: 'Lightweight GPT-5 for quick tasks', cost: 'low' },
-      { id: 'gpt-4o', name: 'GPT-4o', description: 'Most capable, multimodal flagship model', cost: 'high' },
-      { id: 'gpt-4o-mini', name: 'GPT-4o Mini', description: 'Affordable, intelligent small model', cost: 'low' },
-      { id: 'gpt-4-turbo', name: 'GPT-4 Turbo', description: 'Previous generation flagship', cost: 'high' },
-      { id: 'gpt-3.5-turbo', name: 'GPT-3.5 Turbo', description: 'Fast, inexpensive model', cost: 'low' },
+      { id: 'gpt-5', name: 'GPT-5', description: 'Latest flagship model with advanced capabilities', cost: 'high', featured: true },
+      { id: 'gpt-5-mini', name: 'GPT-5 Mini', description: 'Fast and efficient GPT-5 variant', cost: 'medium', featured: true },
+      { id: 'gpt-5-nano', name: 'GPT-5 Nano', description: 'Lightweight GPT-5 for quick tasks', cost: 'low', featured: true },
+      { id: 'gpt-4o', name: 'GPT-4o', description: 'Previous generation flagship', cost: 'high', featured: false },
+      { id: 'gpt-4o-mini', name: 'GPT-4o Mini', description: 'Previous generation affordable model', cost: 'low', featured: false },
+      { id: 'gpt-4-turbo', name: 'GPT-4 Turbo', description: 'Legacy model', cost: 'high', featured: false },
+      { id: 'gpt-3.5-turbo', name: 'GPT-3.5 Turbo', description: 'Legacy model', cost: 'low', featured: false },
     ]
   },
   { 
@@ -56,13 +56,13 @@ const staticProviders: Provider[] = [
     color: 'border-blue-200 bg-blue-50', 
     type: 'api',
     models: [
-      { id: 'claude-4-sonnet-20241022', name: 'Claude 4 Sonnet', description: 'Latest flagship model with advanced reasoning', cost: 'high' },
-      { id: 'claude-4-haiku-20241022', name: 'Claude 4 Haiku', description: 'Fast and efficient Claude 4 variant', cost: 'medium' },
-      { id: 'claude-4-opus-20241022', name: 'Claude 4 Opus', description: 'Most powerful Claude 4 for complex tasks', cost: 'high' },
-      { id: 'claude-3-5-sonnet-20241022', name: 'Claude 3.5 Sonnet', description: 'Previous generation flagship', cost: 'high' },
-      { id: 'claude-3-5-haiku-20241022', name: 'Claude 3.5 Haiku', description: 'Fastest previous generation model', cost: 'low' },
-      { id: 'claude-3-opus-20240229', name: 'Claude 3 Opus', description: 'Powerful model for complex tasks', cost: 'high' },
-      { id: 'claude-3-haiku-20240307', name: 'Claude 3 Haiku', description: 'Fast and cost-effective', cost: 'low' },
+      { id: 'claude-4-sonnet-20241022', name: 'Claude 4 Sonnet', description: 'Latest flagship model with advanced reasoning', cost: 'high', featured: true },
+      { id: 'claude-4-haiku-20241022', name: 'Claude 4 Haiku', description: 'Fast and efficient Claude 4 variant', cost: 'medium', featured: true },
+      { id: 'claude-4-opus-20241022', name: 'Claude 4 Opus', description: 'Most powerful Claude 4 for complex tasks', cost: 'high', featured: true },
+      { id: 'claude-3-5-sonnet-20241022', name: 'Claude 3.5 Sonnet', description: 'Previous generation flagship', cost: 'high', featured: false },
+      { id: 'claude-3-5-haiku-20241022', name: 'Claude 3.5 Haiku', description: 'Previous generation model', cost: 'low', featured: false },
+      { id: 'claude-3-opus-20240229', name: 'Claude 3 Opus', description: 'Legacy model', cost: 'high', featured: false },
+      { id: 'claude-3-haiku-20240307', name: 'Claude 3 Haiku', description: 'Legacy model', cost: 'low', featured: false },
     ]
   },
 ];
@@ -75,6 +75,7 @@ export function ProviderSelector({
 }: ProviderSelectorProps) {
   const [localOllamaModels, setLocalOllamaModels] = useState<OllamaModel[]>([]);
   const [isLoadingOllama, setIsLoadingOllama] = useState(true);
+  const [showLegacyModels, setShowLegacyModels] = useState(false);
 
   // Fetch available Ollama models on component mount
   useEffect(() => {
@@ -98,6 +99,16 @@ export function ProviderSelector({
   const availableOllamaModels = ollamaModels.length > 0 
     ? ollamaModels.map(name => ({ name, model: name, size: 0 }))
     : localOllamaModels;
+
+  // Auto-select recommended combo if no providers are selected
+  useEffect(() => {
+    if (selectedProviders.length === 0 && isInitialized) {
+      const recommendedCombo = modelCombos.find(combo => combo.recommended);
+      if (recommendedCombo) {
+        onProvidersChange(recommendedCombo.models);
+      }
+    }
+  }, [selectedProviders.length, isInitialized, onProvidersChange]);
 
   // Group models by provider for compact display
   const providerGroups = [
@@ -153,51 +164,35 @@ export function ProviderSelector({
     onProvidersChange([]);
   };
 
-  // Preconfigured model combinations
+  // Simplified model combinations with clear recommendations
   const modelCombos = [
     {
-      name: "Budget",
-      description: "Fast, cost-effective models",
+      name: "🚀 Recommended",
+      description: "Best balance of performance and cost",
+      models: ["openai:gpt-5-mini", "anthropic:claude-4-haiku-20241022"],
+      recommended: true
+    },
+    {
+      name: "💰 Budget",
+      description: "Fast and cost-effective",
       models: ["openai:gpt-5-nano", "anthropic:claude-4-haiku-20241022"]
     },
     {
-      name: "Premium", 
+      name: "⚡ Premium",
       description: "Best performance models",
       models: ["openai:gpt-5", "anthropic:claude-4-sonnet-20241022"]
     },
     {
-      name: "Local vs Cloud",
-      description: "Compare local Ollama with cloud APIs",
+      name: "🦙 Local + Cloud",
+      description: "Compare local with cloud",
       models: availableOllamaModels.length > 0 
         ? ["openai:gpt-5-mini", `ollama:${availableOllamaModels[0].name}`]
         : ["openai:gpt-5-mini", "anthropic:claude-4-haiku-20241022"]
     },
     {
-      name: "All Local",
-      description: "Test all running Ollama models",
-      models: availableOllamaModels.length > 0 
-        ? availableOllamaModels.map(model => `ollama:${model.name}`)
-        : []
-    },
-    {
-      name: "OpenAI Compare",
-      description: "Compare OpenAI models",
-      models: ["openai:gpt-5", "openai:gpt-5-mini", "openai:gpt-5-nano"]
-    },
-    {
-      name: "GPT-5 Suite",
-      description: "Compare all GPT-5 variants",
-      models: ["openai:gpt-5", "openai:gpt-5-mini", "openai:gpt-5-nano"]
-    },
-    {
-      name: "Anthropic Compare",
-      description: "Compare Anthropic models", 
-      models: ["anthropic:claude-4-sonnet-20241022", "anthropic:claude-4-haiku-20241022"]
-    },
-    {
-      name: "Claude 4 Suite",
-      description: "Compare all Claude 4 variants",
-      models: ["anthropic:claude-4-opus-20241022", "anthropic:claude-4-sonnet-20241022", "anthropic:claude-4-haiku-20241022"]
+      name: "🔬 Advanced",
+      description: "Compare latest models",
+      models: ["openai:gpt-5", "openai:gpt-5-mini", "anthropic:claude-4-sonnet-20241022", "anthropic:claude-4-haiku-20241022"]
     }
   ];
 
@@ -238,7 +233,7 @@ export function ProviderSelector({
 
       {/* Quick Combos */}
       <div>
-        <label className="text-xs font-medium text-gray-600 mb-2 block">Quick Combos:</label>
+        <label className="text-xs font-medium text-gray-600 mb-2 block">Quick Start (Recommended):</label>
         {!isInitialized ? (
           <div className="flex items-center space-x-2 text-sm text-gray-500">
             <div className="w-4 h-4 border-2 border-gray-300 border-t-blue-600 rounded-full animate-spin"></div>
@@ -246,13 +241,15 @@ export function ProviderSelector({
           </div>
         ) : (
           <div className="flex flex-wrap gap-2">
-            {modelCombos
-              .filter(combo => combo.name !== "All Local" || availableOllamaModels.length > 0)
-              .map((combo) => (
+            {modelCombos.map((combo) => (
               <button
                 key={combo.name}
                 onClick={() => selectCombo(combo)}
-                className="text-xs px-3 py-1.5 bg-blue-50 hover:bg-blue-100 text-blue-700 border border-blue-200 rounded-full transition-colors"
+                className={`text-xs px-3 py-1.5 border rounded-full transition-colors ${
+                  combo.recommended 
+                    ? 'bg-green-50 hover:bg-green-100 text-green-700 border-green-300 font-medium' 
+                    : 'bg-blue-50 hover:bg-blue-100 text-blue-700 border-blue-200'
+                }`}
                 title={combo.description}
               >
                 {combo.name}
@@ -276,34 +273,48 @@ export function ProviderSelector({
                 <span className="font-medium text-gray-900">{providerGroup.name}</span>
               </div>
               <div className="space-y-2 ml-6">
-                {providerGroup.models.map((model) => {
-                  const modelId = `${providerGroup.id}:${model.id}`;
-                  return (
-                    <label
-                      key={modelId}
-                      className={`
-                        flex items-center justify-between p-2 border rounded cursor-pointer transition-all text-sm
-                        ${selectedProviders.includes(modelId) 
-                          ? 'border-blue-500 bg-blue-50' 
-                          : 'border-gray-200 hover:border-gray-300'
-                        }
-                      `}
-                    >
-                      <div className="flex items-center space-x-2 flex-1">
-                        <input
-                          type="checkbox"
-                          checked={selectedProviders.includes(modelId)}
-                          onChange={() => toggleProvider(modelId)}
-                          className="w-3 h-3 text-blue-600 border-gray-300 rounded focus:ring-blue-500 flex-shrink-0"
-                        />
-                        <span className="font-medium text-gray-900">{model.name}</span>
-                      </div>
-                      <span className={`px-1.5 py-0.5 text-xs rounded-full ml-2 flex-shrink-0 ${getCostColor(model.cost)}`}>
-                        {model.cost}
-                      </span>
-                    </label>
-                  );
-                })}
+                {providerGroup.models
+                  .filter(model => model.featured || showLegacyModels)
+                  .map((model) => {
+                    const modelId = `${providerGroup.id}:${model.id}`;
+                    return (
+                      <label
+                        key={modelId}
+                        className={`
+                          flex items-center justify-between p-2 border rounded cursor-pointer transition-all text-sm
+                          ${selectedProviders.includes(modelId) 
+                            ? 'border-blue-500 bg-blue-50' 
+                            : 'border-gray-200 hover:border-gray-300'
+                          }
+                          ${!model.featured ? 'opacity-75' : ''}
+                        `}
+                      >
+                        <div className="flex items-center space-x-2 flex-1">
+                          <input
+                            type="checkbox"
+                            checked={selectedProviders.includes(modelId)}
+                            onChange={() => toggleProvider(modelId)}
+                            className="w-3 h-3 text-blue-600 border-gray-300 rounded focus:ring-blue-500 flex-shrink-0"
+                          />
+                          <span className="font-medium text-gray-900">{model.name}</span>
+                          {!model.featured && (
+                            <span className="text-xs text-gray-500">(legacy)</span>
+                          )}
+                        </div>
+                        <span className={`px-1.5 py-0.5 text-xs rounded-full ml-2 flex-shrink-0 ${getCostColor(model.cost)}`}>
+                          {model.cost}
+                        </span>
+                      </label>
+                    );
+                  })}
+                {providerGroup.models.some(model => !model.featured) && (
+                  <button
+                    onClick={() => setShowLegacyModels(!showLegacyModels)}
+                    className="text-xs text-blue-600 hover:text-blue-800 mt-2"
+                  >
+                    {showLegacyModels ? 'Hide' : 'Show'} legacy models
+                  </button>
+                )}
               </div>
             </div>
           ))}
