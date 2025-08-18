@@ -154,24 +154,9 @@ export function ResponseTabs({
       else if (provider.includes('ollama')) costPer1M = 0; // Local models are free
 
       const cost = (r.tokens.total / 1000000) * costPer1M;
-      
-      // Debug logging for cost calculation
-      console.log(`Cost calculation for ${r.provider}:`, {
-        tokens: r.tokens.total,
-        costPer1M,
-        calculatedCost: cost,
-        provider: r.provider
-      });
-      
       return cost;
     });
     const totalCost = costEstimates.reduce((sum, cost) => sum + cost, 0);
-    
-    console.log('Cost analysis:', {
-      costEstimates,
-      totalCost,
-      responses: responses.map(r => ({ provider: r.provider, tokens: r.tokens?.total }))
-    });
 
     // Response similarity (basic Jaccard similarity for words)
     const calculateSimilarity = (text1: string, text2: string) => {
@@ -348,17 +333,6 @@ export function ResponseTabs({
   };
 
   const analytics = calculateAnalytics();
-  
-  // Debug logging to see what provider names are being used
-  console.log('Analytics Debug:', {
-    performanceRanking: analytics.performanceRanking?.map(r => r.provider),
-    efficiencyRanking: analytics.efficiencyRanking?.map(r => r.provider),
-    qualityMetrics: analytics.qualityMetrics?.map(r => r.provider),
-    bestCompleteness: analytics.bestCompleteness?.provider,
-    bestReadability: analytics.bestReadability?.provider,
-    bestStructure: analytics.bestStructure?.provider,
-    responses: responses?.map(r => r.provider)
-  });
 
   return (
     <div className="space-y-4">
@@ -784,9 +758,9 @@ export function ResponseTabs({
                                                 <div className="space-y-3">
                           {analytics.qualityMetrics.map((metric, index) => (
                             <div key={index} className="py-2">
-                              <div className="flex justify-between items-center mb-1">
-                                <span className="text-gray-600 text-sm truncate mr-2">{metric.provider}</span>
-                                <span className="font-medium text-gray-900 text-sm whitespace-nowrap">{(metric.completeness * 100).toFixed(0)}%</span>
+                              <div className="flex justify-between items-start mb-1">
+                                <span className="text-gray-600 text-sm mr-2 flex-1 min-w-0">{metric.provider}</span>
+                                <span className="font-medium text-gray-900 text-sm whitespace-nowrap ml-2">{(metric.completeness * 100).toFixed(0)}%</span>
                               </div>
                               <div className="w-full bg-gray-200 rounded-full h-2">
                                 <div
@@ -823,9 +797,9 @@ export function ResponseTabs({
                                                 <div className="space-y-3">
                           {analytics.qualityMetrics.map((metric, index) => (
                             <div key={index} className="py-2">
-                              <div className="flex justify-between items-center mb-1">
-                                <span className="text-gray-600 text-sm truncate mr-2">{metric.provider}</span>
-                                <span className="font-medium text-gray-900 text-sm whitespace-nowrap">Grade {metric.readability.toFixed(1)}</span>
+                              <div className="flex justify-between items-start mb-1">
+                                <span className="text-gray-600 text-sm mr-2 flex-1 min-w-0">{metric.provider}</span>
+                                <span className="font-medium text-gray-900 text-sm whitespace-nowrap ml-2">Grade {metric.readability.toFixed(1)}</span>
                               </div>
                               <div className="w-full bg-gray-200 rounded-full h-2">
                                 <div
@@ -862,9 +836,9 @@ export function ResponseTabs({
                                                 <div className="space-y-3">
                           {analytics.qualityMetrics.map((metric, index) => (
                             <div key={index} className="py-2">
-                              <div className="flex justify-between items-center mb-1">
-                                <span className="text-gray-600 text-sm truncate mr-2">{metric.provider}</span>
-                                <span className="font-medium text-gray-900 text-sm whitespace-nowrap">{(metric.structure * 100).toFixed(0)}%</span>
+                              <div className="flex justify-between items-start mb-1">
+                                <span className="text-gray-600 text-sm mr-2 flex-1 min-w-0">{metric.provider}</span>
+                                <span className="font-medium text-gray-900 text-sm whitespace-nowrap ml-2">{(metric.structure * 100).toFixed(0)}%</span>
                               </div>
                               <div className="w-full bg-gray-200 rounded-full h-2">
                                 <div

@@ -209,61 +209,25 @@ export async function callOpenAIStreaming(prompt: string, context?: string, mode
       const delta = chunk.choices[0]?.delta?.content;
       finishReason = chunk.choices[0]?.finish_reason;
       
-      // Log every chunk for debugging
-      console.log(`Chunk ${chunkCount}:`, {
-        delta: delta ? `${delta.length} chars` : 'null',
-        finish_reason: finishReason,
-        hasContent: !!delta,
-        usage: chunk.usage || 'none'
-      });
-      
       if (delta) {
         content += delta;
         hasContent = true;
-        console.log(`Chunk ${chunkCount}: Received "${delta}"`);
       }
       
       // Track token usage - usage is typically only in the final chunk
       if (chunk.usage) {
         finalUsage = chunk.usage;
         totalTokens = chunk.usage.total_tokens || totalTokens;
-        console.log(`Chunk ${chunkCount}: Usage data received:`, chunk.usage);
-      } else {
-        console.log(`Chunk ${chunkCount}: No usage data in chunk`);
-      }
-      
-      // For nano, also check finish_reason to see if it's hitting length limit
-      if (finishReason === 'length') {
-        console.log(`Model ${model} hit length limit at chunk ${chunkCount}`);
       }
     }
     
-    console.log(`Total chunks received: ${chunkCount}`);
-    console.log(`Final content length: ${content.length}`);
-    console.log(`Has content: ${hasContent}`);
-    console.log(`Finish reason: ${finishReason}`);
-
     const latency = Date.now() - startTime;
-    
-    console.log('=== GPT-5 Streaming Results ===');
-    console.log('Final content length:', content.length);
-    console.log('Content preview:', content.substring(0, 200) + '...');
-    console.log('Total tokens used:', totalTokens);
-    console.log('Final usage data:', finalUsage);
-    console.log('Has usage data:', !!finalUsage);
-    console.log('Tokens breakdown:', {
-      prompt: finalUsage?.prompt_tokens || 0,
-      completion: finalUsage?.completion_tokens || totalTokens,
-      total: finalUsage?.total_tokens || totalTokens,
-    });
-    console.log('================================');
     
     // Fallback token estimation if usage data is not available
     let estimatedTokens = 0;
     if (!finalUsage && content && content.length > 0) {
       // Rough estimation: ~4 characters per token for English text
       estimatedTokens = Math.ceil(content.length / 4);
-      console.log(`No usage data received, estimating tokens: ${estimatedTokens} (from ${content.length} chars)`);
     }
 
     return {
@@ -282,10 +246,7 @@ export async function callOpenAIStreaming(prompt: string, context?: string, mode
         'Response may be truncated. Consider increasing token limit or using a shorter prompt for complete responses.' : undefined
     };
   } catch (error) {
-    console.log('=== GPT-5 Streaming Error ===');
-    console.log('Error occurred in callOpenAIStreaming:', error);
-    console.log('Error message:', error instanceof Error ? error.message : 'Unknown error');
-    console.log('================================');
+    console.error('GPT-5 Streaming Error:', error instanceof Error ? error.message : 'Unknown error');
     
     return {
       provider: `OpenAI (${model})`,
