@@ -25,7 +25,8 @@ export async function POST(request: NextRequest) {
         provider: resp.provider,
         contentLength: resp.content?.length,
         contentPreview: resp.content?.substring(0, 100) + '...',
-        hasError: !!resp.error
+        hasError: !!resp.error,
+        fullContent: resp.content
       });
     });
     console.log('================================');

@@ -179,7 +179,8 @@ export function LLMForm({ onResponsesChange, onLoadingChange, onProvidersChange,
           provider: resp.provider,
           content: resp.content?.substring(0, 100) + '...',
           contentLength: resp.content?.length,
-          hasError: !!resp.error
+          hasError: !!resp.error,
+          fullContent: resp.content
         });
       });
       
