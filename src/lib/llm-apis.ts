@@ -50,8 +50,9 @@ export async function callOpenAI(prompt: string, context?: string, model: string
   try {
     const fullPrompt = context ? `${context}\n\n${prompt}` : prompt;
     
-    // Add timeout to individual provider calls - increased for Codespaces
-    const timeoutMs = process.env.CODESPACES ? 45000 : 20000; // 45 seconds for Codespaces, 20 for local
+    // Add timeout to individual provider calls - increased for Codespaces and GPT-5 models
+    const baseTimeoutMs = process.env.CODESPACES ? 45000 : 20000; // 45 seconds for Codespaces, 20 for local
+    const timeoutMs = model.startsWith('gpt-5') ? 60000 : baseTimeoutMs; // 60 seconds for GPT-5 models
     
     // Use max_completion_tokens for GPT-5 models, max_tokens for others
     const tokenParam = model.startsWith('gpt-5') ? 'max_completion_tokens' : 'max_tokens';
