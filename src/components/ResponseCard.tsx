@@ -124,6 +124,7 @@ export function ResponseCard({ response, prompt, context }: ResponseCardProps) {
       case 'mistral':
         return '🌪️';
       default:
+        if (provider.toLowerCase().includes('ollama')) return '🦙';
         return '🤖';
     }
   };
@@ -135,9 +136,9 @@ export function ResponseCard({ response, prompt, context }: ResponseCardProps) {
     )}>
       {/* Header */}
       <div className="flex items-center justify-between mb-4">
-        <div className="flex items-center space-x-2">
-          <span className="text-2xl">{getProviderIcon(response.provider)}</span>
-          <h3 className="font-semibold text-lg">{response.provider}</h3>
+        <div className="flex items-center space-x-3">
+          <span className="text-3xl">{getProviderIcon(response.provider)}</span>
+          <h3 className="font-bold text-xl text-gray-900">{response.provider}</h3>
         </div>
         
         <div className="flex items-center space-x-2">
