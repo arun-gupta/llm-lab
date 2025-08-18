@@ -2,7 +2,7 @@
 
 [![Open in GitHub Codespaces](https://github.com/codespaces/badge.svg)](https://codespaces.new/arun-gupta/llm-prompt-lab)
 
-A full-stack web application that allows you to test and compare LLMs across multiple providers side by side, with **Postman integration and analytics**. Perfect for LLM experimentation, performance analysis, and AI development.
+A full-stack web application that allows you to test and compare LLMs across multiple providers side by side, with **Postman integration, MCP server integration, and analytics**. Perfect for LLM experimentation, performance analysis, and AI development.
 
 ## 🚀 Quick Start
 
