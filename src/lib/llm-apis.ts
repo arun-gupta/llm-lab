@@ -45,6 +45,29 @@ const anthropic = new Anthropic({
   apiKey: process.env.ANTHROPIC_API_KEY,
 });
 
+// Load token limits from config
+const loadTokenLimits = () => {
+  try {
+    const fs = require('fs');
+    const path = require('path');
+    const configPath = path.join(process.cwd(), 'config', 'token-limits.json');
+    
+    if (fs.existsSync(configPath)) {
+      const data = fs.readFileSync(configPath, 'utf8');
+      return JSON.parse(data);
+    }
+  } catch (error) {
+    console.log('Using default token limits');
+  }
+  
+  // Return defaults if file doesn't exist or error
+  return {
+    gpt5Streaming: 1500,
+    gpt5NonStreaming: 100,
+    otherModels: 1000
+  };
+};
+
 export async function callOpenAI(prompt: string, context?: string, model: string = 'gpt-5-mini'): Promise<LLMResponse> {
   const startTime = Date.now();
   
@@ -58,6 +81,9 @@ export async function callOpenAI(prompt: string, context?: string, model: string
     // Use max_completion_tokens for GPT-5 models, max_tokens for others
     const tokenParam = model.startsWith('gpt-5') ? 'max_completion_tokens' : 'max_tokens';
     
+    const tokenLimits = loadTokenLimits();
+    const tokenLimit = model.startsWith('gpt-5') ? tokenLimits.gpt5NonStreaming : tokenLimits.otherModels;
+    
     const response = await Promise.race([
       openai.chat.completions.create({
         model: model,
@@ -67,7 +93,7 @@ export async function callOpenAI(prompt: string, context?: string, model: string
             content: fullPrompt,
           },
         ],
-        [tokenParam]: model.startsWith('gpt-5') ? 100 : 1000,
+        [tokenParam]: tokenLimit,
       }),
       new Promise((_, reject) => 
         setTimeout(() => reject(new Error('OpenAI request timeout')), timeoutMs)
@@ -130,10 +156,13 @@ export async function callOpenAIStreaming(prompt: string, context?: string, mode
     // Use max_completion_tokens for GPT-5 models, max_tokens for others
     const tokenParam = model.startsWith('gpt-5') ? 'max_completion_tokens' : 'max_tokens';
     
+    const tokenLimits = loadTokenLimits();
+    const tokenLimit = tokenLimits.gpt5Streaming;
+    
     console.log('=== GPT-5 Streaming Debug ===');
     console.log('Using streaming for GPT-5 model:', model);
     console.log('Token parameter:', tokenParam);
-    console.log('Token limit: 1500');
+    console.log('Token limit:', tokenLimit);
     console.log('================================');
     
     const stream = await Promise.race([
@@ -145,7 +174,7 @@ export async function callOpenAIStreaming(prompt: string, context?: string, mode
             content: fullPrompt,
           },
         ],
-        [tokenParam]: 1500, // Balanced token limit for GPT-5
+        [tokenParam]: tokenLimit, // Configurable token limit for GPT-5
         stream: true, // Enable streaming
       }),
       new Promise((_, reject) => 

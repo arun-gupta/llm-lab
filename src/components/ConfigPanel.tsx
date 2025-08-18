@@ -20,6 +20,12 @@ interface GitHubSettings {
   reposCount: number;
 }
 
+interface TokenLimits {
+  gpt5Streaming: number;
+  gpt5NonStreaming: number;
+  otherModels: number;
+}
+
 export function ConfigPanel({ isOpen, onClose, onConfigChange }: ConfigPanelProps) {
   const [apiKeys, setApiKeys] = useState<ApiKeys>({
     openai: '',
@@ -29,6 +35,11 @@ export function ConfigPanel({ isOpen, onClose, onConfigChange }: ConfigPanelProp
   });
   const [githubSettings, setGithubSettings] = useState<GitHubSettings>({
     reposCount: 3
+  });
+  const [tokenLimits, setTokenLimits] = useState<TokenLimits>({
+    gpt5Streaming: 1500,
+    gpt5NonStreaming: 100,
+    otherModels: 1000
   });
   const [showKeys, setShowKeys] = useState<{ [key in keyof ApiKeys]: boolean }>({
     openai: false,
@@ -51,6 +62,7 @@ export function ConfigPanel({ isOpen, onClose, onConfigChange }: ConfigPanelProp
     if (isOpen) {
       loadApiKeys();
       loadGitHubSettings();
+      loadTokenLimits();
     }
   }, [isOpen]);
 
@@ -85,6 +97,22 @@ export function ConfigPanel({ isOpen, onClose, onConfigChange }: ConfigPanelProp
     }
   };
 
+  const loadTokenLimits = async () => {
+    try {
+      const response = await fetch('/api/config/token-limits');
+      if (response.ok) {
+        const limits = await response.json();
+        setTokenLimits({
+          gpt5Streaming: limits.gpt5Streaming || 1500,
+          gpt5NonStreaming: limits.gpt5NonStreaming || 100,
+          otherModels: limits.otherModels || 1000
+        });
+      }
+    } catch (error) {
+      console.log('No existing token limits found, using defaults');
+    }
+  };
+
   const handleSave = async () => {
     setIsSaving(true);
     setSaveStatus('idle');
@@ -109,7 +137,16 @@ export function ConfigPanel({ isOpen, onClose, onConfigChange }: ConfigPanelProp
         body: JSON.stringify(githubSettings),
       });
 
-      if (keysResponse.ok && settingsResponse.ok) {
+      // Save token limits
+      const tokenLimitsResponse = await fetch('/api/config/token-limits', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(tokenLimits),
+      });
+
+      if (keysResponse.ok && settingsResponse.ok && tokenLimitsResponse.ok) {
         setSaveStatus('success');
         setStatusMessage('Configuration saved successfully!');
         onConfigChange?.();
@@ -466,6 +503,74 @@ export function ConfigPanel({ isOpen, onClose, onConfigChange }: ConfigPanelProp
                 <p className="text-xs text-gray-500">
                   Number of repositories to fetch when testing GitHub MCP integration (1-100)
                 </p>
+              </div>
+
+              {/* Token Limits Settings */}
+              <div className="space-y-4">
+                <h4 className="text-sm font-medium text-gray-700">Token Limits</h4>
+                
+                <div className="space-y-3">
+                  <div className="flex items-center justify-between">
+                    <label className="block text-sm font-medium text-gray-700">
+                      GPT-5 Streaming
+                    </label>
+                  </div>
+                  <div className="relative">
+                    <input
+                      type="number"
+                      min="100"
+                      max="4000"
+                      value={tokenLimits.gpt5Streaming}
+                      onChange={(e) => setTokenLimits(prev => ({ ...prev, gpt5Streaming: parseInt(e.target.value) || 1500 }))}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-900"
+                    />
+                  </div>
+                  <p className="text-xs text-gray-500">
+                    Token limit for GPT-5 models using streaming (100-4000)
+                  </p>
+                </div>
+
+                <div className="space-y-3">
+                  <div className="flex items-center justify-between">
+                    <label className="block text-sm font-medium text-gray-700">
+                      GPT-5 Non-Streaming
+                    </label>
+                  </div>
+                  <div className="relative">
+                    <input
+                      type="number"
+                      min="50"
+                      max="2000"
+                      value={tokenLimits.gpt5NonStreaming}
+                      onChange={(e) => setTokenLimits(prev => ({ ...prev, gpt5NonStreaming: parseInt(e.target.value) || 100 }))}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-900"
+                    />
+                  </div>
+                  <p className="text-xs text-gray-500">
+                    Token limit for GPT-5 models without streaming (50-2000)
+                  </p>
+                </div>
+
+                <div className="space-y-3">
+                  <div className="flex items-center justify-between">
+                    <label className="block text-sm font-medium text-gray-700">
+                      Other Models
+                    </label>
+                  </div>
+                  <div className="relative">
+                    <input
+                      type="number"
+                      min="100"
+                      max="4000"
+                      value={tokenLimits.otherModels}
+                      onChange={(e) => setTokenLimits(prev => ({ ...prev, otherModels: parseInt(e.target.value) || 1000 }))}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-900"
+                    />
+                  </div>
+                  <p className="text-xs text-gray-500">
+                    Token limit for other models (GPT-4, Claude, etc.) (100-4000)
+                  </p>
+                </div>
               </div>
             </div>
           </div>
