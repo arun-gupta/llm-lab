@@ -348,6 +348,17 @@ export function ResponseTabs({
   };
 
   const analytics = calculateAnalytics();
+  
+  // Debug logging to see what provider names are being used
+  console.log('Analytics Debug:', {
+    performanceRanking: analytics.performanceRanking?.map(r => r.provider),
+    efficiencyRanking: analytics.efficiencyRanking?.map(r => r.provider),
+    qualityMetrics: analytics.qualityMetrics?.map(r => r.provider),
+    bestCompleteness: analytics.bestCompleteness?.provider,
+    bestReadability: analytics.bestReadability?.provider,
+    bestStructure: analytics.bestStructure?.provider,
+    responses: responses?.map(r => r.provider)
+  });
 
   return (
     <div className="space-y-4">
