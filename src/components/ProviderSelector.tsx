@@ -56,13 +56,10 @@ const staticProviders: Provider[] = [
     color: 'border-blue-200 bg-blue-50', 
     type: 'api',
     models: [
-      { id: 'claude-4-sonnet-20241022', name: 'Claude 4 Sonnet', description: 'Latest flagship model with advanced reasoning', cost: 'high', featured: true },
-      { id: 'claude-4-haiku-20241022', name: 'Claude 4 Haiku', description: 'Fast and efficient Claude 4 variant', cost: 'medium', featured: true },
-      { id: 'claude-4-opus-20241022', name: 'Claude 4 Opus', description: 'Most powerful Claude 4 for complex tasks', cost: 'high', featured: true },
-      { id: 'claude-3-5-sonnet-20241022', name: 'Claude 3.5 Sonnet', description: 'Previous generation flagship', cost: 'high', featured: false },
-      { id: 'claude-3-5-haiku-20241022', name: 'Claude 3.5 Haiku', description: 'Previous generation model', cost: 'low', featured: false },
-      { id: 'claude-3-opus-20240229', name: 'Claude 3 Opus', description: 'Legacy model', cost: 'high', featured: false },
-      { id: 'claude-3-haiku-20240307', name: 'Claude 3 Haiku', description: 'Legacy model', cost: 'low', featured: false },
+      { id: 'claude-3-5-sonnet-20241022', name: 'Claude 3.5 Sonnet', description: 'Latest flagship model with advanced reasoning', cost: 'high', featured: true },
+      { id: 'claude-3-5-haiku-20241022', name: 'Claude 3.5 Haiku', description: 'Fast and efficient Claude 3.5 variant', cost: 'medium', featured: true },
+      { id: 'claude-3-opus-20240229', name: 'Claude 3 Opus', description: 'Most powerful Claude 3 for complex tasks', cost: 'high', featured: true },
+      { id: 'claude-3-haiku-20240307', name: 'Claude 3 Haiku', description: 'Fast and cost-effective', cost: 'low', featured: false },
     ]
   },
 ];
@@ -180,7 +177,7 @@ export function ProviderSelector({
     {
       name: "⚡ Premium",
       description: "Best performance models",
-      models: ["openai:gpt-5", "anthropic:claude-4-sonnet-20241022"]
+      models: ["openai:gpt-5", "anthropic:claude-3-5-sonnet-20241022"]
     },
     {
       name: "🦙 Local + Cloud",
