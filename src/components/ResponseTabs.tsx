@@ -513,7 +513,109 @@ export function ResponseTabs({
             </div>
           ) : (
             <div className="space-y-8">
-              {/* Performance Overview */}
+              {/* Performance Ranking */}
+              <div className="mb-8">
+                <h4 className="font-semibold text-gray-900 mb-4 flex items-center space-x-2">
+                  <BarChart3 className="w-5 h-5 text-blue-600" />
+                  <span>Performance Ranking</span>
+                </h4>
+                <div className="bg-white border border-gray-200 rounded-lg overflow-hidden">
+                  {/* Table Header */}
+                  <div className="bg-gray-50 px-6 py-4 border-b border-gray-200">
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center space-x-3">
+                        <span className="w-8 text-sm font-medium text-gray-600">Rank</span>
+                        <span className="font-medium text-gray-700">Model</span>
+                      </div>
+                      <div className="flex items-center space-x-12 text-sm font-medium text-gray-600">
+                        <span>Latency</span>
+                        <span>Tokens</span>
+                        <span>Length</span>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Table Body */}
+                  <div className="divide-y divide-gray-200">
+                    {analytics.performanceRanking.map((response, index) => (
+                      <div
+                        key={index}
+                        className="flex items-center justify-between p-6 hover:bg-gray-50"
+                      >
+                        <div className="flex items-center space-x-4">
+                          <div className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-medium ${index === 0 ? 'bg-green-100 text-green-800' :
+                              index === 1 ? 'bg-yellow-100 text-yellow-800' :
+                                'bg-gray-100 text-gray-800'
+                            }`}>
+                            {index + 1}
+                          </div>
+                          <span className="font-medium text-gray-900">{response.provider}</span>
+                        </div>
+                        <div className="flex items-center space-x-12 text-sm text-gray-600">
+                          <span className="w-16 text-right font-medium">{response.latency}ms</span>
+                          <span className="w-20 text-right font-medium">{response.tokens?.total || 0} tokens</span>
+                          <span className="w-16 text-right font-medium">{response.content.length} chars</span>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </div>
+
+              {/* Head-to-Head Comparison */}
+              {responses.length === 2 && (
+                <div className="mb-8">
+                  <h4 className="font-semibold text-gray-900 mb-4 flex items-center space-x-2">
+                    <Target className="w-5 h-5 text-purple-600" />
+                    <span>Head-to-Head Comparison</span>
+                  </h4>
+                  <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                    {responses.map((response, index) => (
+                      <div key={index} className="bg-white border border-gray-200 rounded-lg p-6">
+                        <h5 className="font-semibold text-gray-900 mb-4 flex items-center space-x-2">
+                          <div className={`w-6 h-6 rounded-full flex items-center justify-center text-sm font-medium ${
+                            index === 0 ? 'bg-blue-100 text-blue-800' : 'bg-green-100 text-green-800'
+                          }`}>
+                            {index + 1}
+                          </div>
+                          <span>{response.provider}</span>
+                        </h5>
+                        <div className="space-y-4">
+                          <div className="flex justify-between items-center py-3 border-b border-gray-100">
+                            <span className="text-gray-600">Speed</span>
+                            <div className="text-right">
+                              <span className={`font-semibold ${response.latency < analytics.avgLatency ? 'text-green-600' : 'text-red-600'}`}>
+                                {response.latency < analytics.avgLatency ? 'Faster' : 'Slower'}
+                              </span>
+                              <div className="text-sm text-gray-500">{response.latency}ms</div>
+                            </div>
+                          </div>
+                          <div className="flex justify-between items-center py-3 border-b border-gray-100">
+                            <span className="text-gray-600">Tokens</span>
+                            <div className="text-right">
+                              <span className={`font-semibold ${(response.tokens?.total || 0) < analytics.avgTokens ? 'text-green-600' : 'text-red-600'}`}>
+                                {(response.tokens?.total || 0) < analytics.avgTokens ? 'Fewer' : 'More'}
+                              </span>
+                              <div className="text-sm text-gray-500">{response.tokens?.total || 0} tokens</div>
+                            </div>
+                          </div>
+                          <div className="flex justify-between items-center py-3">
+                            <span className="text-gray-600">Length</span>
+                            <div className="text-right">
+                              <span className={`font-semibold ${response.content.length < analytics.avgLength ? 'text-blue-600' : 'text-purple-600'}`}>
+                                {response.content.length < analytics.avgLength ? 'Concise' : 'Detailed'}
+                              </span>
+                              <div className="text-sm text-gray-500">{response.content.length} chars</div>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {/* Overview Cards */}
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
                 <div className="bg-white border border-gray-200 rounded-lg p-6">
                   <h4 className="font-semibold text-gray-900 flex items-center space-x-3 mb-6">
@@ -755,85 +857,7 @@ export function ResponseTabs({
                 </div>
               </div>
 
-              {/* Performance Ranking */}
-              <div className="mt-8">
-                <h4 className="font-medium text-gray-900 mb-4">Performance Ranking</h4>
-                <div className="bg-white border border-gray-200 rounded-lg overflow-hidden">
-                  {/* Table Header */}
-                  <div className="bg-gray-50 px-4 py-3 border-b border-gray-200">
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center space-x-3">
-                        <span className="w-6 text-xs font-medium text-gray-600">Rank</span>
-                        <span className="font-medium text-gray-700">Model</span>
-                      </div>
-                      <div className="flex items-center space-x-8 text-xs font-medium text-gray-600">
-                        <span>Latency</span>
-                        <span>Tokens</span>
-                        <span>Length</span>
-                      </div>
-                    </div>
-                  </div>
 
-                  {/* Table Body */}
-                  <div className="divide-y divide-gray-200">
-                    {analytics.performanceRanking.map((response, index) => (
-                      <div
-                        key={index}
-                        className="flex items-center justify-between p-4 hover:bg-gray-50"
-                      >
-                        <div className="flex items-center space-x-3">
-                          <div className={`w-6 h-6 rounded-full flex items-center justify-center text-xs font-medium ${index === 0 ? 'bg-green-100 text-green-800' :
-                              index === 1 ? 'bg-yellow-100 text-yellow-800' :
-                                'bg-gray-100 text-gray-800'
-                            }`}>
-                            {index + 1}
-                          </div>
-                          <span className="font-medium text-gray-900">{response.provider}</span>
-                        </div>
-                        <div className="flex items-center space-x-8 text-sm text-gray-600">
-                          <span className="w-12 text-right">{response.latency}ms</span>
-                          <span className="w-16 text-right">{response.tokens?.total || 0} tokens</span>
-                          <span className="w-12 text-right">{response.content.length} chars</span>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              </div>
-
-              {/* Response Comparison */}
-              {responses.length === 2 && (
-                <div className="mt-8">
-                  <h4 className="font-medium text-gray-900 mb-4">Head-to-Head Comparison</h4>
-                  <div className="grid grid-cols-2 gap-6">
-                    {responses.map((response, index) => (
-                      <div key={index} className="space-y-3">
-                        <h5 className="font-medium text-gray-800">{response.provider}</h5>
-                        <div className="space-y-2 text-sm">
-                          <div className="flex justify-between">
-                            <span className="text-gray-600">Speed</span>
-                            <span className={response.latency < analytics.avgLatency ? 'text-green-600' : 'text-red-600'}>
-                              {response.latency < analytics.avgLatency ? 'Faster' : 'Slower'}
-                            </span>
-                          </div>
-                          <div className="flex justify-between">
-                            <span className="text-gray-600">Tokens</span>
-                            <span className={(response.tokens?.total || 0) < analytics.avgTokens ? 'text-green-600' : 'text-red-600'}>
-                              {(response.tokens?.total || 0) < analytics.avgTokens ? 'Fewer' : 'More'}
-                            </span>
-                          </div>
-                          <div className="flex justify-between">
-                            <span className="text-gray-600">Length</span>
-                            <span className={response.content.length < analytics.avgLength ? 'text-blue-600' : 'text-purple-600'}>
-                              {response.content.length < analytics.avgLength ? 'Concise' : 'Detailed'}
-                            </span>
-                          </div>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              )}
             </div>
           )}
         </div>
