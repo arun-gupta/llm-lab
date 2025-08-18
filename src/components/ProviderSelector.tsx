@@ -42,7 +42,6 @@ const staticProviders: Provider[] = [
     models: [
       { id: 'gpt-5', name: 'GPT-5', description: 'Latest flagship model with advanced capabilities', cost: 'high', featured: true },
       { id: 'gpt-5-mini', name: 'GPT-5 Mini', description: 'Fast and efficient GPT-5 variant', cost: 'medium', featured: true },
-      { id: 'gpt-5-nano', name: 'GPT-5 Nano', description: 'Lightweight GPT-5 for quick tasks', cost: 'low', featured: true },
       { id: 'gpt-4o', name: 'GPT-4o', description: 'Previous generation flagship', cost: 'high', featured: false },
       { id: 'gpt-4o-mini', name: 'GPT-4o Mini', description: 'Previous generation affordable model', cost: 'low', featured: false },
       { id: 'gpt-4-turbo', name: 'GPT-4 Turbo', description: 'Legacy model', cost: 'high', featured: false },
@@ -172,7 +171,7 @@ export function ProviderSelector({
     {
       name: "💰 Budget",
       description: "Fast and cost-effective",
-      models: ["openai:gpt-5-nano", "anthropic:claude-3-5-haiku-20241022"]
+      models: ["openai:gpt-5-mini", "anthropic:claude-3-5-haiku-20241022"]
     },
     {
       name: "⚡ Premium",
