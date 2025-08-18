@@ -65,7 +65,7 @@ export async function callOpenAI(prompt: string, context?: string, model: string
             content: fullPrompt,
           },
         ],
-        [tokenParam]: 1000,
+        [tokenParam]: model.startsWith('gpt-5') ? 4000 : 1000,
       }),
       new Promise((_, reject) => 
         setTimeout(() => reject(new Error('OpenAI request timeout')), timeoutMs)
@@ -89,7 +89,7 @@ export async function callOpenAI(prompt: string, context?: string, model: string
     
     return {
       provider: `OpenAI (${model})`,
-      content: content || 'No response received',
+      content: content || (response.choices?.[0]?.finish_reason === 'length' ? 'Response was cut off due to token limit. Try a shorter prompt.' : 'No response received'),
       latency,
       tokens: {
         prompt: response.usage?.prompt_tokens || 0,
