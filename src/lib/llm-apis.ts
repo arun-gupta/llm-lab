@@ -98,9 +98,15 @@ export async function callOpenAI(prompt: string, context?: string, model: string
       },
     };
   } catch (error) {
+    console.log('=== OpenAI Error Debug ===');
+    console.log('Error occurred in callOpenAI:', error);
+    console.log('Error message:', error instanceof Error ? error.message : 'Unknown error');
+    console.log('Error stack:', error instanceof Error ? error.stack : 'No stack');
+    console.log('================================');
+    
     return {
       provider: `OpenAI (${model})`,
-      content: '',
+      content: 'No response received',
       latency: Date.now() - startTime,
       error: error instanceof Error ? error.message : 'Unknown error occurred',
     };
@@ -240,17 +246,25 @@ export async function callOllama(prompt: string, model: string, context?: string
 }
 
 export async function callAllProviders(request: LLMRequest): Promise<LLMResponse[]> {
+  console.log('=== callAllProviders Debug ===');
+  console.log('Request providers:', request.providers);
+  console.log('Request prompt:', request.prompt);
+  
   const promises: Promise<LLMResponse>[] = [];
   
   for (const provider of request.providers) {
+    console.log('Processing provider:', provider);
     if (provider.startsWith('openai:')) {
       const model = provider.replace('openai:', '');
+      console.log('Calling OpenAI with model:', model);
       promises.push(callOpenAI(request.prompt, request.context, model));
     } else if (provider.startsWith('anthropic:')) {
       const model = provider.replace('anthropic:', '');
+      console.log('Calling Anthropic with model:', model);
       promises.push(callAnthropic(request.prompt, request.context, model));
     } else if (provider.startsWith('ollama:')) {
       const modelName = provider.replace('ollama:', '');
+      console.log('Calling Ollama with model:', modelName);
       promises.push(callOllama(request.prompt, modelName, request.context));
     }
   }
