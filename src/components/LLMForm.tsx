@@ -227,16 +227,16 @@ export function LLMForm({ onResponsesChange, onLoadingChange, onProvidersChange,
 
         {/* Sample Prompts */}
         <div>
-          <div className="flex items-center space-x-3 mb-6">
-            <div className="w-10 h-10 bg-gradient-to-r from-yellow-400 to-orange-500 rounded-xl flex items-center justify-center shadow-sm">
-              <Lightbulb className="w-5 h-5 text-white" />
+          <div className="flex items-center space-x-3 mb-3">
+            <div className="w-8 h-8 bg-gradient-to-r from-yellow-400 to-orange-500 rounded-lg flex items-center justify-center shadow-sm">
+              <Lightbulb className="w-4 h-4 text-white" />
             </div>
             <div>
-              <h3 className="text-xl font-bold text-gray-900">Try Sample Prompts</h3>
-              <p className="text-sm text-gray-600">Click any card to load a sample prompt</p>
+              <h3 className="text-lg font-bold text-gray-900">Try Sample Prompts</h3>
+              <p className="text-xs text-gray-600">Click any card to load a sample prompt</p>
             </div>
           </div>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          <div className="grid grid-cols-1 gap-2">
             {(showAllPrompts ? samplePrompts : samplePrompts.slice(0, 3)).map((sample, index) => {
               const IconComponent = sample.icon;
               return (
@@ -244,14 +244,14 @@ export function LLMForm({ onResponsesChange, onLoadingChange, onProvidersChange,
                   key={index}
                   type="button"
                   onClick={() => loadSamplePrompt(sample)}
-                  className="group relative bg-white border border-gray-200 rounded-xl p-4 hover:border-blue-300 hover:shadow-lg hover:shadow-blue-50 transition-all duration-300 hover:-translate-y-1 text-left h-32"
+                  className="group relative bg-white border border-gray-200 rounded-lg p-3 hover:border-blue-300 hover:shadow-md hover:shadow-blue-50 transition-all duration-300 hover:-translate-y-1 text-left"
                 >
                   {/* Content */}
                   <div className="relative z-10">
                     {/* Icon and Title */}
-                    <div className="flex items-center space-x-3 mb-2">
-                      <div className={`w-10 h-10 rounded-lg bg-gradient-to-br ${sample.color.replace('text-', 'bg-').replace('-600', '-100')} flex items-center justify-center`}>
-                        <IconComponent className={`w-5 h-5 ${sample.color}`} />
+                    <div className="flex items-center space-x-3 mb-1">
+                      <div className={`w-8 h-8 rounded-lg bg-gradient-to-br ${sample.color.replace('text-', 'bg-').replace('-600', '-100')} flex items-center justify-center`}>
+                        <IconComponent className={`w-4 h-4 ${sample.color}`} />
                       </div>
                       <h4 className="font-semibold text-gray-900 text-sm group-hover:text-blue-700 transition-colors">
                         {sample.title}
@@ -259,7 +259,7 @@ export function LLMForm({ onResponsesChange, onLoadingChange, onProvidersChange,
                     </div>
                     
                     {/* Description */}
-                    <p className="text-xs text-gray-600 leading-relaxed min-h-[2.5rem]">
+                    <p className="text-xs text-gray-600 leading-relaxed">
                       {sample.prompt}
                     </p>
                   </div>
@@ -270,7 +270,7 @@ export function LLMForm({ onResponsesChange, onLoadingChange, onProvidersChange,
           
           {/* Show More/Less Button */}
           {samplePrompts.length > 3 && (
-            <div className="flex justify-center mt-6">
+            <div className="flex justify-center mt-3">
               <button
                 type="button"
                 onClick={() => setShowAllPrompts(!showAllPrompts)}
