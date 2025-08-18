@@ -219,9 +219,9 @@ export function MCPTab() {
               </div>
               <h3 className="font-semibold text-gray-900">SQLite MCP</h3>
             </div>
-            <p className="text-sm text-gray-600 mb-4">Database operations with pre-built Docker image and HTTP wrapper</p>
+            <p className="text-sm text-gray-600 mb-4">Database operations with Docker HTTP mode for Postman integration</p>
             <div className="text-xs text-gray-500 mb-4">✅ 15 database tools + HTTP API</div>
-            <div className="text-xs text-blue-600 mb-4">🐳 One-command Docker setup</div>
+                          <div className="text-xs text-blue-600 mb-4">🐳 Docker HTTP mode for API testing</div>
             <button
               onClick={async () => {
                 try {

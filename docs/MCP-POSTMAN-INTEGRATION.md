@@ -105,23 +105,50 @@ This script will:
 
 ### 3. **SQLite MCP Server**
 
+The SQLite MCP Server Docker image supports two modes:
+- **MCP Mode** (default): For MCP client integration
+- **HTTP Mode**: For API testing with Postman
+
+**For Postman Integration (HTTP Mode):**
+
 ```bash
 # Create data directory
 mkdir -p data
 
-# Run Docker container
+# Run Docker container in HTTP mode
 docker run -d \
-  --name sqlite-mcp \
-  -v $(pwd)/data:/data \
+  --name sqlite-mcp-http \
   -p 4000:4000 \
+  -v $(pwd)/data:/data \
+  -e SQLITE_DB_PATH=/data/database.db \
+  -e SERVER_MODE=http \
+  -e HTTP_PORT=4000 \
   arungupta/sqlite-mcp-server
 ```
 
 **Docker Commands:**
-- **Start**: `docker run -d --name sqlite-mcp -v $(pwd)/data:/data -p 4000:4000 arungupta/sqlite-mcp-server`
-- **Stop**: `docker stop sqlite-mcp && docker rm sqlite-mcp`
-- **Logs**: `docker logs sqlite-mcp`
-- **Shell**: `docker exec -it sqlite-mcp sh`
+- **Start HTTP Mode**: `docker run -d --name sqlite-mcp-http -p 4000:4000 -v $(pwd)/data:/data -e SERVER_MODE=http -e HTTP_PORT=4000 arungupta/sqlite-mcp-server`
+- **Stop**: `docker stop sqlite-mcp-http && docker rm sqlite-mcp-http`
+- **Logs**: `docker logs sqlite-mcp-http`
+- **Health Check**: `curl http://localhost:4000/health`
+
+**HTTP Mode Features:**
+- ✅ HTTP API accessible on port 4000
+- ✅ RESTful endpoints for database operations
+- ✅ Perfect for Postman testing
+- ✅ Health check endpoint: `GET /health`
+- ✅ Official Postman collection available in the repository
+
+**Available Endpoints:**
+- `GET /health` - Health check
+- `GET /info` - Server information
+- `GET /tools` - List available MCP tools
+- `GET /tables` - List all tables
+- `GET /tables/{table}` - Get table schema
+- `POST /query` - Execute SELECT queries
+- `POST /insert` - Insert data
+- `POST /update` - Update data
+- `POST /delete` - Delete data
 
 
 
