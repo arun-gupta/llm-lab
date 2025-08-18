@@ -164,13 +164,18 @@ export async function callOpenAIStreaming(prompt: string, context?: string, mode
     const tokenParam = model.startsWith('gpt-5') ? 'max_completion_tokens' : 'max_tokens';
     
     const tokenLimits = loadTokenLimits();
-    const tokenLimit = tokenLimits.gpt5Streaming;
+    // Use different token limits for nano vs mini
+    let tokenLimit = tokenLimits.gpt5Streaming;
+    if (model === 'gpt-5-nano') {
+      tokenLimit = Math.min(tokenLimit, 1000); // Lower limit for nano
+    }
     
     console.log('=== GPT-5 Streaming Debug ===');
     console.log('Using streaming for GPT-5 model:', model);
     console.log('Token parameter:', tokenParam);
     console.log('Token limit:', tokenLimit);
     console.log('Token limits config:', tokenLimits);
+    console.log('Model type:', model === 'gpt-5-nano' ? 'NANO' : model === 'gpt-5-mini' ? 'MINI' : 'OTHER');
     console.log('================================');
     
     const stream = await Promise.race([
@@ -194,16 +199,22 @@ export async function callOpenAIStreaming(prompt: string, context?: string, mode
     let totalTokens = 0;
     
     // Collect all chunks from the stream
+    let chunkCount = 0;
     for await (const chunk of stream) {
+      chunkCount++;
       const delta = chunk.choices[0]?.delta?.content;
       if (delta) {
         content += delta;
+        console.log(`Chunk ${chunkCount}: Received ${delta.length} characters`);
       }
       // Track token usage if available
       if (chunk.usage) {
         totalTokens = chunk.usage.total_tokens || totalTokens;
       }
     }
+    
+    console.log(`Total chunks received: ${chunkCount}`);
+    console.log(`Final content length: ${content.length}`);
 
     const latency = Date.now() - startTime;
     
@@ -385,12 +396,15 @@ export async function callAllProviders(request: LLMRequest): Promise<LLMResponse
     if (provider.startsWith('openai:')) {
       const model = provider.replace('openai:', '');
       console.log('Calling OpenAI with model:', model);
-          if (model.startsWith('gpt-5')) {
-      console.log('Calling GPT-5 with streaming approach');
-      promises.push(callOpenAIStreaming(request.prompt, request.context, model));
-    } else {
-      promises.push(callOpenAI(request.prompt, request.context, model));
-    }
+      if (model === 'gpt-5-nano') {
+        console.log('Calling GPT-5 nano with non-streaming approach');
+        promises.push(callOpenAI(request.prompt, request.context, model));
+      } else if (model.startsWith('gpt-5')) {
+        console.log('Calling GPT-5 with streaming approach');
+        promises.push(callOpenAIStreaming(request.prompt, request.context, model));
+      } else {
+        promises.push(callOpenAI(request.prompt, request.context, model));
+      }
     } else if (provider.startsWith('anthropic:')) {
       const model = provider.replace('anthropic:', '');
       console.log('Calling Anthropic with model:', model);
