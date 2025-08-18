@@ -4,7 +4,7 @@ import { useState } from 'react';
 import { LLMForm } from '../LLMForm';
 import { ResponseTabs } from '../ResponseTabs';
 import { LLMResponse } from '@/lib/llm-apis';
-import { TestTube, BarChart3, Save, Share2, TrendingUp, Zap, Clock, DollarSign, Target } from 'lucide-react';
+import { BarChart3, Save, Share2, TrendingUp, Zap, Clock, DollarSign, Target } from 'lucide-react';
 
 import { TabType } from '../TabNavigation';
 
@@ -118,41 +118,32 @@ export function TestTab({ onTabChange }: TestTabProps) {
       {/* Testing & Comparison Options */}
       <div className="mb-8">
         <h2 className="text-xl font-semibold text-gray-900 mb-4">Testing & Comparison Options</h2>
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           <div className="bg-white border border-gray-200 rounded-lg p-4">
             <div className="flex items-center space-x-2 mb-2">
-              <TestTube className="w-5 h-5 text-blue-600" />
-              <h3 className="font-medium text-gray-900">Provider Testing</h3>
+              <BarChart3 className="w-5 h-5 text-blue-600" />
+              <h3 className="font-medium text-gray-900">Multi-Provider Testing</h3>
             </div>
             <p className="text-sm text-gray-600">
-              Test the same prompt across different providers (OpenAI, Anthropic, Ollama)
+              Test prompts across different providers and models with side-by-side comparison
             </p>
           </div>
           <div className="bg-white border border-gray-200 rounded-lg p-4">
             <div className="flex items-center space-x-2 mb-2">
-              <BarChart3 className="w-5 h-5 text-green-600" />
-              <h3 className="font-medium text-gray-900">Side-by-Side Comparison</h3>
+              <TrendingUp className="w-5 h-5 text-green-600" />
+              <h3 className="font-medium text-gray-900">Performance Analysis</h3>
             </div>
             <p className="text-sm text-gray-600">
-              Compare responses from multiple providers simultaneously
+              Measure response times, costs, and quality metrics with detailed benchmarking
             </p>
           </div>
           <div className="bg-white border border-gray-200 rounded-lg p-4">
             <div className="flex items-center space-x-2 mb-2">
-              <TrendingUp className="w-5 h-5 text-purple-600" />
-              <h3 className="font-medium text-gray-900">Performance Benchmarking</h3>
-            </div>
-            <p className="text-sm text-gray-600">
-              Measure response times, costs, and quality metrics
-            </p>
-          </div>
-          <div className="bg-white border border-gray-200 rounded-lg p-4">
-            <div className="flex items-center space-x-2 mb-2">
-              <Zap className="w-5 h-5 text-orange-600" />
+              <Zap className="w-5 h-5 text-purple-600" />
               <h3 className="font-medium text-gray-900">Local vs Cloud</h3>
             </div>
             <p className="text-sm text-gray-600">
-              Compare Ollama local models with cloud providers
+              Compare Ollama local models with cloud providers for cost and performance
             </p>
           </div>
         </div>
