@@ -14,6 +14,16 @@ interface ResponseCardProps {
 export function ResponseCard({ response, prompt, context }: ResponseCardProps) {
   const [copied, setCopied] = useState(false);
 
+  // Debug logging to see what ResponseCard receives
+  console.log('=== ResponseCard Debug ===');
+  console.log('Response object:', response);
+  console.log('Provider:', response.provider);
+  console.log('Content:', response.content);
+  console.log('Content type:', typeof response.content);
+  console.log('Content length:', response.content?.length);
+  console.log('Has error:', !!response.error);
+  console.log('========================');
+
 
 
   const copyToClipboard = async () => {

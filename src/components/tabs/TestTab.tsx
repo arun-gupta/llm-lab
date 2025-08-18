@@ -36,6 +36,19 @@ export function TestTab({ onTabChange }: TestTabProps) {
   };
 
   const handleResponsesChange = (newResponses: LLMResponse[]) => {
+    console.log('=== TestTab handleResponsesChange ===');
+    console.log('New responses received:', newResponses);
+    console.log('Response count:', newResponses.length);
+    newResponses.forEach((resp, index) => {
+      console.log(`Response ${index}:`, {
+        provider: resp.provider,
+        contentLength: resp.content?.length,
+        contentPreview: resp.content?.substring(0, 100) + '...',
+        hasError: !!resp.error
+      });
+    });
+    console.log('=====================================');
+    
     setResponses(newResponses);
     if (newResponses.length > 0) {
       setActiveTab('responses');

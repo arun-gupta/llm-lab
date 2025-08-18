@@ -16,6 +16,20 @@ export async function POST(request: NextRequest) {
     // Call all selected providers
     const responses = await callAllProviders(body);
     
+    // Debug logging to see what's being sent to frontend
+    console.log('=== API Route Response Debug ===');
+    console.log('Sending responses to frontend:', JSON.stringify(responses, null, 2));
+    console.log('Response count:', responses.length);
+    responses.forEach((resp, index) => {
+      console.log(`Response ${index}:`, {
+        provider: resp.provider,
+        contentLength: resp.content?.length,
+        contentPreview: resp.content?.substring(0, 100) + '...',
+        hasError: !!resp.error
+      });
+    });
+    console.log('================================');
+    
     return NextResponse.json({ responses });
   } catch (error) {
     console.error('Error processing LLM request:', error);
