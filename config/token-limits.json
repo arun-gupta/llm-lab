@@ -1,0 +1,5 @@
+{
+  "gpt5Streaming": 3000,
+  "gpt5NonStreaming": 500,
+  "otherModels": 1000
+}

@@ -202,6 +202,7 @@ export async function callOpenAIStreaming(prompt: string, context?: string, mode
     let chunkCount = 0;
     let hasContent = false;
     let finishReason = null;
+    let finalUsage = null;
     
     for await (const chunk of stream) {
       chunkCount++;
@@ -212,7 +213,8 @@ export async function callOpenAIStreaming(prompt: string, context?: string, mode
       console.log(`Chunk ${chunkCount}:`, {
         delta: delta ? `${delta.length} chars` : 'null',
         finish_reason: finishReason,
-        hasContent: !!delta
+        hasContent: !!delta,
+        usage: chunk.usage || 'none'
       });
       
       if (delta) {
@@ -221,9 +223,11 @@ export async function callOpenAIStreaming(prompt: string, context?: string, mode
         console.log(`Chunk ${chunkCount}: Received "${delta}"`);
       }
       
-      // Track token usage if available
+      // Track token usage - usage is typically only in the final chunk
       if (chunk.usage) {
+        finalUsage = chunk.usage;
         totalTokens = chunk.usage.total_tokens || totalTokens;
+        console.log(`Chunk ${chunkCount}: Usage data received:`, chunk.usage);
       }
       
       // For nano, also check finish_reason to see if it's hitting length limit
@@ -243,6 +247,12 @@ export async function callOpenAIStreaming(prompt: string, context?: string, mode
     console.log('Final content length:', content.length);
     console.log('Content preview:', content.substring(0, 200) + '...');
     console.log('Total tokens used:', totalTokens);
+    console.log('Final usage data:', finalUsage);
+    console.log('Tokens breakdown:', {
+      prompt: finalUsage?.prompt_tokens || 0,
+      completion: finalUsage?.completion_tokens || totalTokens,
+      total: finalUsage?.total_tokens || totalTokens,
+    });
     console.log('================================');
     
     return {
@@ -252,9 +262,9 @@ export async function callOpenAIStreaming(prompt: string, context?: string, mode
         'No response received'),
       latency,
       tokens: {
-        prompt: 0, // We don't have exact breakdown in streaming
-        completion: totalTokens,
-        total: totalTokens,
+        prompt: finalUsage?.prompt_tokens || 0,
+        completion: finalUsage?.completion_tokens || totalTokens,
+        total: finalUsage?.total_tokens || totalTokens,
       },
       // Add truncation warning if content seems incomplete
       truncationWarning: content && content.length > 0 && totalTokens >= 1400 ? 
