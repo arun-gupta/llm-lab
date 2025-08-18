@@ -2,10 +2,8 @@
 
 import { useState } from 'react';
 import { LLMResponse } from '@/lib/llm-apis';
-import { generatePostmanCollection, generatePostmanEnvironment } from '@/lib/postman';
-import { Download, Copy, Check, AlertCircle, Clock, Zap } from 'lucide-react';
+import { Copy, Check, AlertCircle, Clock, Zap } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import { CollectionPreview } from './CollectionPreview';
 
 interface ResponseCardProps {
   response: LLMResponse;
@@ -15,9 +13,8 @@ interface ResponseCardProps {
 
 export function ResponseCard({ response, prompt, context }: ResponseCardProps) {
   const [copied, setCopied] = useState(false);
-  const [downloading, setDownloading] = useState(false);
-  const [showCollectionPreview, setShowCollectionPreview] = useState(false);
-  const [isCreatingCollection, setIsCreatingCollection] = useState(false);
+
+
 
   const copyToClipboard = async () => {
     try {
@@ -26,75 +23,6 @@ export function ResponseCard({ response, prompt, context }: ResponseCardProps) {
       setTimeout(() => setCopied(false), 2000);
     } catch (error) {
       console.error('Failed to copy text:', error);
-    }
-  };
-
-  const createPostmanCollectionForResponse = async () => {
-    // Show preview first
-    setShowCollectionPreview(true);
-  };
-
-  const handleConfirmCollectionCreation = async (createInWeb: boolean = true, collectionName?: string, collection?: any, environment?: any) => {
-    setIsCreatingCollection(true);
-    try {
-      // Use provided collection and environment, or generate them
-      const finalCollection = collection || generatePostmanCollection(prompt, context, [response], collectionName);
-      const finalEnvironment = environment || generatePostmanEnvironment(collectionName || 'LLM Prompt Lab Collection', [response]);
-      
-      const apiResponse = await fetch('/api/postman/create-collection', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ 
-          collection: finalCollection,
-          environment: finalEnvironment,
-          createInWeb 
-        }),
-      });
-
-      const result = await apiResponse.json();
-      
-      if (result.success) {
-        if (createInWeb) {
-          // Open in web browser
-          window.open(result.collectionUrl, '_blank');
-        } else {
-          // For desktop, use the postman:// URL scheme
-          window.open(result.collectionUrl, '_blank');
-        }
-        setShowCollectionPreview(false);
-      } else {
-        // Fallback to download if API key not configured
-        const blob = new Blob([JSON.stringify(collection, null, 2)], {
-          type: 'application/json',
-        });
-        const url = URL.createObjectURL(blob);
-        const a = document.createElement('a');
-        a.href = url;
-        a.download = `${response.provider}-collection.json`;
-        document.body.appendChild(a);
-        a.click();
-        document.body.removeChild(a);
-        URL.revokeObjectURL(url);
-        setShowCollectionPreview(false);
-      }
-    } catch (error) {
-      console.error('Failed to create Postman collection:', error);
-      // Fallback to download on error
-      const collection = generatePostmanCollection(prompt, context, [response]);
-      const blob = new Blob([JSON.stringify(collection, null, 2)], {
-        type: 'application/json',
-      });
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = `${response.provider}-collection.json`;
-      document.body.appendChild(a);
-      a.click();
-      document.body.removeChild(a);
-      URL.revokeObjectURL(url);
-      setShowCollectionPreview(false);
-    } finally {
-      setIsCreatingCollection(false);
     }
   };
 
@@ -188,46 +116,24 @@ export function ResponseCard({ response, prompt, context }: ResponseCardProps) {
       </div>
 
       {/* Actions */}
-      <div className="flex items-center justify-between">
-        <div className="flex items-center space-x-2">
-          <button
-            onClick={copyToClipboard}
-            className="flex items-center space-x-1 px-3 py-1.5 text-sm bg-white border border-gray-300 rounded-md hover:bg-gray-50 transition-colors"
-          >
-            {copied ? (
-              <>
-                <Check className="w-4 h-4 text-green-600" />
-                <span>Copied!</span>
-              </>
-            ) : (
-              <>
-                <Copy className="w-4 h-4" />
-                <span>Copy</span>
-              </>
-            )}
-          </button>
-        </div>
-
+      <div className="flex items-center justify-end">
         <button
-          onClick={createPostmanCollectionForResponse}
-          disabled={downloading || !!response.error}
-          className="flex items-center space-x-1 px-3 py-1.5 text-sm bg-blue-600 text-white rounded-md hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+          onClick={copyToClipboard}
+          className="flex items-center space-x-1 px-3 py-1.5 text-sm bg-white border border-gray-300 rounded-md hover:bg-gray-50 transition-colors"
         >
-          <Download className="w-4 h-4" />
-          <span>{downloading ? 'Creating...' : 'Create in Postman'}</span>
+          {copied ? (
+            <>
+              <Check className="w-4 h-4 text-green-600" />
+              <span>Copied!</span>
+            </>
+          ) : (
+            <>
+              <Copy className="w-4 h-4" />
+              <span>Copy</span>
+            </>
+          )}
         </button>
       </div>
-
-      {/* Collection Preview */}
-      <CollectionPreview
-        isOpen={showCollectionPreview}
-        onClose={() => setShowCollectionPreview(false)}
-        onConfirm={handleConfirmCollectionCreation}
-        prompt={prompt}
-        context={context}
-        responses={[response]}
-        isCreating={isCreatingCollection}
-      />
     </div>
   );
 } 

@@ -5,6 +5,7 @@ import { ResponseCard } from './ResponseCard';
 import { LLMResponse } from '@/lib/llm-apis';
 import { BarChart3, MessageSquare, Clock, Zap, DollarSign, Target, Loader2, Download } from 'lucide-react';
 import React from 'react'; // Added missing import for React.useEffect
+import { generatePostmanCollection } from '@/lib/postman';
 
 interface ResponseTabsProps {
   responses: LLMResponse[];
@@ -26,6 +27,7 @@ export function ResponseTabs({
   onTabChange
 }: ResponseTabsProps) {
   const [internalActiveTab, setInternalActiveTab] = useState<'responses' | 'analytics'>('responses');
+  const [downloading, setDownloading] = useState(false);
   
   // Use external activeTab if provided, otherwise use internal state
   const activeTab = externalActiveTab !== undefined ? externalActiveTab : internalActiveTab;
@@ -44,6 +46,30 @@ export function ResponseTabs({
       handleTabChange('responses');
     }
   }, [responses.length]);
+
+  const createPostmanCollectionForComparison = async () => {
+    if (responses.length === 0) return;
+    
+    setDownloading(true);
+    try {
+      const collection = generatePostmanCollection(prompt, context, responses, 'LLM Model Comparison');
+      const blob = new Blob([JSON.stringify(collection, null, 2)], {
+        type: 'application/json',
+      });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = 'llm-model-comparison.json';
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+    } catch (error) {
+      console.error('Failed to create Postman collection:', error);
+    } finally {
+      setDownloading(false);
+    }
+  };
 
   const calculateAnalytics = () => {
     const totalResponses = responses.length;
@@ -361,6 +387,18 @@ export function ResponseTabs({
                   />
                 </div>
               ))}
+              
+              {/* Postman Collection Button */}
+              <div className="flex justify-center pt-6">
+                <button
+                  onClick={createPostmanCollectionForComparison}
+                  disabled={downloading}
+                  className="flex items-center space-x-2 px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors shadow-sm"
+                >
+                  <Download className="w-5 h-5" />
+                  <span>{downloading ? 'Creating Collection...' : 'Create Postman Collection for Comparison'}</span>
+                </button>
+              </div>
             </div>
           )}
         </div>

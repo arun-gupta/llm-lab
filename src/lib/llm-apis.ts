@@ -74,14 +74,11 @@ export async function callOpenAI(prompt: string, context?: string, model: string
 
     const latency = Date.now() - startTime;
     
-    // Debug logging
-    console.log('OpenAI response:', JSON.stringify(response, null, 2));
-    console.log('OpenAI choices:', response.choices);
-    console.log('OpenAI content:', response.choices[0]?.message?.content);
+    const content = response.choices?.[0]?.message?.content;
     
     return {
       provider: `OpenAI (${model})`,
-      content: response.choices[0]?.message?.content || 'No response received',
+      content: content || 'No response received',
       latency,
       tokens: {
         prompt: response.usage?.prompt_tokens || 0,
