@@ -36,10 +36,11 @@ npm run dev
 
 LLM Lab includes **MCP (Model Context Protocol) server integration** for enhanced Postman automation:
 
-- **GitHub MCP Server**: Access repositories, create issues, search code
-- **Local MCP Servers**: File system, web search, database integration
-- **Auto-installed**: MCP infrastructure is set up automatically
-- **Postman Collections**: Ready-to-use collections for MCP integration
+- **GitHub MCP Server**: Repository analysis, issues, PRs, health reports
+- **Filesystem MCP Server**: File operations, directory listing, content reading
+- **SQLite MCP Server**: Database operations with Docker HTTP mode
+- **Postman Collections**: Ready-to-use collections for all MCP integrations
+- **HTTP Wrappers**: Direct API testing without MCP client setup
 
 **📖 Documentation**: [MCP-Postman Integration Guide](docs/mcp-postman-integration.md)
 
@@ -92,7 +93,7 @@ If you're using GitHub Codespaces, you can add your API keys in two ways:
 - 🔧 **Environment variables** for secure API key management
 - 📈 **Analytics** and performance insights
 - 🏗️ **Tabbed interface** for organized workflow
-- 🔌 **MCP server integration** for enhanced Postman automation
+- 🔌 **MCP server integration** (GitHub, Filesystem, SQLite) for enhanced Postman automation
 
 ## 🎯 Postman Integration
 
@@ -119,15 +120,24 @@ If you're using GitHub Codespaces, you can add your API keys in two ways:
 ✅ **Working**: OpenAI, Anthropic, Ollama integrations  
 ✅ **Complete**: Postman integration, UI, error handling, success celebrations  
 ✅ **Features**: Custom collection names, collection preview, status indicators  
+✅ **MCP Integration**: GitHub, Filesystem, and SQLite MCP servers with Postman collections  
 
 ## 🛠️ Usage
 
+### **LLM Testing & Comparison**
 1. **Enter your prompt** and optional context
 2. **Select providers** (defaults to "All Local" if Ollama models available)
 3. **Submit** to compare responses side-by-side
 4. **Preview collection** details before creation
 5. **Create Postman collection** with custom name for direct API testing
 6. **Celebrate success** with engaging animations
+
+### **MCP Server Integration**
+1. **Navigate to MCP tab** to see available integrations
+2. **Install collections** for GitHub, Filesystem, or SQLite MCP servers
+3. **Set up servers** using the provided setup scripts
+4. **Test connections** with health check endpoints
+5. **Use in Postman** for automated testing and data operations
 
 ## 📈 Planned Features
 
@@ -138,6 +148,8 @@ If you're using GitHub Codespaces, you can add your API keys in two ways:
 - [x] Success celebration moments
 - [x] Improved error handling
 - [x] Custom collection names
+- [x] MCP server integration (GitHub, Filesystem, SQLite)
+- [x] HTTP wrappers for direct API testing
 
 ### **Phase 2: Viral Sharing** 🚀
 - [ ] Public collection gallery
