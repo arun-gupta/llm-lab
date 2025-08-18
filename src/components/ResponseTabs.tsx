@@ -638,7 +638,7 @@ export function ResponseTabs({
                     <div className="flex justify-between items-center py-2">
                       <span className="text-gray-600">Fastest Response</span>
                       <div className="text-right">
-                        <div className="font-semibold text-gray-900">{analytics.performanceRanking[0]?.provider.split(' ')[0]}</div>
+                        <div className="font-semibold text-gray-900">{analytics.performanceRanking[0]?.provider}</div>
                         <div className="text-sm text-gray-500">{analytics.performanceRanking[0]?.latency}ms</div>
                       </div>
                     </div>
@@ -664,7 +664,7 @@ export function ResponseTabs({
                     <div className="flex justify-between items-center py-2">
                       <span className="text-gray-600">Most Efficient</span>
                       <div className="text-right">
-                        <div className="font-semibold text-gray-900">{analytics.efficiencyRanking[0]?.provider.split(' ')[0]}</div>
+                        <div className="font-semibold text-gray-900">{analytics.efficiencyRanking[0]?.provider}</div>
                         <div className="text-sm text-gray-500">Lowest token usage</div>
                       </div>
                     </div>
@@ -692,7 +692,7 @@ export function ResponseTabs({
                           {(() => {
                             const maxCostIndex = analytics.costEstimates.indexOf(Math.max(...analytics.costEstimates));
                             const maxCost = analytics.costEstimates[maxCostIndex];
-                            const provider = responses[maxCostIndex]?.provider.split(' ')[0] || 'Unknown';
+                            const provider = responses[maxCostIndex]?.provider || 'Unknown';
                             return maxCost > 0 ? provider : 'All Free';
                           })()}
                         </div>
@@ -763,17 +763,17 @@ export function ResponseTabs({
                         <span className="text-gray-600">Average</span>
                         <span className="font-semibold text-gray-900 text-lg">{(analytics.avgCompleteness * 100).toFixed(1)}%</span>
                       </div>
-                      <div className="flex justify-between items-center py-2 border-b border-gray-100">
-                        <span className="text-gray-600">Best</span>
-                        <div className="text-right">
-                          <div className="font-semibold text-gray-900">{analytics.bestCompleteness.provider.split(' ')[0]}</div>
-                          <div className="text-sm text-gray-500">{(analytics.bestCompleteness.completeness * 100).toFixed(1)}%</div>
+                                              <div className="flex justify-between items-center py-2 border-b border-gray-100">
+                          <span className="text-gray-600">Best</span>
+                          <div className="text-right">
+                            <div className="font-semibold text-gray-900">{analytics.bestCompleteness.provider}</div>
+                            <div className="text-sm text-gray-500">{(analytics.bestCompleteness.completeness * 100).toFixed(1)}%</div>
+                          </div>
                         </div>
-                      </div>
-                      <div className="space-y-3">
-                        {analytics.qualityMetrics.map((metric, index) => (
-                          <div key={index} className="flex justify-between items-center py-2">
-                            <span className="text-gray-600">{metric.provider.split(' ')[0]}</span>
+                        <div className="space-y-3">
+                          {analytics.qualityMetrics.map((metric, index) => (
+                            <div key={index} className="flex justify-between items-center py-2">
+                              <span className="text-gray-600">{metric.provider}</span>
                             <div className="flex items-center space-x-3">
                               <div className="w-16 bg-gray-200 rounded-full h-2">
                                 <div
@@ -802,17 +802,17 @@ export function ResponseTabs({
                         <span className="text-gray-600">Avg Grade Level</span>
                         <span className="font-semibold text-gray-900 text-lg">{analytics.avgReadability.toFixed(1)}</span>
                       </div>
-                      <div className="flex justify-between items-center py-2 border-b border-gray-100">
-                        <span className="text-gray-600">Most Readable</span>
-                        <div className="text-right">
-                          <div className="font-semibold text-gray-900">{analytics.bestReadability.provider.split(' ')[0]}</div>
-                          <div className="text-sm text-gray-500">Grade {analytics.bestReadability.readability.toFixed(1)}</div>
+                                              <div className="flex justify-between items-center py-2 border-b border-gray-100">
+                          <span className="text-gray-600">Most Readable</span>
+                          <div className="text-right">
+                            <div className="font-semibold text-gray-900">{analytics.bestReadability.provider}</div>
+                            <div className="text-sm text-gray-500">Grade {analytics.bestReadability.readability.toFixed(1)}</div>
+                          </div>
                         </div>
-                      </div>
-                      <div className="space-y-3">
-                        {analytics.qualityMetrics.map((metric, index) => (
-                          <div key={index} className="flex justify-between items-center py-2">
-                            <span className="text-gray-600">{metric.provider.split(' ')[0]}</span>
+                        <div className="space-y-3">
+                          {analytics.qualityMetrics.map((metric, index) => (
+                            <div key={index} className="flex justify-between items-center py-2">
+                              <span className="text-gray-600">{metric.provider}</span>
                             <div className="flex items-center space-x-3">
                               <div className="w-16 bg-gray-200 rounded-full h-2">
                                 <div
@@ -841,17 +841,17 @@ export function ResponseTabs({
                         <span className="text-gray-600">Average</span>
                         <span className="font-semibold text-gray-900 text-lg">{(analytics.avgStructure * 100).toFixed(1)}%</span>
                       </div>
-                      <div className="flex justify-between items-center py-2 border-b border-gray-100">
-                        <span className="text-gray-600">Best</span>
-                        <div className="text-right">
-                          <div className="font-semibold text-gray-900">{analytics.bestStructure.provider.split(' ')[0]}</div>
-                          <div className="text-sm text-gray-500">{(analytics.bestStructure.structure * 100).toFixed(1)}%</div>
+                                              <div className="flex justify-between items-center py-2 border-b border-gray-100">
+                          <span className="text-gray-600">Best</span>
+                          <div className="text-right">
+                            <div className="font-semibold text-gray-900">{analytics.bestStructure.provider}</div>
+                            <div className="text-sm text-gray-500">{(analytics.bestStructure.structure * 100).toFixed(1)}%</div>
+                          </div>
                         </div>
-                      </div>
-                      <div className="space-y-3">
-                        {analytics.qualityMetrics.map((metric, index) => (
-                          <div key={index} className="flex justify-between items-center py-2">
-                            <span className="text-gray-600">{metric.provider.split(' ')[0]}</span>
+                        <div className="space-y-3">
+                          {analytics.qualityMetrics.map((metric, index) => (
+                            <div key={index} className="flex justify-between items-center py-2">
+                              <span className="text-gray-600">{metric.provider}</span>
                             <div className="flex items-center space-x-3">
                               <div className="w-16 bg-gray-200 rounded-full h-2">
                                 <div
