@@ -271,7 +271,10 @@ export async function callAllProviders(request: LLMRequest): Promise<LLMResponse
   }
   
   // Use Promise.allSettled with timeout to handle slow providers gracefully
-  const timeoutMs = process.env.CODESPACES ? 60000 : 25000; // 60 seconds for Codespaces, 25 for local
+  // Increase timeout if any GPT-5 models are being used
+  const hasGPT5 = request.providers.some(p => p.includes('gpt-5'));
+  const baseTimeoutMs = process.env.CODESPACES ? 60000 : 25000; // 60 seconds for Codespaces, 25 for local
+  const timeoutMs = hasGPT5 ? 90000 : baseTimeoutMs; // 90 seconds if GPT-5 is involved
   
   const timeoutPromise = new Promise<LLMResponse[]>((_, reject) => {
     setTimeout(() => reject(new Error('Request timeout')), timeoutMs);
