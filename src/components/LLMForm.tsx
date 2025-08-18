@@ -244,12 +244,12 @@ export function LLMForm({ onResponsesChange, onLoadingChange, onProvidersChange,
                   key={index}
                   type="button"
                   onClick={() => loadSamplePrompt(sample)}
-                  className="group relative bg-white border border-gray-200 rounded-xl p-4 hover:border-blue-300 hover:shadow-lg hover:shadow-blue-50 transition-all duration-300 hover:-translate-y-1 text-left"
+                  className="group relative bg-white border border-gray-200 rounded-xl p-4 hover:border-blue-300 hover:shadow-lg hover:shadow-blue-50 transition-all duration-300 hover:-translate-y-1 text-left h-32"
                 >
                   {/* Content */}
                   <div className="relative z-10">
                     {/* Icon and Title */}
-                    <div className="flex items-center space-x-3 mb-3">
+                    <div className="flex items-center space-x-3 mb-2">
                       <div className={`w-10 h-10 rounded-lg bg-gradient-to-br ${sample.color.replace('text-', 'bg-').replace('-600', '-100')} flex items-center justify-center`}>
                         <IconComponent className={`w-5 h-5 ${sample.color}`} />
                       </div>
@@ -259,7 +259,7 @@ export function LLMForm({ onResponsesChange, onLoadingChange, onProvidersChange,
                     </div>
                     
                     {/* Description */}
-                    <p className="text-xs text-gray-600 leading-relaxed line-clamp-2">
+                    <p className="text-xs text-gray-600 leading-relaxed min-h-[2.5rem]">
                       {sample.prompt}
                     </p>
                   </div>
