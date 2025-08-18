@@ -41,7 +41,7 @@ LLM Lab includes **MCP (Model Context Protocol) server integration** for enhance
 - **Auto-installed**: MCP infrastructure is set up automatically
 - **Postman Collections**: Ready-to-use collections for MCP integration
 
-**📖 Documentation**: [MCP-Postman Integration Guide](docs/MCP-POSTMAN-INTEGRATION.md)
+**📖 Documentation**: [MCP-Postman Integration Guide](docs/mcp-postman-integration.md)
 
 ## 🔑 Required API Keys
 

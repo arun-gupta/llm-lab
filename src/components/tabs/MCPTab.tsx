@@ -350,7 +350,7 @@ export function MCPTab() {
         <div className="text-center">
           <div className="flex justify-center space-x-4">
             <button 
-              onClick={() => window.open('/docs/MCP-POSTMAN-INTEGRATION.md', '_blank')}
+              onClick={() => window.open('/docs/mcp-postman-integration.md', '_blank')}
               className="flex items-center space-x-2 px-6 py-3 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors"
             >
               <Code className="w-4 h-4" />
