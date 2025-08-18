@@ -169,13 +169,13 @@ export function ProviderSelector({
     {
       name: "🚀 Recommended",
       description: "Best balance of performance and cost",
-      models: ["openai:gpt-5-mini", "anthropic:claude-4-haiku-20241022"],
+      models: ["openai:gpt-5-mini", "anthropic:claude-3-5-haiku-20241022"],
       recommended: true
     },
     {
       name: "💰 Budget",
       description: "Fast and cost-effective",
-      models: ["openai:gpt-5-nano", "anthropic:claude-4-haiku-20241022"]
+      models: ["openai:gpt-5-nano", "anthropic:claude-3-5-haiku-20241022"]
     },
     {
       name: "⚡ Premium",
@@ -186,13 +186,13 @@ export function ProviderSelector({
       name: "🦙 Local + Cloud",
       description: "Compare local with cloud",
       models: availableOllamaModels.length > 0 
-        ? ["openai:gpt-5-mini", "anthropic:claude-4-haiku-20241022", `ollama:${availableOllamaModels[0].name}`]
-        : ["openai:gpt-5-mini", "anthropic:claude-4-haiku-20241022"]
+        ? ["openai:gpt-5-mini", "anthropic:claude-3-5-haiku-20241022", `ollama:${availableOllamaModels[0].name}`]
+        : ["openai:gpt-5-mini", "anthropic:claude-3-5-haiku-20241022"]
     },
     {
       name: "🔬 Advanced",
       description: "Compare latest models",
-      models: ["openai:gpt-5", "openai:gpt-5-mini", "anthropic:claude-4-sonnet-20241022", "anthropic:claude-4-haiku-20241022"]
+      models: ["openai:gpt-5", "openai:gpt-5-mini", "anthropic:claude-3-5-sonnet-20241022", "anthropic:claude-3-5-haiku-20241022"]
     }
   ];
 
