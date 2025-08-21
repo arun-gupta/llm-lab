@@ -317,11 +317,11 @@ export function GraphRAGTab() {
           <h2 className="text-2xl font-bold">GraphRAG Lab</h2>
           <p className="text-gray-600">Build knowledge graphs and compare GraphRAG vs traditional RAG</p>
         </div>
-        <div className="flex items-center space-x-2">
+        <div className="flex flex-col space-y-2">
           <button 
             onClick={generatePostmanCollection} 
             disabled={!responses || importStatus === 'importing'}
-            className="flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed"
+            className="flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed w-fit"
           >
             <Download className="w-4 h-4 mr-2" />
             {importStatus === 'importing' ? 'Importing...' : 'Add to Postman Desktop'}
@@ -725,6 +725,32 @@ export function GraphRAGTab() {
                 </div>
               </div>
             )}
+
+            {/* Analytics Cue */}
+            {responses && (
+              <div className="bg-gradient-to-r from-purple-50 to-blue-50 border border-purple-200 rounded-lg p-4">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center space-x-3">
+                    <div className="p-2 bg-purple-100 rounded-full">
+                      <BarChart3 className="w-5 h-5 text-purple-600" />
+                    </div>
+                    <div>
+                      <h4 className="font-medium text-purple-800">Detailed Analytics Available</h4>
+                      <p className="text-sm text-purple-600">
+                        View comprehensive token usage, response quality, and graph coverage metrics
+                      </p>
+                    </div>
+                  </div>
+                  <button
+                    onClick={() => setActiveTab('analytics')}
+                    className="flex items-center px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors"
+                  >
+                    <BarChart3 className="w-4 h-4 mr-2" />
+                    View Analytics
+                  </button>
+                </div>
+              </div>
+            )}
           </div>
         )}
 
@@ -790,7 +816,7 @@ export function GraphRAGTab() {
                           <div className="text-xs text-gray-600">Total Tokens</div>
                         </div>
                         <div className="text-center p-3 bg-green-50 rounded">
-                          <div className="text-lg font-bold text-green-600">${responses.analytics.tokens.graphRAG.cost.toFixed(6)}</div>
+                          <div className="text-lg font-bold text-green-600">${responses.analytics.tokens.graphRAG.cost.toFixed(8)}</div>
                           <div className="text-xs text-gray-600">Estimated Cost</div>
                         </div>
                       </div>
@@ -818,7 +844,7 @@ export function GraphRAGTab() {
                           <div className="text-xs text-gray-600">Total Tokens</div>
                         </div>
                         <div className="text-center p-3 bg-blue-50 rounded">
-                          <div className="text-lg font-bold text-blue-600">${responses.analytics.tokens.traditionalRAG.cost.toFixed(6)}</div>
+                          <div className="text-lg font-bold text-blue-600">${responses.analytics.tokens.traditionalRAG.cost.toFixed(8)}</div>
                           <div className="text-xs text-gray-600">Estimated Cost</div>
                         </div>
                       </div>

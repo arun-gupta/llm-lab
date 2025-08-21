@@ -15,7 +15,26 @@ export async function POST(request: NextRequest) {
       const platform = os.platform();
       
       if (platform === 'darwin') { // macOS
-        postmanCollectionsDir = path.join(os.homedir(), 'Library', 'Application Support', 'Postman', 'Collections');
+        // Try multiple possible Postman directories
+        const possiblePaths = [
+          path.join(os.homedir(), 'Library', 'Application Support', 'Postman', 'Collections'),
+          path.join(os.homedir(), 'Library', 'Application Support', 'Postman', 'app', 'Collections'),
+          path.join(os.homedir(), 'Library', 'Application Support', 'Postman', 'app-*', 'Collections'),
+          path.join(os.homedir(), 'Documents', 'Postman', 'Collections')
+        ];
+        
+        // Find the first existing directory
+        for (const dir of possiblePaths) {
+          if (fs.existsSync(dir)) {
+            postmanCollectionsDir = dir;
+            break;
+          }
+        }
+        
+        // If none exist, use the default
+        if (!postmanCollectionsDir) {
+          postmanCollectionsDir = path.join(os.homedir(), 'Library', 'Application Support', 'Postman', 'Collections');
+        }
       } else if (platform === 'win32') { // Windows
         postmanCollectionsDir = path.join(os.homedir(), 'AppData', 'Roaming', 'Postman', 'Collections');
       } else { // Linux
@@ -31,12 +50,28 @@ export async function POST(request: NextRequest) {
       const collectionFileName = `${name || 'GraphRAG API Collection'}.json`;
       const collectionFilePath = path.join(postmanCollectionsDir, collectionFileName);
       
-      fs.writeFileSync(collectionFilePath, JSON.stringify(collection, null, 2));
+      // Ensure the collection has the correct Postman format
+      const postmanCollection = {
+        ...collection,
+        info: {
+          ...collection.info,
+          name: name || 'GraphRAG API Collection',
+          description: 'Generated from LLM Prompt Lab GraphRAG functionality',
+          schema: 'https://schema.getpostman.com/json/collection/v2.1.0/collection.json'
+        }
+      };
+      
+      fs.writeFileSync(collectionFilePath, JSON.stringify(postmanCollection, null, 2));
+      
+      console.log(`Collection saved to: ${collectionFilePath}`);
+      console.log(`Directory exists: ${fs.existsSync(postmanCollectionsDir)}`);
+      console.log(`File exists: ${fs.existsSync(collectionFilePath)}`);
       
       return NextResponse.json({
         success: true,
-        message: `Collection saved to Postman collections directory. Refresh Postman Desktop to see it.`,
-        filePath: collectionFilePath
+        message: `Collection saved to Postman collections directory. Check your Collections tab in Postman Desktop.`,
+        filePath: collectionFilePath,
+        directory: postmanCollectionsDir
       });
     } catch (error) {
       console.log('Postman Desktop file system integration not available:', error.message);
@@ -110,7 +145,7 @@ export async function POST(request: NextRequest) {
       
       return NextResponse.json({
         success: true,
-        message: 'Collection copied to clipboard! Open Postman Desktop and paste in Import → Raw text.',
+        message: 'Collection copied to clipboard! Paste in Postman Desktop Import → Raw text.',
         collection: collection,
         instructions: [
           '1. Open Postman Desktop',
