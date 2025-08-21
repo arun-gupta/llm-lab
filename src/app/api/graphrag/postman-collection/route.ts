@@ -126,6 +126,46 @@ export async function POST(request: NextRequest) {
               response: []
             }
           ]
+        },
+        {
+          name: "📊 Analytics & Insights",
+          item: [
+            {
+              name: "Get Graph Analytics",
+              request: {
+                method: "GET",
+                header: [],
+                url: {
+                  raw: "{{base_url}}/api/graphrag/analytics",
+                  host: ["{{base_url}}"],
+                  path: ["api", "graphrag", "analytics"]
+                },
+                description: "Get comprehensive analytics and insights about knowledge graphs, documents, and API usage"
+              },
+              response: []
+            },
+            {
+              name: "Get Analytics for Specific Graph",
+              request: {
+                method: "GET",
+                header: [],
+                url: {
+                  raw: "{{base_url}}/api/graphrag/analytics?graphId=specific-graph-id",
+                  host: ["{{base_url}}"],
+                  path: ["api", "graphrag", "analytics"],
+                  query: [
+                    {
+                      key: "graphId",
+                      value: "specific-graph-id",
+                      description: "Optional: Specific graph ID for targeted analytics"
+                    }
+                  ]
+                },
+                description: "Get analytics for a specific knowledge graph (optional graphId parameter)"
+              },
+              response: []
+            }
+          ]
         }
       ],
       event: [
