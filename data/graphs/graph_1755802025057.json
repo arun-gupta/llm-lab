@@ -1,0 +1,2131 @@
+{
+  "nodes": [
+    {
+      "id": "node_0",
+      "label": "The",
+      "type": "concept",
+      "connections": 77,
+      "frequency": 10
+    },
+    {
+      "id": "node_21",
+      "label": "Google",
+      "type": "concept",
+      "connections": 60,
+      "frequency": 3
+    },
+    {
+      "id": "node_22",
+      "label": "Microsoft",
+      "type": "concept",
+      "connections": 53,
+      "frequency": 3
+    },
+    {
+      "id": "node_2",
+      "label": "Their Innovations",
+      "type": "person",
+      "connections": 49,
+      "frequency": 4
+    },
+    {
+      "id": "node_3",
+      "label": "Larry Page",
+      "type": "person",
+      "connections": 49,
+      "frequency": 4
+    },
+    {
+      "id": "node_4",
+      "label": "Sergey Brin",
+      "type": "person",
+      "connections": 49,
+      "frequency": 4
+    },
+    {
+      "id": "node_5",
+      "label": "Jeff Dean",
+      "type": "person",
+      "connections": 49,
+      "frequency": 4
+    },
+    {
+      "id": "node_17",
+      "label": "Leading Technology Companies",
+      "type": "person",
+      "connections": 42,
+      "frequency": 4
+    },
+    {
+      "id": "node_19",
+      "label": "Leading Technology",
+      "type": "person",
+      "connections": 42,
+      "frequency": 3
+    },
+    {
+      "id": "node_6",
+      "label": "Satya Nadella",
+      "type": "person",
+      "connections": 34,
+      "frequency": 4
+    },
+    {
+      "id": "node_23",
+      "label": "Amazon",
+      "type": "concept",
+      "connections": 28,
+      "frequency": 3
+    },
+    {
+      "id": "node_24",
+      "label": "Apple",
+      "type": "concept",
+      "connections": 23,
+      "frequency": 2
+    },
+    {
+      "id": "node_25",
+      "label": "Siri",
+      "type": "concept",
+      "connections": 18,
+      "frequency": 2
+    },
+    {
+      "id": "node_10",
+      "label": "Jeff Bezos",
+      "type": "person",
+      "connections": 17,
+      "frequency": 4
+    },
+    {
+      "id": "node_8",
+      "label": "Tim Cook",
+      "type": "person",
+      "connections": 12,
+      "frequency": 4
+    },
+    {
+      "id": "node_9",
+      "label": "Ian Goodfellow",
+      "type": "person",
+      "connections": 12,
+      "frequency": 4
+    },
+    {
+      "id": "node_26",
+      "label": "Alexa",
+      "type": "concept",
+      "connections": 11,
+      "frequency": 2
+    },
+    {
+      "id": "node_11",
+      "label": "Rohit Prasad",
+      "type": "person",
+      "connections": 5,
+      "frequency": 4
+    },
+    {
+      "id": "node_12",
+      "label": "Mark Zuckerberg",
+      "type": "person",
+      "connections": 5,
+      "frequency": 4
+    },
+    {
+      "id": "node_16",
+      "label": "Jensen Huang",
+      "type": "person",
+      "connections": 5,
+      "frequency": 4
+    },
+    {
+      "id": "node_1",
+      "label": "Elon Musk",
+      "type": "person",
+      "connections": 0,
+      "frequency": 8
+    },
+    {
+      "id": "node_7",
+      "label": "Eric Horvitz",
+      "type": "person",
+      "connections": 0,
+      "frequency": 4
+    },
+    {
+      "id": "node_13",
+      "label": "Andrej Karpathy",
+      "type": "person",
+      "connections": 0,
+      "frequency": 4
+    },
+    {
+      "id": "node_14",
+      "label": "Sam Altman",
+      "type": "person",
+      "connections": 0,
+      "frequency": 4
+    },
+    {
+      "id": "node_15",
+      "label": "Demis Hassabis",
+      "type": "person",
+      "connections": 0,
+      "frequency": 4
+    },
+    {
+      "id": "node_18",
+      "label": "Chief Scientific Officer",
+      "type": "person",
+      "connections": 0,
+      "frequency": 4
+    },
+    {
+      "id": "node_20",
+      "label": "Chief Scientific",
+      "type": "person",
+      "connections": 0,
+      "frequency": 3
+    }
+  ],
+  "edges": [
+    {
+      "source": "node_0",
+      "target": "node_2",
+      "relationship": "employment",
+      "weight": 1
+    },
+    {
+      "source": "node_0",
+      "target": "node_3",
+      "relationship": "employment",
+      "weight": 1
+    },
+    {
+      "source": "node_0",
+      "target": "node_4",
+      "relationship": "employment",
+      "weight": 1
+    },
+    {
+      "source": "node_0",
+      "target": "node_5",
+      "relationship": "employment",
+      "weight": 1
+    },
+    {
+      "source": "node_0",
+      "target": "node_6",
+      "relationship": "employment",
+      "weight": 1
+    },
+    {
+      "source": "node_0",
+      "target": "node_17",
+      "relationship": "employment",
+      "weight": 1
+    },
+    {
+      "source": "node_0",
+      "target": "node_19",
+      "relationship": "employment",
+      "weight": 1
+    },
+    {
+      "source": "node_0",
+      "target": "node_21",
+      "relationship": "employment",
+      "weight": 1
+    },
+    {
+      "source": "node_0",
+      "target": "node_22",
+      "relationship": "employment",
+      "weight": 1
+    },
+    {
+      "source": "node_2",
+      "target": "node_3",
+      "relationship": "employment",
+      "weight": 1
+    },
+    {
+      "source": "node_2",
+      "target": "node_4",
+      "relationship": "employment",
+      "weight": 1
+    },
+    {
+      "source": "node_2",
+      "target": "node_5",
+      "relationship": "employment",
+      "weight": 1
+    },
+    {
+      "source": "node_2",
+      "target": "node_6",
+      "relationship": "employment",
+      "weight": 1
+    },
+    {
+      "source": "node_2",
+      "target": "node_17",
+      "relationship": "employment",
+      "weight": 1
+    },
+    {
+      "source": "node_2",
+      "target": "node_19",
+      "relationship": "employment",
+      "weight": 1
+    },
+    {
+      "source": "node_2",
+      "target": "node_21",
+      "relationship": "employment",
+      "weight": 1
+    },
+    {
+      "source": "node_2",
+      "target": "node_22",
+      "relationship": "employment",
+      "weight": 1
+    },
+    {
+      "source": "node_3",
+      "target": "node_4",
+      "relationship": "employment",
+      "weight": 1
+    },
+    {
+      "source": "node_3",
+      "target": "node_5",
+      "relationship": "employment",
+      "weight": 1
+    },
+    {
+      "source": "node_3",
+      "target": "node_6",
+      "relationship": "employment",
+      "weight": 1
+    },
+    {
+      "source": "node_3",
+      "target": "node_17",
+      "relationship": "employment",
+      "weight": 1
+    },
+    {
+      "source": "node_3",
+      "target": "node_19",
+      "relationship": "employment",
+      "weight": 1
+    },
+    {
+      "source": "node_3",
+      "target": "node_21",
+      "relationship": "employment",
+      "weight": 1
+    },
+    {
+      "source": "node_3",
+      "target": "node_22",
+      "relationship": "employment",
+      "weight": 1
+    },
+    {
+      "source": "node_4",
+      "target": "node_5",
+      "relationship": "employment",
+      "weight": 1
+    },
+    {
+      "source": "node_4",
+      "target": "node_6",
+      "relationship": "employment",
+      "weight": 1
+    },
+    {
+      "source": "node_4",
+      "target": "node_17",
+      "relationship": "employment",
+      "weight": 1
+    },
+    {
+      "source": "node_4",
+      "target": "node_19",
+      "relationship": "employment",
+      "weight": 1
+    },
+    {
+      "source": "node_4",
+      "target": "node_21",
+      "relationship": "employment",
+      "weight": 1
+    },
+    {
+      "source": "node_4",
+      "target": "node_22",
+      "relationship": "employment",
+      "weight": 1
+    },
+    {
+      "source": "node_5",
+      "target": "node_6",
+      "relationship": "employment",
+      "weight": 1
+    },
+    {
+      "source": "node_5",
+      "target": "node_17",
+      "relationship": "employment",
+      "weight": 1
+    },
+    {
+      "source": "node_5",
+      "target": "node_19",
+      "relationship": "employment",
+      "weight": 1
+    },
+    {
+      "source": "node_5",
+      "target": "node_21",
+      "relationship": "employment",
+      "weight": 1
+    },
+    {
+      "source": "node_5",
+      "target": "node_22",
+      "relationship": "employment",
+      "weight": 1
+    },
+    {
+      "source": "node_6",
+      "target": "node_17",
+      "relationship": "employment",
+      "weight": 1
+    },
+    {
+      "source": "node_6",
+      "target": "node_19",
+      "relationship": "employment",
+      "weight": 1
+    },
+    {
+      "source": "node_6",
+      "target": "node_21",
+      "relationship": "employment",
+      "weight": 1
+    },
+    {
+      "source": "node_6",
+      "target": "node_22",
+      "relationship": "employment",
+      "weight": 1
+    },
+    {
+      "source": "node_17",
+      "target": "node_19",
+      "relationship": "employment",
+      "weight": 1
+    },
+    {
+      "source": "node_17",
+      "target": "node_21",
+      "relationship": "employment",
+      "weight": 1
+    },
+    {
+      "source": "node_17",
+      "target": "node_22",
+      "relationship": "employment",
+      "weight": 1
+    },
+    {
+      "source": "node_19",
+      "target": "node_21",
+      "relationship": "employment",
+      "weight": 1
+    },
+    {
+      "source": "node_19",
+      "target": "node_22",
+      "relationship": "employment",
+      "weight": 1
+    },
+    {
+      "source": "node_21",
+      "target": "node_22",
+      "relationship": "employment",
+      "weight": 1
+    },
+    {
+      "source": "node_0",
+      "target": "node_2",
+      "relationship": "leadership",
+      "weight": 1
+    },
+    {
+      "source": "node_0",
+      "target": "node_3",
+      "relationship": "leadership",
+      "weight": 1
+    },
+    {
+      "source": "node_0",
+      "target": "node_4",
+      "relationship": "leadership",
+      "weight": 1
+    },
+    {
+      "source": "node_0",
+      "target": "node_17",
+      "relationship": "leadership",
+      "weight": 1
+    },
+    {
+      "source": "node_0",
+      "target": "node_19",
+      "relationship": "leadership",
+      "weight": 1
+    },
+    {
+      "source": "node_0",
+      "target": "node_21",
+      "relationship": "leadership",
+      "weight": 1
+    },
+    {
+      "source": "node_2",
+      "target": "node_3",
+      "relationship": "leadership",
+      "weight": 1
+    },
+    {
+      "source": "node_2",
+      "target": "node_4",
+      "relationship": "leadership",
+      "weight": 1
+    },
+    {
+      "source": "node_2",
+      "target": "node_17",
+      "relationship": "leadership",
+      "weight": 1
+    },
+    {
+      "source": "node_2",
+      "target": "node_19",
+      "relationship": "leadership",
+      "weight": 1
+    },
+    {
+      "source": "node_2",
+      "target": "node_21",
+      "relationship": "leadership",
+      "weight": 1
+    },
+    {
+      "source": "node_3",
+      "target": "node_4",
+      "relationship": "leadership",
+      "weight": 1
+    },
+    {
+      "source": "node_3",
+      "target": "node_17",
+      "relationship": "leadership",
+      "weight": 1
+    },
+    {
+      "source": "node_3",
+      "target": "node_19",
+      "relationship": "leadership",
+      "weight": 1
+    },
+    {
+      "source": "node_3",
+      "target": "node_21",
+      "relationship": "leadership",
+      "weight": 1
+    },
+    {
+      "source": "node_4",
+      "target": "node_17",
+      "relationship": "leadership",
+      "weight": 1
+    },
+    {
+      "source": "node_4",
+      "target": "node_19",
+      "relationship": "leadership",
+      "weight": 1
+    },
+    {
+      "source": "node_4",
+      "target": "node_21",
+      "relationship": "leadership",
+      "weight": 1
+    },
+    {
+      "source": "node_17",
+      "target": "node_19",
+      "relationship": "leadership",
+      "weight": 1
+    },
+    {
+      "source": "node_17",
+      "target": "node_21",
+      "relationship": "leadership",
+      "weight": 1
+    },
+    {
+      "source": "node_19",
+      "target": "node_21",
+      "relationship": "leadership",
+      "weight": 1
+    },
+    {
+      "source": "node_0",
+      "target": "node_5",
+      "relationship": "leadership",
+      "weight": 1
+    },
+    {
+      "source": "node_0",
+      "target": "node_6",
+      "relationship": "leadership",
+      "weight": 1
+    },
+    {
+      "source": "node_0",
+      "target": "node_22",
+      "relationship": "leadership",
+      "weight": 1
+    },
+    {
+      "source": "node_2",
+      "target": "node_5",
+      "relationship": "leadership",
+      "weight": 1
+    },
+    {
+      "source": "node_2",
+      "target": "node_6",
+      "relationship": "leadership",
+      "weight": 1
+    },
+    {
+      "source": "node_2",
+      "target": "node_22",
+      "relationship": "leadership",
+      "weight": 1
+    },
+    {
+      "source": "node_3",
+      "target": "node_5",
+      "relationship": "leadership",
+      "weight": 1
+    },
+    {
+      "source": "node_3",
+      "target": "node_6",
+      "relationship": "leadership",
+      "weight": 1
+    },
+    {
+      "source": "node_3",
+      "target": "node_22",
+      "relationship": "leadership",
+      "weight": 1
+    },
+    {
+      "source": "node_4",
+      "target": "node_5",
+      "relationship": "leadership",
+      "weight": 1
+    },
+    {
+      "source": "node_4",
+      "target": "node_6",
+      "relationship": "leadership",
+      "weight": 1
+    },
+    {
+      "source": "node_4",
+      "target": "node_22",
+      "relationship": "leadership",
+      "weight": 1
+    },
+    {
+      "source": "node_5",
+      "target": "node_6",
+      "relationship": "leadership",
+      "weight": 1
+    },
+    {
+      "source": "node_5",
+      "target": "node_17",
+      "relationship": "leadership",
+      "weight": 1
+    },
+    {
+      "source": "node_5",
+      "target": "node_19",
+      "relationship": "leadership",
+      "weight": 1
+    },
+    {
+      "source": "node_5",
+      "target": "node_21",
+      "relationship": "leadership",
+      "weight": 1
+    },
+    {
+      "source": "node_5",
+      "target": "node_22",
+      "relationship": "leadership",
+      "weight": 1
+    },
+    {
+      "source": "node_6",
+      "target": "node_17",
+      "relationship": "leadership",
+      "weight": 1
+    },
+    {
+      "source": "node_6",
+      "target": "node_19",
+      "relationship": "leadership",
+      "weight": 1
+    },
+    {
+      "source": "node_6",
+      "target": "node_21",
+      "relationship": "leadership",
+      "weight": 1
+    },
+    {
+      "source": "node_6",
+      "target": "node_22",
+      "relationship": "leadership",
+      "weight": 1
+    },
+    {
+      "source": "node_17",
+      "target": "node_22",
+      "relationship": "leadership",
+      "weight": 1
+    },
+    {
+      "source": "node_19",
+      "target": "node_22",
+      "relationship": "leadership",
+      "weight": 1
+    },
+    {
+      "source": "node_21",
+      "target": "node_22",
+      "relationship": "leadership",
+      "weight": 1
+    },
+    {
+      "source": "node_0",
+      "target": "node_10",
+      "relationship": "leadership",
+      "weight": 1
+    },
+    {
+      "source": "node_0",
+      "target": "node_11",
+      "relationship": "leadership",
+      "weight": 1
+    },
+    {
+      "source": "node_0",
+      "target": "node_12",
+      "relationship": "leadership",
+      "weight": 1
+    },
+    {
+      "source": "node_0",
+      "target": "node_23",
+      "relationship": "leadership",
+      "weight": 1
+    },
+    {
+      "source": "node_0",
+      "target": "node_26",
+      "relationship": "leadership",
+      "weight": 1
+    },
+    {
+      "source": "node_10",
+      "target": "node_11",
+      "relationship": "leadership",
+      "weight": 1
+    },
+    {
+      "source": "node_10",
+      "target": "node_12",
+      "relationship": "leadership",
+      "weight": 1
+    },
+    {
+      "source": "node_10",
+      "target": "node_23",
+      "relationship": "leadership",
+      "weight": 1
+    },
+    {
+      "source": "node_10",
+      "target": "node_26",
+      "relationship": "leadership",
+      "weight": 1
+    },
+    {
+      "source": "node_11",
+      "target": "node_12",
+      "relationship": "leadership",
+      "weight": 1
+    },
+    {
+      "source": "node_11",
+      "target": "node_23",
+      "relationship": "leadership",
+      "weight": 1
+    },
+    {
+      "source": "node_11",
+      "target": "node_26",
+      "relationship": "leadership",
+      "weight": 1
+    },
+    {
+      "source": "node_12",
+      "target": "node_23",
+      "relationship": "leadership",
+      "weight": 1
+    },
+    {
+      "source": "node_12",
+      "target": "node_26",
+      "relationship": "leadership",
+      "weight": 1
+    },
+    {
+      "source": "node_23",
+      "target": "node_26",
+      "relationship": "leadership",
+      "weight": 1
+    },
+    {
+      "source": "node_0",
+      "target": "node_16",
+      "relationship": "collaboration",
+      "weight": 1
+    },
+    {
+      "source": "node_0",
+      "target": "node_21",
+      "relationship": "collaboration",
+      "weight": 1
+    },
+    {
+      "source": "node_0",
+      "target": "node_22",
+      "relationship": "collaboration",
+      "weight": 1
+    },
+    {
+      "source": "node_0",
+      "target": "node_23",
+      "relationship": "collaboration",
+      "weight": 1
+    },
+    {
+      "source": "node_0",
+      "target": "node_24",
+      "relationship": "collaboration",
+      "weight": 1
+    },
+    {
+      "source": "node_16",
+      "target": "node_21",
+      "relationship": "collaboration",
+      "weight": 1
+    },
+    {
+      "source": "node_16",
+      "target": "node_22",
+      "relationship": "collaboration",
+      "weight": 1
+    },
+    {
+      "source": "node_16",
+      "target": "node_23",
+      "relationship": "collaboration",
+      "weight": 1
+    },
+    {
+      "source": "node_16",
+      "target": "node_24",
+      "relationship": "collaboration",
+      "weight": 1
+    },
+    {
+      "source": "node_21",
+      "target": "node_22",
+      "relationship": "collaboration",
+      "weight": 1
+    },
+    {
+      "source": "node_21",
+      "target": "node_23",
+      "relationship": "collaboration",
+      "weight": 1
+    },
+    {
+      "source": "node_21",
+      "target": "node_24",
+      "relationship": "collaboration",
+      "weight": 1
+    },
+    {
+      "source": "node_22",
+      "target": "node_23",
+      "relationship": "collaboration",
+      "weight": 1
+    },
+    {
+      "source": "node_22",
+      "target": "node_24",
+      "relationship": "collaboration",
+      "weight": 1
+    },
+    {
+      "source": "node_23",
+      "target": "node_24",
+      "relationship": "collaboration",
+      "weight": 1
+    },
+    {
+      "source": "node_0",
+      "target": "node_21",
+      "relationship": "partnership",
+      "weight": 1
+    },
+    {
+      "source": "node_0",
+      "target": "node_22",
+      "relationship": "partnership",
+      "weight": 1
+    },
+    {
+      "source": "node_0",
+      "target": "node_23",
+      "relationship": "partnership",
+      "weight": 1
+    },
+    {
+      "source": "node_0",
+      "target": "node_24",
+      "relationship": "partnership",
+      "weight": 1
+    },
+    {
+      "source": "node_0",
+      "target": "node_25",
+      "relationship": "partnership",
+      "weight": 1
+    },
+    {
+      "source": "node_0",
+      "target": "node_26",
+      "relationship": "partnership",
+      "weight": 1
+    },
+    {
+      "source": "node_21",
+      "target": "node_22",
+      "relationship": "partnership",
+      "weight": 1
+    },
+    {
+      "source": "node_21",
+      "target": "node_23",
+      "relationship": "partnership",
+      "weight": 1
+    },
+    {
+      "source": "node_21",
+      "target": "node_24",
+      "relationship": "partnership",
+      "weight": 1
+    },
+    {
+      "source": "node_21",
+      "target": "node_25",
+      "relationship": "partnership",
+      "weight": 1
+    },
+    {
+      "source": "node_21",
+      "target": "node_26",
+      "relationship": "partnership",
+      "weight": 1
+    },
+    {
+      "source": "node_22",
+      "target": "node_23",
+      "relationship": "partnership",
+      "weight": 1
+    },
+    {
+      "source": "node_22",
+      "target": "node_24",
+      "relationship": "partnership",
+      "weight": 1
+    },
+    {
+      "source": "node_22",
+      "target": "node_25",
+      "relationship": "partnership",
+      "weight": 1
+    },
+    {
+      "source": "node_22",
+      "target": "node_26",
+      "relationship": "partnership",
+      "weight": 1
+    },
+    {
+      "source": "node_23",
+      "target": "node_24",
+      "relationship": "partnership",
+      "weight": 1
+    },
+    {
+      "source": "node_23",
+      "target": "node_25",
+      "relationship": "partnership",
+      "weight": 1
+    },
+    {
+      "source": "node_23",
+      "target": "node_26",
+      "relationship": "partnership",
+      "weight": 1
+    },
+    {
+      "source": "node_24",
+      "target": "node_25",
+      "relationship": "partnership",
+      "weight": 1
+    },
+    {
+      "source": "node_24",
+      "target": "node_26",
+      "relationship": "partnership",
+      "weight": 1
+    },
+    {
+      "source": "node_25",
+      "target": "node_26",
+      "relationship": "partnership",
+      "weight": 1
+    },
+    {
+      "source": "node_0",
+      "target": "node_2",
+      "relationship": "achievement",
+      "weight": 1
+    },
+    {
+      "source": "node_0",
+      "target": "node_3",
+      "relationship": "achievement",
+      "weight": 1
+    },
+    {
+      "source": "node_0",
+      "target": "node_4",
+      "relationship": "achievement",
+      "weight": 1
+    },
+    {
+      "source": "node_0",
+      "target": "node_5",
+      "relationship": "achievement",
+      "weight": 1
+    },
+    {
+      "source": "node_0",
+      "target": "node_6",
+      "relationship": "achievement",
+      "weight": 1
+    },
+    {
+      "source": "node_0",
+      "target": "node_21",
+      "relationship": "achievement",
+      "weight": 1
+    },
+    {
+      "source": "node_0",
+      "target": "node_22",
+      "relationship": "achievement",
+      "weight": 1
+    },
+    {
+      "source": "node_2",
+      "target": "node_3",
+      "relationship": "achievement",
+      "weight": 1
+    },
+    {
+      "source": "node_2",
+      "target": "node_4",
+      "relationship": "achievement",
+      "weight": 1
+    },
+    {
+      "source": "node_2",
+      "target": "node_5",
+      "relationship": "achievement",
+      "weight": 1
+    },
+    {
+      "source": "node_2",
+      "target": "node_6",
+      "relationship": "achievement",
+      "weight": 1
+    },
+    {
+      "source": "node_2",
+      "target": "node_21",
+      "relationship": "achievement",
+      "weight": 1
+    },
+    {
+      "source": "node_2",
+      "target": "node_22",
+      "relationship": "achievement",
+      "weight": 1
+    },
+    {
+      "source": "node_3",
+      "target": "node_4",
+      "relationship": "achievement",
+      "weight": 1
+    },
+    {
+      "source": "node_3",
+      "target": "node_5",
+      "relationship": "achievement",
+      "weight": 1
+    },
+    {
+      "source": "node_3",
+      "target": "node_6",
+      "relationship": "achievement",
+      "weight": 1
+    },
+    {
+      "source": "node_3",
+      "target": "node_21",
+      "relationship": "achievement",
+      "weight": 1
+    },
+    {
+      "source": "node_3",
+      "target": "node_22",
+      "relationship": "achievement",
+      "weight": 1
+    },
+    {
+      "source": "node_4",
+      "target": "node_5",
+      "relationship": "achievement",
+      "weight": 1
+    },
+    {
+      "source": "node_4",
+      "target": "node_6",
+      "relationship": "achievement",
+      "weight": 1
+    },
+    {
+      "source": "node_4",
+      "target": "node_21",
+      "relationship": "achievement",
+      "weight": 1
+    },
+    {
+      "source": "node_4",
+      "target": "node_22",
+      "relationship": "achievement",
+      "weight": 1
+    },
+    {
+      "source": "node_5",
+      "target": "node_6",
+      "relationship": "achievement",
+      "weight": 1
+    },
+    {
+      "source": "node_5",
+      "target": "node_21",
+      "relationship": "achievement",
+      "weight": 1
+    },
+    {
+      "source": "node_5",
+      "target": "node_22",
+      "relationship": "achievement",
+      "weight": 1
+    },
+    {
+      "source": "node_6",
+      "target": "node_21",
+      "relationship": "achievement",
+      "weight": 1
+    },
+    {
+      "source": "node_6",
+      "target": "node_22",
+      "relationship": "achievement",
+      "weight": 1
+    },
+    {
+      "source": "node_21",
+      "target": "node_22",
+      "relationship": "achievement",
+      "weight": 1
+    },
+    {
+      "source": "node_0",
+      "target": "node_2",
+      "relationship": "team",
+      "weight": 1
+    },
+    {
+      "source": "node_0",
+      "target": "node_3",
+      "relationship": "team",
+      "weight": 1
+    },
+    {
+      "source": "node_0",
+      "target": "node_4",
+      "relationship": "team",
+      "weight": 1
+    },
+    {
+      "source": "node_0",
+      "target": "node_5",
+      "relationship": "team",
+      "weight": 1
+    },
+    {
+      "source": "node_0",
+      "target": "node_6",
+      "relationship": "team",
+      "weight": 1
+    },
+    {
+      "source": "node_0",
+      "target": "node_17",
+      "relationship": "team",
+      "weight": 1
+    },
+    {
+      "source": "node_0",
+      "target": "node_19",
+      "relationship": "team",
+      "weight": 1
+    },
+    {
+      "source": "node_0",
+      "target": "node_21",
+      "relationship": "team",
+      "weight": 1
+    },
+    {
+      "source": "node_0",
+      "target": "node_22",
+      "relationship": "team",
+      "weight": 1
+    },
+    {
+      "source": "node_2",
+      "target": "node_3",
+      "relationship": "team",
+      "weight": 1
+    },
+    {
+      "source": "node_2",
+      "target": "node_4",
+      "relationship": "team",
+      "weight": 1
+    },
+    {
+      "source": "node_2",
+      "target": "node_5",
+      "relationship": "team",
+      "weight": 1
+    },
+    {
+      "source": "node_2",
+      "target": "node_6",
+      "relationship": "team",
+      "weight": 1
+    },
+    {
+      "source": "node_2",
+      "target": "node_17",
+      "relationship": "team",
+      "weight": 1
+    },
+    {
+      "source": "node_2",
+      "target": "node_19",
+      "relationship": "team",
+      "weight": 1
+    },
+    {
+      "source": "node_2",
+      "target": "node_21",
+      "relationship": "team",
+      "weight": 1
+    },
+    {
+      "source": "node_2",
+      "target": "node_22",
+      "relationship": "team",
+      "weight": 1
+    },
+    {
+      "source": "node_3",
+      "target": "node_4",
+      "relationship": "team",
+      "weight": 1
+    },
+    {
+      "source": "node_3",
+      "target": "node_5",
+      "relationship": "team",
+      "weight": 1
+    },
+    {
+      "source": "node_3",
+      "target": "node_6",
+      "relationship": "team",
+      "weight": 1
+    },
+    {
+      "source": "node_3",
+      "target": "node_17",
+      "relationship": "team",
+      "weight": 1
+    },
+    {
+      "source": "node_3",
+      "target": "node_19",
+      "relationship": "team",
+      "weight": 1
+    },
+    {
+      "source": "node_3",
+      "target": "node_21",
+      "relationship": "team",
+      "weight": 1
+    },
+    {
+      "source": "node_3",
+      "target": "node_22",
+      "relationship": "team",
+      "weight": 1
+    },
+    {
+      "source": "node_4",
+      "target": "node_5",
+      "relationship": "team",
+      "weight": 1
+    },
+    {
+      "source": "node_4",
+      "target": "node_6",
+      "relationship": "team",
+      "weight": 1
+    },
+    {
+      "source": "node_4",
+      "target": "node_17",
+      "relationship": "team",
+      "weight": 1
+    },
+    {
+      "source": "node_4",
+      "target": "node_19",
+      "relationship": "team",
+      "weight": 1
+    },
+    {
+      "source": "node_4",
+      "target": "node_21",
+      "relationship": "team",
+      "weight": 1
+    },
+    {
+      "source": "node_4",
+      "target": "node_22",
+      "relationship": "team",
+      "weight": 1
+    },
+    {
+      "source": "node_5",
+      "target": "node_6",
+      "relationship": "team",
+      "weight": 1
+    },
+    {
+      "source": "node_5",
+      "target": "node_17",
+      "relationship": "team",
+      "weight": 1
+    },
+    {
+      "source": "node_5",
+      "target": "node_19",
+      "relationship": "team",
+      "weight": 1
+    },
+    {
+      "source": "node_5",
+      "target": "node_21",
+      "relationship": "team",
+      "weight": 1
+    },
+    {
+      "source": "node_5",
+      "target": "node_22",
+      "relationship": "team",
+      "weight": 1
+    },
+    {
+      "source": "node_6",
+      "target": "node_17",
+      "relationship": "team",
+      "weight": 1
+    },
+    {
+      "source": "node_6",
+      "target": "node_19",
+      "relationship": "team",
+      "weight": 1
+    },
+    {
+      "source": "node_6",
+      "target": "node_21",
+      "relationship": "team",
+      "weight": 1
+    },
+    {
+      "source": "node_6",
+      "target": "node_22",
+      "relationship": "team",
+      "weight": 1
+    },
+    {
+      "source": "node_17",
+      "target": "node_19",
+      "relationship": "team",
+      "weight": 1
+    },
+    {
+      "source": "node_17",
+      "target": "node_21",
+      "relationship": "team",
+      "weight": 1
+    },
+    {
+      "source": "node_17",
+      "target": "node_22",
+      "relationship": "team",
+      "weight": 1
+    },
+    {
+      "source": "node_19",
+      "target": "node_21",
+      "relationship": "team",
+      "weight": 1
+    },
+    {
+      "source": "node_19",
+      "target": "node_22",
+      "relationship": "team",
+      "weight": 1
+    },
+    {
+      "source": "node_21",
+      "target": "node_22",
+      "relationship": "team",
+      "weight": 1
+    },
+    {
+      "source": "node_0",
+      "target": "node_8",
+      "relationship": "team",
+      "weight": 1
+    },
+    {
+      "source": "node_0",
+      "target": "node_9",
+      "relationship": "team",
+      "weight": 1
+    },
+    {
+      "source": "node_0",
+      "target": "node_10",
+      "relationship": "team",
+      "weight": 1
+    },
+    {
+      "source": "node_0",
+      "target": "node_23",
+      "relationship": "team",
+      "weight": 1
+    },
+    {
+      "source": "node_0",
+      "target": "node_24",
+      "relationship": "team",
+      "weight": 1
+    },
+    {
+      "source": "node_0",
+      "target": "node_25",
+      "relationship": "team",
+      "weight": 1
+    },
+    {
+      "source": "node_8",
+      "target": "node_9",
+      "relationship": "team",
+      "weight": 1
+    },
+    {
+      "source": "node_8",
+      "target": "node_10",
+      "relationship": "team",
+      "weight": 1
+    },
+    {
+      "source": "node_8",
+      "target": "node_23",
+      "relationship": "team",
+      "weight": 1
+    },
+    {
+      "source": "node_8",
+      "target": "node_24",
+      "relationship": "team",
+      "weight": 1
+    },
+    {
+      "source": "node_8",
+      "target": "node_25",
+      "relationship": "team",
+      "weight": 1
+    },
+    {
+      "source": "node_9",
+      "target": "node_10",
+      "relationship": "team",
+      "weight": 1
+    },
+    {
+      "source": "node_9",
+      "target": "node_23",
+      "relationship": "team",
+      "weight": 1
+    },
+    {
+      "source": "node_9",
+      "target": "node_24",
+      "relationship": "team",
+      "weight": 1
+    },
+    {
+      "source": "node_9",
+      "target": "node_25",
+      "relationship": "team",
+      "weight": 1
+    },
+    {
+      "source": "node_10",
+      "target": "node_23",
+      "relationship": "team",
+      "weight": 1
+    },
+    {
+      "source": "node_10",
+      "target": "node_24",
+      "relationship": "team",
+      "weight": 1
+    },
+    {
+      "source": "node_10",
+      "target": "node_25",
+      "relationship": "team",
+      "weight": 1
+    },
+    {
+      "source": "node_23",
+      "target": "node_24",
+      "relationship": "team",
+      "weight": 1
+    },
+    {
+      "source": "node_23",
+      "target": "node_25",
+      "relationship": "team",
+      "weight": 1
+    },
+    {
+      "source": "node_24",
+      "target": "node_25",
+      "relationship": "team",
+      "weight": 1
+    },
+    {
+      "source": "node_0",
+      "target": "node_8",
+      "relationship": "includes",
+      "weight": 1
+    },
+    {
+      "source": "node_0",
+      "target": "node_9",
+      "relationship": "includes",
+      "weight": 1
+    },
+    {
+      "source": "node_0",
+      "target": "node_10",
+      "relationship": "includes",
+      "weight": 1
+    },
+    {
+      "source": "node_0",
+      "target": "node_23",
+      "relationship": "includes",
+      "weight": 1
+    },
+    {
+      "source": "node_0",
+      "target": "node_24",
+      "relationship": "includes",
+      "weight": 1
+    },
+    {
+      "source": "node_0",
+      "target": "node_25",
+      "relationship": "includes",
+      "weight": 1
+    },
+    {
+      "source": "node_8",
+      "target": "node_9",
+      "relationship": "includes",
+      "weight": 1
+    },
+    {
+      "source": "node_8",
+      "target": "node_10",
+      "relationship": "includes",
+      "weight": 1
+    },
+    {
+      "source": "node_8",
+      "target": "node_23",
+      "relationship": "includes",
+      "weight": 1
+    },
+    {
+      "source": "node_8",
+      "target": "node_24",
+      "relationship": "includes",
+      "weight": 1
+    },
+    {
+      "source": "node_8",
+      "target": "node_25",
+      "relationship": "includes",
+      "weight": 1
+    },
+    {
+      "source": "node_9",
+      "target": "node_10",
+      "relationship": "includes",
+      "weight": 1
+    },
+    {
+      "source": "node_9",
+      "target": "node_23",
+      "relationship": "includes",
+      "weight": 1
+    },
+    {
+      "source": "node_9",
+      "target": "node_24",
+      "relationship": "includes",
+      "weight": 1
+    },
+    {
+      "source": "node_9",
+      "target": "node_25",
+      "relationship": "includes",
+      "weight": 1
+    },
+    {
+      "source": "node_10",
+      "target": "node_23",
+      "relationship": "includes",
+      "weight": 1
+    },
+    {
+      "source": "node_10",
+      "target": "node_24",
+      "relationship": "includes",
+      "weight": 1
+    },
+    {
+      "source": "node_10",
+      "target": "node_25",
+      "relationship": "includes",
+      "weight": 1
+    },
+    {
+      "source": "node_23",
+      "target": "node_24",
+      "relationship": "includes",
+      "weight": 1
+    },
+    {
+      "source": "node_23",
+      "target": "node_25",
+      "relationship": "includes",
+      "weight": 1
+    },
+    {
+      "source": "node_24",
+      "target": "node_25",
+      "relationship": "includes",
+      "weight": 1
+    },
+    {
+      "source": "node_0",
+      "target": "node_2",
+      "relationship": "research",
+      "weight": 1
+    },
+    {
+      "source": "node_0",
+      "target": "node_3",
+      "relationship": "research",
+      "weight": 1
+    },
+    {
+      "source": "node_0",
+      "target": "node_4",
+      "relationship": "research",
+      "weight": 1
+    },
+    {
+      "source": "node_0",
+      "target": "node_5",
+      "relationship": "research",
+      "weight": 1
+    },
+    {
+      "source": "node_0",
+      "target": "node_17",
+      "relationship": "research",
+      "weight": 1
+    },
+    {
+      "source": "node_0",
+      "target": "node_19",
+      "relationship": "research",
+      "weight": 1
+    },
+    {
+      "source": "node_0",
+      "target": "node_21",
+      "relationship": "research",
+      "weight": 1
+    },
+    {
+      "source": "node_0",
+      "target": "node_22",
+      "relationship": "research",
+      "weight": 1
+    },
+    {
+      "source": "node_2",
+      "target": "node_3",
+      "relationship": "research",
+      "weight": 1
+    },
+    {
+      "source": "node_2",
+      "target": "node_4",
+      "relationship": "research",
+      "weight": 1
+    },
+    {
+      "source": "node_2",
+      "target": "node_5",
+      "relationship": "research",
+      "weight": 1
+    },
+    {
+      "source": "node_2",
+      "target": "node_17",
+      "relationship": "research",
+      "weight": 1
+    },
+    {
+      "source": "node_2",
+      "target": "node_19",
+      "relationship": "research",
+      "weight": 1
+    },
+    {
+      "source": "node_2",
+      "target": "node_21",
+      "relationship": "research",
+      "weight": 1
+    },
+    {
+      "source": "node_2",
+      "target": "node_22",
+      "relationship": "research",
+      "weight": 1
+    },
+    {
+      "source": "node_3",
+      "target": "node_4",
+      "relationship": "research",
+      "weight": 1
+    },
+    {
+      "source": "node_3",
+      "target": "node_5",
+      "relationship": "research",
+      "weight": 1
+    },
+    {
+      "source": "node_3",
+      "target": "node_17",
+      "relationship": "research",
+      "weight": 1
+    },
+    {
+      "source": "node_3",
+      "target": "node_19",
+      "relationship": "research",
+      "weight": 1
+    },
+    {
+      "source": "node_3",
+      "target": "node_21",
+      "relationship": "research",
+      "weight": 1
+    },
+    {
+      "source": "node_3",
+      "target": "node_22",
+      "relationship": "research",
+      "weight": 1
+    },
+    {
+      "source": "node_4",
+      "target": "node_5",
+      "relationship": "research",
+      "weight": 1
+    },
+    {
+      "source": "node_4",
+      "target": "node_17",
+      "relationship": "research",
+      "weight": 1
+    },
+    {
+      "source": "node_4",
+      "target": "node_19",
+      "relationship": "research",
+      "weight": 1
+    },
+    {
+      "source": "node_4",
+      "target": "node_21",
+      "relationship": "research",
+      "weight": 1
+    },
+    {
+      "source": "node_4",
+      "target": "node_22",
+      "relationship": "research",
+      "weight": 1
+    },
+    {
+      "source": "node_5",
+      "target": "node_17",
+      "relationship": "research",
+      "weight": 1
+    },
+    {
+      "source": "node_5",
+      "target": "node_19",
+      "relationship": "research",
+      "weight": 1
+    },
+    {
+      "source": "node_5",
+      "target": "node_21",
+      "relationship": "research",
+      "weight": 1
+    },
+    {
+      "source": "node_5",
+      "target": "node_22",
+      "relationship": "research",
+      "weight": 1
+    },
+    {
+      "source": "node_17",
+      "target": "node_19",
+      "relationship": "research",
+      "weight": 1
+    },
+    {
+      "source": "node_17",
+      "target": "node_21",
+      "relationship": "research",
+      "weight": 1
+    },
+    {
+      "source": "node_17",
+      "target": "node_22",
+      "relationship": "research",
+      "weight": 1
+    },
+    {
+      "source": "node_19",
+      "target": "node_21",
+      "relationship": "research",
+      "weight": 1
+    },
+    {
+      "source": "node_19",
+      "target": "node_22",
+      "relationship": "research",
+      "weight": 1
+    },
+    {
+      "source": "node_21",
+      "target": "node_22",
+      "relationship": "research",
+      "weight": 1
+    },
+    {
+      "source": "node_0",
+      "target": "node_2",
+      "relationship": "topic",
+      "weight": 1
+    },
+    {
+      "source": "node_0",
+      "target": "node_3",
+      "relationship": "topic",
+      "weight": 1
+    },
+    {
+      "source": "node_0",
+      "target": "node_4",
+      "relationship": "topic",
+      "weight": 1
+    },
+    {
+      "source": "node_0",
+      "target": "node_5",
+      "relationship": "topic",
+      "weight": 1
+    },
+    {
+      "source": "node_0",
+      "target": "node_17",
+      "relationship": "topic",
+      "weight": 1
+    },
+    {
+      "source": "node_0",
+      "target": "node_19",
+      "relationship": "topic",
+      "weight": 1
+    },
+    {
+      "source": "node_0",
+      "target": "node_21",
+      "relationship": "topic",
+      "weight": 1
+    },
+    {
+      "source": "node_2",
+      "target": "node_3",
+      "relationship": "topic",
+      "weight": 1
+    },
+    {
+      "source": "node_2",
+      "target": "node_4",
+      "relationship": "topic",
+      "weight": 1
+    },
+    {
+      "source": "node_2",
+      "target": "node_5",
+      "relationship": "topic",
+      "weight": 1
+    },
+    {
+      "source": "node_2",
+      "target": "node_17",
+      "relationship": "topic",
+      "weight": 1
+    },
+    {
+      "source": "node_2",
+      "target": "node_19",
+      "relationship": "topic",
+      "weight": 1
+    },
+    {
+      "source": "node_2",
+      "target": "node_21",
+      "relationship": "topic",
+      "weight": 1
+    },
+    {
+      "source": "node_3",
+      "target": "node_4",
+      "relationship": "topic",
+      "weight": 1
+    },
+    {
+      "source": "node_3",
+      "target": "node_5",
+      "relationship": "topic",
+      "weight": 1
+    },
+    {
+      "source": "node_3",
+      "target": "node_17",
+      "relationship": "topic",
+      "weight": 1
+    },
+    {
+      "source": "node_3",
+      "target": "node_19",
+      "relationship": "topic",
+      "weight": 1
+    },
+    {
+      "source": "node_3",
+      "target": "node_21",
+      "relationship": "topic",
+      "weight": 1
+    },
+    {
+      "source": "node_4",
+      "target": "node_5",
+      "relationship": "topic",
+      "weight": 1
+    },
+    {
+      "source": "node_4",
+      "target": "node_17",
+      "relationship": "topic",
+      "weight": 1
+    },
+    {
+      "source": "node_4",
+      "target": "node_19",
+      "relationship": "topic",
+      "weight": 1
+    },
+    {
+      "source": "node_4",
+      "target": "node_21",
+      "relationship": "topic",
+      "weight": 1
+    },
+    {
+      "source": "node_5",
+      "target": "node_17",
+      "relationship": "topic",
+      "weight": 1
+    },
+    {
+      "source": "node_5",
+      "target": "node_19",
+      "relationship": "topic",
+      "weight": 1
+    },
+    {
+      "source": "node_5",
+      "target": "node_21",
+      "relationship": "topic",
+      "weight": 1
+    },
+    {
+      "source": "node_17",
+      "target": "node_19",
+      "relationship": "topic",
+      "weight": 1
+    },
+    {
+      "source": "node_17",
+      "target": "node_21",
+      "relationship": "topic",
+      "weight": 1
+    },
+    {
+      "source": "node_19",
+      "target": "node_21",
+      "relationship": "topic",
+      "weight": 1
+    }
+  ],
+  "stats": {
+    "totalNodes": 27,
+    "totalEdges": 320,
+    "topEntities": [
+      "The",
+      "Google",
+      "Microsoft",
+      "Their Innovations",
+      "Larry Page",
+      "Sergey Brin",
+      "Jeff Dean",
+      "Leading Technology Companies",
+      "Leading Technology",
+      "Satya Nadella"
+    ]
+  }
+}

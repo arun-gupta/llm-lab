@@ -1,8 +1,9 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { Upload, Network, Search, BarChart3, Download } from 'lucide-react';
+import { Upload, Network, Search, BarChart3, Download, Code } from 'lucide-react';
 import { GraphPreview } from '@/components/GraphPreview';
+import { GraphQLPlayground } from '@/components/GraphQLPlayground';
 
 interface GraphNode {
   id: string;
@@ -89,7 +90,7 @@ export function GraphRAGTab() {
   const [responses, setResponses] = useState<GraphRAGResponse | null>(null);
   const [isQuerying, setIsQuerying] = useState(false);
   const [processingProgress, setProcessingProgress] = useState(0);
-  const [activeTab, setActiveTab] = useState<'upload' | 'graph' | 'query' | 'analytics'>('upload');
+  const [activeTab, setActiveTab] = useState<'upload' | 'graph' | 'query' | 'analytics' | 'graphql'>('upload');
   const [buildSuccess, setBuildSuccess] = useState(false);
   const [buildError, setBuildError] = useState<string | null>(null);
   const [selectedModel, setSelectedModel] = useState('gpt-5-nano');
@@ -327,7 +328,7 @@ export function GraphRAGTab() {
           <h2 className="text-2xl font-bold">GraphRAG Lab</h2>
           <p className="text-gray-600">Build knowledge graphs and compare GraphRAG vs traditional RAG</p>
         </div>
-        <div className="flex flex-col space-y-2">
+        <div className="flex flex-col space-y-3">
           <button 
             onClick={generatePostmanCollection} 
             disabled={!responses || importStatus === 'importing'}
@@ -338,13 +339,20 @@ export function GraphRAGTab() {
           </button>
           
           {importStatus !== 'idle' && (
-            <div className={`px-3 py-1 rounded-full text-sm ${
-              importStatus === 'success' ? 'bg-green-100 text-green-800' :
-              importStatus === 'manual' ? 'bg-yellow-100 text-yellow-800' :
-              importStatus === 'error' ? 'bg-red-100 text-red-800' :
-              'bg-blue-100 text-blue-800'
+            <div className={`px-4 py-3 rounded-lg text-sm max-w-md ${
+              importStatus === 'success' ? 'bg-green-50 border border-green-200 text-green-800' :
+              importStatus === 'manual' ? 'bg-yellow-50 border border-yellow-200 text-yellow-800' :
+              importStatus === 'error' ? 'bg-red-50 border border-red-200 text-red-800' :
+              'bg-blue-50 border border-blue-200 text-blue-800'
             }`}>
-              {importMessage}
+              <div className="flex items-start space-x-2">
+                {importStatus === 'success' && (
+                  <svg className="w-4 h-4 mt-0.5 text-green-600 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                    <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                  </svg>
+                )}
+                <span className="leading-relaxed">{importMessage}</span>
+              </div>
             </div>
           )}
         </div>
@@ -394,6 +402,16 @@ export function GraphRAGTab() {
             disabled={!responses}
           >
             📊 Analytics
+          </button>
+          <button 
+            className={`px-4 py-2 text-sm font-medium border-b-2 transition-colors ${
+              activeTab === 'graphql' 
+                ? 'border-blue-500 text-blue-600' 
+                : 'border-transparent text-gray-500 hover:text-gray-700'
+            }`}
+            onClick={() => setActiveTab('graphql')}
+          >
+            🔧 GraphQL Playground
           </button>
         </div>
 
@@ -1017,6 +1035,10 @@ export function GraphRAGTab() {
               </div>
             </div>
           </div>
+        )}
+
+        {activeTab === 'graphql' && (
+          <GraphQLPlayground />
         )}
       </div>
     </div>

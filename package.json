@@ -20,6 +20,8 @@
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.57.0",
+    "@apollo/server": "^5.0.0",
+    "@as-integrations/next": "^4.0.0",
     "@hookform/resolvers": "^5.1.1",
     "@mistralai/mistralai": "^1.7.5",
     "@radix-ui/react-select": "^2.2.5",
@@ -28,6 +30,8 @@
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "cohere-ai": "^7.18.0",
+    "graphql": "^16.11.0",
+    "graphql-tag": "^2.12.6",
     "lucide-react": "^0.525.0",
     "networkx": "^0.0.1-security",
     "next": "15.4.3",
