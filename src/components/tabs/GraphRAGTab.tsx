@@ -251,20 +251,20 @@ export function GraphRAGTab() {
       if (response.ok) {
         const collectionData = await response.json();
         
-        // Try to import directly to Postman Desktop
-        const importToPostman = async () => {
+        // Try to create collection directly in Postman Desktop using API
+        const createInPostman = async () => {
           try {
-            setImportMessage('Attempting to import to Postman Desktop...');
+            setImportMessage('Creating collection in Postman Desktop...');
             
-            // Postman Desktop API endpoint (default port)
-            const postmanResponse = await fetch('/api/postman/import', {
+            // Use the same API as MCP tab for direct Postman integration
+            const postmanResponse = await fetch('/api/postman/create-collection', {
               method: 'POST',
               headers: {
                 'Content-Type': 'application/json',
               },
               body: JSON.stringify({
                 collection: collectionData,
-                name: 'GraphRAG API Collection'
+                createInWeb: false, // Create in Desktop
               }),
             });
 
@@ -272,33 +272,43 @@ export function GraphRAGTab() {
 
             if (result.success) {
               setImportStatus('success');
-              setImportMessage(result.message);
+              setImportMessage('✅ GraphRAG Collection created successfully in Postman Desktop!');
+              
+              // Open the collection in Postman Desktop
+              if (result.collectionUrl) {
+                window.open(result.collectionUrl, '_blank');
+              }
             } else {
-              // Fallback to file download if Postman Desktop is not available
-              throw new Error('Postman Desktop not available');
+              // Fallback to download if API key not configured
+              if (result.fallback) {
+                setImportMessage('Downloading collection file...');
+                
+                const blob = new Blob([JSON.stringify(collectionData, null, 2)], {
+                  type: 'application/json'
+                });
+                const url = window.URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = 'graphrag-postman-collection.json';
+                document.body.appendChild(a);
+                a.click();
+                window.URL.revokeObjectURL(url);
+                document.body.removeChild(a);
+                
+                setImportStatus('manual');
+                setImportMessage('Collection downloaded! Import it manually into Postman.');
+              } else {
+                throw new Error(result.message || 'Failed to create collection');
+              }
             }
           } catch (error) {
-            // Fallback: Download the collection file
-            setImportMessage('Postman Desktop not available. Downloading collection file...');
-            
-            const blob = new Blob([JSON.stringify(collectionData, null, 2)], {
-              type: 'application/json'
-            });
-            const url = window.URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = 'graphrag-postman-collection.json';
-            document.body.appendChild(a);
-            a.click();
-            window.URL.revokeObjectURL(url);
-            document.body.removeChild(a);
-            
-            setImportStatus('manual');
-            setImportMessage('Collection downloaded. Import manually into Postman Desktop.');
+            console.error('Error creating collection:', error);
+            setImportStatus('error');
+            setImportMessage('Failed to create collection. Try downloading manually.');
           }
         };
 
-        await importToPostman();
+        await createInPostman();
       } else {
         setImportStatus('error');
         setImportMessage('Failed to generate collection');
