@@ -4,7 +4,52 @@ export async function POST(request: NextRequest) {
   try {
     const { collection, name } = await request.json();
 
-    // Method 1: Try using Postman Desktop via file system integration
+    // Method 1: Try to copy to clipboard (most reliable method)
+    try {
+      const { exec } = require('child_process');
+      const util = require('util');
+      const execAsync = util.promisify(exec);
+      
+      // Ensure the collection has the correct Postman format
+      const postmanCollection = {
+        ...collection,
+        info: {
+          ...collection.info,
+          name: name || 'GraphRAG API Collection',
+          description: 'Generated from LLM Prompt Lab GraphRAG functionality',
+          schema: 'https://schema.getpostman.com/json/collection/v2.1.0/collection.json'
+        }
+      };
+      
+      // Try to copy collection JSON to clipboard
+      const collectionJson = JSON.stringify(postmanCollection, null, 2);
+      const platform = require('os').platform();
+      
+      if (platform === 'darwin') { // macOS
+        await execAsync(`echo '${collectionJson.replace(/'/g, "'\"'\"'")}' | pbcopy`);
+      } else if (platform === 'win32') { // Windows
+        await execAsync(`echo '${collectionJson.replace(/'/g, "'\"'\"'")}' | clip`);
+      } else { // Linux
+        await execAsync(`echo '${collectionJson.replace(/'/g, "'\"'\"'")}' | xclip -selection clipboard`);
+      }
+      
+      return NextResponse.json({
+        success: true,
+        message: 'Collection copied to clipboard! Paste in Postman Desktop Import → Raw text.',
+        collection: postmanCollection,
+        instructions: [
+          '1. Open Postman Desktop',
+          '2. Click "Import" button',
+          '3. Select "Raw text" tab',
+          '4. Paste the collection (already copied to clipboard)',
+          '5. Click "Continue" and "Import"'
+        ]
+      });
+    } catch (error) {
+      console.log('Clipboard method failed:', error.message);
+    }
+
+    // Method 2: Try using Postman Desktop via file system integration (fallback)
     try {
       const fs = require('fs');
       const path = require('path');
@@ -69,7 +114,7 @@ export async function POST(request: NextRequest) {
       
       return NextResponse.json({
         success: true,
-        message: `Collection saved to Postman collections directory. Check your Collections tab in Postman Desktop.`,
+        message: `Collection saved to Postman collections directory. You may need to restart Postman Desktop to see it.`,
         filePath: collectionFilePath,
         directory: postmanCollectionsDir
       });
@@ -77,7 +122,7 @@ export async function POST(request: NextRequest) {
       console.log('Postman Desktop file system integration not available:', error.message);
     }
 
-    // Method 2: Try using Postman CLI (if installed)
+    // Method 3: Try using Postman CLI (if installed)
     try {
       const { exec } = require('child_process');
       const util = require('util');
@@ -125,7 +170,7 @@ export async function POST(request: NextRequest) {
       console.log('Postman CLI not available');
     }
 
-    // Method 3: Try to copy to clipboard and provide instructions
+    // Method 4: Return collection data for manual import (final fallback)
     try {
       const { exec } = require('child_process');
       const util = require('util');

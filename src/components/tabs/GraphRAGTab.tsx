@@ -92,7 +92,7 @@ export function GraphRAGTab() {
   const [activeTab, setActiveTab] = useState<'upload' | 'graph' | 'query' | 'analytics'>('upload');
   const [buildSuccess, setBuildSuccess] = useState(false);
   const [buildError, setBuildError] = useState<string | null>(null);
-  const [selectedModel, setSelectedModel] = useState('gpt-4o-mini');
+  const [selectedModel, setSelectedModel] = useState('gpt-5-nano');
   const [ollamaModels, setOllamaModels] = useState<string[]>([]);
   const [importStatus, setImportStatus] = useState<'idle' | 'importing' | 'success' | 'manual' | 'error'>('idle');
   const [importMessage, setImportMessage] = useState('');
