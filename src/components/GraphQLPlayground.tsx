@@ -3,81 +3,29 @@ import { useState } from 'react';
 
 export function GraphQLPlayground() {
   const [query, setQuery] = useState(`# GraphRAG GraphQL Playground
-# Try these example queries:
+# Welcome! Try this example query to get started:
 
-# 1. Get all graphs
-query GetGraphs {
-  graphs {
-    id
-    name
-    stats {
-      totalNodes
-      totalEdges
-      nodeTypes
-    }
-  }
-}
-
-# 2. Get analytics overview
 query GetAnalytics {
   analytics {
     graphStats {
       totalGraphs
       totalNodes
       totalEdges
+      averageNodesPerGraph
+      averageEdgesPerGraph
     }
     insights {
       mostCommonEntities
       graphDensity
+      connectivityScore
     }
     timestamp
-  }
-}
-
-# 3. Search entities
-query SearchEntities($query: String!) {
-  searchEntities(query: $query, limit: 5) {
-    id
-    label
-    type
-    connections
-  }
-}
-
-# 4. GraphRAG Query (requires graphId)
-query GraphRAGQuery($input: GraphRAGQueryInput!) {
-  graphRAGQuery(input: $input) {
-    query
-    model
-    graphRAGResponse
-    traditionalRAGResponse
-    performance {
-      graphRAGLatency
-      traditionalRAGLatency
-      contextRelevance
-    }
-    analytics {
-      tokens {
-        graphRAG {
-          total
-          cost
-        }
-        traditionalRAG {
-          total
-          cost
-        }
-      }
-    }
+    version
   }
 }`);
   
   const [variables, setVariables] = useState(`{
-  "query": "AI healthcare",
-  "input": {
-    "query": "What are the key relationships between AI and healthcare?",
-    "graphId": "ai-healthcare",
-    "model": "gpt-5-nano"
-  }
+  "query": "AI"
 }`);
   
   const [result, setResult] = useState('');
@@ -173,16 +121,20 @@ query GraphRAGQuery($input: GraphRAGQueryInput!) {
         <h3 className="text-lg font-semibold mb-4">Quick Examples</h3>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <button
-            onClick={() => setQuery(`query GetGraphs {
+            onClick={() => {
+              setQuery(`query GetGraphs {
   graphs {
     id
     name
     stats {
       totalNodes
       totalEdges
+      nodeTypes
     }
   }
-}`)}
+}`);
+              setVariables('{}');
+            }}
             className="p-3 text-left bg-white border border-gray-200 rounded-lg hover:bg-gray-50"
           >
             <div className="font-medium">Get All Graphs</div>
@@ -190,19 +142,27 @@ query GraphRAGQuery($input: GraphRAGQueryInput!) {
           </button>
 
           <button
-            onClick={() => setQuery(`query GetAnalytics {
+            onClick={() => {
+              setQuery(`query GetAnalytics {
   analytics {
     graphStats {
       totalGraphs
       totalNodes
       totalEdges
+      averageNodesPerGraph
+      averageEdgesPerGraph
     }
     insights {
       mostCommonEntities
       graphDensity
+      connectivityScore
     }
+    timestamp
+    version
   }
-}`)}
+}`);
+              setVariables('{}');
+            }}
             className="p-3 text-left bg-white border border-gray-200 rounded-lg hover:bg-gray-50"
           >
             <div className="font-medium">Get Analytics</div>
@@ -212,7 +172,7 @@ query GraphRAGQuery($input: GraphRAGQueryInput!) {
           <button
             onClick={() => {
               setQuery(`query SearchEntities($query: String!) {
-  searchEntities(query: $query, limit: 5) {
+  searchEntities(query: $query, limit: 10) {
     id
     label
     type
@@ -232,11 +192,25 @@ query GraphRAGQuery($input: GraphRAGQueryInput!) {
               setQuery(`query GraphRAGQuery($input: GraphRAGQueryInput!) {
   graphRAGQuery(input: $input) {
     query
+    model
     graphRAGResponse
     traditionalRAGResponse
     performance {
       graphRAGLatency
       traditionalRAGLatency
+      contextRelevance
+    }
+    analytics {
+      tokens {
+        graphRAG {
+          total
+          cost
+        }
+        traditionalRAG {
+          total
+          cost
+        }
+      }
     }
   }
 }`);
