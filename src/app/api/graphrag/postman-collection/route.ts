@@ -102,65 +102,26 @@ export async function POST(request: NextRequest) {
           ]
         },
         {
-          name: "📊 Graph Analytics",
+          name: "📄 Sample Documents",
           item: [
             {
-              name: "Get Graph Statistics",
+              name: "Get Sample Document",
               request: {
                 method: "GET",
                 header: [],
                 url: {
-                  raw: "{{base_url}}/api/graphrag/graph-stats",
+                  raw: "{{base_url}}/api/graphrag/sample-docs?type=ai-healthcare",
                   host: ["{{base_url}}"],
-                  path: ["api", "graphrag", "graph-stats"]
+                  path: ["api", "graphrag", "sample-docs"],
+                  query: [
+                    {
+                      key: "type",
+                      value: "ai-healthcare",
+                      description: "Document type: ai-healthcare or tech-companies"
+                    }
+                  ]
                 },
-                description: "Retrieve statistics about the knowledge graph (nodes, edges, top entities)"
-              },
-              response: []
-            },
-            {
-              name: "Visualize Graph",
-              request: {
-                method: "GET",
-                header: [],
-                url: {
-                  raw: "{{base_url}}/api/graphrag/visualize",
-                  host: ["{{base_url}}"],
-                  path: ["api", "graphrag", "visualize"]
-                },
-                description: "Get graph visualization data for interactive display"
-              },
-              response: []
-            }
-          ]
-        },
-        {
-          name: "🔄 LLM Integration",
-          item: [
-            {
-              name: "Test LLM Providers with Graph Context",
-              request: {
-                method: "POST",
-                header: [
-                  {
-                    key: "Content-Type",
-                    value: "application/json"
-                  }
-                ],
-                body: {
-                  mode: "raw",
-                  raw: JSON.stringify({
-                    prompt: "Analyze the relationships in our knowledge graph",
-                    context: "Graph context will be automatically added",
-                    providers: ["openai:gpt-4o-mini", "anthropic:claude-3-5-haiku-20241022"]
-                  }, null, 2)
-                },
-                url: {
-                  raw: "{{base_url}}/api/llm",
-                  host: ["{{base_url}}"],
-                  path: ["api", "llm"]
-                },
-                description: "Test different LLM providers with graph-enhanced prompts"
+                description: "Retrieve sample documents for testing GraphRAG functionality"
               },
               response: []
             }
