@@ -1,6 +1,6 @@
 'use client';
 
-import { Zap, TestTube, BarChart3, Library, Settings, ArrowRight, Play, Code } from 'lucide-react';
+import { Zap, TestTube, BarChart3, Library, Settings, ArrowRight, Play, Code, Network } from 'lucide-react';
 import { ApiKeyStatusIndicator } from '../ApiKeyStatusIndicator';
 
 import { TabType } from '../TabNavigation';
@@ -20,13 +20,19 @@ export function HomeTab({ onTabChange, apiKeyStatus }: HomeTabProps) {
       color: 'bg-blue-500 hover:bg-blue-600'
     },
     {
+      title: 'GraphRAG Lab',
+      description: 'Build knowledge graphs and compare GraphRAG vs traditional RAG',
+      icon: Network,
+      action: () => onTabChange('graphrag'),
+      color: 'bg-green-500 hover:bg-green-600'
+    },
+    {
       title: 'MCP Integrations',
       description: 'Explore Model Context Protocol integrations and collections',
       icon: Library,
       action: () => onTabChange('collections'),
       color: 'bg-purple-500 hover:bg-purple-600'
     },
-
   ];
 
   return (
@@ -46,7 +52,7 @@ export function HomeTab({ onTabChange, apiKeyStatus }: HomeTabProps) {
       {/* Quick Actions */}
       <div className="mb-8">
         <h2 className="text-xl font-semibold text-gray-900 mb-4">Quick Actions</h2>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           {quickActions.map((action, index) => {
             const Icon = action.icon;
             return (
@@ -73,7 +79,7 @@ export function HomeTab({ onTabChange, apiKeyStatus }: HomeTabProps) {
       <div className="mb-8">
         <h2 className="text-xl font-semibold text-gray-900 mb-4">Getting Started</h2>
         <div className="bg-gray-50 rounded-lg p-6">
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
             <div className="text-center">
               <div className="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
                 <span className="text-blue-600 font-bold text-lg">1</span>
@@ -99,6 +105,15 @@ export function HomeTab({ onTabChange, apiKeyStatus }: HomeTabProps) {
               <h3 className="font-semibold text-gray-900 mb-2">Explore MCP</h3>
               <p className="text-gray-600 text-sm">
                 Discover MCP integrations and collections for enhanced API testing and automation.
+              </p>
+            </div>
+            <div className="text-center">
+              <div className="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                <span className="text-green-600 font-bold text-lg">4</span>
+              </div>
+              <h3 className="font-semibold text-gray-900 mb-2">Try GraphRAG</h3>
+              <p className="text-gray-600 text-sm">
+                Upload documents, build knowledge graphs, and compare GraphRAG vs traditional RAG responses.
               </p>
             </div>
           </div>
