@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { Upload, Network, Search, BarChart3, Download } from 'lucide-react';
+import { GraphPreview } from '@/components/GraphPreview';
 
 interface GraphNode {
   id: string;
@@ -381,12 +382,7 @@ export function GraphRAGTab() {
                   </p>
                 </div>
                 <div className="p-6">
-                  <div className="h-64 bg-gray-50 rounded-lg flex items-center justify-center">
-                    <div className="text-center text-gray-500">
-                      <Network className="w-12 h-12 mx-auto mb-2" />
-                      <p>Graph visualization coming soon...</p>
-                    </div>
-                  </div>
+                  <GraphPreview graphData={graphData} />
                 </div>
               </div>
             </div>
