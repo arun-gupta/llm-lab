@@ -22,6 +22,9 @@ npm install
 cp .env.local.example .env.local
 # Add your API keys to .env.local
 npm run dev
+
+# Optional: Set up MCP servers manually (if not using quickstart.sh)
+./scripts/setup-http-filesystem-mcp.sh
 ```
 
 ### **Option 2: GitHub Codespaces (Outdated - Use Local Setup Instead)**
@@ -48,9 +51,18 @@ cp .env.local.example .env.local
 npm run dev
 ```
 
-### **MCP Server Setup (Optional)**
+### **MCP Server Setup (Automatic)**
+
+The `quickstart.sh` script automatically sets up MCP servers for enhanced Postman integration:
+- **Local MCP Server Template**: Port 3001
+- **File System MCP Server**: Port 3002  
+- **Web Search MCP Server**: Port 3003
+- **Database MCP Server**: Port 3004
+- **Remote GitHub MCP**: https://api.githubcopilot.com/mcp/ (no installation needed)
+
+**Manual Setup (if needed):**
 ```bash
-# Set up Filesystem MCP server
+# Set up Filesystem MCP server manually
 ./scripts/setup-http-filesystem-mcp.sh
 
 # Set up SQLite MCP server (requires Docker)
