@@ -320,9 +320,29 @@ export function GraphRAGTab() {
                       {documents.map((doc, index) => (
                         <div key={index} className="flex items-center justify-between p-2 bg-gray-50 rounded">
                           <span className="text-sm">{doc.name}</span>
-                          <span className="px-2 py-1 text-xs bg-gray-200 text-gray-700 rounded">{(doc.size / 1024).toFixed(1)} KB</span>
+                          <div className="flex items-center space-x-2">
+                            <span className="px-2 py-1 text-xs bg-gray-200 text-gray-700 rounded">{(doc.size / 1024).toFixed(1)} KB</span>
+                            <button
+                              onClick={() => setDocuments(prev => prev.filter((_, i) => i !== index))}
+                              className="p-1 text-red-500 hover:text-red-700 hover:bg-red-50 rounded transition-colors"
+                              title="Remove document"
+                            >
+                              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                              </svg>
+                            </button>
+                          </div>
                         </div>
                       ))}
+                    </div>
+                    <div className="flex justify-between items-center pt-2">
+                      <span className="text-xs text-gray-500">{documents.length} document{documents.length !== 1 ? 's' : ''} selected</span>
+                      <button
+                        onClick={() => setDocuments([])}
+                        className="text-xs text-red-600 hover:text-red-800 hover:underline"
+                      >
+                        Clear all
+                      </button>
                     </div>
                   </div>
                 )}
