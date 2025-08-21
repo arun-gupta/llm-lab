@@ -1,23 +1,38 @@
 # LLM Lab
 
-[![Open in GitHub Codespaces](https://github.com/codespaces/badge.svg)](https://codespaces.new/arun-gupta/llm-prompt-lab)
+[![Open in GitHub Codespaces](https://github.com/codespaces/badge.svg)](https://codespaces.new/arun-gupta/llm-prompt-lab) *(Outdated - Use Local Setup)*
 
 A full-stack web application that allows you to test and compare LLMs across multiple providers side by side, with **Postman integration, MCP server integration, and analytics**. Perfect for LLM experimentation, performance analysis, and AI development.
 
 ## 🚀 Quick Start
 
-### **Option 1: GitHub Codespaces (Recommended for trying)**
+### **Option 1: Local Development (Recommended)**
 
-Click the button at the top of this README to open LLM Lab in GitHub Codespaces. This will:
-- 🚀 **Launch instantly** in your browser
-- ⚡ **Auto-install dependencies** and start the dev server
-- 🔑 **Set up environment** with example configuration
-- 🌐 **Forward port 3000** automatically
-- 📋 **Show detailed logs** during setup (use Cmd/Ctrl + Shift + P → "View Creation Log")
-- 💻 **Use 4-core machine** with 8GB RAM for optimal LLM performance
-- 🔌 **Optional MCP setup** for enhanced Postman integration
+**Quick and Easy Setup:**
+```bash
+# Clone and run with one command
+git clone https://github.com/arun-gupta/llm-lab.git
+cd llm-lab
+./quickstart.sh
+```
 
-### **Option 2: Local Development**
+**Manual Setup:**
+```bash
+npm install
+cp .env.local.example .env.local
+# Add your API keys to .env.local
+npm run dev
+```
+
+### **Option 2: GitHub Codespaces (Outdated - Use Local Setup Instead)**
+
+⚠️ **Note**: GitHub Codespaces setup is currently outdated and may not work properly. We recommend using the local development setup above for the best experience.
+
+If you still want to try Codespaces:
+- Click the button at the top of this README
+- May require manual dependency installation
+- Environment setup may need manual configuration
+- Use local setup for optimal performance and reliability
 ```bash
 # Clone and run
 git clone https://github.com/arun-gupta/llm-lab.git
@@ -86,24 +101,25 @@ GITHUB_TOKEN=your_github_personal_access_token_here
 - ✅ **Graceful truncation handling** for long responses
 - ✅ **Real-time content capture** as it's generated
 
-### **🔑 Setting Up API Keys in Codespaces**
+### **🔑 Setting Up API Keys**
 
-If you're using GitHub Codespaces, you can add your API keys in two ways:
+**For Local Development:**
+1. Copy `.env.local.example` to `.env.local`
+2. Add your API keys to `.env.local`:
+   ```env
+   OPENAI_API_KEY=your_key_here
+   ANTHROPIC_API_KEY=your_key_here
+   POSTMAN_API_KEY=your_key_here  # optional
+   GITHUB_TOKEN=your_github_token_here  # optional, for MCP integration
+   ```
 
-**Option 1: Environment Variables (Recommended)**
-1. Go to your Codespace settings
-2. Add environment variables:
-   - `OPENAI_API_KEY`
-   - `ANTHROPIC_API_KEY` 
-   - `POSTMAN_API_KEY` (optional)
-   - `GITHUB_TOKEN` (optional, for MCP integration)
-   - `NEXT_PUBLIC_BASE_URL` (set to your Codespaces URL)
+**For GitHub Codespaces (Outdated):**
+⚠️ **Note**: Codespaces setup is outdated. Use local development instead.
 
-**Option 2: Direct File Edit**
-1. Open `.env.local` in the Codespace
-2. Replace the placeholder values with your actual API keys
-3. Set `NEXT_PUBLIC_BASE_URL` to your Codespaces URL (e.g., `https://your-codespace-name.your-username.github.dev`)
-4. Save the file - the dev server will auto-restart
+If you still want to try Codespaces:
+1. Go to your Codespace settings and add environment variables, or
+2. Edit `.env.local` directly in the Codespace
+3. Set `NEXT_PUBLIC_BASE_URL` to your Codespaces URL
 
 ## ✨ Key Features
 
