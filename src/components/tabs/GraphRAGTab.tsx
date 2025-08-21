@@ -271,13 +271,13 @@ export function GraphRAGTab() {
             const result = await postmanResponse.json();
 
             if (result.success) {
-              setImportStatus('success');
-              setImportMessage('✅ GraphRAG Collection created successfully in Postman Desktop!');
-              
-              // Open the collection in Postman Desktop
-              if (result.collectionUrl) {
-                window.open(result.collectionUrl, '_blank');
-              }
+                          setImportStatus('success');
+            setImportMessage('✅ GraphRAG Collection created successfully in Postman Desktop! Set base_url to http://localhost:3000 in your environment.');
+            
+            // Open the collection in Postman Desktop
+            if (result.collectionUrl) {
+              window.open(result.collectionUrl, '_blank');
+            }
             } else {
               // Fallback to download if API key not configured
               if (result.fallback) {
