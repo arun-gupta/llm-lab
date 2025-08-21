@@ -95,8 +95,9 @@ export async function POST(request: NextRequest) {
     }
 
     const endTime = Date.now();
-    const graphRAGLatency = endTime - startTime;
-    const traditionalRAGLatency = endTime - startTime; // Simplified for MVP
+    // Use individual latencies from each response for accurate comparison
+    const graphRAGLatency = graphRAGResponse?.latency || (endTime - startTime);
+    const traditionalRAGLatency = traditionalRAGResponse?.latency || (endTime - startTime);
 
     // Validate responses
     const graphRAGContent = graphRAGResponse?.content || 'No response received from GraphRAG';
