@@ -48,6 +48,17 @@ export function GraphRAGTab() {
   const [isQuerying, setIsQuerying] = useState(false);
   const [processingProgress, setProcessingProgress] = useState(0);
   const [activeTab, setActiveTab] = useState<'upload' | 'graph' | 'query' | 'analytics'>('upload');
+  const [buildSuccess, setBuildSuccess] = useState(false);
+  const [buildError, setBuildError] = useState<string | null>(null);
+
+  const sampleQueries = [
+    "What are the key relationships between AI and healthcare?",
+    "How do technology companies innovate in their respective fields?",
+    "What are the main challenges in AI implementation?",
+    "Which organizations are leading in AI research?",
+    "What are the benefits of AI in modern healthcare?",
+    "How do different companies approach AI development?"
+  ];
 
   const handleFileUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
     const files = Array.from(event.target.files || []);
@@ -60,6 +71,8 @@ export function GraphRAGTab() {
 
     setIsProcessing(true);
     setProcessingProgress(0);
+    setBuildSuccess(false);
+    setBuildError(null);
 
     try {
       const formData = new FormData();
@@ -81,11 +94,17 @@ export function GraphRAGTab() {
       if (response.ok) {
         const data = await response.json();
         setGraphData(data);
+        setBuildSuccess(true);
+        // Auto-switch to graph tab after successful build
+        setTimeout(() => setActiveTab('graph'), 1000);
       } else {
+        const errorData = await response.json();
+        setBuildError(errorData.error || 'Failed to build knowledge graph');
         console.error('Failed to build graph');
       }
     } catch (error) {
       console.error('Error building graph:', error);
+      setBuildError('Network error occurred while building graph');
     } finally {
       setIsProcessing(false);
       setProcessingProgress(0);
@@ -174,7 +193,7 @@ export function GraphRAGTab() {
             onClick={() => graphData && setActiveTab('graph')}
             disabled={!graphData}
           >
-            🕸️ Knowledge Graph
+            🕸️ Knowledge Graph {graphData && <span className="ml-1 text-green-500">✓</span>}
           </button>
           <button 
             className={`px-4 py-2 text-sm font-medium border-b-2 transition-colors ${
@@ -185,7 +204,7 @@ export function GraphRAGTab() {
             onClick={() => graphData && setActiveTab('query')}
             disabled={!graphData}
           >
-            🔍 Query & Compare
+            🔍 Query & Compare {graphData && <span className="ml-1 text-green-500">✓</span>}
           </button>
           <button 
             className={`px-4 py-2 text-sm font-medium border-b-2 transition-colors ${
@@ -275,6 +294,47 @@ export function GraphRAGTab() {
                     </p>
                   </div>
                 )}
+
+                {buildSuccess && (
+                  <div className="p-4 bg-green-50 border border-green-200 rounded-lg">
+                    <div className="flex items-center">
+                      <div className="flex-shrink-0">
+                        <svg className="h-5 w-5 text-green-400" viewBox="0 0 20 20" fill="currentColor">
+                          <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                        </svg>
+                      </div>
+                      <div className="ml-3">
+                        <h3 className="text-sm font-medium text-green-800">
+                          Knowledge Graph Built Successfully!
+                        </h3>
+                        <p className="text-sm text-green-700 mt-1">
+                          {graphData?.stats.totalNodes} entities and {graphData?.stats.totalEdges} relationships extracted. 
+                          You can now explore the graph or start querying.
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                )}
+
+                {buildError && (
+                  <div className="p-4 bg-red-50 border border-red-200 rounded-lg">
+                    <div className="flex items-center">
+                      <div className="flex-shrink-0">
+                        <svg className="h-5 w-5 text-red-400" viewBox="0 0 20 20" fill="currentColor">
+                          <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
+                        </svg>
+                      </div>
+                      <div className="ml-3">
+                        <h3 className="text-sm font-medium text-red-800">
+                          Failed to Build Knowledge Graph
+                        </h3>
+                        <p className="text-sm text-red-700 mt-1">
+                          {buildError}
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                )}
               </div>
             </div>
           </div>
@@ -356,6 +416,21 @@ export function GraphRAGTab() {
                     rows={3}
                     className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                   />
+                </div>
+
+                <div className="space-y-2">
+                  <label className="block text-sm font-medium text-gray-700">Sample Queries:</label>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
+                    {sampleQueries.map((sampleQuery, index) => (
+                      <button
+                        key={index}
+                        onClick={() => setQuery(sampleQuery)}
+                        className="text-left p-2 text-sm text-blue-600 hover:bg-blue-50 rounded border border-blue-200 hover:border-blue-300 transition-colors"
+                      >
+                        {sampleQuery}
+                      </button>
+                    ))}
+                  </div>
                 </div>
 
                 <button 
