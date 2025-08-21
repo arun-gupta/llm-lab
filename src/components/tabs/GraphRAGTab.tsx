@@ -94,6 +94,8 @@ export function GraphRAGTab() {
   const [buildError, setBuildError] = useState<string | null>(null);
   const [selectedModel, setSelectedModel] = useState('gpt-4o-mini');
   const [ollamaModels, setOllamaModels] = useState<string[]>([]);
+  const [importStatus, setImportStatus] = useState<'idle' | 'importing' | 'success' | 'manual' | 'error'>('idle');
+  const [importMessage, setImportMessage] = useState('');
 
   const fetchOllamaModels = async () => {
     try {
@@ -233,24 +235,78 @@ export function GraphRAGTab() {
   };
 
   const generatePostmanCollection = async () => {
+    setImportStatus('importing');
+    setImportMessage('Generating collection...');
+    
     try {
       const response = await fetch('/api/graphrag/postman-collection', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 
+          'Content-Type': 'application/json',
+          'Accept': 'application/json'
+        },
         body: JSON.stringify({ graphData, responses }),
       });
 
       if (response.ok) {
-        const blob = await response.blob();
-        const url = window.URL.createObjectURL(blob);
-        const a = document.createElement('a');
-        a.href = url;
-        a.download = 'graphrag-collection.json';
-        a.click();
-        window.URL.revokeObjectURL(url);
+        const collectionData = await response.json();
+        
+        // Try to import directly to Postman Desktop
+        const importToPostman = async () => {
+          try {
+            setImportMessage('Attempting to import to Postman Desktop...');
+            
+            // Postman Desktop API endpoint (default port)
+            const postmanResponse = await fetch('/api/postman/import', {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+              },
+              body: JSON.stringify({
+                collection: collectionData,
+                name: 'GraphRAG API Collection'
+              }),
+            });
+
+            const result = await postmanResponse.json();
+
+            if (result.success) {
+              setImportStatus('success');
+              setImportMessage(result.message);
+            } else {
+              // Fallback to file download if Postman Desktop is not available
+              throw new Error('Postman Desktop not available');
+            }
+          } catch (error) {
+            // Fallback: Download the collection file
+            setImportMessage('Postman Desktop not available. Downloading collection file...');
+            
+            const blob = new Blob([JSON.stringify(collectionData, null, 2)], {
+              type: 'application/json'
+            });
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'graphrag-postman-collection.json';
+            document.body.appendChild(a);
+            a.click();
+            window.URL.revokeObjectURL(url);
+            document.body.removeChild(a);
+            
+            setImportStatus('manual');
+            setImportMessage('Collection downloaded. Import manually into Postman Desktop.');
+          }
+        };
+
+        await importToPostman();
+      } else {
+        setImportStatus('error');
+        setImportMessage('Failed to generate collection');
       }
     } catch (error) {
       console.error('Error generating Postman collection:', error);
+      setImportStatus('error');
+      setImportMessage('Error generating collection');
     }
   };
 
@@ -261,14 +317,27 @@ export function GraphRAGTab() {
           <h2 className="text-2xl font-bold">GraphRAG Lab</h2>
           <p className="text-gray-600">Build knowledge graphs and compare GraphRAG vs traditional RAG</p>
         </div>
-        <button 
-          onClick={generatePostmanCollection} 
-          disabled={!responses}
-          className="flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed"
-        >
-          <Download className="w-4 h-4 mr-2" />
-          Export Postman Collection
-        </button>
+        <div className="flex items-center space-x-2">
+          <button 
+            onClick={generatePostmanCollection} 
+            disabled={!responses || importStatus === 'importing'}
+            className="flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            <Download className="w-4 h-4 mr-2" />
+            {importStatus === 'importing' ? 'Importing...' : 'Add to Postman Desktop'}
+          </button>
+          
+          {importStatus !== 'idle' && (
+            <div className={`px-3 py-1 rounded-full text-sm ${
+              importStatus === 'success' ? 'bg-green-100 text-green-800' :
+              importStatus === 'manual' ? 'bg-yellow-100 text-yellow-800' :
+              importStatus === 'error' ? 'bg-red-100 text-red-800' :
+              'bg-blue-100 text-blue-800'
+            }`}>
+              {importMessage}
+            </div>
+          )}
+        </div>
       </div>
 
       <div className="space-y-4">
@@ -721,7 +790,7 @@ export function GraphRAGTab() {
                           <div className="text-xs text-gray-600">Total Tokens</div>
                         </div>
                         <div className="text-center p-3 bg-green-50 rounded">
-                          <div className="text-lg font-bold text-green-600">${responses.analytics.tokens.graphRAG.cost.toFixed(4)}</div>
+                          <div className="text-lg font-bold text-green-600">${responses.analytics.tokens.graphRAG.cost.toFixed(6)}</div>
                           <div className="text-xs text-gray-600">Estimated Cost</div>
                         </div>
                       </div>
@@ -749,7 +818,7 @@ export function GraphRAGTab() {
                           <div className="text-xs text-gray-600">Total Tokens</div>
                         </div>
                         <div className="text-center p-3 bg-blue-50 rounded">
-                          <div className="text-lg font-bold text-blue-600">${responses.analytics.tokens.traditionalRAG.cost.toFixed(4)}</div>
+                          <div className="text-lg font-bold text-blue-600">${responses.analytics.tokens.traditionalRAG.cost.toFixed(6)}</div>
                           <div className="text-xs text-gray-600">Estimated Cost</div>
                         </div>
                       </div>

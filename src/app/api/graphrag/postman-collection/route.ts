@@ -248,12 +248,22 @@ export async function POST(request: NextRequest) {
       ];
     }
 
-    return new NextResponse(JSON.stringify(collection, null, 2), {
-      headers: {
-        'Content-Type': 'application/json',
-        'Content-Disposition': 'attachment; filename="graphrag-collection.json"'
-      }
-    });
+    // Check if this is a request for direct import or file download
+    const acceptHeader = request.headers.get('accept');
+    const isDirectImport = acceptHeader?.includes('application/json') && !request.headers.get('content-type')?.includes('multipart');
+
+    if (isDirectImport) {
+      // Return JSON for direct import
+      return NextResponse.json(collection);
+    } else {
+      // Return file download
+      return new NextResponse(JSON.stringify(collection, null, 2), {
+        headers: {
+          'Content-Type': 'application/json',
+          'Content-Disposition': 'attachment; filename="graphrag-collection.json"'
+        }
+      });
+    }
 
   } catch (error) {
     console.error('Error generating Postman collection:', error);
