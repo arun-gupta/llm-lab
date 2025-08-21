@@ -273,7 +273,7 @@ export function GraphRAGTab() {
 
             if (result.success) {
                           setImportStatus('success');
-            setImportMessage('✅ GraphRAG Collection created successfully in Postman Desktop! Set base_url to http://localhost:3000 in your environment.');
+            setImportMessage('✅ REST API Collection created successfully in Postman Desktop! Set base_url to http://localhost:3000 in your environment.');
             
             // Open the collection in Postman Desktop
             if (result.collectionUrl) {
@@ -297,7 +297,7 @@ export function GraphRAGTab() {
                 document.body.removeChild(a);
                 
                 setImportStatus('manual');
-                setImportMessage('Collection downloaded! Import it manually into Postman.');
+                setImportMessage('📥 REST API Collection downloaded! Import manually into Postman Desktop.');
               } else {
                 throw new Error(result.message || 'Failed to create collection');
               }
@@ -335,7 +335,7 @@ export function GraphRAGTab() {
             className="flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed w-fit"
           >
             <Download className="w-4 h-4 mr-2" />
-            {importStatus === 'importing' ? 'Importing...' : 'Add to Postman Desktop'}
+            {importStatus === 'importing' ? 'Importing...' : 'Add REST to Postman'}
           </button>
           
           {importStatus !== 'idle' && (
