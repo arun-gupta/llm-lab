@@ -118,6 +118,24 @@ export async function POST(request: NextRequest) {
     // Calculate context relevance (simplified)
     const contextRelevance = calculateContextRelevance(query, graphContext);
 
+    // Calculate token usage analytics
+    const tokenAnalytics = calculateTokenAnalytics(
+      graphRAGResponse, 
+      traditionalRAGResponse, 
+      graphRAGPrompt, 
+      traditionalRAGPrompt
+    );
+
+    // Calculate response quality analytics
+    const qualityAnalytics = calculateResponseQuality(
+      finalGraphRAGResponse, 
+      finalTraditionalRAGResponse, 
+      query
+    );
+
+    // Calculate graph coverage analytics
+    const graphAnalytics = calculateGraphCoverage(graphContext, graphData);
+
     return NextResponse.json({
       query,
       model,
@@ -128,6 +146,11 @@ export async function POST(request: NextRequest) {
         graphRAGLatency,
         traditionalRAGLatency,
         contextRelevance
+      },
+      analytics: {
+        tokens: tokenAnalytics,
+        quality: qualityAnalytics,
+        graph: graphAnalytics
       }
     });
 
@@ -258,4 +281,201 @@ function calculateContextRelevance(query: string, context: any[]) {
   }
   
   return relevantContexts / context.length;
+}
+
+function calculateTokenAnalytics(graphRAGResponse: any, traditionalRAGResponse: any, graphRAGPrompt: string, traditionalRAGPrompt: string) {
+  // Estimate tokens (rough approximation: ~4 characters per token)
+  const estimateTokens = (text: string) => Math.ceil(text.length / 4);
+  
+  const graphRAGInputTokens = estimateTokens(graphRAGPrompt);
+  const traditionalRAGInputTokens = estimateTokens(traditionalRAGPrompt);
+  
+  const graphRAGOutputTokens = graphRAGResponse?.tokens?.completion || estimateTokens(graphRAGResponse?.content || '');
+  const traditionalRAGOutputTokens = traditionalRAGResponse?.tokens?.completion || estimateTokens(traditionalRAGResponse?.content || '');
+  
+  const graphRAGTotalTokens = graphRAGResponse?.tokens?.total || (graphRAGInputTokens + graphRAGOutputTokens);
+  const traditionalRAGTotalTokens = traditionalRAGResponse?.tokens?.total || (traditionalRAGInputTokens + traditionalRAGOutputTokens);
+  
+  // Calculate token efficiency (output per input)
+  const graphRAGEfficiency = graphRAGInputTokens > 0 ? graphRAGOutputTokens / graphRAGInputTokens : 0;
+  const traditionalRAGEfficiency = traditionalRAGInputTokens > 0 ? traditionalRAGOutputTokens / traditionalRAGInputTokens : 0;
+  
+  // Rough cost estimation (using GPT-4o-mini pricing as baseline)
+  const costPer1KTokens = 0.00015; // $0.00015 per 1K tokens
+  const graphRAGCost = (graphRAGTotalTokens / 1000) * costPer1KTokens;
+  const traditionalRAGCost = (traditionalRAGTotalTokens / 1000) * costPer1KTokens;
+  
+  return {
+    graphRAG: {
+      input: graphRAGInputTokens,
+      output: graphRAGOutputTokens,
+      total: graphRAGTotalTokens,
+      efficiency: graphRAGEfficiency,
+      cost: graphRAGCost
+    },
+    traditionalRAG: {
+      input: traditionalRAGInputTokens,
+      output: traditionalRAGOutputTokens,
+      total: traditionalRAGTotalTokens,
+      efficiency: traditionalRAGEfficiency,
+      cost: traditionalRAGCost
+    }
+  };
+}
+
+function calculateResponseQuality(graphRAGResponse: string, traditionalRAGResponse: string, query: string) {
+  // Response length analysis
+  const graphRAGLength = graphRAGResponse.length;
+  const traditionalRAGLength = traditionalRAGResponse.length;
+  
+  // Completeness score (how many query terms are addressed)
+  const queryTerms = query.toLowerCase().split(' ').filter(term => term.length > 2);
+  const graphRAGCompleteness = calculateCompleteness(graphRAGResponse, queryTerms);
+  const traditionalRAGCompleteness = calculateCompleteness(traditionalRAGResponse, queryTerms);
+  
+  // Specificity score (ratio of specific terms vs generic terms)
+  const graphRAGSpecificity = calculateSpecificity(graphRAGResponse);
+  const traditionalRAGSpecificity = calculateSpecificity(traditionalRAGResponse);
+  
+  // Readability score (Flesch reading ease approximation)
+  const graphRAGReadability = calculateReadability(graphRAGResponse);
+  const traditionalRAGReadability = calculateReadability(traditionalRAGResponse);
+  
+  return {
+    graphRAG: {
+      length: graphRAGLength,
+      completeness: graphRAGCompleteness,
+      specificity: graphRAGSpecificity,
+      readability: graphRAGReadability
+    },
+    traditionalRAG: {
+      length: traditionalRAGLength,
+      completeness: traditionalRAGCompleteness,
+      specificity: traditionalRAGSpecificity,
+      readability: traditionalRAGReadability
+    }
+  };
+}
+
+function calculateGraphCoverage(context: any[], graphData: GraphData) {
+  const totalNodes = graphData.nodes.length;
+  const totalEdges = graphData.edges.length;
+  
+  // Count unique entities used in context
+  const usedEntities = new Set();
+  const usedRelationships = new Set();
+  
+  context.forEach(ctx => {
+    if (ctx.type === 'entity') {
+      usedEntities.add(ctx.description.split(' (')[0]); // Extract entity name
+    } else if (ctx.type === 'relationship') {
+      usedRelationships.add(ctx.description);
+    }
+  });
+  
+  const coveragePercentage = totalNodes > 0 ? (usedEntities.size / totalNodes) * 100 : 0;
+  const relationshipUtilization = totalEdges > 0 ? (usedRelationships.size / totalEdges) * 100 : 0;
+  
+  // Calculate entity type distribution
+  const entityTypes = new Map<string, number>();
+  graphData.nodes.forEach(node => {
+    if (usedEntities.has(node.label)) {
+      entityTypes.set(node.type, (entityTypes.get(node.type) || 0) + 1);
+    }
+  });
+  
+  return {
+    totalNodes,
+    totalEdges,
+    usedEntities: usedEntities.size,
+    usedRelationships: usedRelationships.size,
+    coveragePercentage,
+    relationshipUtilization,
+    entityTypeDistribution: Object.fromEntries(entityTypes)
+  };
+}
+
+// Helper functions for quality calculations
+function calculateCompleteness(response: string, queryTerms: string[]): number {
+  if (queryTerms.length === 0) return 1;
+  
+  const responseLower = response.toLowerCase();
+  let addressedTerms = 0;
+  
+  for (const term of queryTerms) {
+    if (responseLower.includes(term)) {
+      addressedTerms++;
+    }
+  }
+  
+  return addressedTerms / queryTerms.length;
+}
+
+function calculateSpecificity(response: string): number {
+  // Count specific terms (proper nouns, technical terms) vs generic terms
+  const specificPatterns = [
+    /\b[A-Z][a-z]+ [A-Z][a-z]+\b/g, // Proper nouns
+    /\b[A-Z][A-Z]+\b/g, // Acronyms
+    /\b\d+\b/g, // Numbers
+    /\b[A-Z][a-z]+(?: [A-Z][a-z]+)*\b/g // Technical terms
+  ];
+  
+  const genericPatterns = [
+    /\b(the|a|an|and|or|but|in|on|at|to|for|of|with|by)\b/gi, // Common words
+    /\b(this|that|these|those|it|they|them|their)\b/gi // Pronouns
+  ];
+  
+  let specificCount = 0;
+  let genericCount = 0;
+  
+  specificPatterns.forEach(pattern => {
+    const matches = response.match(pattern);
+    if (matches) specificCount += matches.length;
+  });
+  
+  genericPatterns.forEach(pattern => {
+    const matches = response.match(pattern);
+    if (matches) genericCount += matches.length;
+  });
+  
+  const total = specificCount + genericCount;
+  return total > 0 ? specificCount / total : 0;
+}
+
+function calculateReadability(text: string): number {
+  // Simplified Flesch reading ease calculation
+  const sentences = text.split(/[.!?]+/).filter(s => s.trim().length > 0);
+  const words = text.split(/\s+/).filter(w => w.length > 0);
+  const syllables = estimateSyllables(text);
+  
+  if (sentences.length === 0 || words.length === 0) return 0;
+  
+  const avgSentenceLength = words.length / sentences.length;
+  const avgSyllablesPerWord = syllables / words.length;
+  
+  // Flesch Reading Ease formula: 206.835 - (1.015 × avg sentence length) - (84.6 × avg syllables per word)
+  const fleschScore = 206.835 - (1.015 * avgSentenceLength) - (84.6 * avgSyllablesPerWord);
+  
+  return Math.max(0, Math.min(100, fleschScore));
+}
+
+function estimateSyllables(text: string): number {
+  // Simple syllable estimation
+  const words = text.toLowerCase().split(/\s+/);
+  let syllableCount = 0;
+  
+  words.forEach(word => {
+    // Remove common suffixes
+    word = word.replace(/(?:ed|es|ing|ly|ment|ness|tion|sion)$/, '');
+    
+    // Count vowel groups
+    const vowelGroups = word.match(/[aeiouy]+/g);
+    if (vowelGroups) {
+      syllableCount += vowelGroups.length;
+    } else {
+      syllableCount += 1; // At least one syllable
+    }
+  });
+  
+  return syllableCount;
 }

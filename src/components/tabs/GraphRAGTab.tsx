@@ -38,6 +38,47 @@ interface GraphRAGResponse {
     traditionalRAGLatency: number;
     contextRelevance: number;
   };
+  analytics?: {
+    tokens: {
+      graphRAG: {
+        input: number;
+        output: number;
+        total: number;
+        efficiency: number;
+        cost: number;
+      };
+      traditionalRAG: {
+        input: number;
+        output: number;
+        total: number;
+        efficiency: number;
+        cost: number;
+      };
+    };
+    quality: {
+      graphRAG: {
+        length: number;
+        completeness: number;
+        specificity: number;
+        readability: number;
+      };
+      traditionalRAG: {
+        length: number;
+        completeness: number;
+        specificity: number;
+        readability: number;
+      };
+    };
+    graph: {
+      totalNodes: number;
+      totalEdges: number;
+      usedEntities: number;
+      usedRelationships: number;
+      coveragePercentage: number;
+      relationshipUtilization: number;
+      entityTypeDistribution: Record<string, number>;
+    };
+  };
 }
 
 export function GraphRAGTab() {
@@ -619,47 +660,254 @@ export function GraphRAGTab() {
         )}
 
         {activeTab === 'analytics' && responses && (
-          <div className="space-y-4">
+          <div className="space-y-6">
+            {/* Performance Comparison */}
             <div className="bg-white rounded-lg border shadow-sm">
               <div className="p-6 border-b">
                 <h3 className="text-lg font-semibold">Performance Comparison</h3>
                 <p className="text-gray-600 mt-1">
-                  Detailed analysis of GraphRAG vs Traditional RAG
+                  Basic performance metrics
                 </p>
               </div>
               <div className="p-6">
-                <div className="space-y-4">
-                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                    <div className="text-center p-4 bg-green-50 rounded-lg">
-                      <div className="text-2xl font-bold text-green-600">
-                        {responses.performance.graphRAGLatency}ms
-                      </div>
-                      <div className="text-sm text-gray-600">GraphRAG Latency</div>
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                  <div className="text-center p-4 bg-green-50 rounded-lg">
+                    <div className="text-2xl font-bold text-green-600">
+                      {responses.performance.graphRAGLatency}ms
                     </div>
-                    <div className="text-center p-4 bg-blue-50 rounded-lg">
-                      <div className="text-2xl font-bold text-blue-600">
-                        {responses.performance.traditionalRAGLatency}ms
-                      </div>
-                      <div className="text-sm text-gray-600">Traditional RAG Latency</div>
-                    </div>
-                    <div className="text-center p-4 bg-purple-50 rounded-lg">
-                      <div className="text-2xl font-bold text-purple-600">
-                        {(responses.performance.contextRelevance * 100).toFixed(1)}%
-                      </div>
-                      <div className="text-sm text-gray-600">Context Relevance</div>
-                    </div>
+                    <div className="text-sm text-gray-600">GraphRAG Latency</div>
                   </div>
+                  <div className="text-center p-4 bg-blue-50 rounded-lg">
+                    <div className="text-2xl font-bold text-blue-600">
+                      {responses.performance.traditionalRAGLatency}ms
+                    </div>
+                    <div className="text-sm text-gray-600">Traditional RAG Latency</div>
+                  </div>
+                  <div className="text-center p-4 bg-purple-50 rounded-lg">
+                    <div className="text-2xl font-bold text-purple-600">
+                      {(responses.performance.contextRelevance * 100).toFixed(1)}%
+                    </div>
+                    <div className="text-sm text-gray-600">Context Relevance</div>
+                  </div>
+                </div>
+              </div>
+            </div>
 
-                  <div>
-                    <h4 className="font-medium mb-2">Graph Context Used:</h4>
-                    <div className="space-y-1">
-                      {responses.graphContext.map((context, index) => (
-                        <div key={index} className="p-2 bg-gray-50 rounded text-sm">
-                          {context}
+            {/* Token Usage Analytics */}
+            {responses.analytics?.tokens && (
+              <div className="bg-white rounded-lg border shadow-sm">
+                <div className="p-6 border-b">
+                  <h3 className="text-lg font-semibold">Token Usage & Cost Analysis</h3>
+                  <p className="text-gray-600 mt-1">
+                    Token consumption and estimated costs
+                  </p>
+                </div>
+                <div className="p-6">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    {/* GraphRAG Tokens */}
+                    <div className="space-y-4">
+                      <h4 className="font-medium text-green-600">GraphRAG</h4>
+                      <div className="grid grid-cols-2 gap-3">
+                        <div className="text-center p-3 bg-green-50 rounded">
+                          <div className="text-lg font-bold text-green-600">{responses.analytics.tokens.graphRAG.input}</div>
+                          <div className="text-xs text-gray-600">Input Tokens</div>
                         </div>
-                      ))}
+                        <div className="text-center p-3 bg-green-50 rounded">
+                          <div className="text-lg font-bold text-green-600">{responses.analytics.tokens.graphRAG.output}</div>
+                          <div className="text-xs text-gray-600">Output Tokens</div>
+                        </div>
+                        <div className="text-center p-3 bg-green-50 rounded">
+                          <div className="text-lg font-bold text-green-600">{responses.analytics.tokens.graphRAG.total}</div>
+                          <div className="text-xs text-gray-600">Total Tokens</div>
+                        </div>
+                        <div className="text-center p-3 bg-green-50 rounded">
+                          <div className="text-lg font-bold text-green-600">${responses.analytics.tokens.graphRAG.cost.toFixed(4)}</div>
+                          <div className="text-xs text-gray-600">Estimated Cost</div>
+                        </div>
+                      </div>
+                      <div className="text-center p-2 bg-gray-50 rounded">
+                        <span className="text-sm text-gray-600">
+                          Efficiency: {(responses.analytics.tokens.graphRAG.efficiency * 100).toFixed(1)}%
+                        </span>
+                      </div>
+                    </div>
+
+                    {/* Traditional RAG Tokens */}
+                    <div className="space-y-4">
+                      <h4 className="font-medium text-blue-600">Traditional RAG</h4>
+                      <div className="grid grid-cols-2 gap-3">
+                        <div className="text-center p-3 bg-blue-50 rounded">
+                          <div className="text-lg font-bold text-blue-600">{responses.analytics.tokens.traditionalRAG.input}</div>
+                          <div className="text-xs text-gray-600">Input Tokens</div>
+                        </div>
+                        <div className="text-center p-3 bg-blue-50 rounded">
+                          <div className="text-lg font-bold text-blue-600">{responses.analytics.tokens.traditionalRAG.output}</div>
+                          <div className="text-xs text-gray-600">Output Tokens</div>
+                        </div>
+                        <div className="text-center p-3 bg-blue-50 rounded">
+                          <div className="text-lg font-bold text-blue-600">{responses.analytics.tokens.traditionalRAG.total}</div>
+                          <div className="text-xs text-gray-600">Total Tokens</div>
+                        </div>
+                        <div className="text-center p-3 bg-blue-50 rounded">
+                          <div className="text-lg font-bold text-blue-600">${responses.analytics.tokens.traditionalRAG.cost.toFixed(4)}</div>
+                          <div className="text-xs text-gray-600">Estimated Cost</div>
+                        </div>
+                      </div>
+                      <div className="text-center p-2 bg-gray-50 rounded">
+                        <span className="text-sm text-gray-600">
+                          Efficiency: {(responses.analytics.tokens.traditionalRAG.efficiency * 100).toFixed(1)}%
+                        </span>
+                      </div>
                     </div>
                   </div>
+                </div>
+              </div>
+            )}
+
+            {/* Response Quality Analytics */}
+            {responses.analytics?.quality && (
+              <div className="bg-white rounded-lg border shadow-sm">
+                <div className="p-6 border-b">
+                  <h3 className="text-lg font-semibold">Response Quality Analysis</h3>
+                  <p className="text-gray-600 mt-1">
+                    Quality metrics for response evaluation
+                  </p>
+                </div>
+                <div className="p-6">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    {/* GraphRAG Quality */}
+                    <div className="space-y-4">
+                      <h4 className="font-medium text-green-600">GraphRAG Quality</h4>
+                      <div className="space-y-3">
+                        <div className="flex justify-between items-center p-2 bg-green-50 rounded">
+                          <span className="text-sm text-gray-600">Length:</span>
+                          <span className="font-medium">{responses.analytics.quality.graphRAG.length} chars</span>
+                        </div>
+                        <div className="flex justify-between items-center p-2 bg-green-50 rounded">
+                          <span className="text-sm text-gray-600">Completeness:</span>
+                          <span className="font-medium">{(responses.analytics.quality.graphRAG.completeness * 100).toFixed(1)}%</span>
+                        </div>
+                        <div className="flex justify-between items-center p-2 bg-green-50 rounded">
+                          <span className="text-sm text-gray-600">Specificity:</span>
+                          <span className="font-medium">{(responses.analytics.quality.graphRAG.specificity * 100).toFixed(1)}%</span>
+                        </div>
+                        <div className="flex justify-between items-center p-2 bg-green-50 rounded">
+                          <span className="text-sm text-gray-600">Readability:</span>
+                          <span className="font-medium">{responses.analytics.quality.graphRAG.readability.toFixed(0)}/100</span>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Traditional RAG Quality */}
+                    <div className="space-y-4">
+                      <h4 className="font-medium text-blue-600">Traditional RAG Quality</h4>
+                      <div className="space-y-3">
+                        <div className="flex justify-between items-center p-2 bg-blue-50 rounded">
+                          <span className="text-sm text-gray-600">Length:</span>
+                          <span className="font-medium">{responses.analytics.quality.traditionalRAG.length} chars</span>
+                        </div>
+                        <div className="flex justify-between items-center p-2 bg-blue-50 rounded">
+                          <span className="text-sm text-gray-600">Completeness:</span>
+                          <span className="font-medium">{(responses.analytics.quality.traditionalRAG.completeness * 100).toFixed(1)}%</span>
+                        </div>
+                        <div className="flex justify-between items-center p-2 bg-blue-50 rounded">
+                          <span className="text-sm text-gray-600">Specificity:</span>
+                          <span className="font-medium">{(responses.analytics.quality.traditionalRAG.specificity * 100).toFixed(1)}%</span>
+                        </div>
+                        <div className="flex justify-between items-center p-2 bg-blue-50 rounded">
+                          <span className="text-sm text-gray-600">Readability:</span>
+                          <span className="font-medium">{responses.analytics.quality.traditionalRAG.readability.toFixed(0)}/100</span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* Graph Coverage Analytics */}
+            {responses.analytics?.graph && (
+              <div className="bg-white rounded-lg border shadow-sm">
+                <div className="p-6 border-b">
+                  <h3 className="text-lg font-semibold">Graph Coverage Analysis</h3>
+                  <p className="text-gray-600 mt-1">
+                    How much of the knowledge graph was utilized
+                  </p>
+                </div>
+                <div className="p-6">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    {/* Graph Statistics */}
+                    <div className="space-y-4">
+                      <h4 className="font-medium">Graph Statistics</h4>
+                      <div className="grid grid-cols-2 gap-3">
+                        <div className="text-center p-3 bg-purple-50 rounded">
+                          <div className="text-lg font-bold text-purple-600">{responses.analytics.graph.totalNodes}</div>
+                          <div className="text-xs text-gray-600">Total Nodes</div>
+                        </div>
+                        <div className="text-center p-3 bg-purple-50 rounded">
+                          <div className="text-lg font-bold text-purple-600">{responses.analytics.graph.totalEdges}</div>
+                          <div className="text-xs text-gray-600">Total Edges</div>
+                        </div>
+                        <div className="text-center p-3 bg-purple-50 rounded">
+                          <div className="text-lg font-bold text-purple-600">{responses.analytics.graph.usedEntities}</div>
+                          <div className="text-xs text-gray-600">Used Entities</div>
+                        </div>
+                        <div className="text-center p-3 bg-purple-50 rounded">
+                          <div className="text-lg font-bold text-purple-600">{responses.analytics.graph.usedRelationships}</div>
+                          <div className="text-xs text-gray-600">Used Relationships</div>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Coverage Metrics */}
+                    <div className="space-y-4">
+                      <h4 className="font-medium">Coverage Metrics</h4>
+                      <div className="space-y-3">
+                        <div className="flex justify-between items-center p-2 bg-purple-50 rounded">
+                          <span className="text-sm text-gray-600">Entity Coverage:</span>
+                          <span className="font-medium">{responses.analytics.graph.coveragePercentage.toFixed(1)}%</span>
+                        </div>
+                        <div className="flex justify-between items-center p-2 bg-purple-50 rounded">
+                          <span className="text-sm text-gray-600">Relationship Utilization:</span>
+                          <span className="font-medium">{responses.analytics.graph.relationshipUtilization.toFixed(1)}%</span>
+                        </div>
+                      </div>
+                      
+                      {/* Entity Type Distribution */}
+                      {Object.keys(responses.analytics.graph.entityTypeDistribution).length > 0 && (
+                        <div className="mt-4">
+                          <h5 className="text-sm font-medium text-gray-700 mb-2">Entity Type Distribution:</h5>
+                          <div className="space-y-1">
+                            {Object.entries(responses.analytics.graph.entityTypeDistribution).map(([type, count]) => (
+                              <div key={type} className="flex justify-between items-center text-sm">
+                                <span className="text-gray-600 capitalize">{type}:</span>
+                                <span className="font-medium">{count}</span>
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* Graph Context Used */}
+            <div className="bg-white rounded-lg border shadow-sm">
+              <div className="p-6 border-b">
+                <h3 className="text-lg font-semibold">Graph Context Used</h3>
+                <p className="text-gray-600 mt-1">
+                  Context extracted from the knowledge graph
+                </p>
+              </div>
+              <div className="p-6">
+                <div className="space-y-1">
+                  {responses.graphContext.map((context, index) => (
+                    <div key={index} className="p-2 bg-gray-50 rounded text-sm">
+                      {context}
+                    </div>
+                  ))}
                 </div>
               </div>
             </div>
