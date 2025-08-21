@@ -53,12 +53,12 @@ export function GraphRAGTab() {
   const [buildError, setBuildError] = useState<string | null>(null);
 
   const sampleQueries = [
-    "What are the key relationships between AI and healthcare?",
-    "How do technology companies innovate in their respective fields?",
-    "What are the main challenges in AI implementation?",
-    "Which organizations are leading in AI research?",
-    "What are the benefits of AI in modern healthcare?",
-    "How do different companies approach AI development?"
+    "What is the relationship between AI and healthcare?",
+    "How do tech companies innovate?",
+    "What are AI implementation challenges?",
+    "Which organizations lead in AI research?",
+    "What are AI benefits in healthcare?",
+    "How do companies approach AI development?"
   ];
 
   const handleFileUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
