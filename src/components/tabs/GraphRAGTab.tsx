@@ -67,6 +67,31 @@ export function GraphRAGTab() {
     setDocuments(textFiles);
   };
 
+  const loadSampleDocuments = async () => {
+    try {
+      // Fetch the sample documents
+      const [aiHealthcareResponse, techCompaniesResponse] = await Promise.all([
+        fetch('/sample-docs/ai-healthcare.txt'),
+        fetch('/sample-docs/tech-companies.txt')
+      ]);
+
+      if (aiHealthcareResponse.ok && techCompaniesResponse.ok) {
+        const aiHealthcareText = await aiHealthcareResponse.text();
+        const techCompaniesText = await techCompaniesResponse.text();
+
+        // Create File objects from the text content
+        const aiHealthcareFile = new File([aiHealthcareText], 'ai-healthcare.txt', { type: 'text/plain' });
+        const techCompaniesFile = new File([techCompaniesText], 'tech-companies.txt', { type: 'text/plain' });
+
+        setDocuments([aiHealthcareFile, techCompaniesFile]);
+      } else {
+        console.error('Failed to load sample documents');
+      }
+    } catch (error) {
+      console.error('Error loading sample documents:', error);
+    }
+  };
+
   const buildKnowledgeGraph = async () => {
     if (documents.length === 0) return;
 
@@ -233,21 +258,39 @@ export function GraphRAGTab() {
                 </p>
               </div>
               <div className="p-6 space-y-4">
-                <div className="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center">
-                  <input
-                    type="file"
-                    multiple
-                    accept=".txt,text/plain"
-                    onChange={handleFileUpload}
-                    className="hidden"
-                    id="file-upload"
-                  />
-                  <label htmlFor="file-upload" className="cursor-pointer">
-                    <Upload className="w-8 h-8 mx-auto mb-2 text-gray-400" />
-                    <p className="text-sm text-gray-600">
-                      Click to upload text files or drag and drop
+                <div className="space-y-4">
+                  <div className="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center">
+                    <input
+                      type="file"
+                      multiple
+                      accept=".txt,text/plain"
+                      onChange={handleFileUpload}
+                      className="hidden"
+                      id="file-upload"
+                    />
+                    <label htmlFor="file-upload" className="cursor-pointer">
+                      <Upload className="w-8 h-8 mx-auto mb-2 text-gray-400" />
+                      <p className="text-sm text-gray-600">
+                        Click to upload text files or drag and drop
+                      </p>
+                    </label>
+                  </div>
+
+                  <div className="text-center">
+                    <div className="text-sm text-gray-500 mb-2">or</div>
+                    <button
+                      onClick={loadSampleDocuments}
+                      className="inline-flex items-center px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors"
+                    >
+                      <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                      </svg>
+                      Load Sample Documents
+                    </button>
+                    <p className="text-xs text-gray-500 mt-1">
+                      AI Healthcare & Tech Companies datasets
                     </p>
-                  </label>
+                  </div>
                 </div>
 
                 {documents.length > 0 && (
