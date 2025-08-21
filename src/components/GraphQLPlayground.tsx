@@ -4,6 +4,8 @@ import { useState, useEffect } from 'react';
 export function GraphQLPlayground() {
   const [availableGraphs, setAvailableGraphs] = useState<string[]>([]);
   const [isLoading, setIsLoading] = useState(false);
+  const [importStatus, setImportStatus] = useState<'idle' | 'importing' | 'success' | 'manual' | 'error'>('idle');
+  const [importMessage, setImportMessage] = useState('');
   
   // Fetch available graphs on component mount
   useEffect(() => {
@@ -89,13 +91,132 @@ query GetAnalytics {
     }
   };
 
+  const generatePostmanCollection = async () => {
+    setImportStatus('importing');
+    setImportMessage('Generating GraphQL collection...');
+    
+    try {
+      const response = await fetch('/api/graphql/postman-collection', {
+        method: 'POST',
+        headers: { 
+          'Content-Type': 'application/json',
+          'Accept': 'application/json'
+        },
+        body: JSON.stringify({}),
+      });
+
+      if (response.ok) {
+        const collectionData = await response.json();
+        
+        // Try to create collection directly in Postman Desktop using API
+        const createInPostman = async () => {
+          try {
+            setImportMessage('Creating collection in Postman Desktop...');
+            
+            // Use the same API as MCP tab for direct Postman integration
+            const postmanResponse = await fetch('/api/postman/create-collection', {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+              },
+              body: JSON.stringify({
+                collection: collectionData,
+                createInWeb: false, // Create in Desktop
+              }),
+            });
+
+            const result = await postmanResponse.json();
+
+            if (result.success) {
+              setImportStatus('success');
+              setImportMessage('✅ GraphQL Collection created successfully in Postman Desktop! Set base_url to http://localhost:3000 in your environment.');
+              
+              // Open the collection in Postman Desktop
+              if (result.collectionUrl) {
+                window.open(result.collectionUrl, '_blank');
+              }
+            } else {
+              // Fallback to download if API key not configured
+              if (result.fallback) {
+                setImportMessage('Downloading collection file...');
+                
+                const blob = new Blob([JSON.stringify(collectionData, null, 2)], {
+                  type: 'application/json'
+                });
+                const url = window.URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = 'graphrag-graphql-collection.json';
+                document.body.appendChild(a);
+                a.click();
+                window.URL.revokeObjectURL(url);
+                document.body.removeChild(a);
+                
+                setImportStatus('manual');
+                setImportMessage('📥 GraphQL Collection downloaded! Import manually into Postman Desktop.');
+              } else {
+                setImportStatus('error');
+                setImportMessage('❌ Failed to create collection. Please try again.');
+              }
+            }
+          } catch (error) {
+            console.error('Error creating collection in Postman:', error);
+            setImportStatus('error');
+            setImportMessage('❌ Error creating collection. Please try again.');
+          }
+        };
+
+        await createInPostman();
+      } else {
+        setImportStatus('error');
+        setImportMessage('❌ Failed to generate collection. Please try again.');
+      }
+    } catch (error) {
+      console.error('Error generating collection:', error);
+      setImportStatus('error');
+      setImportMessage('❌ Error generating collection. Please try again.');
+    }
+  };
+
   return (
     <div className="space-y-6">
-      <div>
-        <h2 className="text-2xl font-bold mb-4">GraphQL Playground</h2>
-        <p className="text-gray-600 mb-4">
-          Test GraphQL queries for the GraphRAG system. The playground includes example queries to get you started.
-        </p>
+      <div className="flex items-center justify-between">
+        <div>
+          <h2 className="text-2xl font-bold mb-4">GraphQL Playground</h2>
+          <p className="text-gray-600 mb-4">
+            Test GraphQL queries for the GraphRAG system. The playground includes example queries to get you started.
+          </p>
+        </div>
+        <div className="flex flex-col space-y-3">
+          <button 
+            onClick={generatePostmanCollection} 
+            disabled={importStatus === 'importing'}
+            className="flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed w-fit"
+          >
+            <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+            </svg>
+            {importStatus === 'importing' ? 'Importing...' : 'Add to Postman Desktop'}
+          </button>
+          
+          {importStatus !== 'idle' && (
+            <div className={`px-4 py-3 rounded-lg text-sm max-w-md ${
+              importStatus === 'success' ? 'bg-green-50 border border-green-200 text-green-800' :
+              importStatus === 'manual' ? 'bg-yellow-50 border border-yellow-200 text-yellow-800' :
+              importStatus === 'error' ? 'bg-red-50 border border-red-200 text-red-800' :
+              'bg-blue-50 border border-blue-200 text-blue-800'
+            }`}>
+              <div className="flex items-start space-x-2">
+                {importStatus === 'success' && (
+                  <svg className="w-4 h-4 mt-0.5 text-green-600 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                    <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                  </svg>
+                )}
+                <span className="leading-relaxed">{importMessage}</span>
+              </div>
+            </div>
+          )}
+        </div>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
