@@ -20,18 +20,18 @@ export function HomeTab({ onTabChange, apiKeyStatus }: HomeTabProps) {
       color: 'bg-blue-500 hover:bg-blue-600'
     },
     {
-      title: 'GraphRAG Lab',
-      description: 'Build knowledge graphs and compare GraphRAG vs traditional RAG',
-      icon: Network,
-      action: () => onTabChange('graphrag'),
-      color: 'bg-green-500 hover:bg-green-600'
-    },
-    {
       title: 'MCP Integrations',
       description: 'Explore Model Context Protocol integrations and collections',
       icon: Library,
       action: () => onTabChange('collections'),
       color: 'bg-purple-500 hover:bg-purple-600'
+    },
+    {
+      title: 'GraphRAG Lab',
+      description: 'Build knowledge graphs and compare GraphRAG vs traditional RAG',
+      icon: Network,
+      action: () => onTabChange('graphrag'),
+      color: 'bg-green-500 hover:bg-green-600'
     },
   ];
 
