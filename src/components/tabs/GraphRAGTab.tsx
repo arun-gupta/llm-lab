@@ -213,68 +213,69 @@ export function GraphRAGTab() {
                 </p>
               </div>
               <div className="p-6 space-y-4">
-              <div className="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center">
-                <input
-                  type="file"
-                  multiple
-                  accept=".txt,text/plain"
-                  onChange={handleFileUpload}
-                  className="hidden"
-                  id="file-upload"
-                />
-                <label htmlFor="file-upload" className="cursor-pointer">
-                  <Upload className="w-8 h-8 mx-auto mb-2 text-gray-400" />
-                  <p className="text-sm text-gray-600">
-                    Click to upload text files or drag and drop
-                  </p>
-                </label>
-              </div>
-
-              {documents.length > 0 && (
-                <div className="space-y-2">
-                  <h4 className="font-medium">Selected Files:</h4>
-                  <div className="space-y-1">
-                    {documents.map((doc, index) => (
-                      <div key={index} className="flex items-center justify-between p-2 bg-gray-50 rounded">
-                        <span className="text-sm">{doc.name}</span>
-                        <span className="px-2 py-1 text-xs bg-gray-200 text-gray-700 rounded">{(doc.size / 1024).toFixed(1)} KB</span>
-                      </div>
-                    ))}
-                  </div>
+                <div className="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center">
+                  <input
+                    type="file"
+                    multiple
+                    accept=".txt,text/plain"
+                    onChange={handleFileUpload}
+                    className="hidden"
+                    id="file-upload"
+                  />
+                  <label htmlFor="file-upload" className="cursor-pointer">
+                    <Upload className="w-8 h-8 mx-auto mb-2 text-gray-400" />
+                    <p className="text-sm text-gray-600">
+                      Click to upload text files or drag and drop
+                    </p>
+                  </label>
                 </div>
-              )}
 
-              <button 
-                onClick={buildKnowledgeGraph} 
-                disabled={documents.length === 0 || isProcessing}
-                className="w-full flex items-center justify-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed"
-              >
-                {isProcessing ? (
-                  <>
-                    <Network className="w-4 h-4 mr-2 animate-spin" />
-                    Building Knowledge Graph...
-                  </>
-                ) : (
-                  <>
-                    <Network className="w-4 h-4 mr-2" />
-                    Build Knowledge Graph
-                  </>
+                {documents.length > 0 && (
+                  <div className="space-y-2">
+                    <h4 className="font-medium">Selected Files:</h4>
+                    <div className="space-y-1">
+                      {documents.map((doc, index) => (
+                        <div key={index} className="flex items-center justify-between p-2 bg-gray-50 rounded">
+                          <span className="text-sm">{doc.name}</span>
+                          <span className="px-2 py-1 text-xs bg-gray-200 text-gray-700 rounded">{(doc.size / 1024).toFixed(1)} KB</span>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
                 )}
-              </button>
 
-              {isProcessing && (
-                <div className="space-y-2">
-                  <div className="w-full bg-gray-200 rounded-full h-2">
-                    <div 
-                      className="bg-blue-600 h-2 rounded-full transition-all duration-300" 
-                      style={{ width: `${processingProgress}%` }}
-                    ></div>
+                <button 
+                  onClick={buildKnowledgeGraph} 
+                  disabled={documents.length === 0 || isProcessing}
+                  className="w-full flex items-center justify-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  {isProcessing ? (
+                    <>
+                      <Network className="w-4 h-4 mr-2 animate-spin" />
+                      Building Knowledge Graph...
+                    </>
+                  ) : (
+                    <>
+                      <Network className="w-4 h-4 mr-2" />
+                      Build Knowledge Graph
+                    </>
+                  )}
+                </button>
+
+                {isProcessing && (
+                  <div className="space-y-2">
+                    <div className="w-full bg-gray-200 rounded-full h-2">
+                      <div 
+                        className="bg-blue-600 h-2 rounded-full transition-all duration-300" 
+                        style={{ width: `${processingProgress}%` }}
+                      ></div>
+                    </div>
+                    <p className="text-sm text-gray-600 text-center">
+                      Processing documents and extracting entities...
+                    </p>
                   </div>
-                  <p className="text-sm text-gray-600 text-center">
-                    Processing documents and extracting entities...
-                  </p>
-                </div>
-              )}
+                )}
+              </div>
             </div>
           </div>
         )}
@@ -329,7 +330,7 @@ export function GraphRAGTab() {
                 </div>
               </div>
             </div>
-          )}
+          </div>
         )}
 
         {activeTab === 'query' && (
@@ -345,70 +346,71 @@ export function GraphRAGTab() {
                 </p>
               </div>
               <div className="p-6 space-y-4">
-              <div className="space-y-2">
-                <label htmlFor="query" className="block text-sm font-medium text-gray-700">Enter your query:</label>
-                <textarea
-                  id="query"
-                  placeholder="e.g., What are the key relationships between AI and healthcare in our documents?"
-                  value={query}
-                  onChange={(e) => setQuery(e.target.value)}
-                  rows={3}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                />
-              </div>
+                <div className="space-y-2">
+                  <label htmlFor="query" className="block text-sm font-medium text-gray-700">Enter your query:</label>
+                  <textarea
+                    id="query"
+                    placeholder="e.g., What are the key relationships between AI and healthcare in our documents?"
+                    value={query}
+                    onChange={(e) => setQuery(e.target.value)}
+                    rows={3}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  />
+                </div>
 
-              <button 
-                onClick={queryGraphRAG} 
-                disabled={!query.trim() || isQuerying}
-                className="w-full flex items-center justify-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed"
-              >
-                {isQuerying ? 'Querying...' : 'Compare GraphRAG vs Traditional RAG'}
-              </button>
+                <button 
+                  onClick={queryGraphRAG} 
+                  disabled={!query.trim() || isQuerying}
+                  className="w-full flex items-center justify-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  {isQuerying ? 'Querying...' : 'Compare GraphRAG vs Traditional RAG'}
+                </button>
+              </div>
             </div>
+
+            {responses && (
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div className="bg-white rounded-lg border shadow-sm">
+                  <div className="p-6 border-b">
+                    <h3 className="text-lg font-semibold text-green-600">GraphRAG Response</h3>
+                    <p className="text-gray-600 mt-1">
+                      Enhanced with knowledge graph context
+                    </p>
+                  </div>
+                  <div className="p-6">
+                    <div className="space-y-4">
+                      <div className="p-3 bg-green-50 rounded-lg">
+                        <p className="text-sm text-green-800">{responses.graphRAGResponse}</p>
+                      </div>
+                      <div className="text-sm text-gray-600">
+                        <p>Latency: {responses.performance.graphRAGLatency}ms</p>
+                        <p>Context Relevance: {responses.performance.contextRelevance.toFixed(2)}</p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="bg-white rounded-lg border shadow-sm">
+                  <div className="p-6 border-b">
+                    <h3 className="text-lg font-semibold text-blue-600">Traditional RAG Response</h3>
+                    <p className="text-gray-600 mt-1">
+                      Standard retrieval-augmented generation
+                    </p>
+                  </div>
+                  <div className="p-6">
+                    <div className="space-y-4">
+                      <div className="p-3 bg-blue-50 rounded-lg">
+                        <p className="text-sm text-blue-800">{responses.traditionalRAGResponse}</p>
+                      </div>
+                      <div className="text-sm text-gray-600">
+                        <p>Latency: {responses.performance.traditionalRAGLatency}ms</p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            )}
           </div>
-
-          {responses && (
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <div className="bg-white rounded-lg border shadow-sm">
-                <div className="p-6 border-b">
-                  <h3 className="text-lg font-semibold text-green-600">GraphRAG Response</h3>
-                  <p className="text-gray-600 mt-1">
-                    Enhanced with knowledge graph context
-                  </p>
-                </div>
-                <div className="p-6">
-                  <div className="space-y-4">
-                    <div className="p-3 bg-green-50 rounded-lg">
-                      <p className="text-sm text-green-800">{responses.graphRAGResponse}</p>
-                    </div>
-                    <div className="text-sm text-gray-600">
-                      <p>Latency: {responses.performance.graphRAGLatency}ms</p>
-                      <p>Context Relevance: {responses.performance.contextRelevance.toFixed(2)}</p>
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              <div className="bg-white rounded-lg border shadow-sm">
-                <div className="p-6 border-b">
-                  <h3 className="text-lg font-semibold text-blue-600">Traditional RAG Response</h3>
-                  <p className="text-gray-600 mt-1">
-                    Standard retrieval-augmented generation
-                  </p>
-                </div>
-                <div className="p-6">
-                  <div className="space-y-4">
-                    <div className="p-3 bg-blue-50 rounded-lg">
-                      <p className="text-sm text-blue-800">{responses.traditionalRAGResponse}</p>
-                    </div>
-                    <div className="text-sm text-gray-600">
-                      <p>Latency: {responses.performance.traditionalRAGLatency}ms</p>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          )}
         )}
 
         {activeTab === 'analytics' && responses && (
@@ -456,7 +458,7 @@ export function GraphRAGTab() {
                 </div>
               </div>
             </div>
-          )}
+          </div>
         )}
       </div>
     </div>
