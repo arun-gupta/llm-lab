@@ -1,7 +1,43 @@
 'use client';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 
 export function GraphQLPlayground() {
+  const [availableGraphs, setAvailableGraphs] = useState<string[]>([]);
+  const [isLoading, setIsLoading] = useState(false);
+  
+  // Fetch available graphs on component mount
+  useEffect(() => {
+    const fetchGraphs = async () => {
+      try {
+        const response = await fetch('/api/graphql', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            query: `query GetGraphs {
+              graphs {
+                id
+                name
+                stats {
+                  totalNodes
+                  totalEdges
+                }
+              }
+            }`
+          })
+        });
+        
+        const data = await response.json();
+        if (data.data?.graphs) {
+          setAvailableGraphs(data.data.graphs.map((g: any) => g.id));
+        }
+      } catch (error) {
+        console.warn('Could not fetch available graphs:', error);
+      }
+    };
+    
+    fetchGraphs();
+  }, []);
+
   const [query, setQuery] = useState(`# GraphRAG GraphQL Playground
 # Welcome! Try this example query to get started:
 
@@ -29,10 +65,9 @@ query GetAnalytics {
 }`);
   
   const [result, setResult] = useState('');
-  const [loading, setLoading] = useState(false);
 
   const executeQuery = async () => {
-    setLoading(true);
+    setIsLoading(true);
     try {
       const response = await fetch('/api/graphql', {
         method: 'POST',
@@ -50,7 +85,7 @@ query GetAnalytics {
     } catch (error) {
       setResult(`Error: ${error instanceof Error ? error.message : 'Unknown error'}`);
     } finally {
-      setLoading(false);
+      setIsLoading(false);
     }
   };
 
@@ -92,10 +127,10 @@ query GetAnalytics {
 
           <button
             onClick={executeQuery}
-            disabled={loading}
+            disabled={isLoading}
             className="w-full px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            {loading ? 'Executing...' : 'Execute Query'}
+            {isLoading ? 'Executing...' : 'Execute Query'}
           </button>
         </div>
 
@@ -115,6 +150,28 @@ query GetAnalytics {
           </div>
         </div>
       </div>
+
+      {/* Available Graphs */}
+      {availableGraphs.length > 0 && (
+        <div className="bg-blue-50 p-4 rounded-lg mb-6">
+          <h3 className="text-sm font-semibold text-blue-800 mb-2">Available Graph IDs:</h3>
+          <div className="flex flex-wrap gap-2">
+            {availableGraphs.slice(0, 5).map((graphId) => (
+              <span key={graphId} className="px-2 py-1 bg-blue-100 text-blue-700 text-xs rounded">
+                {graphId}
+              </span>
+            ))}
+            {availableGraphs.length > 5 && (
+              <span className="px-2 py-1 bg-blue-100 text-blue-700 text-xs rounded">
+                +{availableGraphs.length - 5} more
+              </span>
+            )}
+          </div>
+          <p className="text-xs text-blue-600 mt-2">
+            Use these IDs in your GraphRAG queries. The first graph will be used in examples.
+          </p>
+        </div>
+      )}
 
       {/* Quick Examples */}
       <div className="bg-gray-50 p-6 rounded-lg">
@@ -189,6 +246,7 @@ query GetAnalytics {
 
           <button
             onClick={() => {
+              const graphId = availableGraphs[0] || 'graph_1755797167093';
               setQuery(`query GraphRAGQuery($input: GraphRAGQueryInput!) {
   graphRAGQuery(input: $input) {
     query
@@ -214,7 +272,7 @@ query GetAnalytics {
     }
   }
 }`);
-              setVariables('{"input": {"query": "What is AI?", "graphId": "ai-healthcare", "model": "gpt-5-nano"}}');
+              setVariables(`{"input": {"query": "What is AI?", "graphId": "${graphId}", "model": "gpt-5-nano"}}`);
             }}
             className="p-3 text-left bg-white border border-gray-200 rounded-lg hover:bg-gray-50"
           >
