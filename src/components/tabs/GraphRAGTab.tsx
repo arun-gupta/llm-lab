@@ -76,28 +76,28 @@ export function GraphRAGTab() {
     setDocuments(textFiles);
   };
 
-  const loadSampleDocuments = async () => {
+  const loadSampleDocument = async (docType: 'ai-healthcare' | 'tech-companies') => {
     try {
-      // Fetch the sample documents
-      const [aiHealthcareResponse, techCompaniesResponse] = await Promise.all([
-        fetch('/sample-docs/ai-healthcare.txt'),
-        fetch('/sample-docs/tech-companies.txt')
-      ]);
-
-      if (aiHealthcareResponse.ok && techCompaniesResponse.ok) {
-        const aiHealthcareText = await aiHealthcareResponse.text();
-        const techCompaniesText = await techCompaniesResponse.text();
-
-        // Create File objects from the text content
-        const aiHealthcareFile = new File([aiHealthcareText], 'ai-healthcare.txt', { type: 'text/plain' });
-        const techCompaniesFile = new File([techCompaniesText], 'tech-companies.txt', { type: 'text/plain' });
-
-        setDocuments([aiHealthcareFile, techCompaniesFile]);
+      const response = await fetch(`/api/graphrag/sample-docs?type=${docType}`);
+      
+      if (response.ok) {
+        const data = await response.json();
+        const file = new File([data.content], `${docType}.txt`, { type: 'text/plain' });
+        
+        // Add to existing documents or replace if it's already there
+        setDocuments(prev => {
+          const existing = prev.find(doc => doc.name === `${docType}.txt`);
+          if (existing) {
+            return prev.map(doc => doc.name === `${docType}.txt` ? file : doc);
+          } else {
+            return [...prev, file];
+          }
+        });
       } else {
-        console.error('Failed to load sample documents');
+        console.error(`Failed to load ${docType} document`);
       }
     } catch (error) {
-      console.error('Error loading sample documents:', error);
+      console.error(`Error loading ${docType} document:`, error);
     }
   };
 
@@ -286,18 +286,29 @@ export function GraphRAGTab() {
                   </div>
 
                   <div className="text-center">
-                    <div className="text-sm text-gray-500 mb-2">or</div>
-                    <button
-                      onClick={loadSampleDocuments}
-                      className="inline-flex items-center px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors"
-                    >
-                      <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                      </svg>
-                      Load Sample Documents
-                    </button>
+                    <div className="text-sm text-gray-500 mb-2">or load sample documents:</div>
+                    <div className="flex flex-col sm:flex-row gap-2 justify-center">
+                      <button
+                        onClick={() => loadSampleDocument('ai-healthcare')}
+                        className="inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+                      >
+                        <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                        </svg>
+                        AI Healthcare
+                      </button>
+                      <button
+                        onClick={() => loadSampleDocument('tech-companies')}
+                        className="inline-flex items-center px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors"
+                      >
+                        <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                        </svg>
+                        Tech Companies
+                      </button>
+                    </div>
                     <p className="text-xs text-gray-500 mt-1">
-                      AI Healthcare & Tech Companies datasets
+                      Click to load individual sample datasets
                     </p>
                   </div>
                 </div>
