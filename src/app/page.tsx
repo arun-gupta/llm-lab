@@ -4,7 +4,7 @@ import { useState } from 'react';
 import { TabNavigation, TabType } from '@/components/TabNavigation';
 import { HomeTab } from '@/components/tabs/HomeTab';
 import { TestTab } from '@/components/tabs/TestTab';
-
+import { GraphRAGTab } from '@/components/tabs/GraphRAGTab';
 import { MCPTab } from '@/components/tabs/MCPTab';
 
 import { SettingsTab } from '@/components/tabs/SettingsTab';
@@ -94,6 +94,10 @@ export default function Home() {
         )}
         {activeTab === 'test' && (
           <TestTab onTabChange={setActiveTab} />
+        )}
+
+        {activeTab === 'graphrag' && (
+          <GraphRAGTab />
         )}
 
         {activeTab === 'collections' && (

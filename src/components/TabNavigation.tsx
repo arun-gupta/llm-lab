@@ -1,9 +1,9 @@
 'use client';
 
 import { useState } from 'react';
-import { Home, TestTube, BarChart3, Library, TrendingUp, Settings } from 'lucide-react';
+import { Home, TestTube, BarChart3, Library, TrendingUp, Settings, Network } from 'lucide-react';
 
-export type TabType = 'home' | 'test' | 'collections' | 'settings';
+export type TabType = 'home' | 'test' | 'collections' | 'graphrag' | 'settings';
 
 interface TabNavigationProps {
   activeTab: TabType;
@@ -28,6 +28,12 @@ const tabs = [
     label: 'MCP',
     icon: Library,
     description: 'Model Context Protocol integrations and collections'
+  },
+  {
+    id: 'graphrag' as TabType,
+    label: 'GraphRAG',
+    icon: Network,
+    description: 'Graph-based Retrieval-Augmented Generation'
   },
   {
     id: 'settings' as TabType,

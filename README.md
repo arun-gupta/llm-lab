@@ -60,6 +60,14 @@ The `quickstart.sh` script automatically sets up MCP servers for enhanced Postma
 - **Database MCP Server**: Port 3004
 - **Remote GitHub MCP**: https://api.githubcopilot.com/mcp/ (no installation needed)
 
+### **GraphRAG Setup (Automatic)**
+
+The `quickstart.sh` script also sets up GraphRAG functionality:
+- **Data Directories**: `data/graphs/` and `sample-docs/`
+- **Sample Documents**: AI healthcare and tech companies examples
+- **Knowledge Graph Storage**: JSON-based graph persistence
+- **API Endpoints**: Document upload, graph building, query comparison
+
 **Manual Setup (if needed):**
 ```bash
 # Set up Filesystem MCP server manually
@@ -147,6 +155,7 @@ If you still want to try Codespaces:
 - 📈 **Analytics** and performance insights
 - 🏗️ **Tabbed interface** for organized workflow
 - 🔌 **MCP server integration** (GitHub, Filesystem, SQLite) for enhanced Postman automation
+- 🕸️ **GraphRAG integration** (Graph-based Retrieval-Augmented Generation) for enhanced context and comparison
 
 ## 🎯 Postman Integration
 
@@ -175,6 +184,7 @@ If you still want to try Codespaces:
 ✅ **Features**: Custom collection names, collection preview, status indicators  
 ✅ **MCP Integration**: GitHub, Filesystem, and SQLite MCP servers with Postman collections  
 ✅ **GPT-5 Streaming**: Implemented streaming for GPT-5 models to fix empty response issues  
+✅ **GraphRAG Integration**: Document upload, knowledge graph building, and GraphRAG vs traditional RAG comparison  
 
 ## 🛠️ Usage
 
@@ -192,6 +202,13 @@ If you still want to try Codespaces:
 3. **Set up servers** using the provided setup scripts
 4. **Test connections** with health check endpoints
 5. **Use in Postman** for automated testing and data operations
+
+### **GraphRAG Integration**
+1. **Navigate to GraphRAG tab** to access graph-based RAG functionality
+2. **Upload documents** (text files) to build knowledge graphs
+3. **Build knowledge graph** with entity extraction and relationship mapping
+4. **Query and compare** GraphRAG vs traditional RAG responses
+5. **Export Postman collection** for API testing and integration
 
 ## 📈 Planned Features
 
