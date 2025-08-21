@@ -53,7 +53,8 @@ export async function POST(request: NextRequest) {
     try {
       // Determine provider and model
       const isAnthropic = model.startsWith('claude');
-      const provider = isAnthropic ? 'anthropic' : 'openai';
+      const isOllama = model.startsWith('ollama:');
+      const provider = isAnthropic ? 'anthropic' : isOllama ? 'ollama' : 'openai';
       
       if (isAnthropic) {
         // Use Anthropic API for Claude models
@@ -62,12 +63,28 @@ export async function POST(request: NextRequest) {
           callAnthropic(graphRAGPrompt, undefined, model),
           callAnthropic(traditionalRAGPrompt, undefined, model)
         ]);
-      } else {
-        // Use OpenAI API for GPT models
+      } else if (isOllama) {
+        // Use Ollama API for local models
+        const { callOllama } = await import('@/lib/llm-apis');
+        const ollamaModel = model.replace('ollama:', '');
         [graphRAGResponse, traditionalRAGResponse] = await Promise.all([
-          callOpenAI(graphRAGPrompt, undefined, model),
-          callOpenAI(traditionalRAGPrompt, undefined, model)
+          callOllama(graphRAGPrompt, ollamaModel, undefined),
+          callOllama(traditionalRAGPrompt, ollamaModel, undefined)
         ]);
+      } else {
+        // Use OpenAI API for GPT models - use streaming for GPT-5 models
+        if (model.startsWith('gpt-5')) {
+          const { callOpenAIStreaming } = await import('@/lib/llm-apis');
+          [graphRAGResponse, traditionalRAGResponse] = await Promise.all([
+            callOpenAIStreaming(graphRAGPrompt, undefined, model),
+            callOpenAIStreaming(traditionalRAGPrompt, undefined, model)
+          ]);
+        } else {
+          [graphRAGResponse, traditionalRAGResponse] = await Promise.all([
+            callOpenAI(graphRAGPrompt, undefined, model),
+            callOpenAI(traditionalRAGPrompt, undefined, model)
+          ]);
+        }
       }
     } catch (error) {
       console.error('LLM API error:', error);

@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Upload, Network, Search, BarChart3, Download } from 'lucide-react';
 import { GraphPreview } from '@/components/GraphPreview';
 
@@ -52,13 +52,31 @@ export function GraphRAGTab() {
   const [buildSuccess, setBuildSuccess] = useState(false);
   const [buildError, setBuildError] = useState<string | null>(null);
   const [selectedModel, setSelectedModel] = useState('gpt-4o-mini');
+  const [ollamaModels, setOllamaModels] = useState<string[]>([]);
+
+  const fetchOllamaModels = async () => {
+    try {
+      const response = await fetch('/api/ollama/models');
+      if (response.ok) {
+        const data = await response.json();
+        setOllamaModels(data.models || []);
+      }
+    } catch (error) {
+      console.log('Ollama not available:', error);
+    }
+  };
 
   const availableModels = [
     { id: 'gpt-4o-mini', name: 'GPT-4o Mini', description: 'Fast and efficient' },
     { id: 'gpt-5-nano', name: 'GPT-5 Nano', description: 'Lightweight and fast' },
     { id: 'gpt-5-mini', name: 'GPT-5 Mini', description: 'Balanced performance' },
     { id: 'claude-3-5-haiku-20241022', name: 'Claude 3.5 Haiku', description: 'Anthropic\'s fastest model' },
-    { id: 'claude-3-5-sonnet-20241022', name: 'Claude 3.5 Sonnet', description: 'Balanced performance' }
+    { id: 'claude-3-5-sonnet-20241022', name: 'Claude 3.5 Sonnet', description: 'Balanced performance' },
+    ...ollamaModels.map(model => ({
+      id: `ollama:${model}`,
+      name: `Ollama ${model}`,
+      description: 'Local model'
+    }))
   ];
 
   const sampleQueries = [
@@ -69,6 +87,11 @@ export function GraphRAGTab() {
     "What are AI benefits in healthcare?",
     "How do companies approach AI development?"
   ];
+
+  // Fetch Ollama models on component mount
+  useEffect(() => {
+    fetchOllamaModels();
+  }, []);
 
   const handleFileUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
     const files = Array.from(event.target.files || []);
