@@ -161,7 +161,7 @@ export async function POST(request: NextRequest) {
   }
 }`,
                     variables: {
-                      "id": "ai-healthcare"
+                      "id": "graph_1755797167093"
                     }
                   }, null, 2)
                 },
@@ -234,7 +234,7 @@ export async function POST(request: NextRequest) {
 }`,
                     variables: {
                       "entityId": "Artificial Intelligence",
-                      "graphId": "ai-healthcare",
+                      "graphId": "graph_1755797167093",
                       "depth": 2
                     }
                   }, null, 2)
@@ -324,7 +324,7 @@ export async function POST(request: NextRequest) {
                     variables: {
                       "input": {
                         "query": "What are the key relationships between AI and healthcare?",
-                        "graphId": "ai-healthcare",
+                        "graphId": "graph_1755797167093",
                         "model": "gpt-5-nano"
                       }
                     }
@@ -518,7 +518,7 @@ export async function POST(request: NextRequest) {
   }
 }`,
                     variables: {
-                      "id": "ai-healthcare"
+                      "id": "graph_1755797167093"
                     }
                   }, null, 2)
                 },
