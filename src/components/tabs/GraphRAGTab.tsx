@@ -51,6 +51,15 @@ export function GraphRAGTab() {
   const [activeTab, setActiveTab] = useState<'upload' | 'graph' | 'query' | 'analytics'>('upload');
   const [buildSuccess, setBuildSuccess] = useState(false);
   const [buildError, setBuildError] = useState<string | null>(null);
+  const [selectedModel, setSelectedModel] = useState('gpt-4o-mini');
+
+  const availableModels = [
+    { id: 'gpt-4o-mini', name: 'GPT-4o Mini', description: 'Fast and efficient' },
+    { id: 'gpt-5-nano', name: 'GPT-5 Nano', description: 'Lightweight and fast' },
+    { id: 'gpt-5-mini', name: 'GPT-5 Mini', description: 'Balanced performance' },
+    { id: 'claude-3-5-haiku-20241022', name: 'Claude 3.5 Haiku', description: 'Anthropic\'s fastest model' },
+    { id: 'claude-3-5-sonnet-20241022', name: 'Claude 3.5 Sonnet', description: 'Balanced performance' }
+  ];
 
   const sampleQueries = [
     "What is the relationship between AI and healthcare?",
@@ -145,7 +154,7 @@ export function GraphRAGTab() {
       const response = await fetch('/api/graphrag/query', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ query, graphData }),
+        body: JSON.stringify({ query, graphData, model: selectedModel }),
       });
 
       if (response.ok) {
@@ -445,16 +454,34 @@ export function GraphRAGTab() {
                 </p>
               </div>
               <div className="p-6 space-y-4">
-                <div className="space-y-2">
-                  <label htmlFor="query" className="block text-sm font-medium text-gray-700">Enter your query:</label>
-                  <textarea
-                    id="query"
-                    placeholder="e.g., What are the key relationships between AI and healthcare in our documents?"
-                    value={query}
-                    onChange={(e) => setQuery(e.target.value)}
-                    rows={3}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                  />
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <label htmlFor="query" className="block text-sm font-medium text-gray-700">Enter your query:</label>
+                    <textarea
+                      id="query"
+                      placeholder="e.g., What are the key relationships between AI and healthcare in our documents?"
+                      value={query}
+                      onChange={(e) => setQuery(e.target.value)}
+                      rows={3}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    />
+                  </div>
+
+                  <div className="space-y-2">
+                    <label htmlFor="model" className="block text-sm font-medium text-gray-700">Select Model:</label>
+                    <select
+                      id="model"
+                      value={selectedModel}
+                      onChange={(e) => setSelectedModel(e.target.value)}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    >
+                      {availableModels.map((model) => (
+                        <option key={model.id} value={model.id}>
+                          {model.name} - {model.description}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
                 </div>
 
                 <div className="space-y-2">
@@ -490,6 +517,11 @@ export function GraphRAGTab() {
                     <p className="text-gray-600 mt-1">
                       Enhanced with knowledge graph context
                     </p>
+                    {responses.model && (
+                      <p className="text-sm text-gray-500 mt-1">
+                        Model: {availableModels.find(m => m.id === responses.model)?.name || responses.model}
+                      </p>
+                    )}
                   </div>
                   <div className="p-6">
                     <div className="space-y-4">
@@ -510,6 +542,11 @@ export function GraphRAGTab() {
                     <p className="text-gray-600 mt-1">
                       Standard retrieval-augmented generation
                     </p>
+                    {responses.model && (
+                      <p className="text-sm text-gray-500 mt-1">
+                        Model: {availableModels.find(m => m.id === responses.model)?.name || responses.model}
+                      </p>
+                    )}
                   </div>
                   <div className="p-6">
                     <div className="space-y-4">

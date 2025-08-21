@@ -27,7 +27,7 @@ interface GraphData {
 
 export async function POST(request: NextRequest) {
   try {
-    const { query, graphData } = await request.json();
+    const { query, graphData, model = 'gpt-4o-mini' } = await request.json();
 
     if (!query || !graphData) {
       return NextResponse.json(
@@ -51,10 +51,24 @@ export async function POST(request: NextRequest) {
     let graphRAGResponse, traditionalRAGResponse;
     
     try {
-      [graphRAGResponse, traditionalRAGResponse] = await Promise.all([
-        callOpenAI('gpt-4o-mini', graphRAGPrompt),
-        callOpenAI('gpt-4o-mini', traditionalRAGPrompt)
-      ]);
+      // Determine provider and model
+      const isAnthropic = model.startsWith('claude');
+      const provider = isAnthropic ? 'anthropic' : 'openai';
+      
+      if (isAnthropic) {
+        // Use Anthropic API for Claude models
+        const { callAnthropic } = await import('@/lib/llm-apis');
+        [graphRAGResponse, traditionalRAGResponse] = await Promise.all([
+          callAnthropic(graphRAGPrompt, undefined, model),
+          callAnthropic(traditionalRAGPrompt, undefined, model)
+        ]);
+      } else {
+        // Use OpenAI API for GPT models
+        [graphRAGResponse, traditionalRAGResponse] = await Promise.all([
+          callOpenAI(graphRAGPrompt, undefined, model),
+          callOpenAI(traditionalRAGPrompt, undefined, model)
+        ]);
+      }
     } catch (error) {
       console.error('LLM API error:', error);
       return NextResponse.json({
@@ -88,6 +102,7 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json({
       query,
+      model,
       graphRAGResponse: finalGraphRAGResponse,
       traditionalRAGResponse: finalTraditionalRAGResponse,
       graphContext: graphContext.map(ctx => ctx.description),
