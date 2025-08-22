@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { getGRPCPort } from '@/lib/port-config';
 
 // This is a proxy that connects to the real gRPC server
 // In production, you'd use a proper gRPC client library
@@ -15,7 +16,7 @@ export async function POST(request: NextRequest) {
 
     // Connect to the real gRPC server via HTTP (since we're in a Next.js API route)
     // The gRPC server also exposes HTTP endpoints for compatibility
-    const grpcServerUrl = process.env.GRPC_SERVER_URL || 'http://localhost:50052';
+    const grpcServerUrl = process.env.GRPC_SERVER_URL || `http://localhost:${getGRPCPort('http')}`;
     
     const startTime = performance.now();
     

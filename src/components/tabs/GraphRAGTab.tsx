@@ -27,6 +27,7 @@ interface GraphData {
     totalEdges: number;
     topEntities: string[];
   };
+  graphId?: string;
 }
 
 interface GraphRAGResponse {
@@ -333,7 +334,7 @@ export function GraphRAGTab() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           query: query.trim(),
-          graphId: graphData.id || 'default',
+          graphId: graphData.graphId || `graph_${Date.now()}`,
           model: selectedModel
         })
       });
@@ -379,28 +380,87 @@ export function GraphRAGTab() {
   const generateComparisonCollection = async () => {
     if (!graphData) return;
 
+    setImportStatus('importing');
+    setImportMessage('Generating protocol comparison collection...');
+    
     try {
       const response = await fetch('/api/protocol-comparison/postman-collection', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' }
+        headers: { 
+          'Content-Type': 'application/json',
+          'Accept': 'application/json'
+        }
       });
 
       if (response.ok) {
-        const blob = await response.blob();
-        const url = window.URL.createObjectURL(blob);
-        const a = document.createElement('a');
-        a.style.display = 'none';
-        a.href = url;
-        a.download = 'protocol-comparison-collection.json';
-        document.body.appendChild(a);
-        a.click();
-        window.URL.revokeObjectURL(url);
-        document.body.removeChild(a);
+        const collectionData = await response.json();
+        
+        // Try to create collection directly in Postman Desktop using API
+        const createInPostman = async () => {
+          try {
+            setImportMessage('Creating collection in Postman Desktop...');
+            
+            // Use the same API as other collection buttons for direct Postman integration
+            const postmanResponse = await fetch('/api/postman/create-collection', {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+              },
+              body: JSON.stringify({
+                collection: collectionData,
+                createInWeb: false, // Create in Desktop
+              }),
+            });
+
+            const result = await postmanResponse.json();
+
+            if (result.success) {
+              setImportStatus('success');
+              setImportMessage('✅ Protocol Comparison Collection created successfully in Postman Desktop! Set base_url to http://localhost:3000 in your environment.');
+              
+              // Open the collection in Postman Desktop
+              if (result.collectionUrl) {
+                window.open(result.collectionUrl, '_blank');
+              }
+            } else {
+              // Fallback to download if API key not configured
+              if (result.fallback) {
+                setImportMessage('Downloading collection file...');
+                
+                const blob = new Blob([JSON.stringify(collectionData, null, 2)], {
+                  type: 'application/json'
+                });
+                const url = window.URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = 'protocol-comparison-collection.json';
+                document.body.appendChild(a);
+                a.click();
+                window.URL.revokeObjectURL(url);
+                document.body.removeChild(a);
+                
+                setImportStatus('manual');
+                setImportMessage('📥 Protocol Comparison Collection downloaded! Import manually into Postman Desktop.');
+              } else {
+                throw new Error(result.message || 'Failed to create collection');
+              }
+            }
+          } catch (error) {
+            console.error('Error creating collection:', error);
+            setImportStatus('error');
+            setImportMessage('Failed to create Protocol Comparison collection. Try downloading manually.');
+          }
+        };
+
+        await createInPostman();
       } else {
-        throw new Error('Failed to generate comparison collection');
+        setImportStatus('error');
+        setImportMessage('Failed to generate comparison collection');
       }
     } catch (error) {
       console.error('Error generating comparison collection:', error);
+      setImportStatus('error');
+      setImportMessage('Error generating comparison collection');
     }
   };
 
@@ -1205,6 +1265,57 @@ export function GraphRAGTab() {
                           className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                         />
                       </div>
+
+                      {/* Sample Queries */}
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-2">
+                          Sample Queries
+                        </label>
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
+                          <button
+                            onClick={() => setQuery("What are the benefits of AI in healthcare?")}
+                            className="text-left p-3 bg-blue-50 border border-blue-200 rounded-lg hover:bg-blue-100 transition-colors"
+                          >
+                            <div className="text-sm font-medium text-blue-800">AI Healthcare Benefits</div>
+                            <div className="text-xs text-blue-600">What are the benefits of AI in healthcare?</div>
+                          </button>
+                          <button
+                            onClick={() => setQuery("Who are the key researchers at Stanford Medical Center?")}
+                            className="text-left p-3 bg-green-50 border border-green-200 rounded-lg hover:bg-green-100 transition-colors"
+                          >
+                            <div className="text-sm font-medium text-green-800">Stanford Researchers</div>
+                            <div className="text-xs text-green-600">Who are the key researchers at Stanford Medical Center?</div>
+                          </button>
+                          <button
+                            onClick={() => setQuery("What technologies has Google Health developed?")}
+                            className="text-left p-3 bg-purple-50 border border-purple-200 rounded-lg hover:bg-purple-100 transition-colors"
+                          >
+                            <div className="text-sm font-medium text-purple-800">Google Health Tech</div>
+                            <div className="text-xs text-purple-600">What technologies has Google Health developed?</div>
+                          </button>
+                          <button
+                            onClick={() => setQuery("How does machine learning improve medical diagnosis?")}
+                            className="text-left p-3 bg-orange-50 border border-orange-200 rounded-lg hover:bg-orange-100 transition-colors"
+                          >
+                            <div className="text-sm font-medium text-orange-800">ML Medical Diagnosis</div>
+                            <div className="text-xs text-orange-600">How does machine learning improve medical diagnosis?</div>
+                          </button>
+                          <button
+                            onClick={() => setQuery("What are the ethical considerations in AI healthcare?")}
+                            className="text-left p-3 bg-red-50 border border-red-200 rounded-lg hover:bg-red-100 transition-colors"
+                          >
+                            <div className="text-sm font-medium text-red-800">AI Ethics</div>
+                            <div className="text-xs text-red-600">What are the ethical considerations in AI healthcare?</div>
+                          </button>
+                          <button
+                            onClick={() => setQuery("How do AI systems analyze patient records?")}
+                            className="text-left p-3 bg-indigo-50 border border-indigo-200 rounded-lg hover:bg-indigo-100 transition-colors"
+                          >
+                            <div className="text-sm font-medium text-indigo-800">Patient Records Analysis</div>
+                            <div className="text-xs text-indigo-600">How do AI systems analyze patient records?</div>
+                          </button>
+                        </div>
+                      </div>
                       
                       {/* Run Comparison Button */}
                       <div className="flex space-x-3">
@@ -1219,12 +1330,30 @@ export function GraphRAGTab() {
                         
                         <button
                           onClick={generateComparisonCollection}
-                          disabled={!graphData}
+                          disabled={!graphData || importStatus === 'importing'}
                           className="flex items-center px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 disabled:opacity-50 disabled:cursor-not-allowed"
                         >
                           <Download className="w-4 h-4 mr-2" />
-                          Get Comparison Collection
+                          {importStatus === 'importing' ? 'Importing...' : 'Get Comparison Collection'}
                         </button>
+                        
+                        {importStatus !== 'idle' && (
+                          <div className={`px-4 py-3 rounded-lg text-sm max-w-md ${
+                            importStatus === 'success' ? 'bg-green-50 border border-green-200 text-green-800' :
+                            importStatus === 'manual' ? 'bg-yellow-50 border border-yellow-200 text-yellow-800' :
+                            importStatus === 'error' ? 'bg-red-50 border border-red-200 text-red-800' :
+                            'bg-blue-50 border border-blue-200 text-blue-800'
+                          }`}>
+                            <div className="flex items-start space-x-2">
+                              {importStatus === 'success' && (
+                                <svg className="w-4 h-4 mt-0.5 text-green-600 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                                  <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                                </svg>
+                              )}
+                              <span className="leading-relaxed">{importMessage}</span>
+                            </div>
+                          </div>
+                        )}
                       </div>
                     </div>
                   </div>
@@ -1797,291 +1926,6 @@ for chunk in stub.GetContextStream(context_req):
           </div>
         )}
         </div>
-        )}
-
-        {activeTab === 'compare' && (
-          <div>
-            {graphData ? (
-              <div className="space-y-6">
-                {/* Protocol Comparison Overview */}
-                <div className="bg-white rounded-lg border shadow-sm">
-                  <div className="p-6 border-b">
-                    <h3 className="flex items-center gap-2 text-lg font-semibold">
-                      <BarChart3 className="w-5 h-5" />
-                      Protocol Performance Comparison
-                    </h3>
-                    <p className="text-gray-600 mt-1">
-                      Compare REST, GraphQL, and gRPC performance using the same GraphRAG query
-                    </p>
-                  </div>
-                  <div className="p-6">
-                    <div className="space-y-4">
-                      {/* Query Input */}
-                      <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-2">
-                          Test Query
-                        </label>
-                        <input
-                          type="text"
-                          value={query}
-                          onChange={(e) => setQuery(e.target.value)}
-                          placeholder="Enter a question about your knowledge graph..."
-                          className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                        />
-                      </div>
-
-                      {/* Run Comparison Button */}
-                      <div className="flex space-x-3">
-                        <button
-                          onClick={handleProtocolComparison}
-                          disabled={!query.trim() || isQuerying}
-                          className="flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed"
-                        >
-                          <BarChart3 className="w-4 h-4 mr-2" />
-                          {isQuerying ? 'Running Comparison...' : 'Run Protocol Comparison'}
-                        </button>
-
-                        <button
-                          onClick={generateComparisonCollection}
-                          disabled={!graphData}
-                          className="flex items-center px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 disabled:opacity-50 disabled:cursor-not-allowed"
-                        >
-                          <Download className="w-4 h-4 mr-2" />
-                          Get Comparison Collection
-                        </button>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-
-                {/* Results Comparison */}
-                {responses && (
-                  <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                    {/* REST Results */}
-                    <div className="bg-white rounded-lg border shadow-sm">
-                      <div className="p-4 border-b bg-blue-50">
-                        <h4 className="font-semibold text-blue-800 flex items-center gap-2">
-                          🌐 REST API
-                          <span className="text-xs bg-blue-200 text-blue-800 px-2 py-1 rounded">HTTP/1.1</span>
-                        </h4>
-                      </div>
-                      <div className="p-4 space-y-3">
-                        <div className="space-y-2">
-                          <div className="text-sm">
-                            <span className="font-medium">Latency:</span>
-                            <span className="ml-2 text-green-600">{responses.performance.traditionalRAGLatency}ms</span>
-                          </div>
-                          <div className="text-sm">
-                            <span className="font-medium">Protocol:</span>
-                            <span className="ml-2">HTTP/1.1 + JSON</span>
-                          </div>
-                          <div className="text-sm">
-                            <span className="font-medium">Payload Size:</span>
-                            <span className="ml-2">~2.5KB</span>
-                          </div>
-                        </div>
-                        <div className="border-t pt-3">
-                          <div className="text-xs text-gray-600 mb-2">Response Preview:</div>
-                          <div className="text-sm bg-gray-50 p-2 rounded text-gray-700 max-h-20 overflow-y-auto">
-                            {responses.traditionalRAGResponse.substring(0, 150)}...
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-
-                    {/* GraphQL Results */}
-                    <div className="bg-white rounded-lg border shadow-sm">
-                      <div className="p-4 border-b bg-purple-50">
-                        <h4 className="font-semibold text-purple-800 flex items-center gap-2">
-                          🔧 GraphQL
-                          <span className="text-xs bg-purple-200 text-purple-800 px-2 py-1 rounded">HTTP/1.1</span>
-                        </h4>
-                      </div>
-                      <div className="p-4 space-y-3">
-                        <div className="space-y-2">
-                          <div className="text-sm">
-                            <span className="font-medium">Latency:</span>
-                            <span className="ml-2 text-green-600">{Math.round(responses.performance.graphRAGLatency * 0.85)}ms</span>
-                          </div>
-                          <div className="text-sm">
-                            <span className="font-medium">Protocol:</span>
-                            <span className="ml-2">HTTP/1.1 + JSON</span>
-                          </div>
-                          <div className="text-sm">
-                            <span className="font-medium">Payload Size:</span>
-                            <span className="ml-2">~1.8KB</span>
-                          </div>
-                        </div>
-                        <div className="border-t pt-3">
-                          <div className="text-xs text-gray-600 mb-2">Response Preview:</div>
-                          <div className="text-sm bg-gray-50 p-2 rounded text-gray-700 max-h-20 overflow-y-auto">
-                            {responses.graphRAGResponse.substring(0, 150)}...
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-
-                    {/* gRPC Results */}
-                    <div className="bg-white rounded-lg border shadow-sm">
-                      <div className="p-4 border-b bg-green-50">
-                        <h4 className="font-semibold text-green-800 flex items-center gap-2">
-                          ⚡ gRPC
-                          <span className="text-xs bg-green-200 text-green-800 px-2 py-1 rounded">HTTP/2</span>
-                        </h4>
-                      </div>
-                      <div className="p-4 space-y-3">
-                        <div className="space-y-2">
-                          <div className="text-sm">
-                            <span className="font-medium">Latency:</span>
-                            <span className="ml-2 text-green-600">{Math.round(responses.performance.graphRAGLatency * 0.4)}ms</span>
-                          </div>
-                          <div className="text-sm">
-                            <span className="font-medium">Protocol:</span>
-                            <span className="ml-2">HTTP/2 + Protobuf</span>
-                          </div>
-                          <div className="text-sm">
-                            <span className="font-medium">Payload Size:</span>
-                            <span className="ml-2">~800B</span>
-                          </div>
-                        </div>
-                        <div className="border-t pt-3">
-                          <div className="text-xs text-gray-600 mb-2">Response Preview:</div>
-                          <div className="text-sm bg-gray-50 p-2 rounded text-gray-700 max-h-20 overflow-y-auto">
-                            {responses.graphRAGResponse.substring(0, 150)}...
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                )}
-
-                {/* Performance Analytics */}
-                {responses && (
-                  <div className="bg-white rounded-lg border shadow-sm">
-                    <div className="p-6 border-b">
-                      <h3 className="flex items-center gap-2 text-lg font-semibold">
-                        <BarChart3 className="w-5 h-5" />
-                        Performance Analytics
-                      </h3>
-                    </div>
-                    <div className="p-6">
-                      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                        {/* Latency Comparison */}
-                        <div className="space-y-3">
-                          <h4 className="font-medium text-gray-800">Latency Comparison</h4>
-                          <div className="space-y-2">
-                            <div className="flex justify-between items-center">
-                              <span className="text-sm">REST</span>
-                              <div className="flex items-center space-x-2">
-                                <div className="w-20 bg-gray-200 rounded-full h-2">
-                                  <div className="bg-blue-500 h-2 rounded-full" style={{width: '100%'}}></div>
-                                </div>
-                                <span className="text-xs text-gray-600">{responses.performance.traditionalRAGLatency}ms</span>
-                              </div>
-                            </div>
-                            <div className="flex justify-between items-center">
-                              <span className="text-sm">GraphQL</span>
-                              <div className="flex items-center space-x-2">
-                                <div className="w-20 bg-gray-200 rounded-full h-2">
-                                  <div className="bg-purple-500 h-2 rounded-full" style={{width: '85%'}}></div>
-                                </div>
-                                <span className="text-xs text-gray-600">{Math.round(responses.performance.graphRAGLatency * 0.85)}ms</span>
-                              </div>
-                            </div>
-                            <div className="flex justify-between items-center">
-                              <span className="text-sm">gRPC</span>
-                              <div className="flex items-center space-x-2">
-                                <div className="w-20 bg-gray-200 rounded-full h-2">
-                                  <div className="bg-green-500 h-2 rounded-full" style={{width: '40%'}}></div>
-                                </div>
-                                <span className="text-xs text-gray-600">{Math.round(responses.performance.graphRAGLatency * 0.4)}ms</span>
-                              </div>
-                            </div>
-                          </div>
-                        </div>
-
-                        {/* Payload Size Comparison */}
-                        <div className="space-y-3">
-                          <h4 className="font-medium text-gray-800">Payload Efficiency</h4>
-                          <div className="space-y-2">
-                            <div className="flex justify-between items-center">
-                              <span className="text-sm">REST (JSON)</span>
-                              <div className="flex items-center space-x-2">
-                                <div className="w-20 bg-gray-200 rounded-full h-2">
-                                  <div className="bg-blue-500 h-2 rounded-full" style={{width: '100%'}}></div>
-                                </div>
-                                <span className="text-xs text-gray-600">2.5KB</span>
-                              </div>
-                            </div>
-                            <div className="flex justify-between items-center">
-                              <span className="text-sm">GraphQL (JSON)</span>
-                              <div className="flex items-center space-x-2">
-                                <div className="w-20 bg-gray-200 rounded-full h-2">
-                                  <div className="bg-purple-500 h-2 rounded-full" style={{width: '72%'}}></div>
-                                </div>
-                                <span className="text-xs text-gray-600">1.8KB</span>
-                              </div>
-                            </div>
-                            <div className="flex justify-between items-center">
-                              <span className="text-sm">gRPC (Protobuf)</span>
-                              <div className="flex items-center space-x-2">
-                                <div className="w-20 bg-gray-200 rounded-full h-2">
-                                  <div className="bg-green-500 h-2 rounded-full" style={{width: '32%'}}></div>
-                                </div>
-                                <span className="text-xs text-gray-600">800B</span>
-                              </div>
-                            </div>
-                          </div>
-                        </div>
-
-                        {/* Protocol Features */}
-                        <div className="space-y-3">
-                          <h4 className="font-medium text-gray-800">Protocol Features</h4>
-                          <div className="space-y-3">
-                            <div className="text-sm">
-                              <div className="font-medium text-blue-600">REST</div>
-                              <div className="text-xs text-gray-600">✓ Simple, cacheable</div>
-                              <div className="text-xs text-gray-600">✗ Over-fetching</div>
-                            </div>
-                            <div className="text-sm">
-                              <div className="font-medium text-purple-600">GraphQL</div>
-                              <div className="text-xs text-gray-600">✓ Precise queries</div>
-                              <div className="text-xs text-gray-600">✓ Single endpoint</div>
-                            </div>
-                            <div className="text-sm">
-                              <div className="font-medium text-green-600">gRPC</div>
-                              <div className="text-xs text-gray-600">✓ Binary protocol</div>
-                              <div className="text-xs text-gray-600">✓ Streaming support</div>
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                )}
-              </div>
-            ) : (
-              <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-6 text-center">
-                <div className="flex items-center justify-center mb-3">
-                  <div className="w-8 h-8 bg-yellow-100 rounded-full flex items-center justify-center">
-                    <svg className="w-5 h-5 text-yellow-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16.5c-.77.833.192 2.5 1.732 2.5z" />
-                    </svg>
-                  </div>
-                </div>
-                <h3 className="text-lg font-medium text-yellow-800 mb-2">Graph Required</h3>
-                <p className="text-yellow-700 mb-4">
-                  Please upload documents and build a knowledge graph first to use protocol comparison features.
-                </p>
-                <button
-                  onClick={() => setActiveTab('upload')}
-                  className="px-4 py-2 bg-yellow-600 text-white rounded-lg hover:bg-yellow-700 transition-colors"
-                >
-                  Go to Document Upload
-                </button>
-              </div>
-            )}
-          </div>
         )}
       </div>
     </div>

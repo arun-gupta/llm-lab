@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Start GraphRAG gRPC Server
-cd "$(dirname "$0")/grpc-server"
+# Already in the correct directory, no need to cd
 
 echo "🚀 Starting GraphRAG gRPC Server..."
 echo "   • gRPC Server: localhost:50051"

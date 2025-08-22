@@ -1,0 +1,35 @@
+{
+  "development": {
+    "nextjs": 3000,
+    "mcp": {
+      "sqlite": 3001,
+      "filesystem": 3002
+    },
+    "grpc": {
+      "server": 50051,
+      "http": 50052
+    }
+  },
+  "production": {
+    "nextjs": 3000,
+    "mcp": {
+      "sqlite": 3001,
+      "filesystem": 3002
+    },
+    "grpc": {
+      "server": 50051,
+      "http": 50052
+    }
+  },
+  "fallback": {
+    "nextjs": 3000,
+    "mcp": {
+      "sqlite": 3001,
+      "filesystem": 3002
+    },
+    "grpc": {
+      "server": 50051,
+      "http": 50052
+    }
+  }
+}

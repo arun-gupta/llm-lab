@@ -1,0 +1,41 @@
+{
+  "development": {
+    "nextjs": 3001,
+    "mcp": {
+      "template": 3001,
+      "filesystem": 3002,
+      "websearch": 3003,
+      "database": 3004
+    },
+    "grpc": {
+      "server": 50051,
+      "http": 50052
+    }
+  },
+  "production": {
+    "nextjs": 3001,
+    "mcp": {
+      "template": 3001,
+      "filesystem": 3002,
+      "websearch": 3003,
+      "database": 3004
+    },
+    "grpc": {
+      "server": 50051,
+      "http": 50052
+    }
+  },
+  "fallback": {
+    "nextjs": 3001,
+    "mcp": {
+      "template": 3001,
+      "filesystem": 3002,
+      "websearch": 3003,
+      "database": 3004
+    },
+    "grpc": {
+      "server": 50051,
+      "http": 50052
+    }
+  }
+}

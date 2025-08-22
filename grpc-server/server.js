@@ -334,7 +334,23 @@ const server = new grpc.Server();
 server.addService(graphragProto.GraphRAGService.service, graphRAGService);
 
 // Start gRPC server
-const GRPC_PORT = process.env.GRPC_PORT || 50051;
+// Load port configuration
+let GRPC_PORT = 50051;
+let HTTP_PORT = 50052;
+
+try {
+  const configPath = path.join(__dirname, '..', 'config', 'ports.json');
+  const configData = fs.readFileSync(configPath, 'utf-8');
+  const config = JSON.parse(configData);
+  const environment = process.env.NODE_ENV || 'development';
+  const portConfig = config[environment] || config.fallback;
+  GRPC_PORT = process.env.GRPC_PORT || portConfig.grpc.server;
+  HTTP_PORT = process.env.HTTP_PORT || portConfig.grpc.http;
+} catch (error) {
+  console.warn('Failed to load port config, using default values:', error.message);
+  GRPC_PORT = process.env.GRPC_PORT || 50051;
+  HTTP_PORT = process.env.HTTP_PORT || 50052;
+}
 server.bindAsync(`0.0.0.0:${GRPC_PORT}`, grpc.ServerCredentials.createInsecure(), (err, port) => {
   if (err) {
     console.error('Failed to bind gRPC server:', err);
@@ -358,7 +374,7 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
-const HTTP_PORT = process.env.HTTP_PORT || 50052;
+
 
 // Health check endpoint
 app.get('/health', (req, res) => {

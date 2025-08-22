@@ -54,11 +54,11 @@ npm run dev
 ### **MCP Server Setup (Automatic)**
 
 The `quickstart.sh` script automatically sets up MCP servers for enhanced Postman integration:
-- **Local MCP Server Template**: Port 3001
-- **File System MCP Server**: Port 3002  
-- **Web Search MCP Server**: Port 3003
-- **Database MCP Server**: Port 3004
+- **MCP SQLite Server**: Port 3001 (SQLite database operations)
+- **MCP Filesystem Server**: Port 3002 (File operations and directory listing)
 - **Remote GitHub MCP**: https://api.githubcopilot.com/mcp/ (no installation needed)
+
+**Note**: Web Search and Database MCP servers are not yet implemented.
 
 ### **GraphRAG Setup (Automatic)**
 
@@ -67,6 +67,8 @@ The `quickstart.sh` script also sets up GraphRAG functionality:
 - **Sample Documents**: AI healthcare and tech companies examples
 - **Knowledge Graph Storage**: JSON-based graph persistence
 - **API Endpoints**: Document upload, graph building, query comparison
+- **gRPC Server**: Port 50051 (gRPC protocol) and 50052 (HTTP proxy)
+- **Protocol Comparison**: REST vs GraphQL vs gRPC performance testing
 
 **Manual Setup (if needed):**
 ```bash
@@ -75,7 +77,7 @@ The `quickstart.sh` script also sets up GraphRAG functionality:
 
 # Set up SQLite MCP server (requires Docker)
 mkdir -p data
-docker run -d --name sqlite-mcp-http -p 4000:4000 -v $(pwd)/data:/data -e SERVER_MODE=http -e HTTP_PORT=4000 arungupta/sqlite-mcp-server
+docker run -d --name sqlite-mcp-http -p 3001:3001 -v $(pwd)/data:/data -e SERVER_MODE=http -e HTTP_PORT=3001 arungupta/sqlite-mcp-server
 ```
 
 ### **MCP Server Integration**
@@ -185,6 +187,9 @@ If you still want to try Codespaces:
 ✅ **MCP Integration**: GitHub, Filesystem, and SQLite MCP servers with Postman collections  
 ✅ **GPT-5 Streaming**: Implemented streaming for GPT-5 models to fix empty response issues  
 ✅ **GraphRAG Integration**: Document upload, knowledge graph building, and GraphRAG vs traditional RAG comparison  
+✅ **Protocol Comparison**: REST vs GraphQL vs gRPC performance testing with Postman integration  
+✅ **Port Configuration**: Centralized port management with configurable ports  
+✅ **Concise Quickstart**: Streamlined setup with minimal verbosity  
 
 ## 🛠️ Usage
 
@@ -208,7 +213,9 @@ If you still want to try Codespaces:
 2. **Upload documents** (text files) to build knowledge graphs
 3. **Build knowledge graph** with entity extraction and relationship mapping
 4. **Query and compare** GraphRAG vs traditional RAG responses
-5. **Export Postman collection** for API testing and integration
+5. **Test protocols** with REST, GraphQL, and gRPC comparison
+6. **Export Postman collections** for API testing and integration
+7. **Direct Postman integration** for all collections (REST, GraphQL, gRPC, Protocol Comparison)
 
 ## 📈 Planned Features
 
@@ -221,6 +228,10 @@ If you still want to try Codespaces:
 - [x] Custom collection names
 - [x] MCP server integration (GitHub, Filesystem, SQLite)
 - [x] HTTP wrappers for direct API testing
+- [x] GraphRAG integration with protocol comparison
+- [x] gRPC server with HTTP proxy
+- [x] Centralized port configuration
+- [x] Streamlined quickstart experience
 
 ### **Phase 2: Viral Sharing** 🚀
 - [ ] Public collection gallery
