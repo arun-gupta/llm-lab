@@ -6,8 +6,8 @@ export async function POST(request: NextRequest) {
 
     const collection = {
       info: {
-        name: "GraphRAG API Collection",
-        description: "Postman collection for GraphRAG (Graph-based Retrieval-Augmented Generation) API testing and comparison",
+        name: "GraphRAG REST API Collection",
+        description: "Postman collection for GraphRAG REST APIs (Graph-based Retrieval-Augmented Generation) - HTTP endpoints for document upload, graph building, querying, and analytics",
         schema: "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
       },
       variable: [

@@ -317,23 +317,49 @@ export const resolvers = {
 
     // Search entities
     searchEntities: async (_: any, { query, graphId, limit = 10 }: { query: string, graphId?: string, limit?: number }) => {
-      const graphs = graphId ? [await getGraphData(graphId)] : await getAllGraphs();
-      const results: any[] = [];
-      
-      graphs.forEach(graph => {
-        graph.nodes.forEach((node: any) => {
-          if (node.label.toLowerCase().includes(query.toLowerCase())) {
-            results.push({
-              ...node,
-              connections: graph.edges.filter((edge: any) => 
-                edge.source === node.id || edge.target === node.id
-              ).length
-            });
-          }
+      try {
+        const graphs = graphId ? [await getGraphData(graphId)] : await getAllGraphs();
+        const results: any[] = [];
+        
+        console.log(`Searching for "${query}" in ${graphs.length} graphs`);
+        
+        graphs.forEach(graph => {
+          console.log(`Graph ${graph.id || 'unknown'}: ${graph.nodes.length} nodes, ${graph.edges.length} edges`);
+          
+          graph.nodes.forEach((node: any) => {
+            // If query is empty, return all entities
+            if (!query || query.trim() === '') {
+              results.push({
+                ...node,
+                connections: graph.edges.filter((edge: any) => 
+                  edge.source === node.id || edge.target === node.id
+                ).length
+              });
+            } else {
+              // More flexible search - check label, type, and properties
+              const searchText = `${node.label} ${node.type} ${Object.values(node.properties || {}).join(' ')}`.toLowerCase();
+              const queryLower = query.toLowerCase();
+              
+              if (searchText.includes(queryLower) || 
+                  node.label.toLowerCase().includes(queryLower) ||
+                  node.type.toLowerCase().includes(queryLower)) {
+                results.push({
+                  ...node,
+                  connections: graph.edges.filter((edge: any) => 
+                    edge.source === node.id || edge.target === node.id
+                  ).length
+                });
+              }
+            }
+          });
         });
-      });
-      
-      return results.slice(0, limit);
+        
+        console.log(`Found ${results.length} matching entities`);
+        return results.slice(0, limit);
+      } catch (error) {
+        console.error('Error in searchEntities:', error);
+        return [];
+      }
     },
 
     // Get entity relationships

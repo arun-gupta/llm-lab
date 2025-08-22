@@ -125,6 +125,22 @@ else
     echo ""
 fi
 
+# Set up GraphRAG gRPC server for protocol comparison
+echo "⚡ Setting up GraphRAG gRPC server for protocol comparison..."
+if [ -f "scripts/setup-grpc-server.sh" ]; then
+    bash scripts/setup-grpc-server.sh
+    echo "✅ GraphRAG gRPC server installed successfully"
+    echo "   • gRPC Server: localhost:50051"
+    echo "   • HTTP Server: localhost:50052"
+    echo "   • Health check: http://localhost:50052/health"
+    echo "   • Metrics: http://localhost:50052/metrics"
+    echo "   💡 Use Protocol Comparison tab to test REST vs GraphQL vs gRPC"
+    echo ""
+else
+    echo "⚠️  gRPC server setup script not found, skipping installation"
+    echo ""
+fi
+
 # Set up environment file if it doesn't exist
 if [ ! -f ".env.local" ]; then
     echo "⚙️  Setting up environment file..."
@@ -194,6 +210,21 @@ if [ -f "$HOME/.mcp-servers/start-mcp-servers.sh" ]; then
     echo ""
 else
     echo "⚠️  MCP servers startup script not found"
+    echo ""
+fi
+
+# Start GraphRAG gRPC server in background
+echo "⚡ Starting GraphRAG gRPC server in background..."
+if [ -f "grpc-server/start-grpc-server.sh" ]; then
+    bash grpc-server/start-grpc-server.sh &
+    GRPC_PID=$!
+    echo "✅ GraphRAG gRPC server started (PID: $GRPC_PID)"
+    echo "   • gRPC Server: localhost:50051"
+    echo "   • HTTP Server: localhost:50052"
+    echo "   • Health check: http://localhost:50052/health"
+    echo ""
+else
+    echo "⚠️  gRPC server startup script not found"
     echo ""
 fi
 

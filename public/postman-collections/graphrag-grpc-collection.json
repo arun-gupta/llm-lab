@@ -1,0 +1,250 @@
+{
+  "info": {
+    "name": "GraphRAG gRPC Collection",
+    "description": "Postman collection for GraphRAG gRPC services with Protocol Buffers",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "grpc_server_url",
+      "value": "localhost:8080",
+      "type": "string"
+    },
+    {
+      "key": "proto_file_path",
+      "value": "./graphrag.proto",
+      "type": "string"
+    }
+  ],
+  "item": [
+    {
+      "name": "📋 gRPC Service Setup",
+      "item": [
+        {
+          "name": "Import Protocol Buffer Definition",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{proto_file_path}}",
+              "host": ["{{proto_file_path}}"]
+            },
+            "description": "Import the GraphRAG Protocol Buffer definition file (.proto) into Postman's gRPC interface"
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "⚡ GraphRAG gRPC Services",
+      "item": [
+        {
+          "name": "TraverseGraph (Streaming)",
+          "request": {
+            "method": "GRPC",
+            "header": [],
+            "url": {
+              "raw": "{{grpc_server_url}}/graphrag.GraphRAGService/TraverseGraph",
+              "host": ["{{grpc_server_url}}"],
+              "path": ["graphrag.GraphRAGService", "TraverseGraph"]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"query\": \"AI healthcare relationships\",\n  \"graph_id\": \"graph_123\",\n  \"max_depth\": 3,\n  \"node_types\": [\"person\", \"organization\", \"concept\"]\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "description": "Stream graph traversal results in real-time"
+          },
+          "response": []
+        },
+        {
+          "name": "GetContextStream (Streaming)",
+          "request": {
+            "method": "GRPC",
+            "header": [],
+            "url": {
+              "raw": "{{grpc_server_url}}/graphrag.GraphRAGService/GetContextStream",
+              "host": ["{{grpc_server_url}}"],
+              "path": ["graphrag.GraphRAGService", "GetContextStream"]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"query\": \"What are AI benefits in healthcare?\",\n  \"graph_id\": \"graph_123\",\n  \"max_context_size\": 10,\n  \"relevance_threshold\": 0.7\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "description": "Stream context retrieval for GraphRAG queries"
+          },
+          "response": []
+        },
+        {
+          "name": "ResolveEntities",
+          "request": {
+            "method": "GRPC",
+            "header": [],
+            "url": {
+              "raw": "{{grpc_server_url}}/graphrag.GraphRAGService/ResolveEntities",
+              "host": ["{{grpc_server_url}}"],
+              "path": ["graphrag.GraphRAGService", "ResolveEntities"]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"entity_name\": \"Dr. Sarah Johnson\",\n  \"graph_id\": \"graph_123\",\n  \"entity_types\": [\"person\", \"researcher\"]\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "description": "High-performance entity resolution"
+          },
+          "response": []
+        },
+        {
+          "name": "BuildGraph (Bidirectional Streaming)",
+          "request": {
+            "method": "GRPC",
+            "header": [],
+            "url": {
+              "raw": "{{grpc_server_url}}/graphrag.GraphRAGService/BuildGraph",
+              "host": ["{{grpc_server_url}}"],
+              "path": ["graphrag.GraphRAGService", "BuildGraph"]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"content\": \"Artificial Intelligence in Healthcare...\",\n  \"filename\": \"ai-healthcare.txt\",\n  \"type\": \"text\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "description": "Incremental graph construction with streaming progress"
+          },
+          "response": []
+        },
+        {
+          "name": "StreamGraphUpdates (Streaming)",
+          "request": {
+            "method": "GRPC",
+            "header": [],
+            "url": {
+              "raw": "{{grpc_server_url}}/graphrag.GraphRAGService/StreamGraphUpdates",
+              "host": ["{{grpc_server_url}}"],
+              "path": ["graphrag.GraphRAGService", "StreamGraphUpdates"]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"graph_id\": \"graph_123\",\n  \"node_types\": [\"person\", \"organization\"],\n  \"edge_types\": [\"employment\", \"collaboration\"]\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "description": "Real-time graph updates and modifications"
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "📊 Performance Testing",
+      "item": [
+        {
+          "name": "Load Test - Graph Traversal",
+          "request": {
+            "method": "GRPC",
+            "header": [],
+            "url": {
+              "raw": "{{grpc_server_url}}/graphrag.GraphRAGService/TraverseGraph",
+              "host": ["{{grpc_server_url}}"],
+              "path": ["graphrag.GraphRAGService", "TraverseGraph"]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"query\": \"tech companies innovation\",\n  \"graph_id\": \"graph_123\",\n  \"max_depth\": 5,\n  \"node_types\": [\"organization\", \"concept\", \"technology\"]\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "description": "Performance test for deep graph traversal"
+          },
+          "response": []
+        },
+        {
+          "name": "Load Test - Context Streaming",
+          "request": {
+            "method": "GRPC",
+            "header": [],
+            "url": {
+              "raw": "{{grpc_server_url}}/graphrag.GraphRAGService/GetContextStream",
+              "host": ["{{grpc_server_url}}"],
+              "path": ["graphrag.GraphRAGService", "GetContextStream"]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"query\": \"How do AI and machine learning impact modern healthcare systems?\",\n  \"graph_id\": \"graph_123\",\n  \"max_context_size\": 50,\n  \"relevance_threshold\": 0.5\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "description": "Performance test for large context retrieval"
+          },
+          "response": []
+        }
+      ]
+    }
+  ],
+  "event": [
+    {
+      "listen": "prerequest",
+      "script": {
+        "type": "text/javascript",
+        "exec": [
+          "// gRPC pre-request script",
+          "console.log('Setting up gRPC request...');",
+          "",
+          "// Set gRPC metadata if needed",
+          "pm.request.headers.add({",
+          "  key: 'Content-Type',",
+          "  value: 'application/grpc'",
+          "});"
+        ]
+      }
+    },
+    {
+      "listen": "test",
+      "script": {
+        "type": "text/javascript",
+        "exec": [
+          "// gRPC response test script",
+          "console.log('Testing gRPC response...');",
+          "",
+          "// Check if response is streaming",
+          "if (pm.response.code === 200) {",
+          "  console.log('✅ gRPC request successful');",
+          "  ",
+          "  // For streaming responses, check if data is coming",
+          "  if (pm.response.stream) {",
+          "    console.log('📡 Streaming response detected');",
+          "  }",
+          "} else {",
+          "  console.log('❌ gRPC request failed');",
+          "}"
+        ]
+      }
+    }
+  ]
+}

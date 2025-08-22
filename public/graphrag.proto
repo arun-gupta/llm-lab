@@ -1,0 +1,152 @@
+syntax = "proto3";
+
+package graphrag;
+
+// GraphRAG gRPC Service Definition
+// High-performance GraphRAG operations using Protocol Buffers
+
+service GraphRAGService {
+  // Stream graph traversal results in real-time
+  rpc TraverseGraph(GraphQuery) returns (stream GraphNode);
+  
+  // Stream context retrieval for GraphRAG queries
+  rpc GetContextStream(ContextRequest) returns (stream ContextChunk);
+  
+  // High-performance entity resolution
+  rpc ResolveEntities(EntityQuery) returns (EntityResolution);
+  
+  // Incremental graph building with streaming progress
+  rpc BuildGraph(stream Document) returns (GraphBuildProgress);
+  
+  // Real-time graph updates and modifications
+  rpc StreamGraphUpdates(GraphFilter) returns (stream GraphUpdate);
+}
+
+// Graph traversal query
+message GraphQuery {
+  string query = 1;                    // Search query
+  string graph_id = 2;                 // Target graph ID
+  int32 max_depth = 3;                 // Maximum traversal depth
+  repeated string node_types = 4;      // Filter by node types
+  float relevance_threshold = 5;       // Minimum relevance score
+}
+
+// Graph node representation
+message GraphNode {
+  string id = 1;                       // Unique node ID
+  string label = 2;                    // Node label/name
+  string type = 3;                     // Node type (person, organization, etc.)
+  map<string, string> properties = 4;  // Additional properties
+  repeated string connections = 5;     // Connected node IDs
+  float relevance_score = 6;           // Relevance to query
+}
+
+// Context retrieval request
+message ContextRequest {
+  string query = 1;                    // Query for context
+  string graph_id = 2;                 // Target graph ID
+  int32 max_context_size = 3;          // Maximum context chunks
+  float relevance_threshold = 4;       // Minimum relevance score
+  repeated string entity_types = 5;    // Filter by entity types
+}
+
+// Context chunk for streaming
+message ContextChunk {
+  string entity_id = 1;                // Entity ID
+  string description = 2;              // Context description
+  float relevance_score = 3;           // Relevance score
+  repeated string relationships = 4;   // Related entities
+  string source_document = 5;          // Source document
+}
+
+// Entity resolution query
+message EntityQuery {
+  string entity_name = 1;              // Entity name to resolve
+  string graph_id = 2;                 // Target graph ID
+  repeated string entity_types = 3;    // Expected entity types
+  float similarity_threshold = 4;      // Minimum similarity score
+}
+
+// Entity resolution result
+message EntityResolution {
+  repeated EntityMatch matches = 1;    // Potential matches
+  float confidence = 2;                // Overall confidence
+  int32 total_candidates = 3;          // Total candidates considered
+}
+
+// Individual entity match
+message EntityMatch {
+  string entity_id = 1;                // Entity ID
+  string name = 2;                     // Entity name
+  string type = 3;                     // Entity type
+  float similarity_score = 4;          // Similarity score
+  map<string, string> properties = 5;  // Entity properties
+}
+
+// Document for graph building
+message Document {
+  string content = 1;                  // Document content
+  string filename = 2;                 // Original filename
+  string type = 3;                     // Document type
+  map<string, string> metadata = 4;    // Additional metadata
+}
+
+// Graph building progress
+message GraphBuildProgress {
+  string status = 1;                   // Build status
+  float percentage = 2;                // Progress percentage
+  string message = 3;                  // Status message
+  GraphStats stats = 4;                // Current graph stats
+  repeated string processed_files = 5; // Processed files
+}
+
+// Graph statistics
+message GraphStats {
+  int32 total_nodes = 1;               // Total nodes
+  int32 total_edges = 2;               // Total edges
+  map<string, int32> node_types = 3;   // Node type distribution
+  map<string, int32> edge_types = 4;   // Edge type distribution
+  float density = 5;                   // Graph density
+  float connectivity = 6;              // Connectivity score
+}
+
+// Graph filter for updates
+message GraphFilter {
+  string graph_id = 1;                 // Target graph ID
+  repeated string node_types = 2;      // Node type filter
+  repeated string edge_types = 3;      // Edge type filter
+  float min_relevance = 4;             // Minimum relevance
+}
+
+// Graph update event
+message GraphUpdate {
+  string operation = 1;                // Operation type
+  GraphNode node = 2;                  // Updated node (if applicable)
+  GraphEdge edge = 3;                  // Updated edge (if applicable)
+  int64 timestamp = 4;                 // Update timestamp
+  string source = 5;                   // Update source
+}
+
+// Graph edge representation
+message GraphEdge {
+  string id = 1;                       // Unique edge ID
+  string source = 2;                   // Source node ID
+  string target = 3;                   // Target node ID
+  string label = 4;                    // Edge label
+  string type = 5;                     // Edge type
+  map<string, string> properties = 6;  // Edge properties
+  float weight = 7;                    // Edge weight
+}
+
+// Service health check
+message HealthCheck {
+  string service = 1;                  // Service name
+  string status = 2;                   // Service status
+  int64 timestamp = 3;                 // Check timestamp
+}
+
+// Health check response
+message HealthCheckResponse {
+  string status = 1;                   // Overall status
+  repeated HealthCheck services = 2;   // Individual service health
+}

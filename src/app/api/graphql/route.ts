@@ -31,4 +31,10 @@ const handler = startServerAndCreateNextHandler(server, {
 });
 
 // Export the handler for Next.js
-export { handler as GET, handler as POST };
+export async function GET(request: NextRequest) {
+  return handler(request);
+}
+
+export async function POST(request: NextRequest) {
+  return handler(request);
+}

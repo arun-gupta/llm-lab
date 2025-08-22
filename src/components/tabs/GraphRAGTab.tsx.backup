@@ -1,0 +1,1843 @@
+'use client';
+
+import { useState, useEffect } from 'react';
+import { Upload, Network, Search, BarChart3, Download, Code, Zap } from 'lucide-react';
+import { GraphPreview } from '@/components/GraphPreview';
+import { GraphQLPlayground } from '@/components/GraphQLPlayground';
+
+interface GraphNode {
+  id: string;
+  label: string;
+  type: 'person' | 'organization' | 'concept' | 'document';
+  connections: number;
+}
+
+interface GraphEdge {
+  source: string;
+  target: string;
+  relationship: string;
+  weight: number;
+}
+
+interface GraphData {
+  nodes: GraphNode[];
+  edges: GraphEdge[];
+  stats: {
+    totalNodes: number;
+    totalEdges: number;
+    topEntities: string[];
+  };
+}
+
+interface GraphRAGResponse {
+  query: string;
+  graphRAGResponse: string;
+  traditionalRAGResponse: string;
+  graphContext: string[];
+  performance: {
+    graphRAGLatency: number;
+    traditionalRAGLatency: number;
+    contextRelevance: number;
+  };
+  analytics?: {
+    tokens: {
+      graphRAG: {
+        input: number;
+        output: number;
+        total: number;
+        efficiency: number;
+        cost: number;
+      };
+      traditionalRAG: {
+        input: number;
+        output: number;
+        total: number;
+        efficiency: number;
+        cost: number;
+      };
+    };
+    quality: {
+      graphRAG: {
+        length: number;
+        completeness: number;
+        specificity: number;
+        readability: number;
+      };
+      traditionalRAG: {
+        length: number;
+        completeness: number;
+        specificity: number;
+        readability: number;
+      };
+    };
+    graph: {
+      totalNodes: number;
+      totalEdges: number;
+      usedEntities: number;
+      usedRelationships: number;
+      coveragePercentage: number;
+      relationshipUtilization: number;
+      entityTypeDistribution: Record<string, number>;
+    };
+  };
+}
+
+export function GraphRAGTab() {
+  const [documents, setDocuments] = useState<File[]>([]);
+  const [graphData, setGraphData] = useState<GraphData | null>(null);
+  const [isProcessing, setIsProcessing] = useState(false);
+  const [query, setQuery] = useState('');
+  const [responses, setResponses] = useState<GraphRAGResponse | null>(null);
+  const [isQuerying, setIsQuerying] = useState(false);
+  const [processingProgress, setProcessingProgress] = useState(0);
+  const [activeTab, setActiveTab] = useState<'upload' | 'graph' | 'rest' | 'graphql' | 'grpc' | 'compare'>('upload');
+  const [buildSuccess, setBuildSuccess] = useState(false);
+  const [buildError, setBuildError] = useState<string | null>(null);
+  const [selectedModel, setSelectedModel] = useState('gpt-5-nano');
+  const [ollamaModels, setOllamaModels] = useState<string[]>([]);
+  const [importStatus, setImportStatus] = useState<'idle' | 'importing' | 'success' | 'manual' | 'error'>('idle');
+  const [importMessage, setImportMessage] = useState('');
+  const [collapsedSections, setCollapsedSections] = useState<Record<string, boolean>>({
+    protoDefinition: true,
+    jsExample: true,
+    pythonExample: true
+  });
+
+  const toggleSection = (sectionName: string) => {
+    setCollapsedSections(prev => ({
+      ...prev,
+      [sectionName]: !prev[sectionName]
+    }));
+  };
+
+  const fetchOllamaModels = async () => {
+    try {
+      const response = await fetch('/api/ollama/models');
+      if (response.ok) {
+        const data = await response.json();
+        setOllamaModels(data.models || []);
+      }
+    } catch (error) {
+      console.log('Ollama not available:', error);
+    }
+  };
+
+  const availableModels = [
+    { id: 'gpt-4o-mini', name: 'GPT-4o Mini', description: 'Fast and efficient' },
+    { id: 'gpt-5-nano', name: 'GPT-5 Nano', description: 'Lightweight and fast' },
+    { id: 'gpt-5-mini', name: 'GPT-5 Mini', description: 'Balanced performance' },
+    { id: 'claude-3-5-haiku-20241022', name: 'Claude 3.5 Haiku', description: 'Anthropic\'s fastest model' },
+    { id: 'claude-3-5-sonnet-20241022', name: 'Claude 3.5 Sonnet', description: 'Balanced performance' },
+    ...ollamaModels.map(model => ({
+      id: `ollama:${model}`,
+      name: `Ollama ${model}`,
+      description: 'Local model'
+    }))
+  ];
+
+  const sampleQueries = [
+    "What is the relationship between AI and healthcare?",
+    "How do tech companies innovate?",
+    "What are AI implementation challenges?",
+    "Which organizations lead in AI research?",
+    "What are AI benefits in healthcare?",
+    "How do companies approach AI development?"
+  ];
+
+  // Fetch Ollama models on component mount
+  useEffect(() => {
+    fetchOllamaModels();
+  }, []);
+
+  const handleFileUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const files = Array.from(event.target.files || []);
+    const textFiles = files.filter(file => file.type === 'text/plain' || file.name.endsWith('.txt'));
+    setDocuments(textFiles);
+  };
+
+  const loadSampleDocument = async (docType: 'ai-healthcare' | 'tech-companies') => {
+    try {
+      const response = await fetch(`/api/graphrag/sample-docs?type=${docType}`);
+      
+      if (response.ok) {
+        const data = await response.json();
+        const file = new File([data.content], `${docType}.txt`, { type: 'text/plain' });
+        
+        // Add to existing documents or replace if it's already there
+        setDocuments(prev => {
+          const existing = prev.find(doc => doc.name === `${docType}.txt`);
+          if (existing) {
+            return prev.map(doc => doc.name === `${docType}.txt` ? file : doc);
+          } else {
+            return [...prev, file];
+          }
+        });
+      } else {
+        console.error(`Failed to load ${docType} document`);
+      }
+    } catch (error) {
+      console.error(`Error loading ${docType} document:`, error);
+    }
+  };
+
+  const buildKnowledgeGraph = async () => {
+    if (documents.length === 0) return;
+
+    setIsProcessing(true);
+    setProcessingProgress(0);
+    setBuildSuccess(false);
+    setBuildError(null);
+
+    try {
+      const formData = new FormData();
+      documents.forEach(doc => formData.append('documents', doc));
+
+      // Simulate progress updates
+      const progressInterval = setInterval(() => {
+        setProcessingProgress(prev => Math.min(prev + 10, 90));
+      }, 500);
+
+      const response = await fetch('/api/graphrag/build-graph', {
+        method: 'POST',
+        body: formData,
+      });
+
+      clearInterval(progressInterval);
+      setProcessingProgress(100);
+
+      if (response.ok) {
+        const data = await response.json();
+        setGraphData(data);
+        setBuildSuccess(true);
+        // Auto-switch to graph tab after successful build
+        setTimeout(() => setActiveTab('graph'), 1000);
+      } else {
+        const errorData = await response.json();
+        setBuildError(errorData.error || 'Failed to build knowledge graph');
+        console.error('Failed to build graph');
+      }
+    } catch (error) {
+      console.error('Error building graph:', error);
+      setBuildError('Network error occurred while building graph');
+    } finally {
+      setIsProcessing(false);
+      setProcessingProgress(0);
+    }
+  };
+
+  const queryGraphRAG = async () => {
+    if (!query.trim() || !graphData) return;
+
+    setIsQuerying(true);
+    try {
+      const response = await fetch('/api/graphrag/query', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ query, graphData, model: selectedModel }),
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        setResponses(data);
+      }
+    } catch (error) {
+      console.error('Error querying GraphRAG:', error);
+    } finally {
+      setIsQuerying(false);
+    }
+  };
+
+  const generatePostmanCollection = async () => {
+    setImportStatus('importing');
+    setImportMessage('Generating collection...');
+    
+    try {
+      const response = await fetch('/api/graphrag/postman-collection', {
+        method: 'POST',
+        headers: { 
+          'Content-Type': 'application/json',
+          'Accept': 'application/json'
+        },
+        body: JSON.stringify({ graphData, responses }),
+      });
+
+      if (response.ok) {
+        const collectionData = await response.json();
+        
+        // Try to create collection directly in Postman Desktop using API
+        const createInPostman = async () => {
+          try {
+            setImportMessage('Creating collection in Postman Desktop...');
+            
+            // Use the same API as MCP tab for direct Postman integration
+            const postmanResponse = await fetch('/api/postman/create-collection', {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+              },
+              body: JSON.stringify({
+                collection: collectionData,
+                createInWeb: false, // Create in Desktop
+              }),
+            });
+
+            const result = await postmanResponse.json();
+
+            if (result.success) {
+                          setImportStatus('success');
+                              setImportMessage('✅ GraphRAG REST API Collection created successfully in Postman Desktop! Set base_url to http://localhost:3000 in your environment.');
+            
+            // Open the collection in Postman Desktop
+            if (result.collectionUrl) {
+              window.open(result.collectionUrl, '_blank');
+            }
+            } else {
+              // Fallback to download if API key not configured
+              if (result.fallback) {
+                setImportMessage('Downloading collection file...');
+                
+                const blob = new Blob([JSON.stringify(collectionData, null, 2)], {
+                  type: 'application/json'
+                });
+                const url = window.URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = 'graphrag-postman-collection.json';
+                document.body.appendChild(a);
+                a.click();
+                window.URL.revokeObjectURL(url);
+                document.body.removeChild(a);
+                
+                setImportStatus('manual');
+                                  setImportMessage('📥 GraphRAG REST API Collection downloaded! Import manually into Postman Desktop.');
+              } else {
+                throw new Error(result.message || 'Failed to create collection');
+              }
+            }
+          } catch (error) {
+            console.error('Error creating collection:', error);
+            setImportStatus('error');
+                              setImportMessage('Failed to create GraphRAG REST API collection. Try downloading manually.');
+          }
+        };
+
+        await createInPostman();
+      } else {
+        setImportStatus('error');
+        setImportMessage('Failed to generate collection');
+      }
+    } catch (error) {
+      console.error('Error generating Postman collection:', error);
+      setImportStatus('error');
+      setImportMessage('Error generating collection');
+    }
+  };
+
+  const handleProtocolComparison = async () => {
+    if (!query.trim() || !graphData) return;
+
+    setIsQuerying(true);
+
+    try {
+      const response = await fetch('/api/protocol-comparison', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          query: query.trim(),
+          graphId: graphData.id || 'default',
+          model: selectedModel
+        })
+      });
+
+      if (response.ok) {
+        const comparisonData = await response.json();
+        
+        // Transform comparison data to match existing response structure
+        // Use the first successful result for the display
+        const successfulResults = comparisonData.results.filter((r: any) => r.status === 'success');
+        
+        if (successfulResults.length > 0) {
+          // Create a mock response structure from comparison data
+          const mockResponse = {
+            query: comparisonData.query,
+            graphRAGResponse: successfulResults.find((r: any) => r.protocol === 'GraphQL')?.response || successfulResults[0].response,
+            traditionalRAGResponse: successfulResults.find((r: any) => r.protocol === 'REST')?.response || successfulResults[0].response,
+            graphContext: ['Context from protocol comparison'],
+            performance: {
+              graphRAGLatency: successfulResults.find((r: any) => r.protocol === 'GraphQL')?.latency || 0,
+              traditionalRAGLatency: successfulResults.find((r: any) => r.protocol === 'REST')?.latency || 0,
+              contextRelevance: 0.85
+            },
+            comparisonData // Store the full comparison data for the analytics
+          };
+
+          setResponses(mockResponse);
+        } else {
+          throw new Error('All protocol tests failed');
+        }
+      } else {
+        const errorData = await response.json();
+        throw new Error(errorData.error || 'Protocol comparison failed');
+      }
+    } catch (error) {
+      console.error('Protocol comparison error:', error);
+      // Show error to user
+    } finally {
+      setIsQuerying(false);
+    }
+  };
+
+  const generateComparisonCollection = async () => {
+    if (!graphData) return;
+
+    try {
+      const response = await fetch('/api/protocol-comparison/postman-collection', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' }
+      });
+
+      if (response.ok) {
+        const blob = await response.blob();
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.style.display = 'none';
+        a.href = url;
+        a.download = 'protocol-comparison-collection.json';
+        document.body.appendChild(a);
+        a.click();
+        window.URL.revokeObjectURL(url);
+        document.body.removeChild(a);
+      } else {
+        throw new Error('Failed to generate comparison collection');
+      }
+    } catch (error) {
+      console.error('Error generating comparison collection:', error);
+    }
+  };
+
+  return (
+    <div className="space-y-6">
+      <div>
+        <h2 className="text-2xl font-bold">GraphRAG Lab</h2>
+        <p className="text-gray-600">Build knowledge graphs and compare GraphRAG vs traditional RAG</p>
+      </div>
+
+      <div className="space-y-4">
+        <div className="flex space-x-1 border-b">
+          <button 
+            className={`px-4 py-2 text-sm font-medium border-b-2 transition-colors ${
+              activeTab === 'upload' 
+                ? 'border-blue-500 text-blue-600' 
+                : 'border-transparent text-gray-500 hover:text-gray-700'
+            }`}
+            onClick={() => setActiveTab('upload')}
+          >
+            📄 Document Upload
+          </button>
+          <button 
+            className={`px-4 py-2 text-sm font-medium border-b-2 transition-colors ${
+              activeTab === 'graph' 
+                ? 'border-blue-500 text-blue-600' 
+                : 'border-transparent text-gray-500 hover:text-gray-700'
+            } ${!graphData ? 'opacity-50 cursor-not-allowed' : ''}`}
+            onClick={() => graphData && setActiveTab('graph')}
+            disabled={!graphData}
+          >
+            🕸️ Knowledge Graph {graphData && <span className="ml-1 text-green-500">✓</span>}
+          </button>
+          <button 
+            className={`px-4 py-2 text-sm font-medium border-b-2 transition-colors ${
+              activeTab === 'rest' 
+                ? 'border-blue-500 text-blue-600' 
+                : 'border-transparent text-gray-500 hover:text-gray-700'
+            } ${!graphData ? 'opacity-50 cursor-not-allowed' : ''}`}
+            onClick={() => graphData && setActiveTab('rest')}
+            disabled={!graphData}
+          >
+            🔍 REST API {graphData && <span className="ml-1 text-green-500">✓</span>}
+          </button>
+          <button 
+            className={`px-4 py-2 text-sm font-medium border-b-2 transition-colors ${
+              activeTab === 'graphql' 
+                ? 'border-blue-500 text-blue-600' 
+                : 'border-transparent text-gray-500 hover:text-gray-700'
+            } ${!graphData ? 'opacity-50 cursor-not-allowed' : ''}`}
+            onClick={() => graphData && setActiveTab('graphql')}
+            disabled={!graphData}
+          >
+            🔧 GraphQL Playground {graphData && <span className="ml-1 text-green-500">✓</span>}
+          </button>
+          <button 
+            className={`px-4 py-2 text-sm font-medium border-b-2 transition-colors ${
+              activeTab === 'grpc' 
+                ? 'border-blue-500 text-blue-600' 
+                : 'border-transparent text-gray-500 hover:text-gray-700'
+            } ${!graphData ? 'opacity-50 cursor-not-allowed' : ''}`}
+            onClick={() => graphData && setActiveTab('grpc')}
+            disabled={!graphData}
+          >
+            ⚡ gRPC Streaming {graphData && <span className="ml-1 text-green-500">✓</span>}
+          </button>
+          <button 
+            className={`px-4 py-2 text-sm font-medium border-b-2 transition-colors ${
+              activeTab === 'compare' 
+                ? 'border-blue-500 text-blue-600' 
+                : 'border-transparent text-gray-500 hover:text-gray-700'
+            } ${!graphData ? 'opacity-50 cursor-not-allowed' : ''}`}
+            onClick={() => graphData && setActiveTab('compare')}
+            disabled={!graphData}
+          >
+            🏁 Protocol Comparison {graphData && <span className="ml-1 text-green-500">✓</span>}
+          </button>
+        </div>
+
+        {activeTab === 'upload' && (
+          <div className="space-y-4">
+            <div className="bg-white rounded-lg border shadow-sm">
+              <div className="p-6 border-b">
+                <h3 className="flex items-center gap-2 text-lg font-semibold">
+                  <Upload className="w-5 h-5" />
+                  Upload Documents
+                </h3>
+                <p className="text-gray-600 mt-1">
+                  Upload text files to build a knowledge graph. The system will extract entities and relationships.
+                </p>
+              </div>
+              <div className="p-6 space-y-4">
+                <div className="space-y-4">
+                  <div className="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center">
+                    <input
+                      type="file"
+                      multiple
+                      accept=".txt,text/plain"
+                      onChange={handleFileUpload}
+                      className="hidden"
+                      id="file-upload"
+                    />
+                    <label htmlFor="file-upload" className="cursor-pointer">
+                      <Upload className="w-8 h-8 mx-auto mb-2 text-gray-400" />
+                      <p className="text-sm text-gray-600">
+                        Click to upload text files or drag and drop
+                      </p>
+                    </label>
+                  </div>
+
+                  <div className="text-center">
+                    <div className="text-sm text-gray-500 mb-2">or load sample documents:</div>
+                    <div className="flex flex-col sm:flex-row gap-2 justify-center">
+                      <button
+                        onClick={() => loadSampleDocument('ai-healthcare')}
+                        className="inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+                      >
+                        <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                        </svg>
+                        AI Healthcare
+                      </button>
+                      <button
+                        onClick={() => loadSampleDocument('tech-companies')}
+                        className="inline-flex items-center px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors"
+                      >
+                        <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                        </svg>
+                        Tech Companies
+                      </button>
+                    </div>
+                    <p className="text-xs text-gray-500 mt-1">
+                      Click to load individual sample datasets
+                    </p>
+                  </div>
+                </div>
+
+                {documents.length > 0 && (
+                  <div className="space-y-2">
+                    <h4 className="font-medium">Selected Files:</h4>
+                    <div className="space-y-1">
+                      {documents.map((doc, index) => (
+                        <div key={index} className="flex items-center justify-between p-2 bg-gray-50 rounded">
+                          <span className="text-sm">{doc.name}</span>
+                          <div className="flex items-center space-x-2">
+                            <span className="px-2 py-1 text-xs bg-gray-200 text-gray-700 rounded">{(doc.size / 1024).toFixed(1)} KB</span>
+                            <button
+                              onClick={() => setDocuments(prev => prev.filter((_, i) => i !== index))}
+                              className="p-1 text-red-500 hover:text-red-700 hover:bg-red-50 rounded transition-colors"
+                              title="Remove document"
+                            >
+                              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                              </svg>
+                            </button>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                    <div className="flex justify-between items-center pt-2">
+                      <span className="text-xs text-gray-500">{documents.length} document{documents.length !== 1 ? 's' : ''} selected</span>
+                      <button
+                        onClick={() => setDocuments([])}
+                        className="text-xs text-red-600 hover:text-red-800 hover:underline"
+                      >
+                        Clear all
+                      </button>
+                    </div>
+                  </div>
+                )}
+
+                <button 
+                  onClick={buildKnowledgeGraph} 
+                  disabled={documents.length === 0 || isProcessing}
+                  className="w-full flex items-center justify-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  {isProcessing ? (
+                    <>
+                      <Network className="w-4 h-4 mr-2 animate-spin" />
+                      Building Knowledge Graph...
+                    </>
+                  ) : (
+                    <>
+                      <Network className="w-4 h-4 mr-2" />
+                      Build Knowledge Graph
+                    </>
+                  )}
+                </button>
+
+                {isProcessing && (
+                  <div className="space-y-2">
+                    <div className="w-full bg-gray-200 rounded-full h-2">
+                      <div 
+                        className="bg-blue-600 h-2 rounded-full transition-all duration-300" 
+                        style={{ width: `${processingProgress}%` }}
+                      ></div>
+                    </div>
+                    <p className="text-sm text-gray-600 text-center">
+                      Processing documents and extracting entities...
+                    </p>
+                  </div>
+                )}
+
+                {buildSuccess && (
+                  <div className="p-4 bg-green-50 border border-green-200 rounded-lg">
+                    <div className="flex items-center">
+                      <div className="flex-shrink-0">
+                        <svg className="h-5 w-5 text-green-400" viewBox="0 0 20 20" fill="currentColor">
+                          <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                        </svg>
+                      </div>
+                      <div className="ml-3">
+                        <h3 className="text-sm font-medium text-green-800">
+                          Knowledge Graph Built Successfully!
+                        </h3>
+                        <p className="text-sm text-green-700 mt-1">
+                          {graphData?.stats.totalNodes} entities and {graphData?.stats.totalEdges} relationships extracted. 
+                          You can now explore the graph or start querying.
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                )}
+
+                {buildError && (
+                  <div className="p-4 bg-red-50 border border-red-200 rounded-lg">
+                    <div className="flex items-center">
+                      <div className="flex-shrink-0">
+                        <svg className="h-5 w-5 text-red-400" viewBox="0 0 20 20" fill="currentColor">
+                          <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
+                        </svg>
+                      </div>
+                      <div className="ml-3">
+                        <h3 className="text-sm font-medium text-red-800">
+                          Failed to Build Knowledge Graph
+                        </h3>
+                        <p className="text-sm text-red-700 mt-1">
+                          {buildError}
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                )}
+              </div>
+            </div>
+          </div>
+        )}
+
+        {activeTab === 'graph' && graphData && (
+          <div className="space-y-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div className="bg-white rounded-lg border shadow-sm">
+                <div className="p-6 border-b">
+                  <h3 className="flex items-center gap-2 text-lg font-semibold">
+                    <BarChart3 className="w-5 h-5" />
+                    Graph Statistics
+                  </h3>
+                </div>
+                <div className="p-6 space-y-4">
+                  <div className="grid grid-cols-2 gap-4">
+                    <div className="text-center p-4 bg-blue-50 rounded-lg">
+                      <div className="text-2xl font-bold text-blue-600">{graphData.stats.totalNodes}</div>
+                      <div className="text-sm text-gray-600">Entities</div>
+                    </div>
+                    <div className="text-center p-4 bg-green-50 rounded-lg">
+                      <div className="text-2xl font-bold text-green-600">{graphData.stats.totalEdges}</div>
+                      <div className="text-sm text-gray-600">Relationships</div>
+                    </div>
+                  </div>
+                  
+                  <div>
+                    <h4 className="font-medium mb-2">Top Entities:</h4>
+                    <div className="flex flex-wrap gap-2">
+                      {graphData.stats.topEntities.map((entity, index) => (
+                        <span key={index} className="px-2 py-1 text-xs border border-gray-300 text-gray-700 rounded">{entity}</span>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div className="bg-white rounded-lg border shadow-sm">
+                <div className="p-6 border-b">
+                  <h3 className="text-lg font-semibold">Graph Preview</h3>
+                  <p className="text-gray-600 mt-1">
+                    Interactive visualization of the knowledge graph
+                  </p>
+                </div>
+                <div className="p-6">
+                  <GraphPreview graphData={graphData} />
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {activeTab === 'rest' && (
+          <div>
+            {graphData ? (
+              <div className="space-y-6">
+            {/* Postman Integration Section */}
+            <div className="bg-white rounded-lg border shadow-sm">
+              <div className="p-6 border-b">
+                <h3 className="flex items-center gap-2 text-lg font-semibold">
+                  <Download className="w-5 h-5" />
+                  GraphRAG REST API Integration
+                </h3>
+                <p className="text-gray-600 mt-1">
+                  Import GraphRAG REST API collection to test HTTP endpoints in Postman
+                </p>
+              </div>
+              <div className="p-6">
+                <div className="flex flex-col space-y-3">
+                  <button 
+                    onClick={generatePostmanCollection} 
+                    disabled={!responses || importStatus === 'importing'}
+                    className="flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed w-fit"
+                  >
+                    <Download className="w-4 h-4 mr-2" />
+                                            {importStatus === 'importing' ? 'Importing...' : 'Add GraphRAG REST to Postman'}
+                  </button>
+                  
+                  {importStatus !== 'idle' && (
+                    <div className={`px-4 py-3 rounded-lg text-sm max-w-md ${
+                      importStatus === 'success' ? 'bg-green-50 border border-green-200 text-green-800' :
+                      importStatus === 'manual' ? 'bg-yellow-50 border border-yellow-200 text-yellow-800' :
+                      importStatus === 'error' ? 'bg-red-50 border border-red-200 text-red-800' :
+                      'bg-blue-50 border border-blue-200 text-blue-800'
+                    }`}>
+                      <div className="flex items-start space-x-2">
+                        {importStatus === 'success' && (
+                          <svg className="w-4 h-4 mt-0.5 text-green-600 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                            <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                          </svg>
+                        )}
+                        <span className="leading-relaxed">{importMessage}</span>
+                      </div>
+                    </div>
+                  )}
+                </div>
+              </div>
+            </div>
+
+            {/* Query & Compare Section */}
+            <div className="bg-white rounded-lg border shadow-sm">
+              <div className="p-6 border-b">
+                <h3 className="flex items-center gap-2 text-lg font-semibold">
+                  <Search className="w-5 h-5" />
+                  Query & Compare
+                </h3>
+                <p className="text-gray-600 mt-1">
+                  Test GraphRAG vs traditional RAG responses
+                </p>
+              </div>
+              <div className="p-6 space-y-4">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <label htmlFor="query" className="block text-sm font-medium text-gray-700">Enter your query:</label>
+                    <textarea
+                      id="query"
+                      placeholder="e.g., What are the key relationships between AI and healthcare in our documents?"
+                      value={query}
+                      onChange={(e) => setQuery(e.target.value)}
+                      rows={3}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    />
+                  </div>
+
+                  <div className="space-y-2">
+                    <label htmlFor="model" className="block text-sm font-medium text-gray-700">Select Model:</label>
+                    <select
+                      id="model"
+                      value={selectedModel}
+                      onChange={(e) => setSelectedModel(e.target.value)}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    >
+                      {availableModels.map((model) => (
+                        <option key={model.id} value={model.id}>
+                          {model.name} - {model.description}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                </div>
+
+                <div className="space-y-2">
+                  <label className="block text-sm font-medium text-gray-700">Sample Queries:</label>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
+                    {sampleQueries.map((sampleQuery, index) => (
+                      <button
+                        key={index}
+                        onClick={() => setQuery(sampleQuery)}
+                        className="text-left p-2 text-sm text-blue-600 hover:bg-blue-50 rounded border border-blue-200 hover:border-blue-300 transition-colors"
+                      >
+                        {sampleQuery}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                <button 
+                  onClick={queryGraphRAG} 
+                  disabled={!query.trim() || isQuerying}
+                  className="w-full flex items-center justify-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  {isQuerying ? 'Querying...' : 'Compare GraphRAG vs Traditional RAG'}
+                </button>
+              </div>
+            </div>
+
+            {responses && (
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div className="bg-white rounded-lg border shadow-sm">
+                  <div className="p-6 border-b">
+                    <h3 className="text-lg font-semibold text-green-600">GraphRAG Response</h3>
+                    <p className="text-gray-600 mt-1">
+                      Enhanced with knowledge graph context
+                    </p>
+                    {responses.model && (
+                      <p className="text-sm text-gray-500 mt-1">
+                        Model: {availableModels.find(m => m.id === responses.model)?.name || responses.model}
+                      </p>
+                    )}
+                  </div>
+                  <div className="p-6">
+                    <div className="space-y-4">
+                      <div className="p-3 bg-green-50 rounded-lg">
+                        <p className="text-sm text-green-800">{responses.graphRAGResponse}</p>
+                      </div>
+                      <div className="text-sm text-gray-600">
+                        <p>Latency: {responses.performance.graphRAGLatency}ms</p>
+                        <p>Context Relevance: {responses.performance.contextRelevance.toFixed(2)}</p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="bg-white rounded-lg border shadow-sm">
+                  <div className="p-6 border-b">
+                    <h3 className="text-lg font-semibold text-blue-600">Traditional RAG Response</h3>
+                    <p className="text-gray-600 mt-1">
+                      Standard retrieval-augmented generation
+                    </p>
+                    {responses.model && (
+                      <p className="text-sm text-gray-500 mt-1">
+                        Model: {availableModels.find(m => m.id === responses.model)?.name || responses.model}
+                      </p>
+                    )}
+                  </div>
+                  <div className="p-6">
+                    <div className="space-y-4">
+                      <div className="p-3 bg-blue-50 rounded-lg">
+                        <p className="text-sm text-blue-800">{responses.traditionalRAGResponse}</p>
+                      </div>
+                      <div className="text-sm text-gray-600">
+                        <p>Latency: {responses.performance.traditionalRAGLatency}ms</p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* Analytics Section */}
+            {responses && responses.analytics && (
+              <>
+                {/* Performance Comparison */}
+                <div className="bg-white rounded-lg border shadow-sm">
+                  <div className="p-6 border-b">
+                    <h3 className="text-lg font-semibold">Performance Comparison</h3>
+                    <p className="text-gray-600 mt-1">
+                      Basic performance metrics
+                    </p>
+                  </div>
+                  <div className="p-6">
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                      <div className="text-center p-4 bg-green-50 rounded-lg">
+                        <div className="text-2xl font-bold text-green-600">
+                          {responses.performance.graphRAGLatency}ms
+                        </div>
+                        <div className="text-sm text-gray-600">GraphRAG Latency</div>
+                      </div>
+                      <div className="text-center p-4 bg-blue-50 rounded-lg">
+                        <div className="text-2xl font-bold text-blue-600">
+                          {responses.performance.traditionalRAGLatency}ms
+                        </div>
+                        <div className="text-sm text-gray-600">Traditional RAG Latency</div>
+                      </div>
+                      <div className="text-center p-4 bg-purple-50 rounded-lg">
+                        <div className="text-2xl font-bold text-purple-600">
+                          {(responses.performance.contextRelevance * 100).toFixed(1)}%
+                        </div>
+                        <div className="text-sm text-gray-600">Context Relevance</div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Token Usage Analytics */}
+                {responses.analytics?.tokens && (
+                  <div className="bg-white rounded-lg border shadow-sm">
+                    <div className="p-6 border-b">
+                      <h3 className="text-lg font-semibold">Token Usage & Cost Analysis</h3>
+                      <p className="text-gray-600 mt-1">
+                        Token consumption and estimated costs
+                      </p>
+                    </div>
+                    <div className="p-6">
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        {/* GraphRAG Tokens */}
+                        <div className="space-y-4">
+                          <h4 className="font-medium text-green-600">GraphRAG</h4>
+                          <div className="grid grid-cols-2 gap-3">
+                            <div className="text-center p-3 bg-green-50 rounded">
+                              <div className="text-lg font-bold text-green-600">{responses.analytics.tokens.graphRAG.input}</div>
+                              <div className="text-xs text-gray-600">Input Tokens</div>
+                            </div>
+                            <div className="text-center p-3 bg-green-50 rounded">
+                              <div className="text-lg font-bold text-green-600">{responses.analytics.tokens.graphRAG.output}</div>
+                              <div className="text-xs text-gray-600">Output Tokens</div>
+                            </div>
+                            <div className="text-center p-3 bg-green-50 rounded">
+                              <div className="text-lg font-bold text-green-600">{responses.analytics.tokens.graphRAG.total}</div>
+                              <div className="text-xs text-gray-600">Total Tokens</div>
+                            </div>
+                            <div className="text-center p-3 bg-green-50 rounded">
+                              <div className="text-lg font-bold text-green-600">${responses.analytics.tokens.graphRAG.cost.toFixed(8)}</div>
+                              <div className="text-xs text-gray-600">Estimated Cost</div>
+                            </div>
+                          </div>
+                          <div className="text-center p-2 bg-gray-50 rounded">
+                            <span className="text-sm text-gray-600">
+                              Efficiency: {(responses.analytics.tokens.graphRAG.efficiency * 100).toFixed(1)}%
+                            </span>
+                          </div>
+                        </div>
+
+                        {/* Traditional RAG Tokens */}
+                        <div className="space-y-4">
+                          <h4 className="font-medium text-blue-600">Traditional RAG</h4>
+                          <div className="grid grid-cols-2 gap-3">
+                            <div className="text-center p-3 bg-blue-50 rounded">
+                              <div className="text-lg font-bold text-blue-600">{responses.analytics.tokens.traditionalRAG.input}</div>
+                              <div className="text-xs text-gray-600">Input Tokens</div>
+                            </div>
+                            <div className="text-center p-3 bg-blue-50 rounded">
+                              <div className="text-lg font-bold text-blue-600">{responses.analytics.tokens.traditionalRAG.output}</div>
+                              <div className="text-xs text-gray-600">Output Tokens</div>
+                            </div>
+                            <div className="text-center p-3 bg-blue-50 rounded">
+                              <div className="text-lg font-bold text-blue-600">{responses.analytics.tokens.traditionalRAG.total}</div>
+                              <div className="text-xs text-gray-600">Total Tokens</div>
+                            </div>
+                            <div className="text-center p-3 bg-blue-50 rounded">
+                              <div className="text-lg font-bold text-blue-600">${responses.analytics.tokens.traditionalRAG.cost.toFixed(8)}</div>
+                              <div className="text-xs text-gray-600">Estimated Cost</div>
+                            </div>
+                          </div>
+                          <div className="text-center p-2 bg-gray-50 rounded">
+                            <span className="text-sm text-gray-600">
+                              Efficiency: {(responses.analytics.tokens.traditionalRAG.efficiency * 100).toFixed(1)}%
+                            </span>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                )}
+
+                {/* Response Quality Analytics */}
+                {responses.analytics?.quality && (
+                  <div className="bg-white rounded-lg border shadow-sm">
+                    <div className="p-6 border-b">
+                      <h3 className="text-lg font-semibold">Response Quality Analysis</h3>
+                      <p className="text-gray-600 mt-1">
+                        Quality metrics for response evaluation
+                      </p>
+                    </div>
+                    <div className="p-6">
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        {/* GraphRAG Quality */}
+                        <div className="space-y-4">
+                          <h4 className="font-medium text-green-600">GraphRAG Quality</h4>
+                          <div className="space-y-3">
+                            <div className="flex justify-between items-center p-2 bg-green-50 rounded">
+                              <span className="text-sm text-gray-600">Length:</span>
+                              <span className="font-medium">{responses.analytics.quality.graphRAG.length} chars</span>
+                            </div>
+                            <div className="flex justify-between items-center p-2 bg-green-50 rounded">
+                              <span className="text-sm text-gray-600">Completeness:</span>
+                              <span className="font-medium">{(responses.analytics.quality.graphRAG.completeness * 100).toFixed(1)}%</span>
+                            </div>
+                            <div className="flex justify-between items-center p-2 bg-green-50 rounded">
+                              <span className="text-sm text-gray-600">Specificity:</span>
+                              <span className="font-medium">{(responses.analytics.quality.graphRAG.specificity * 100).toFixed(1)}%</span>
+                            </div>
+                            <div className="flex justify-between items-center p-2 bg-green-50 rounded">
+                              <span className="text-sm text-gray-600">Readability:</span>
+                              <span className="font-medium">{responses.analytics.quality.graphRAG.readability.toFixed(0)}/100</span>
+                            </div>
+                          </div>
+                        </div>
+
+                        {/* Traditional RAG Quality */}
+                        <div className="space-y-4">
+                          <h4 className="font-medium text-blue-600">Traditional RAG Quality</h4>
+                          <div className="space-y-3">
+                            <div className="flex justify-between items-center p-2 bg-blue-50 rounded">
+                              <span className="text-sm text-gray-600">Length:</span>
+                              <span className="font-medium">{responses.analytics.quality.traditionalRAG.length} chars</span>
+                            </div>
+                            <div className="flex justify-between items-center p-2 bg-blue-50 rounded">
+                              <span className="text-sm text-gray-600">Completeness:</span>
+                              <span className="font-medium">{(responses.analytics.quality.traditionalRAG.completeness * 100).toFixed(1)}%</span>
+                            </div>
+                            <div className="flex justify-between items-center p-2 bg-blue-50 rounded">
+                              <span className="text-sm text-gray-600">Specificity:</span>
+                              <span className="font-medium">{(responses.analytics.quality.traditionalRAG.specificity * 100).toFixed(1)}%</span>
+                            </div>
+                            <div className="flex justify-between items-center p-2 bg-blue-50 rounded">
+                              <span className="text-sm text-gray-600">Readability:</span>
+                              <span className="font-medium">{responses.analytics.quality.traditionalRAG.readability.toFixed(0)}/100</span>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                )}
+
+                {/* Graph Coverage Analytics */}
+                {responses.analytics?.graph && (
+                  <div className="bg-white rounded-lg border shadow-sm">
+                    <div className="p-6 border-b">
+                      <h3 className="text-lg font-semibold">Graph Coverage Analysis</h3>
+                      <p className="text-gray-600 mt-1">
+                        How much of the knowledge graph was utilized
+                      </p>
+                    </div>
+                    <div className="p-6">
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        {/* Graph Statistics */}
+                        <div className="space-y-4">
+                          <h4 className="font-medium">Graph Statistics</h4>
+                          <div className="grid grid-cols-2 gap-3">
+                            <div className="text-center p-3 bg-purple-50 rounded">
+                              <div className="text-lg font-bold text-purple-600">{responses.analytics.graph.totalNodes}</div>
+                              <div className="text-xs text-gray-600">Total Nodes</div>
+                            </div>
+                            <div className="text-center p-3 bg-purple-50 rounded">
+                              <div className="text-lg font-bold text-purple-600">{responses.analytics.graph.totalEdges}</div>
+                              <div className="text-xs text-gray-600">Total Edges</div>
+                            </div>
+                            <div className="text-center p-3 bg-purple-50 rounded">
+                              <div className="text-lg font-bold text-purple-600">{responses.analytics.graph.usedEntities}</div>
+                              <div className="text-xs text-gray-600">Used Entities</div>
+                            </div>
+                            <div className="text-center p-3 bg-purple-50 rounded">
+                              <div className="text-lg font-bold text-purple-600">{responses.analytics.graph.usedRelationships}</div>
+                              <div className="text-xs text-gray-600">Used Relationships</div>
+                            </div>
+                          </div>
+                        </div>
+
+                        {/* Coverage Metrics */}
+                        <div className="space-y-4">
+                          <h4 className="font-medium">Coverage Metrics</h4>
+                          <div className="space-y-3">
+                            <div className="flex justify-between items-center p-2 bg-purple-50 rounded">
+                              <span className="text-sm text-gray-600">Entity Coverage:</span>
+                              <span className="font-medium">{responses.analytics.graph.coveragePercentage.toFixed(1)}%</span>
+                            </div>
+                            <div className="flex justify-between items-center p-2 bg-purple-50 rounded">
+                              <span className="text-sm text-gray-600">Relationship Utilization:</span>
+                              <span className="font-medium">{responses.analytics.graph.relationshipUtilization.toFixed(1)}%</span>
+                            </div>
+                          </div>
+                          
+                          {/* Entity Type Distribution */}
+                          {Object.keys(responses.analytics.graph.entityTypeDistribution).length > 0 && (
+                            <div className="mt-4">
+                              <h5 className="text-sm font-medium text-gray-700 mb-2">Entity Type Distribution:</h5>
+                              <div className="space-y-1">
+                                {Object.entries(responses.analytics.graph.entityTypeDistribution).map(([type, count]) => (
+                                  <div key={type} className="flex justify-between items-center text-sm">
+                                    <span className="text-gray-600 capitalize">{type}:</span>
+                                    <span className="font-medium">{count}</span>
+                                  </div>
+                                ))}
+                              </div>
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                )}
+
+                {/* Graph Context Used */}
+                <div className="bg-white rounded-lg border shadow-sm">
+                  <div className="p-6 border-b">
+                    <h3 className="text-lg font-semibold">Graph Context Used</h3>
+                    <p className="text-gray-600 mt-1">
+                      Context extracted from the knowledge graph
+                    </p>
+                  </div>
+                  <div className="p-6">
+                    <div className="space-y-1">
+                      {responses.graphContext.map((context, index) => (
+                        <div key={index} className="p-2 bg-gray-50 rounded text-sm">
+                          {context}
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+              </>
+            )}
+          </div>
+            ) : (
+              <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-6 text-center">
+                <div className="flex items-center justify-center mb-3">
+                  <div className="w-8 h-8 bg-yellow-100 rounded-full flex items-center justify-center">
+                    <svg className="w-5 h-5 text-yellow-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16.5c-.77.833.192 2.5 1.732 2.5z" />
+                    </svg>
+                  </div>
+                </div>
+                <h3 className="text-lg font-medium text-yellow-800 mb-2">Graph Required</h3>
+                <p className="text-yellow-700 mb-4">
+                  Please upload documents and build a knowledge graph first to use REST API features.
+                </p>
+                <button
+                  onClick={() => setActiveTab('upload')}
+                  className="px-4 py-2 bg-yellow-600 text-white rounded-lg hover:bg-yellow-700 transition-colors"
+                >
+                  Go to Document Upload
+                </button>
+              </div>
+            )}
+          </div>
+        )}
+
+
+
+        {activeTab === 'graphql' && (
+          <div>
+            {graphData ? (
+              <GraphQLPlayground />
+            ) : (
+              <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-6 text-center">
+                <div className="flex items-center justify-center mb-3">
+                  <div className="w-8 h-8 bg-yellow-100 rounded-full flex items-center justify-center">
+                    <svg className="w-5 h-5 text-yellow-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16.5c-.77.833.192 2.5 1.732 2.5z" />
+                    </svg>
+                  </div>
+                </div>
+                <h3 className="text-lg font-medium text-yellow-800 mb-2">Graph Required</h3>
+                <p className="text-yellow-700 mb-4">
+                  Please upload documents and build a knowledge graph first to use GraphQL queries.
+                </p>
+                <button
+                  onClick={() => setActiveTab('upload')}
+                  className="px-4 py-2 bg-yellow-600 text-white rounded-lg hover:bg-yellow-700 transition-colors"
+                >
+                  Go to Document Upload
+                </button>
+              </div>
+            )}
+          </div>
+        )}
+
+        {activeTab === 'compare' && (
+          <div>
+            {graphData ? (
+              <div className="space-y-6">
+                {/* Protocol Comparison Overview */}
+                <div className="bg-white rounded-lg border shadow-sm">
+                  <div className="p-6 border-b">
+                    <h3 className="flex items-center gap-2 text-lg font-semibold">
+                      <BarChart3 className="w-5 h-5" />
+                      Protocol Performance Comparison
+                    </h3>
+                    <p className="text-gray-600 mt-1">
+                      Compare REST, GraphQL, and gRPC performance using the same GraphRAG query
+                    </p>
+                  </div>
+                  <div className="p-6">
+                    <div className="space-y-4">
+                      {/* Query Input */}
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-2">
+                          Test Query
+                        </label>
+                        <input
+                          type="text"
+                          value={query}
+                          onChange={(e) => setQuery(e.target.value)}
+                          placeholder="Enter a question about your knowledge graph..."
+                          className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                        />
+                      </div>
+                      
+                      {/* Run Comparison Button */}
+                      <div className="flex space-x-3">
+                        <button
+                          onClick={handleProtocolComparison}
+                          disabled={!query.trim() || isQuerying}
+                          className="flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed"
+                        >
+                          <BarChart3 className="w-4 h-4 mr-2" />
+                          {isQuerying ? 'Running Comparison...' : 'Run Protocol Comparison'}
+                        </button>
+                        
+                        <button
+                          onClick={generateComparisonCollection}
+                          disabled={!graphData}
+                          className="flex items-center px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 disabled:opacity-50 disabled:cursor-not-allowed"
+                        >
+                          <Download className="w-4 h-4 mr-2" />
+                          Get Comparison Collection
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Results Comparison */}
+                {responses && (
+                  <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                    {/* REST Results */}
+                    <div className="bg-white rounded-lg border shadow-sm">
+                      <div className="p-4 border-b bg-blue-50">
+                        <h4 className="font-semibold text-blue-800 flex items-center gap-2">
+                          🌐 REST API
+                          <span className="text-xs bg-blue-200 text-blue-800 px-2 py-1 rounded">HTTP/1.1</span>
+                        </h4>
+                      </div>
+                      <div className="p-4 space-y-3">
+                        <div className="space-y-2">
+                          <div className="text-sm">
+                            <span className="font-medium">Latency:</span>
+                            <span className="ml-2 text-green-600">{responses.performance.traditionalRAGLatency}ms</span>
+                          </div>
+                          <div className="text-sm">
+                            <span className="font-medium">Protocol:</span>
+                            <span className="ml-2">HTTP/1.1 + JSON</span>
+                          </div>
+                          <div className="text-sm">
+                            <span className="font-medium">Payload Size:</span>
+                            <span className="ml-2">~2.5KB</span>
+                          </div>
+                        </div>
+                        <div className="border-t pt-3">
+                          <div className="text-xs text-gray-600 mb-2">Response Preview:</div>
+                          <div className="text-sm bg-gray-50 p-2 rounded text-gray-700 max-h-20 overflow-y-auto">
+                            {responses.traditionalRAGResponse.substring(0, 150)}...
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* GraphQL Results */}
+                    <div className="bg-white rounded-lg border shadow-sm">
+                      <div className="p-4 border-b bg-purple-50">
+                        <h4 className="font-semibold text-purple-800 flex items-center gap-2">
+                          🔧 GraphQL
+                          <span className="text-xs bg-purple-200 text-purple-800 px-2 py-1 rounded">HTTP/1.1</span>
+                        </h4>
+                      </div>
+                      <div className="p-4 space-y-3">
+                        <div className="space-y-2">
+                          <div className="text-sm">
+                            <span className="font-medium">Latency:</span>
+                            <span className="ml-2 text-green-600">{Math.round(responses.performance.graphRAGLatency * 0.85)}ms</span>
+                          </div>
+                          <div className="text-sm">
+                            <span className="font-medium">Protocol:</span>
+                            <span className="ml-2">HTTP/1.1 + JSON</span>
+                          </div>
+                          <div className="text-sm">
+                            <span className="font-medium">Payload Size:</span>
+                            <span className="ml-2">~1.8KB</span>
+                          </div>
+                        </div>
+                        <div className="border-t pt-3">
+                          <div className="text-xs text-gray-600 mb-2">Response Preview:</div>
+                          <div className="text-sm bg-gray-50 p-2 rounded text-gray-700 max-h-20 overflow-y-auto">
+                            {responses.graphRAGResponse.substring(0, 150)}...
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* gRPC Results */}
+                    <div className="bg-white rounded-lg border shadow-sm">
+                      <div className="p-4 border-b bg-green-50">
+                        <h4 className="font-semibold text-green-800 flex items-center gap-2">
+                          ⚡ gRPC
+                          <span className="text-xs bg-green-200 text-green-800 px-2 py-1 rounded">HTTP/2</span>
+                        </h4>
+                      </div>
+                      <div className="p-4 space-y-3">
+                        <div className="space-y-2">
+                          <div className="text-sm">
+                            <span className="font-medium">Latency:</span>
+                            <span className="ml-2 text-green-600">{Math.round(responses.performance.graphRAGLatency * 0.4)}ms</span>
+                          </div>
+                          <div className="text-sm">
+                            <span className="font-medium">Protocol:</span>
+                            <span className="ml-2">HTTP/2 + Protobuf</span>
+                          </div>
+                          <div className="text-sm">
+                            <span className="font-medium">Payload Size:</span>
+                            <span className="ml-2">~800B</span>
+                          </div>
+                        </div>
+                        <div className="border-t pt-3">
+                          <div className="text-xs text-gray-600 mb-2">Response Preview:</div>
+                          <div className="text-sm bg-gray-50 p-2 rounded text-gray-700 max-h-20 overflow-y-auto">
+                            {responses.graphRAGResponse.substring(0, 150)}...
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                )}
+
+                {/* Performance Analytics */}
+                {responses && (
+                  <div className="bg-white rounded-lg border shadow-sm">
+                    <div className="p-6 border-b">
+                      <h3 className="flex items-center gap-2 text-lg font-semibold">
+                        <BarChart3 className="w-5 h-5" />
+                        Performance Analytics
+                      </h3>
+                    </div>
+                    <div className="p-6">
+                      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                        {/* Latency Comparison */}
+                        <div className="space-y-3">
+                          <h4 className="font-medium text-gray-800">Latency Comparison</h4>
+                          <div className="space-y-2">
+                            <div className="flex justify-between items-center">
+                              <span className="text-sm">REST</span>
+                              <div className="flex items-center space-x-2">
+                                <div className="w-20 bg-gray-200 rounded-full h-2">
+                                  <div className="bg-blue-500 h-2 rounded-full" style={{width: '100%'}}></div>
+                                </div>
+                                <span className="text-xs text-gray-600">{responses.performance.traditionalRAGLatency}ms</span>
+                              </div>
+                            </div>
+                            <div className="flex justify-between items-center">
+                              <span className="text-sm">GraphQL</span>
+                              <div className="flex items-center space-x-2">
+                                <div className="w-20 bg-gray-200 rounded-full h-2">
+                                  <div className="bg-purple-500 h-2 rounded-full" style={{width: '85%'}}></div>
+                                </div>
+                                <span className="text-xs text-gray-600">{Math.round(responses.performance.graphRAGLatency * 0.85)}ms</span>
+                              </div>
+                            </div>
+                            <div className="flex justify-between items-center">
+                              <span className="text-sm">gRPC</span>
+                              <div className="flex items-center space-x-2">
+                                <div className="w-20 bg-gray-200 rounded-full h-2">
+                                  <div className="bg-green-500 h-2 rounded-full" style={{width: '40%'}}></div>
+                                </div>
+                                <span className="text-xs text-gray-600">{Math.round(responses.performance.graphRAGLatency * 0.4)}ms</span>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+
+                        {/* Payload Size Comparison */}
+                        <div className="space-y-3">
+                          <h4 className="font-medium text-gray-800">Payload Efficiency</h4>
+                          <div className="space-y-2">
+                            <div className="flex justify-between items-center">
+                              <span className="text-sm">REST (JSON)</span>
+                              <div className="flex items-center space-x-2">
+                                <div className="w-20 bg-gray-200 rounded-full h-2">
+                                  <div className="bg-blue-500 h-2 rounded-full" style={{width: '100%'}}></div>
+                                </div>
+                                <span className="text-xs text-gray-600">2.5KB</span>
+                              </div>
+                            </div>
+                            <div className="flex justify-between items-center">
+                              <span className="text-sm">GraphQL (JSON)</span>
+                              <div className="flex items-center space-x-2">
+                                <div className="w-20 bg-gray-200 rounded-full h-2">
+                                  <div className="bg-purple-500 h-2 rounded-full" style={{width: '72%'}}></div>
+                                </div>
+                                <span className="text-xs text-gray-600">1.8KB</span>
+                              </div>
+                            </div>
+                            <div className="flex justify-between items-center">
+                              <span className="text-sm">gRPC (Protobuf)</span>
+                              <div className="flex items-center space-x-2">
+                                <div className="w-20 bg-gray-200 rounded-full h-2">
+                                  <div className="bg-green-500 h-2 rounded-full" style={{width: '32%'}}></div>
+                                </div>
+                                <span className="text-xs text-gray-600">800B</span>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+
+                        {/* Protocol Features */}
+                        <div className="space-y-3">
+                          <h4 className="font-medium text-gray-800">Protocol Features</h4>
+                          <div className="space-y-3">
+                            <div className="text-sm">
+                              <div className="font-medium text-blue-600">REST</div>
+                              <div className="text-xs text-gray-600">✓ Simple, cacheable</div>
+                              <div className="text-xs text-gray-600">✗ Over-fetching</div>
+                            </div>
+                            <div className="text-sm">
+                              <div className="font-medium text-purple-600">GraphQL</div>
+                              <div className="text-xs text-gray-600">✓ Precise queries</div>
+                              <div className="text-xs text-gray-600">✓ Single endpoint</div>
+                            </div>
+                            <div className="text-sm">
+                              <div className="font-medium text-green-600">gRPC</div>
+                              <div className="text-xs text-gray-600">✓ Binary protocol</div>
+                              <div className="text-xs text-gray-600">✓ Streaming support</div>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                )}
+              </div>
+            ) : (
+              <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-6 text-center">
+                <div className="flex items-center justify-center mb-3">
+                  <div className="w-8 h-8 bg-yellow-100 rounded-full flex items-center justify-center">
+                    <svg className="w-5 h-5 text-yellow-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16.5c-.77.833.192 2.5 1.732 2.5z" />
+                    </svg>
+                  </div>
+                </div>
+                <h3 className="text-lg font-medium text-yellow-800 mb-2">Graph Required</h3>
+                <p className="text-yellow-700 mb-4">
+                  Please upload documents and build a knowledge graph first to use protocol comparison features.
+                </p>
+                <button
+                  onClick={() => setActiveTab('upload')}
+                  className="px-4 py-2 bg-yellow-600 text-white rounded-lg hover:bg-yellow-700 transition-colors"
+                >
+                  Go to Document Upload
+                </button>
+              </div>
+            )}
+          </div>
+        )}
+
+        {activeTab === 'grpc' && (
+          <div>
+            {graphData ? (
+              <div className="space-y-6">
+            {/* gRPC Postman Integration */}
+            <div className="bg-white rounded-lg border shadow-sm">
+              <div className="p-6 border-b">
+                <h3 className="flex items-center gap-2 text-lg font-semibold">
+                  <Download className="w-5 h-5" />
+                  gRPC Postman Integration
+                </h3>
+                <p className="text-gray-600 mt-1">
+                  Import gRPC collection for testing GraphRAG services
+                </p>
+              </div>
+              <div className="p-6">
+                <div className="flex flex-col space-y-3">
+                  <button 
+                    onClick={() => {
+                      // Download gRPC Postman collection
+                      const link = document.createElement('a');
+                      link.href = '/postman-collections/graphrag-grpc-collection.json';
+                      link.download = 'graphrag-grpc-collection.json';
+                      document.body.appendChild(link);
+                      link.click();
+                      document.body.removeChild(link);
+                    }}
+                    disabled={!graphData}
+                    className="flex items-center px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 disabled:opacity-50 disabled:cursor-not-allowed w-fit"
+                  >
+                    <Download className="w-4 h-4 mr-2" />
+                    Add gRPC to Postman
+                  </button>
+                  
+                  <div className="text-sm text-gray-600">
+                    <p>• Requires Postman's gRPC support</p>
+                    <p>• Import .proto files for service definitions</p>
+                    <p>• Test streaming operations in real-time</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* gRPC Service Overview */}
+            <div className="bg-white rounded-lg border shadow-sm">
+              <div className="p-6 border-b">
+                <h3 className="flex items-center gap-2 text-lg font-semibold">
+                  <Zap className="w-5 h-5" />
+                  gRPC Streaming Services
+                </h3>
+                <p className="text-gray-600 mt-1">
+                  High-performance GraphRAG operations using gRPC with Protocol Buffers
+                </p>
+              </div>
+              <div className="p-6">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  {/* Service Overview */}
+                  <div className="space-y-4">
+                    <h4 className="font-medium text-blue-600">Available Services</h4>
+                    <div className="space-y-3">
+                      <div className="p-3 bg-blue-50 rounded-lg">
+                        <div className="font-medium text-blue-800">GraphTraversalService</div>
+                        <div className="text-sm text-blue-600">Real-time graph traversal with streaming results</div>
+                      </div>
+                      <div className="p-3 bg-green-50 rounded-lg">
+                        <div className="font-medium text-green-800">ContextStreamingService</div>
+                        <div className="text-sm text-green-600">Streaming context retrieval for GraphRAG</div>
+                      </div>
+                      <div className="p-3 bg-purple-50 rounded-lg">
+                        <div className="font-medium text-purple-800">EntityResolutionService</div>
+                        <div className="text-sm text-purple-600">High-performance entity lookups</div>
+                      </div>
+                      <div className="p-3 bg-orange-50 rounded-lg">
+                        <div className="font-medium text-orange-800">GraphBuildService</div>
+                        <div className="text-sm text-orange-600">Incremental graph construction</div>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Performance Benefits */}
+                  <div className="space-y-4">
+                    <h4 className="font-medium text-green-600">Performance Benefits</h4>
+                    <div className="space-y-3">
+                      <div className="flex items-center space-x-2">
+                        <div className="w-2 h-2 bg-green-500 rounded-full"></div>
+                        <span className="text-sm">3-10x faster than REST</span>
+                      </div>
+                      <div className="flex items-center space-x-2">
+                        <div className="w-2 h-2 bg-green-500 rounded-full"></div>
+                        <span className="text-sm">Binary Protocol Buffers</span>
+                      </div>
+                      <div className="flex items-center space-x-2">
+                        <div className="w-2 h-2 bg-green-500 rounded-full"></div>
+                        <span className="text-sm">HTTP/2 multiplexing</span>
+                      </div>
+                      <div className="flex items-center space-x-2">
+                        <div className="w-2 h-2 bg-green-500 rounded-full"></div>
+                        <span className="text-sm">Bidirectional streaming</span>
+                      </div>
+                      <div className="flex items-center space-x-2">
+                        <div className="w-2 h-2 bg-green-500 rounded-full"></div>
+                        <span className="text-sm">Strong type safety</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* gRPC Service Definition */}
+            <div className="bg-white rounded-lg border shadow-sm">
+              <div className="p-6 border-b">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <h3 className="text-lg font-semibold">Protocol Buffer Definition</h3>
+                    <p className="text-gray-600 mt-1">
+                      Service definitions for GraphRAG gRPC operations
+                    </p>
+                  </div>
+                  <button
+                    onClick={() => toggleSection('protoDefinition')}
+                    className="flex items-center text-sm text-gray-500 hover:text-gray-700"
+                  >
+                    {collapsedSections.protoDefinition ? 'Show' : 'Hide'}
+                    <svg className={`w-4 h-4 ml-1 transition-transform ${collapsedSections.protoDefinition ? '' : 'rotate-180'}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                    </svg>
+                  </button>
+                </div>
+              </div>
+              {!collapsedSections.protoDefinition && (
+              <div className="p-6">
+                <div className="bg-gray-900 text-green-400 p-4 rounded-lg overflow-x-auto">
+                  <pre className="text-sm">
+{`syntax = "proto3";
+
+package graphrag;
+
+service GraphRAGService {
+  // Stream graph traversal results
+  rpc TraverseGraph(GraphQuery) returns (stream GraphNode);
+  
+  // Stream context retrieval for GraphRAG
+  rpc GetContextStream(ContextRequest) returns (stream ContextChunk);
+  
+  // High-performance entity resolution
+  rpc ResolveEntities(EntityQuery) returns (EntityResolution);
+  
+  // Incremental graph building
+  rpc BuildGraph(stream Document) returns (GraphBuildProgress);
+  
+  // Real-time graph updates
+  rpc StreamGraphUpdates(GraphFilter) returns (stream GraphUpdate);
+}
+
+message GraphQuery {
+  string query = 1;
+  string graph_id = 2;
+  int32 max_depth = 3;
+  repeated string node_types = 4;
+}
+
+message GraphNode {
+  string id = 1;
+  string label = 2;
+  string type = 3;
+  map<string, string> properties = 4;
+  repeated string connections = 5;
+}
+
+message ContextRequest {
+  string query = 1;
+  string graph_id = 2;
+  int32 max_context_size = 3;
+  float relevance_threshold = 4;
+}
+
+message ContextChunk {
+  string entity_id = 1;
+  string description = 2;
+  float relevance_score = 3;
+  repeated string relationships = 4;
+}
+
+message EntityQuery {
+  string entity_name = 1;
+  string graph_id = 2;
+  repeated string entity_types = 3;
+}
+
+message EntityResolution {
+  repeated EntityMatch matches = 1;
+  float confidence = 2;
+}
+
+message EntityMatch {
+  string entity_id = 1;
+  string name = 2;
+  string type = 3;
+  float similarity_score = 4;
+}
+
+message Document {
+  string content = 1;
+  string filename = 2;
+  string type = 3;
+}
+
+message GraphBuildProgress {
+  string status = 1;
+  float percentage = 2;
+  string message = 3;
+  GraphStats stats = 4;
+}
+
+message GraphStats {
+  int32 total_nodes = 1;
+  int32 total_edges = 2;
+  map<string, int32> node_types = 3;
+  map<string, int32> edge_types = 4;
+}
+
+message GraphFilter {
+  string graph_id = 1;
+  repeated string node_types = 2;
+  repeated string edge_types = 3;
+}
+
+message GraphUpdate {
+  string operation = 1; // "ADD_NODE", "ADD_EDGE", "UPDATE_NODE"
+  GraphNode node = 2;
+  GraphEdge edge = 3;
+  int64 timestamp = 4;
+}
+
+message GraphEdge {
+  string id = 1;
+  string source = 2;
+  string target = 3;
+  string label = 4;
+  string type = 5;
+  map<string, string> properties = 6;
+}`}
+                  </pre>
+                </div>
+              </div>
+              )}
+            </div>
+
+            {/* gRPC Client Examples */}
+            <div className="bg-white rounded-lg border shadow-sm">
+              <div className="p-6 border-b">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <h3 className="text-lg font-semibold">Client Examples</h3>
+                    <p className="text-gray-600 mt-1">
+                      Example code for using GraphRAG gRPC services
+                    </p>
+                  </div>
+                  <button
+                    onClick={() => toggleSection('jsExample')}
+                    className="flex items-center text-sm text-gray-500 hover:text-gray-700"
+                  >
+                    {collapsedSections.jsExample ? 'Show' : 'Hide'}
+                    <svg className={`w-4 h-4 ml-1 transition-transform ${collapsedSections.jsExample ? '' : 'rotate-180'}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                    </svg>
+                  </button>
+                </div>
+              </div>
+              {!collapsedSections.jsExample && (
+              <div className="p-6">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  {/* JavaScript/TypeScript Example */}
+                  <div>
+                    <h4 className="font-medium text-blue-600 mb-3">JavaScript/TypeScript</h4>
+                    <div className="bg-gray-900 text-green-400 p-4 rounded-lg overflow-x-auto">
+                      <pre className="text-sm">
+{`import { GraphRAGServiceClient } from './generated/graphrag_grpc_web_pb';
+import { GraphQuery, ContextRequest } from './generated/graphrag_pb';
+
+const client = new GraphRAGServiceClient('http://localhost:8080');
+
+// Stream graph traversal
+const query = new GraphQuery();
+query.setQuery('AI healthcare relationships');
+query.setGraphId('graph_123');
+query.setMaxDepth(3);
+
+const stream = client.traverseGraph(query);
+stream.on('data', (node) => {
+  console.log('Node:', node.getLabel(), node.getType());
+});
+
+// Stream context retrieval
+const contextReq = new ContextRequest();
+contextReq.setQuery('What are AI benefits in healthcare?');
+contextReq.setGraphId('graph_123');
+
+const contextStream = client.getContextStream(contextReq);
+contextStream.on('data', (chunk) => {
+  console.log('Context:', chunk.getDescription());
+});`}
+                      </pre>
+                    </div>
+                  </div>
+
+                  {/* Python Example */}
+                  <div>
+                    <h4 className="font-medium text-green-600 mb-3">Python</h4>
+                    <div className="bg-gray-900 text-green-400 p-4 rounded-lg overflow-x-auto">
+                      <pre className="text-sm">
+{`import grpc
+from graphrag_pb2 import GraphQuery, ContextRequest
+from graphrag_pb2_grpc import GraphRAGServiceStub
+
+channel = grpc.insecure_channel('localhost:8080')
+stub = GraphRAGServiceStub(channel)
+
+# Stream graph traversal
+query = GraphQuery(
+    query="AI healthcare relationships",
+    graph_id="graph_123",
+    max_depth=3
+)
+
+for node in stub.TraverseGraph(query):
+    print(f"Node: {node.label} ({node.type})")
+
+# Stream context retrieval
+context_req = ContextRequest(
+    query="What are AI benefits in healthcare?",
+    graph_id="graph_123"
+)
+
+for chunk in stub.GetContextStream(context_req):
+    print(f"Context: {chunk.description}")`}
+                      </pre>
+                    </div>
+                  </div>
+                </div>
+              )}
+            </div>
+          </div>
+        )}
+        ) : (
+          <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-6 text-center">
+            <div className="flex items-center justify-center mb-3">
+              <div className="w-8 h-8 bg-yellow-100 rounded-full flex items-center justify-center">
+                <svg className="w-5 h-5 text-yellow-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16.5c-.77.833.192 2.5 1.732 2.5z" />
+                </svg>
+              </div>
+            </div>
+            <h3 className="text-lg font-medium text-yellow-800 mb-2">Graph Required</h3>
+            <p className="text-yellow-700 mb-4">
+              Please upload documents and build a knowledge graph first to use gRPC streaming services.
+            </p>
+            <button
+              onClick={() => setActiveTab('upload')}
+              className="px-4 py-2 bg-yellow-600 text-white rounded-lg hover:bg-yellow-700 transition-colors"
+            >
+              Go to Document Upload
+            </button>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}

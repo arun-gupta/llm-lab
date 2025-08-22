@@ -1,0 +1,195 @@
+syntax = "proto3";
+
+package graphrag;
+
+// GraphRAG Service for high-performance graph operations
+service GraphRAGService {
+  // Query the knowledge graph with GraphRAG
+  rpc QueryGraph(GraphQuery) returns (GraphRAGResponse);
+  
+  // Stream graph traversal results
+  rpc TraverseGraph(GraphQuery) returns (stream GraphNode);
+  
+  // Stream context retrieval for GraphRAG
+  rpc GetContextStream(ContextRequest) returns (stream ContextChunk);
+  
+  // High-performance entity resolution
+  rpc ResolveEntities(EntityQuery) returns (EntityResolution);
+  
+  // Incremental graph building
+  rpc BuildGraph(stream Document) returns (GraphBuildProgress);
+  
+  // Real-time graph updates
+  rpc StreamGraphUpdates(GraphFilter) returns (stream GraphUpdate);
+  
+  // Health check endpoint
+  rpc HealthCheck(HealthCheck) returns (HealthCheckResponse);
+}
+
+// Graph query request
+message GraphQuery {
+  string query = 1;
+  string graph_id = 2;
+  string model = 3;
+  int32 max_depth = 4;
+  repeated string node_types = 5;
+  bool streaming = 6;
+}
+
+// GraphRAG response
+message GraphRAGResponse {
+  string query_id = 1;
+  string query = 2;
+  string graph_id = 3;
+  string model = 4;
+  string response = 5;
+  repeated ContextChunk context = 6;
+  PerformanceMetrics performance = 7;
+  repeated GraphNode relevant_nodes = 8;
+  string timestamp = 9;
+}
+
+// Graph node representation
+message GraphNode {
+  string id = 1;
+  string label = 2;
+  string type = 3;
+  map<string, string> properties = 4;
+  repeated string connections = 5;
+  float relevance_score = 6;
+  int32 frequency = 7;
+}
+
+// Context request for streaming
+message ContextRequest {
+  string query = 1;
+  string graph_id = 2;
+  int32 max_context_size = 3;
+  float relevance_threshold = 4;
+  bool include_relationships = 5;
+}
+
+// Context chunk for streaming
+message ContextChunk {
+  string entity_id = 1;
+  string description = 2;
+  float relevance_score = 3;
+  repeated string relationships = 4;
+  string entity_type = 5;
+  map<string, string> metadata = 6;
+}
+
+// Entity query for resolution
+message EntityQuery {
+  string entity_name = 1;
+  string graph_id = 2;
+  repeated string entity_types = 3;
+  int32 max_results = 4;
+  float similarity_threshold = 5;
+}
+
+// Entity resolution response
+message EntityResolution {
+  repeated EntityMatch matches = 1;
+  int32 total_found = 2;
+  float search_time_ms = 3;
+  string graph_id = 4;
+}
+
+// Entity match result
+message EntityMatch {
+  string entity_id = 1;
+  string entity_name = 2;
+  string entity_type = 3;
+  float similarity_score = 4;
+  repeated string properties = 5;
+  repeated string connections = 6;
+}
+
+// Document for graph building
+message Document {
+  string id = 1;
+  string name = 2;
+  string content = 3;
+  string type = 4;
+  int64 size = 5;
+  string uploaded_at = 6;
+}
+
+// Graph build progress
+message GraphBuildProgress {
+  string graph_id = 1;
+  string status = 2;
+  int32 progress_percentage = 3;
+  GraphStats stats = 4;
+  repeated string errors = 5;
+  string estimated_completion = 6;
+}
+
+// Graph statistics
+message GraphStats {
+  int32 total_nodes = 1;
+  int32 total_edges = 2;
+  repeated string node_types = 3;
+  repeated string edge_types = 4;
+  float density = 5;
+  float connectivity = 6;
+  repeated string top_entities = 7;
+}
+
+// Graph filter for updates
+message GraphFilter {
+  string graph_id = 1;
+  repeated string node_types = 2;
+  repeated string edge_types = 3;
+  float min_relevance = 4;
+  int32 max_results = 5;
+}
+
+// Graph update for streaming
+message GraphUpdate {
+  string update_id = 1;
+  string graph_id = 2;
+  string update_type = 3;
+  GraphNode node = 4;
+  GraphEdge edge = 5;
+  string timestamp = 6;
+  map<string, string> metadata = 7;
+}
+
+// Graph edge representation
+message GraphEdge {
+  string id = 1;
+  string source = 2;
+  string target = 3;
+  string label = 4;
+  string type = 5;
+  float weight = 6;
+  map<string, string> properties = 7;
+}
+
+// Health check request
+message HealthCheck {
+  string service = 1;
+}
+
+// Health check response
+message HealthCheckResponse {
+  string status = 1;
+  string version = 2;
+  string timestamp = 3;
+  map<string, string> services = 4;
+  PerformanceMetrics system_performance = 5;
+}
+
+// Performance metrics
+message PerformanceMetrics {
+  float processing_time_ms = 1;
+  float context_retrieval_time_ms = 2;
+  float llm_generation_time_ms = 3;
+  int32 total_nodes_accessed = 4;
+  int32 total_edges_traversed = 5;
+  float compression_ratio = 6;
+  int64 memory_usage_bytes = 7;
+  float cpu_usage_percent = 8;
+}

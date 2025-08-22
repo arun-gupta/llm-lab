@@ -175,7 +175,7 @@ export async function POST(request: NextRequest) {
               response: []
             },
             {
-              name: "Search Entities",
+              name: "Search Entities - Healthcare",
               request: {
                 method: "POST",
                 header: [
@@ -196,7 +196,8 @@ export async function POST(request: NextRequest) {
   }
 }`,
                     variables: {
-                      "query": "AI",
+                      "query": "healthcare",
+                      "graphId": "graph_1755797167093",
                       "limit": 10
                     }
                   }, null, 2)
@@ -206,7 +207,150 @@ export async function POST(request: NextRequest) {
                   host: ["{{base_url}}"],
                   path: ["api", "graphql"]
                 },
-                description: "Search for entities across all graphs or within a specific graph"
+                description: "Search for healthcare-related entities in the knowledge graph"
+              },
+              response: []
+            },
+            {
+              name: "Search Entities - AI",
+              request: {
+                method: "POST",
+                header: [
+                  {
+                    key: "Content-Type",
+                    value: "application/json"
+                  }
+                ],
+                body: {
+                  mode: "raw",
+                  raw: JSON.stringify({
+                    query: `query SearchEntities($query: String!, $graphId: ID, $limit: Int) {
+  searchEntities(query: $query, graphId: $graphId, limit: $limit) {
+    id
+    label
+    type
+    connections
+  }
+}`,
+                    variables: {
+                      "query": "artificial intelligence",
+                      "graphId": "graph_1755797167093",
+                      "limit": 10
+                    }
+                  }, null, 2)
+                },
+                url: {
+                  raw: "{{graphql_endpoint}}",
+                  host: ["{{base_url}}"],
+                  path: ["api", "graphql"]
+                },
+                description: "Search for AI-related entities in the knowledge graph"
+              },
+              response: []
+            },
+            {
+              name: "Search Entities - Tech Companies",
+              request: {
+                method: "POST",
+                header: [
+                  {
+                    key: "Content-Type",
+                    value: "application/json"
+                  }
+                ],
+                body: {
+                  mode: "raw",
+                  raw: JSON.stringify({
+                    query: `query SearchEntities($query: String!, $graphId: ID, $limit: Int) {
+  searchEntities(query: $query, graphId: $graphId, limit: $limit) {
+    id
+    label
+    type
+    connections
+  }
+}`,
+                    variables: {
+                      "query": "technology",
+                      "graphId": "graph_1755797167093",
+                      "limit": 10
+                    }
+                  }, null, 2)
+                },
+                url: {
+                  raw: "{{graphql_endpoint}}",
+                  host: ["{{base_url}}"],
+                  path: ["api", "graphql"]
+                },
+                description: "Search for technology company entities in the knowledge graph"
+              },
+              response: []
+            },
+            {
+              name: "Search Entities - Generic",
+              request: {
+                method: "POST",
+                header: [
+                  {
+                    key: "Content-Type",
+                    value: "application/json"
+                  }
+                ],
+                body: {
+                  mode: "raw",
+                  raw: JSON.stringify({
+                    query: `query SearchEntities($query: String!, $graphId: ID, $limit: Int) {
+  searchEntities(query: $query, graphId: $graphId, limit: $limit) {
+    id
+    label
+    type
+    connections
+  }
+}`,
+                    variables: {
+                      "query": "research",
+                      "limit": 10
+                    }
+                  }, null, 2)
+                },
+                url: {
+                  raw: "{{graphql_endpoint}}",
+                  host: ["{{base_url}}"],
+                  path: ["api", "graphql"]
+                },
+                description: "Search for research-related entities across all graphs (no specific graph ID)"
+              },
+              response: []
+            },
+            {
+              name: "Get All Entities (Test)",
+              request: {
+                method: "POST",
+                header: [
+                  {
+                    key: "Content-Type",
+                    value: "application/json"
+                  }
+                ],
+                body: {
+                  mode: "raw",
+                  raw: JSON.stringify({
+                    query: `query GetAllEntities {
+  searchEntities(query: "", limit: 50) {
+    id
+    label
+    type
+    connections
+  }
+}`,
+                    variables: {}
+                  }, null, 2)
+                },
+                url: {
+                  raw: "{{graphql_endpoint}}",
+                  host: ["{{base_url}}"],
+                  path: ["api", "graphql"]
+                },
+                description: "Get all entities from all graphs (useful for testing and exploring available data)"
               },
               response: []
             },
@@ -233,7 +377,7 @@ export async function POST(request: NextRequest) {
   }
 }`,
                     variables: {
-                      "entityId": "Artificial Intelligence",
+                      "entityId": "node_6",
                       "graphId": "graph_1755797167093",
                       "depth": 2
                     }
@@ -379,19 +523,19 @@ export async function POST(request: NextRequest) {
               response: []
             },
             {
-              name: "Get Specific Document",
-              request: {
-                method: "POST",
-                header: [
-                  {
-                    key: "Content-Type",
-                    value: "application/json"
-                  }
-                ],
-                body: {
-                  mode: "raw",
-                  raw: JSON.stringify({
-                    query: `query GetDocument($id: ID!) {
+                                name: "Get Specific Document",
+                  request: {
+                    method: "POST",
+                    header: [
+                      {
+                        key: "Content-Type",
+                        value: "application/json"
+                      }
+                    ],
+                    body: {
+                      mode: "raw",
+                      raw: JSON.stringify({
+                        query: `query GetDocument($id: ID!) {
   document(id: $id) {
     id
     name
@@ -401,9 +545,9 @@ export async function POST(request: NextRequest) {
     uploadedAt
   }
 }`,
-                    variables: {
-                      "id": "ai-healthcare"
-                    }
+                        variables: {
+                          "id": "ai-healthcare"
+                        }
                   }, null, 2)
                 },
                 url: {
@@ -475,7 +619,7 @@ export async function POST(request: NextRequest) {
   }
 }`,
                     variables: {
-                      "id": "ai-healthcare",
+                      "id": "graph_1755797167093",
                       "name": "Updated AI Healthcare Graph"
                     }
                   }, null, 2)
