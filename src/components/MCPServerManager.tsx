@@ -3,70 +3,48 @@
 import { useState, useEffect } from 'react';
 import { Play, Square, RefreshCw, Server, CheckCircle, XCircle, AlertCircle, Settings } from 'lucide-react';
 
+// Default port configuration (will be overridden by API)
+const DEFAULT_MCP_PORTS = {
+  sqlite: 3001,
+  filesystem: 3002
+};
+
 interface MCPServer {
   name: string;
   port: number;
   status: 'running' | 'stopped' | 'error';
   pid?: number;
   description: string;
+  type: 'remote' | 'local';
 }
 
 interface MCPServerManagerProps {
   className?: string;
+  onClose?: () => void;
 }
 
-export function MCPServerManager({ className = '' }: MCPServerManagerProps) {
+export function MCPServerManager({ className = '', onClose }: MCPServerManagerProps) {
   const [servers, setServers] = useState<MCPServer[]>([
     {
-      name: 'Local MCP Server Template',
-      port: 3001,
+      name: 'GitHub MCP',
+      port: 0, // Remote server, no local port
+      status: 'running',
+      description: 'Fast repository analysis with user repos, issues, PRs, and health reports',
+      type: 'remote'
+    },
+    {
+      name: 'Filesystem MCP',
+      port: DEFAULT_MCP_PORTS.filesystem,
       status: 'stopped',
-      description: 'Basic MCP server template for testing'
+      description: 'Official MCP server with HTTP wrapper for Postman integration',
+      type: 'local'
     },
     {
-      name: 'SQLite MCP Server',
-      port: 4000,
+      name: 'SQLite MCP',
+      port: DEFAULT_MCP_PORTS.sqlite,
       status: 'stopped',
-      description: 'Database operations with Docker HTTP mode for Postman integration'
-    },
-    {
-      name: 'Filesystem MCP Server',
-      port: 3002,
-      status: 'stopped',
-      description: 'File and directory operations with HTTP wrapper for Postman integration'
-    }
-  ]);
-
-  const [remoteServers] = useState([
-    {
-      name: 'GitHub MCP Server (Remote)',
-      url: 'https://api.githubcopilot.com/mcp/',
-      status: 'running' as const,
-      description: 'Official GitHub MCP server - always available'
-    },
-    {
-      name: 'GitHub Repositories',
-      url: 'https://api.githubcopilot.com/mcp/x/repos',
-      status: 'running' as const,
-      description: 'GitHub repository management tools'
-    },
-    {
-      name: 'GitHub Issues',
-      url: 'https://api.githubcopilot.com/mcp/x/issues',
-      status: 'running' as const,
-      description: 'GitHub issue management tools'
-    },
-    {
-      name: 'GitHub Pull Requests',
-      url: 'https://api.githubcopilot.com/mcp/x/pull_requests',
-      status: 'running' as const,
-      description: 'GitHub pull request management tools'
-    },
-    {
-      name: 'GitHub Actions',
-      url: 'https://api.githubcopilot.com/mcp/x/actions',
-      status: 'running' as const,
-      description: 'GitHub Actions and CI/CD tools'
+      description: 'Database operations with Docker HTTP mode for Postman integration',
+      type: 'local'
     }
   ]);
   const [isLoading, setIsLoading] = useState(false);
@@ -77,20 +55,43 @@ export function MCPServerManager({ className = '' }: MCPServerManagerProps) {
     checkServerStatus();
   }, []);
 
+  // Add Esc key listener for closing
+  useEffect(() => {
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === 'Escape' && onClose) {
+        onClose();
+      }
+    };
+
+    document.addEventListener('keydown', handleKeyDown);
+    return () => {
+      document.removeEventListener('keydown', handleKeyDown);
+    };
+  }, [onClose]);
+
   const checkServerStatus = async () => {
     setIsLoading(true);
     try {
-      // This would call a backend API to check MCP server status
-      // For now, we'll simulate the check
       const response = await fetch('/api/mcp/status');
       if (response.ok) {
         const statusData = await response.json();
+        
+        // Update local servers with status from API, keep GitHub MCP as always running
         setServers(prevServers => 
-          prevServers.map(server => ({
-            ...server,
-            status: statusData[server.port]?.status || 'stopped',
-            pid: statusData[server.port]?.pid
-          }))
+          prevServers.map(server => {
+            if (server.name === 'GitHub MCP') {
+              // GitHub MCP is always running (remote server)
+              return { ...server, status: 'running' as const };
+            } else {
+              // Find matching local server by port
+              const localServer = Object.values(statusData).find((s: any) => s.port === server.port);
+              return {
+                ...server,
+                status: localServer?.status || 'stopped',
+                pid: localServer?.pid
+              };
+            }
+          })
         );
       }
     } catch (error) {
@@ -210,9 +211,9 @@ export function MCPServerManager({ className = '' }: MCPServerManagerProps) {
         </div>
       )}
 
-      {/* Local Server Status */}
+      {/* MCP Server Status */}
       <div className="mb-6">
-        <h4 className="text-lg font-semibold text-gray-900 mb-4">Local MCP Servers</h4>
+        <h4 className="text-lg font-semibold text-gray-900 mb-4">MCP Servers</h4>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
           {servers.map((server) => (
             <div key={server.port} className="border border-gray-200 rounded-lg p-4">
@@ -237,31 +238,7 @@ export function MCPServerManager({ className = '' }: MCPServerManagerProps) {
         </div>
       </div>
 
-      {/* Remote Server Status */}
-      <div className="mb-6">
-        <h4 className="text-lg font-semibold text-gray-900 mb-4">Remote GitHub MCP Servers</h4>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
-          {remoteServers.map((server) => (
-            <div key={server.url} className="border border-gray-200 rounded-lg p-4">
-              <div className="flex items-start justify-between">
-                <div className="flex-1">
-                  <div className="flex items-center space-x-2 mb-2">
-                    {getStatusIcon(server.status)}
-                    <h4 className="font-medium text-gray-900">{server.name}</h4>
-                  </div>
-                  <p className="text-sm text-gray-600 mb-2">{server.description}</p>
-                  <div className="flex items-center space-x-4 text-xs text-gray-500">
-                    <span className="truncate">URL: {server.url}</span>
-                  </div>
-                </div>
-                <div className={`px-2 py-1 rounded-full text-xs font-medium border ${getStatusColor(server.status)}`}>
-                  {getStatusText(server.status)}
-                </div>
-              </div>
-            </div>
-          ))}
-        </div>
-      </div>
+
 
       {/* Control Buttons */}
       <div className="flex flex-col sm:flex-row gap-3">
