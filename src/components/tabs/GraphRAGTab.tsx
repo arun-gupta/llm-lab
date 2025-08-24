@@ -91,7 +91,7 @@ export function GraphRAGTab() {
   const [responses, setResponses] = useState<GraphRAGResponse | null>(null);
   const [isQuerying, setIsQuerying] = useState(false);
   const [processingProgress, setProcessingProgress] = useState(0);
-  const [activeTab, setActiveTab] = useState<'upload' | 'graph' | 'rest' | 'graphql' | 'grpc' | 'sse' | 'websocket' | 'compare'>('upload');
+  const [activeTab, setActiveTab] = useState<'upload' | 'graph' | 'rest' | 'graphql' | 'grpc' | 'websocket' | 'sse' | 'compare'>('upload');
   const [grpcSubTab, setGrpcSubTab] = useState<'grpc' | 'grpc-web'>('grpc');
   const [buildSuccess, setBuildSuccess] = useState(false);
   const [buildError, setBuildError] = useState<string | null>(null);
@@ -1582,17 +1582,6 @@ export function GraphRAGTab() {
           </button>
           <button 
             className={`px-4 py-2 text-sm font-medium border-b-2 transition-colors ${
-              activeTab === 'sse' 
-                ? 'border-red-500 text-red-600 bg-red-50' 
-                : 'border-transparent text-gray-500 hover:text-gray-700 hover:bg-gray-50'
-            } ${!graphData ? 'opacity-50 cursor-not-allowed' : ''}`}
-            onClick={() => graphData && setActiveTab('sse')}
-            disabled={!graphData}
-          >
-            📡 SSE {graphData && <span className="ml-1 text-green-500">✓</span>}
-          </button>
-          <button 
-            className={`px-4 py-2 text-sm font-medium border-b-2 transition-colors ${
               activeTab === 'websocket' 
                 ? 'border-orange-500 text-orange-600 bg-orange-50' 
                 : 'border-transparent text-gray-500 hover:text-gray-700 hover:bg-gray-50'
@@ -1601,6 +1590,17 @@ export function GraphRAGTab() {
             disabled={!graphData}
           >
             🔌 WebSocket {graphData && <span className="ml-1 text-green-500">✓</span>}
+          </button>
+          <button 
+            className={`px-4 py-2 text-sm font-medium border-b-2 transition-colors ${
+              activeTab === 'sse' 
+                ? 'border-red-500 text-red-600 bg-red-50' 
+                : 'border-transparent text-gray-500 hover:text-gray-700 hover:bg-gray-50'
+            } ${!graphData ? 'opacity-50 cursor-not-allowed' : ''}`}
+            onClick={() => graphData && setActiveTab('sse')}
+            disabled={!graphData}
+          >
+            📡 SSE {graphData && <span className="ml-1 text-green-500">✓</span>}
           </button>
           <button 
             className={`px-4 py-2 text-sm font-medium border-b-2 transition-colors ${
@@ -2571,38 +2571,6 @@ export function GraphRAGTab() {
                       </div>
                     </div>
 
-                    {/* WebSocket Results */}
-                    <div className="bg-white rounded-lg border shadow-sm">
-                      <div className="p-4 border-b bg-orange-50">
-                        <h4 className="font-semibold text-orange-800 flex items-center gap-2">
-                          🔌 WebSocket
-                          <span className="text-xs bg-orange-200 text-orange-800 px-2 py-1 rounded">Real-time</span>
-                        </h4>
-                      </div>
-                      <div className="p-4 space-y-3">
-                        <div className="space-y-2">
-                          <div className="text-sm">
-                            <span className="font-medium text-gray-900">Latency:</span>
-                            <span className="ml-2 text-green-600">{Math.round(responses.performance.graphRAGLatency * 0.25)}ms</span>
-                          </div>
-                          <div className="text-sm">
-                            <span className="font-medium text-gray-900">Protocol:</span>
-                            <span className="ml-2 text-gray-700">WebSocket + JSON</span>
-                          </div>
-                          <div className="text-sm">
-                            <span className="font-medium text-gray-900">Payload Size:</span>
-                            <span className="ml-2 text-gray-700">~2.2KB</span>
-                          </div>
-                        </div>
-                        <div className="border-t pt-3">
-                          <div className="text-xs text-gray-600 mb-2">Response Preview:</div>
-                          <div className="text-sm bg-gray-50 p-2 rounded text-gray-700 max-h-20 overflow-y-auto">
-                            {responses.graphRAGResponse.substring(0, 150)}...
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-
                     {/* SSE Results */}
                     <div className="bg-white rounded-lg border shadow-sm">
                       <div className="p-4 border-b bg-red-50">
@@ -2624,6 +2592,38 @@ export function GraphRAGTab() {
                           <div className="text-sm">
                             <span className="font-medium text-gray-900">Payload Size:</span>
                             <span className="ml-2 text-gray-700">~1.7KB</span>
+                          </div>
+                        </div>
+                        <div className="border-t pt-3">
+                          <div className="text-xs text-gray-600 mb-2">Response Preview:</div>
+                          <div className="text-sm bg-gray-50 p-2 rounded text-gray-700 max-h-20 overflow-y-auto">
+                            {responses.graphRAGResponse.substring(0, 150)}...
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* WebSocket Results */}
+                    <div className="bg-white rounded-lg border shadow-sm">
+                      <div className="p-4 border-b bg-orange-50">
+                        <h4 className="font-semibold text-orange-800 flex items-center gap-2">
+                          🔌 WebSocket
+                          <span className="text-xs bg-orange-200 text-orange-800 px-2 py-1 rounded">Real-time</span>
+                        </h4>
+                      </div>
+                      <div className="p-4 space-y-3">
+                        <div className="space-y-2">
+                          <div className="text-sm">
+                            <span className="font-medium text-gray-900">Latency:</span>
+                            <span className="ml-2 text-green-600">{Math.round(responses.performance.graphRAGLatency * 0.25)}ms</span>
+                          </div>
+                          <div className="text-sm">
+                            <span className="font-medium text-gray-900">Protocol:</span>
+                            <span className="ml-2 text-gray-700">WebSocket + JSON</span>
+                          </div>
+                          <div className="text-sm">
+                            <span className="font-medium text-gray-900">Payload Size:</span>
+                            <span className="ml-2 text-gray-700">~2.2KB</span>
                           </div>
                         </div>
                         <div className="border-t pt-3">
@@ -2689,21 +2689,21 @@ export function GraphRAGTab() {
                               </div>
                             </div>
                             <div className="flex justify-between items-center">
-                              <span className="text-sm text-gray-900">WebSocket</span>
-                              <div className="flex items-center space-x-2">
-                                <div className="w-20 bg-gray-200 rounded-full h-2">
-                                  <div className="bg-orange-500 h-2 rounded-full" style={{width: '25%'}}></div>
-                                </div>
-                                <span className="text-xs text-gray-600">{Math.round(responses.performance.graphRAGLatency * 0.25)}ms</span>
-                              </div>
-                            </div>
-                            <div className="flex justify-between items-center">
                               <span className="text-sm text-gray-900">SSE</span>
                               <div className="flex items-center space-x-2">
                                 <div className="w-20 bg-gray-200 rounded-full h-2">
                                   <div className="bg-red-500 h-2 rounded-full" style={{width: '20%'}}></div>
                                 </div>
                                 <span className="text-xs text-gray-600">{Math.round(responses.performance.graphRAGLatency * 0.2)}ms</span>
+                              </div>
+                            </div>
+                            <div className="flex justify-between items-center">
+                              <span className="text-sm text-gray-900">WebSocket</span>
+                              <div className="flex items-center space-x-2">
+                                <div className="w-20 bg-gray-200 rounded-full h-2">
+                                  <div className="bg-orange-500 h-2 rounded-full" style={{width: '25%'}}></div>
+                                </div>
+                                <span className="text-xs text-gray-600">{Math.round(responses.performance.graphRAGLatency * 0.25)}ms</span>
                               </div>
                             </div>
                           </div>
@@ -2750,21 +2750,21 @@ export function GraphRAGTab() {
                               </div>
                             </div>
                             <div className="flex justify-between items-center">
-                              <span className="text-sm text-gray-900">WebSocket (JSON)</span>
-                              <div className="flex items-center space-x-2">
-                                <div className="w-20 bg-gray-200 rounded-full h-2">
-                                  <div className="bg-orange-500 h-2 rounded-full" style={{width: '88%'}}></div>
-                                </div>
-                                <span className="text-xs text-gray-600">2.2KB</span>
-                              </div>
-                            </div>
-                            <div className="flex justify-between items-center">
                               <span className="text-sm text-gray-900">SSE (EventSource)</span>
                               <div className="flex items-center space-x-2">
                                 <div className="w-20 bg-gray-200 rounded-full h-2">
                                   <div className="bg-red-500 h-2 rounded-full" style={{width: '68%'}}></div>
                                 </div>
                                 <span className="text-xs text-gray-600">1.7KB</span>
+                              </div>
+                            </div>
+                            <div className="flex justify-between items-center">
+                              <span className="text-sm text-gray-900">WebSocket (JSON)</span>
+                              <div className="flex items-center space-x-2">
+                                <div className="w-20 bg-gray-200 rounded-full h-2">
+                                  <div className="bg-orange-500 h-2 rounded-full" style={{width: '88%'}}></div>
+                                </div>
+                                <span className="text-xs text-gray-600">2.2KB</span>
                               </div>
                             </div>
                           </div>
