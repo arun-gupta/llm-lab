@@ -1,6 +1,6 @@
 # Multi-Protocol Lab
 
-[![Open in GitHub Codespaces](https://github.com/codespaces/badge.svg)](https://codespaces.new/arun-gupta/llm-prompt-lab) *(Outdated - Use Local Setup)*
+[![Open in GitHub Codespaces](https://github.com/codespaces/badge.svg)](https://codespaces.new/arun-gupta/multi-protocol-lab) *(Outdated - Use Local Setup)*
 
 A comprehensive **multi-protocol experimentation and GraphRAG development platform** that combines traditional LLM testing with advanced **Graph-based Retrieval-Augmented Generation (GraphRAG)** capabilities. Build knowledge graphs from documents, compare GraphRAG vs traditional RAG, and test multiple protocols (REST, GraphQL, gRPC, gRPC-Web, WebSocket, SSE) with seamless **Postman integration**.
 
@@ -53,8 +53,8 @@ A comprehensive **multi-protocol experimentation and GraphRAG development platfo
 **Quick and Easy Setup:**
 ```bash
 # Clone and run with one command
-git clone https://github.com/arun-gupta/llm-lab.git
-cd llm-lab
+git clone https://github.com/arun-gupta/multi-protocol-lab.git
+cd multi-protocol-lab
 ./quickstart.sh
 ```
 
@@ -80,8 +80,8 @@ If you still want to try Codespaces:
 - Use local setup for optimal performance and reliability
 ```bash
 # Clone and run
-git clone https://github.com/arun-gupta/llm-lab.git
-cd llm-lab
+git clone https://github.com/arun-gupta/multi-protocol-lab.git
+cd multi-protocol-lab
 ./quickstart.sh
 ```
 

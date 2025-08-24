@@ -17,7 +17,7 @@
     },
     {
       "key": "repo_name",
-      "value": "llm-lab",
+        "value": "multi-protocol-lab",
       "type": "string"
     },
     

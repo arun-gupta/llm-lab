@@ -5,8 +5,8 @@ A comprehensive guide on how to use all features of Multi-Protocol Lab.
 ## 🚀 Getting Started
 
 ### **Quick Start**
-1. **Clone the repository**: `git clone https://github.com/arun-gupta/llm-lab.git`
-2. **Navigate to directory**: `cd llm-lab`
+1. **Clone the repository**: `git clone https://github.com/arun-gupta/multi-protocol-lab.git`
+2. **Navigate to directory**: `cd multi-protocol-lab`
 3. **Run setup script**: `./quickstart.sh`
 4. **Add API keys** to `.env.local`
 5. **Start the application**: `npm run dev`
