@@ -241,36 +241,14 @@ npm start
 
 ## 📝 API Reference
 
-### **LLM API Endpoint**
-```bash
-POST /api/llm
-Content-Type: application/json
+For complete API documentation, see our **[📚 API Reference](docs/api-reference.md)**.
 
-{
-  "prompt": "Your prompt here",
-  "context": "Optional context",
-  "providers": ["openai:gpt-5", "anthropic:claude-4-sonnet-20241022"]
-}
-```
-
-### **Postman Integration**
-```bash
-# Check Postman API key status
-GET /api/postman/status
-
-# Create collection in Postman workspace
-POST /api/postman/create-collection
-{
-  "collection": { /* Postman collection object */ },
-  "createInWeb": true
-}
-```
-
-### **Ollama Models**
-```bash
-# Get available Ollama models
-GET /api/ollama/models
-```
+**Key Endpoints**:
+- **LLM Testing**: `POST /api/llm` - Test multiple LLM providers
+- **Postman Integration**: `POST /api/postman/create-collection` - Create collections
+- **GraphRAG**: `POST /api/graphrag/query` - Query knowledge graphs
+- **Protocol Comparison**: `POST /api/protocol-comparison` - Compare protocols
+- **Ollama Models**: `GET /api/ollama/models` - List local models
 
 
 
