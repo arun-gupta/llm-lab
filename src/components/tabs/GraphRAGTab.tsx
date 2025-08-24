@@ -867,7 +867,6 @@ export function GraphRAGTab() {
     setWebsocketResults(null);
 
     try {
-      // Simulate WebSocket query with realistic timing and responses
       const startTime = performance.now();
       
       // Parse the query type from the input
@@ -879,83 +878,135 @@ export function GraphRAGTab() {
         queryType = 'unary';
         actualQuery = queryText.replace('QueryGraph:', '').trim();
       } else if (queryText.startsWith('StreamGraphTraversal:')) {
-        queryType = 'streaming';
+        queryType = 'stream_query';
         actualQuery = queryText.replace('StreamGraphTraversal:', '').trim();
       } else if (queryText.startsWith('StreamContext:')) {
-        queryType = 'context-streaming';
+        queryType = 'context_stream';
         actualQuery = queryText.replace('StreamContext:', '').trim();
       } else if (queryText.startsWith('InteractiveSession:')) {
-        queryType = 'bidirectional';
+        queryType = 'bidirectional_session';
         actualQuery = queryText.replace('InteractiveSession:', '').trim();
       }
 
-      // Simulate different response times based on query type (WebSocket is very fast)
-      let delay = 30 + Math.random() * 40; // Base delay (fastest among all protocols)
-      if (queryType === 'streaming') delay += 20;
-      if (queryType === 'context-streaming') delay += 15;
-      if (queryType === 'bidirectional') delay += 25;
+      // Try to connect to real WebSocket server first
+      try {
+        const ws = new WebSocket('ws://localhost:3001');
+        
+        return new Promise((resolve, reject) => {
+          const timeout = setTimeout(() => {
+            reject(new Error('WebSocket connection timeout'));
+          }, 5000);
 
-      await new Promise(resolve => setTimeout(resolve, delay));
-      
-      const endTime = performance.now();
-      const latency = Math.round(endTime - startTime);
+          ws.onopen = () => {
+            clearTimeout(timeout);
+            
+            // Send the query
+            ws.send(JSON.stringify({
+              type: queryType,
+              query: actualQuery,
+              graph_id: graphData.graphId,
+              model: 'gpt-4'
+            }));
 
-      // Generate appropriate response based on query type
-      let response = '';
-      let streamingData: any[] = [];
-      let payloadSize = 1800; // WebSocket typically has JSON payloads
+            const messages: any[] = [];
+            let response = '';
+            let streamingData: any[] = [];
 
-      switch (queryType) {
-        case 'unary':
-          response = `WebSocket unary response for "${actualQuery}": Found 5 relevant nodes in the knowledge graph. The query processed successfully using persistent WebSocket connection with real-time communication.`;
-          payloadSize = 1850;
-          break;
-        case 'streaming':
-          response = `WebSocket streaming initiated for "${actualQuery}": Streaming graph traversal results in real-time via persistent connection.`;
-          streamingData = [
-            { content: `Node 1: Stanford Medical Center (organization)` },
-            { content: `Node 2: Dr. Sarah Chen (person) - AI researcher` },
-            { content: `Node 3: Machine Learning (concept) - diagnostic algorithms` },
-            { content: `Node 4: Patient Records (concept) - data analysis` },
-            { content: `Node 5: Healthcare AI (concept) - clinical applications` }
-          ];
-          payloadSize = 1920;
-          break;
-        case 'context-streaming':
-          response = `WebSocket context streaming for "${actualQuery}": Retrieving relevant context chunks via real-time connection.`;
-          streamingData = [
-            { content: `Context 1: AI improves diagnostic accuracy by 15-20%` },
-            { content: `Context 2: Machine learning reduces false positives in screening` },
-            { content: `Context 3: Predictive analytics enhance patient outcomes` },
-            { content: `Context 4: Automated analysis saves 30% of radiologist time` }
-          ];
-          payloadSize = 1880;
-          break;
-        case 'bidirectional':
-          response = `WebSocket bidirectional session for "${actualQuery}": Interactive query processing with real-time bidirectional communication.`;
-          streamingData = [
-            { content: `Session: Interactive query processing initiated` },
-            { content: `Query: ${actualQuery}` },
-            { content: `Response: Real-time analysis of medical diagnosis patterns` },
-            { content: `Feedback: Query refined based on context` }
-          ];
-          payloadSize = 1950;
-          break;
-        default:
-          response = `WebSocket query "${actualQuery}" processed successfully with persistent real-time connection.`;
-          payloadSize = 1800;
+            ws.onmessage = (event) => {
+              const data = JSON.parse(event.data);
+              messages.push(data);
+
+              switch (data.type) {
+                case 'connection':
+                  console.log('WebSocket connected:', data.message);
+                  break;
+                case 'query_result':
+                  response = data.data?.response || 'WebSocket response received';
+                  break;
+                case 'stream_node':
+                case 'context_chunk':
+                case 'session_step':
+                  streamingData.push({ content: data.data?.message || JSON.stringify(data.data) });
+                  break;
+                case 'stream_complete':
+                case 'context_stream_complete':
+                case 'session_complete':
+                  ws.close();
+                  break;
+                case 'error':
+                  ws.close();
+                  reject(new Error(data.error));
+                  break;
+              }
+            };
+
+            ws.onclose = () => {
+              const endTime = performance.now();
+              const latency = Math.round(endTime - startTime);
+              
+              setWebsocketResults({
+                query: actualQuery,
+                queryType,
+                response: response || `WebSocket ${queryType} completed successfully`,
+                latency,
+                payloadSize: JSON.stringify(messages).length,
+                streaming: streamingData.length > 0,
+                streamingData,
+                timestamp: new Date().toISOString()
+              });
+              
+              setIsQuerying(false);
+              resolve(true);
+            };
+
+            ws.onerror = (error) => {
+              clearTimeout(timeout);
+              ws.close();
+              reject(error);
+            };
+          });
+        });
+      } catch (wsError) {
+        console.log('WebSocket server not available, falling back to API route');
+        
+        // Fallback to API route if WebSocket server is not available
+        const response = await fetch('/api/websocket/graphrag', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            message: { 
+              query: actualQuery, 
+              graph_id: graphData.graphId, 
+              model: 'gpt-4',
+              session_type: queryType === 'unary' ? 'unary' : 
+                           queryType === 'stream_query' ? 'streaming' : 
+                           queryType === 'bidirectional_session' ? 'bidirectional' : 'unary'
+            }
+          })
+        });
+
+        const endTime = performance.now();
+        const latency = Math.round(endTime - startTime);
+        
+        if (!response.ok) {
+          throw new Error('WebSocket API error');
+        }
+
+        const data = await response.json();
+        
+        setWebsocketResults({
+          query: actualQuery,
+          queryType,
+          response: data.data?.response || 'WebSocket response received',
+          latency,
+          payloadSize: data.websocket_metadata?.payload_size_bytes || JSON.stringify(data).length,
+          streaming: data.data?.streaming_data ? true : false,
+          streamingData: data.data?.streaming_data ? Object.entries(data.data.streaming_data).map(([key, value]) => ({
+            content: `${key}: ${JSON.stringify(value).slice(0, 100)}...`
+          })) : [],
+          timestamp: new Date().toISOString()
+        });
       }
-
-      setWebsocketResults({
-        query: actualQuery,
-        queryType,
-        response,
-        latency,
-        payloadSize,
-        streaming: streamingData.length > 0,
-        streamingData,
-        timestamp: new Date().toISOString()
-      });
 
     } catch (error) {
       console.error('Error running WebSocket query:', error);
@@ -976,57 +1027,103 @@ export function GraphRAGTab() {
     setSseResults(null);
 
     try {
-      // Simulate SSE query with realistic timing and responses
       const startTime = performance.now();
       
       // Parse the query type from the input
       const queryText = query.trim();
-      let queryType = 'streaming';
+      let endpoint = 'stream';
       let actualQuery = queryText;
       
       if (queryText.startsWith('StreamGraph:')) {
-        queryType = 'graph-streaming';
+        endpoint = 'stream';
         actualQuery = queryText.replace('StreamGraph:', '').trim();
       } else if (queryText.startsWith('StreamContext:')) {
-        queryType = 'context-streaming';
+        endpoint = 'context';
         actualQuery = queryText.replace('StreamContext:', '').trim();
       } else if (queryText.startsWith('StreamResults:')) {
-        queryType = 'results-streaming';
+        endpoint = 'stream';
         actualQuery = queryText.replace('StreamResults:', '').trim();
       }
 
-      // Simulate different response times based on query type (SSE is fast for streaming)
-      let delay = 40 + Math.random() * 50; // Base delay (faster than WebSocket for streaming)
-      if (queryType === 'graph-streaming') delay += 15;
-      if (queryType === 'context-streaming') delay += 10;
-      if (queryType === 'results-streaming') delay += 20;
-
-      await new Promise(resolve => setTimeout(resolve, delay));
+      // Use real SSE connection
+      const eventSource = new EventSource(`/api/sse/graphrag/${endpoint}?query=${encodeURIComponent(actualQuery)}&graphId=${encodeURIComponent(graphData.graphId)}&model=gpt-4`);
       
-      const endTime = performance.now();
-      const latency = Math.round(endTime - startTime);
-
-      // Generate appropriate response based on query type
+      const messages: any[] = [];
       let response = '';
       let streamingData: any[] = [];
-      let payloadSize = 1600; // SSE typically has smaller payloads than WebSocket
 
-      switch (queryType) {
-        case 'graph-streaming':
-          response = `SSE graph streaming initiated for "${actualQuery}": Streaming graph traversal results via EventSource.`;
-          streamingData = [
-            { content: `Event: graph_node\nData: {"node": "Stanford Medical Center", "type": "organization"}` },
-            { content: `Event: graph_node\nData: {"node": "Dr. Sarah Chen", "type": "person", "role": "AI researcher"}` },
-            { content: `Event: graph_edge\nData: {"from": "Stanford Medical Center", "to": "Dr. Sarah Chen", "relation": "employs"}` },
-            { content: `Event: graph_node\nData: {"node": "Machine Learning", "type": "concept", "domain": "diagnostic algorithms"}` },
-            { content: `Event: complete\nData: {"total_nodes": 5, "total_edges": 8}` }
-          ];
-          payloadSize = 1680;
-          break;
-        case 'context-streaming':
-          response = `SSE context streaming for "${actualQuery}": Retrieving relevant context chunks via EventSource.`;
-          streamingData = [
-            { content: `Event: context_chunk\nData: {"chunk": 1, "content": "AI improves diagnostic accuracy by 15-20%"}` },
+      return new Promise((resolve, reject) => {
+        const timeout = setTimeout(() => {
+          eventSource.close();
+          reject(new Error('SSE connection timeout'));
+        }, 10000);
+
+        eventSource.onmessage = (event) => {
+          try {
+            const data = JSON.parse(event.data);
+            messages.push(data);
+
+            switch (data.event) {
+              case 'connected':
+                console.log('SSE connected:', data.message);
+                break;
+              case 'processing':
+                response = data.message;
+                break;
+              case 'graph_node':
+              case 'context_chunk':
+                streamingData.push({ content: `Event: ${data.event}\nData: ${JSON.stringify(data.data)}` });
+                break;
+              case 'complete':
+                eventSource.close();
+                clearTimeout(timeout);
+                
+                const endTime = performance.now();
+                const latency = Math.round(endTime - startTime);
+                
+                setSseResults({
+                  query: actualQuery,
+                  queryType: endpoint,
+                  response: response || `SSE ${endpoint} streaming completed successfully`,
+                  latency,
+                  payloadSize: JSON.stringify(messages).length,
+                  streaming: streamingData.length > 0,
+                  streamingData,
+                  timestamp: new Date().toISOString()
+                });
+                
+                setIsQuerying(false);
+                resolve(true);
+                break;
+              case 'error':
+                eventSource.close();
+                clearTimeout(timeout);
+                reject(new Error(data.error));
+                break;
+            }
+          } catch (parseError) {
+            console.error('Error parsing SSE data:', parseError);
+          }
+        };
+
+        eventSource.onerror = (error) => {
+          eventSource.close();
+          clearTimeout(timeout);
+          reject(error);
+        };
+      });
+
+    } catch (error) {
+      console.error('Error running SSE query:', error);
+      setSseResults({
+        query: query.trim(),
+        error: 'Failed to execute SSE query',
+        timestamp: new Date().toISOString()
+      });
+    } finally {
+      setIsQuerying(false);
+    }
+  };
             { content: `Event: context_chunk\nData: {"chunk": 2, "content": "Machine learning reduces false positives in screening"}` },
             { content: `Event: context_chunk\nData: {"chunk": 3, "content": "Predictive analytics enhance patient outcomes"}` },
             { content: `Event: context_chunk\nData: {"chunk": 4, "content": "Automated analysis saves 30% of radiologist time"}` },

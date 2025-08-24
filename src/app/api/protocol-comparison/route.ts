@@ -3,6 +3,9 @@ import { readFile } from 'fs/promises';
 import { join } from 'path';
 import { getBaseURL } from '@/lib/port-config';
 
+// Import real API clients
+import { graphRAGWebClient } from '@/lib/grpc-web-client';
+
 interface ProtocolTestResult {
   protocol: 'REST' | 'GraphQL' | 'gRPC' | 'gRPC-Web' | 'WebSocket' | 'SSE';
   latency: number;
@@ -52,21 +55,31 @@ export async function POST(request: NextRequest) {
     const startTime = Date.now();
     const results: ProtocolTestResult[] = [];
 
-    // Test REST API (Mock for now)
+    // Test REST API (Real implementation)
     try {
       const restStartTime = performance.now();
       
-      // Simulate REST API call with mock data
-      await new Promise(resolve => setTimeout(resolve, 150 + Math.random() * 100));
+      // Call real REST API
+      const restResponse = await fetch(`${getBaseURL()}/api/graphrag/query`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          message: { query, graph_id: graphId, model }
+        })
+      });
       
       const restEndTime = performance.now();
-      const mockRestResponse = `AI in healthcare offers numerous benefits including improved diagnostic accuracy, personalized treatment plans, and enhanced patient care through machine learning algorithms. The technology can analyze vast amounts of medical data to identify patterns and provide insights that help healthcare professionals make better decisions.`;
+      const restData = await restResponse.json();
+      
+      if (!restResponse.ok) {
+        throw new Error(restData.error || 'REST API error');
+      }
 
       results.push({
         protocol: 'REST',
         latency: Math.round(restEndTime - restStartTime),
-        payloadSize: JSON.stringify({ response: mockRestResponse }).length,
-        response: mockRestResponse,
+        payloadSize: JSON.stringify(restData).length,
+        response: restData.data?.response || 'REST response received',
         timestamp: new Date().toISOString(),
         status: 'success',
         error: undefined
@@ -83,21 +96,47 @@ export async function POST(request: NextRequest) {
       });
     }
 
-    // Test GraphQL API (Mock for now)
+    // Test GraphQL API (Real implementation)
     try {
       const graphqlStartTime = performance.now();
       
-      // Simulate GraphQL API call with mock data
-      await new Promise(resolve => setTimeout(resolve, 120 + Math.random() * 80));
+      // Call real GraphQL API
+      const graphqlResponse = await fetch(`${getBaseURL()}/api/graphql`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          query: `
+            query GraphRAGQuery($query: String!, $graphId: String!, $model: String) {
+              graphRAGQuery(query: $query, graphId: $graphId, model: $model) {
+                graphRAGResponse
+                contextNodes {
+                  id
+                  label
+                  relevance
+                }
+                performanceMetrics {
+                  processingTimeMs
+                  totalNodesAccessed
+                }
+              }
+            }
+          `,
+          variables: { query, graphId, model }
+        })
+      });
       
       const graphqlEndTime = performance.now();
-      const mockGraphQLResponse = `Based on the knowledge graph analysis, AI in healthcare provides significant advantages such as enhanced diagnostic precision through pattern recognition, optimized treatment protocols, and improved patient outcomes. The graph-based approach enables more contextual understanding of medical relationships.`;
+      const graphqlData = await graphqlResponse.json();
+      
+      if (!graphqlResponse.ok || graphqlData.errors) {
+        throw new Error(graphqlData.errors?.[0]?.message || 'GraphQL API error');
+      }
 
       results.push({
         protocol: 'GraphQL',
         latency: Math.round(graphqlEndTime - graphqlStartTime),
-        payloadSize: JSON.stringify({ data: { graphRAGQuery: { graphRAGResponse: mockGraphQLResponse } } }).length,
-        response: mockGraphQLResponse,
+        payloadSize: JSON.stringify(graphqlData).length,
+        response: graphqlData.data?.graphRAGQuery?.graphRAGResponse || 'GraphQL response received',
         timestamp: new Date().toISOString(),
         status: 'success',
         error: undefined
@@ -149,26 +188,31 @@ export async function POST(request: NextRequest) {
       });
     }
 
-    // Test gRPC-Web API (Mock for now)
+    // Test gRPC-Web API (Real implementation)
     try {
       const grpcWebStartTime = performance.now();
       
-      // Simulate gRPC-Web API call with mock data
-      // gRPC-Web has slightly higher latency than gRPC due to HTTP/1.1 transport
-      await new Promise(resolve => setTimeout(resolve, 100 + Math.random() * 80));
+      // Call real gRPC-Web API
+      const grpcWebResponse = await fetch(`${getBaseURL()}/api/grpc-web/graphrag/query`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          message: { query, graph_id: graphId, model }
+        })
+      });
       
       const grpcWebEndTime = performance.now();
-      const mockGrpcWebResponse = `gRPC-Web browser analysis demonstrates AI healthcare advantages: client-side streaming, HTTP/1.1 compatibility, and browser-optimized communication. The web-friendly approach enables direct browser-to-server communication without proxies.`;
-
-      // gRPC-Web has similar protobuf efficiency but slightly larger headers due to HTTP/1.1
-      const jsonPayloadSize = JSON.stringify({ response: mockGrpcWebResponse }).length;
-      const protobufPayloadSize = Math.round(jsonPayloadSize * 0.4); // Slightly larger than gRPC due to HTTP headers
+      const grpcWebData = await grpcWebResponse.json();
+      
+      if (!grpcWebResponse.ok) {
+        throw new Error(grpcWebData.error || 'gRPC-Web API error');
+      }
 
       results.push({
         protocol: 'gRPC-Web',
         latency: Math.round(grpcWebEndTime - grpcWebStartTime),
-        payloadSize: protobufPayloadSize,
-        response: mockGrpcWebResponse,
+        payloadSize: grpcWebData.grpc_web_metadata?.payload_size_bytes || JSON.stringify(grpcWebData).length,
+        response: grpcWebData.data?.response || 'gRPC-Web response received',
         timestamp: new Date().toISOString(),
         status: 'success',
         error: undefined
@@ -185,26 +229,31 @@ export async function POST(request: NextRequest) {
       });
     }
 
-    // Test WebSocket API (Mock for now)
+    // Test WebSocket API (Real implementation)
     try {
       const websocketStartTime = performance.now();
       
-      // Simulate WebSocket API call with mock data
-      // WebSocket has low latency due to persistent connection
-      await new Promise(resolve => setTimeout(resolve, 50 + Math.random() * 40));
+      // Call real WebSocket API
+      const websocketResponse = await fetch(`${getBaseURL()}/api/websocket/graphrag`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          message: { query, graph_id: graphId, model, session_type: 'unary' }
+        })
+      });
       
       const websocketEndTime = performance.now();
-      const mockWebSocketResponse = `WebSocket real-time analysis reveals AI healthcare benefits: persistent bidirectional communication, minimal overhead, and instant data streaming. The connection-oriented approach enables continuous data flow and real-time updates.`;
-
-      // WebSocket has minimal overhead, similar to JSON but with connection benefits
-      const jsonPayloadSize = JSON.stringify({ response: mockWebSocketResponse }).length;
-      const websocketPayloadSize = Math.round(jsonPayloadSize * 0.9); // Minimal overhead
+      const websocketData = await websocketResponse.json();
+      
+      if (!websocketResponse.ok) {
+        throw new Error(websocketData.error || 'WebSocket API error');
+      }
 
       results.push({
         protocol: 'WebSocket',
         latency: Math.round(websocketEndTime - websocketStartTime),
-        payloadSize: websocketPayloadSize,
-        response: mockWebSocketResponse,
+        payloadSize: websocketData.websocket_metadata?.payload_size_bytes || JSON.stringify(websocketData).length,
+        response: websocketData.data?.response || 'WebSocket response received',
         timestamp: new Date().toISOString(),
         status: 'success',
         error: undefined
@@ -221,26 +270,50 @@ export async function POST(request: NextRequest) {
       });
     }
 
-    // Test SSE API (Mock for now)
+    // Test SSE API (Real implementation)
     try {
       const sseStartTime = performance.now();
       
-      // Simulate SSE API call with mock data
-      // SSE has very low latency due to simple HTTP streaming
-      await new Promise(resolve => setTimeout(resolve, 35 + Math.random() * 30));
+      // Call real SSE API - we'll use the context streaming endpoint for comparison
+      const sseResponse = await fetch(`${getBaseURL()}/api/sse/graphrag/context?query=${encodeURIComponent(query)}&graphId=${encodeURIComponent(graphId)}&maxContextSize=5`, {
+        method: 'GET',
+        headers: { 'Accept': 'text/event-stream' }
+      });
       
       const sseEndTime = performance.now();
-      const mockSseResponse = `SSE streaming analysis shows AI healthcare benefits: real-time data streaming, minimal overhead, and efficient server-to-client communication. The EventSource approach enables continuous data flow with automatic reconnection.`;
+      
+      if (!sseResponse.ok) {
+        throw new Error('SSE API error');
+      }
 
-      // SSE has minimal overhead, similar to JSON but with streaming benefits
-      const jsonPayloadSize = JSON.stringify({ response: mockSseResponse }).length;
-      const ssePayloadSize = Math.round(jsonPayloadSize * 0.85); // Minimal overhead
+      // Read the SSE stream to get actual data
+      const reader = sseResponse.body?.getReader();
+      let sseData = '';
+      let eventCount = 0;
+      
+      if (reader) {
+        while (true) {
+          const { done, value } = await reader.read();
+          if (done) break;
+          
+          const chunk = new TextDecoder().decode(value);
+          sseData += chunk;
+          
+          // Count events
+          const events = chunk.split('\n\n').filter(event => event.trim().startsWith('data: '));
+          eventCount += events.length;
+          
+          // Stop after receiving a few events for comparison
+          if (eventCount >= 3) break;
+        }
+        reader.releaseLock();
+      }
 
       results.push({
         protocol: 'SSE',
         latency: Math.round(sseEndTime - sseStartTime),
-        payloadSize: ssePayloadSize,
-        response: mockSseResponse,
+        payloadSize: sseData.length,
+        response: `SSE streaming completed with ${eventCount} events`,
         timestamp: new Date().toISOString(),
         status: 'success',
         error: undefined
