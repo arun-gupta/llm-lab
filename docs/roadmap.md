@@ -158,6 +158,7 @@ A comprehensive roadmap of planned features and development phases for Postman P
 
 ### **Medium-term Goals (2025)**
 - Launch Phase 4 AI/ML service integrations
+- Implement Neo4j backend for scalable graph storage
 - Establish partnerships with AI/ML service providers
 - Develop advanced analytics and monitoring features
 - Create comprehensive training and certification programs
