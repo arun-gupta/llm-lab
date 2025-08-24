@@ -179,15 +179,15 @@ query GetAnalytics {
   };
 
   return (
-    <div className="space-y-6">
+          <div className="space-y-4">
       <div className="flex items-center justify-between">
         <div>
-          <h2 className="text-2xl font-bold text-gray-900 mb-4">GraphQL Playground</h2>
-          <p className="text-gray-700 mb-4">
+          <h2 className="text-2xl font-bold text-gray-900 mb-2">GraphQL Playground</h2>
+          <p className="text-gray-700 mb-2">
             Test GraphQL queries for the GraphRAG system. The playground includes example queries to get you started.
           </p>
         </div>
-        <div className="flex flex-col space-y-3">
+        <div className="flex flex-col space-y-2">
           <button 
             onClick={generatePostmanCollection} 
             disabled={importStatus === 'importing'}
@@ -219,9 +219,9 @@ query GetAnalytics {
         </div>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
         {/* Query Editor */}
-        <div className="space-y-4">
+        <div className="space-y-3">
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">
               GraphQL Query
@@ -229,7 +229,7 @@ query GetAnalytics {
             <textarea
               value={query}
               onChange={(e) => setQuery(e.target.value)}
-              className="w-full h-96 p-4 border border-gray-300 rounded-lg font-mono text-sm bg-gray-50"
+              className="w-full h-64 p-3 border border-gray-300 rounded-lg font-mono text-sm bg-white text-gray-900"
               placeholder="Enter your GraphQL query here..."
             />
           </div>
@@ -241,7 +241,7 @@ query GetAnalytics {
             <textarea
               value={variables}
               onChange={(e) => setVariables(e.target.value)}
-              className="w-full h-32 p-4 border border-gray-300 rounded-lg font-mono text-sm bg-gray-50"
+              className="w-full h-24 p-3 border border-gray-300 rounded-lg font-mono text-sm bg-white text-gray-900"
               placeholder='{"key": "value"}'
             />
           </div>
@@ -260,7 +260,7 @@ query GetAnalytics {
           <label className="block text-sm font-medium text-gray-700 mb-2">
             Results
           </label>
-          <div className="w-full h-[calc(24rem+8rem)] p-4 border border-gray-300 rounded-lg font-mono text-sm bg-gray-50 overflow-auto">
+          <div className="w-full h-64 p-3 border border-gray-300 rounded-lg font-mono text-sm bg-white overflow-auto">
             {result ? (
               <pre className="whitespace-pre-wrap">{result}</pre>
             ) : (
@@ -274,7 +274,7 @@ query GetAnalytics {
 
       {/* Available Graphs */}
       {availableGraphs.length > 0 && (
-        <div className="bg-blue-50 p-4 rounded-lg mb-6">
+        <div className="bg-blue-50 p-3 rounded-lg mb-4">
           <h3 className="text-sm font-semibold text-blue-800 mb-2">Available Graph IDs:</h3>
           <div className="flex flex-wrap gap-2">
             {availableGraphs.slice(0, 5).map((graphId) => (
@@ -295,9 +295,9 @@ query GetAnalytics {
       )}
 
       {/* Quick Examples */}
-      <div className="bg-gray-50 p-6 rounded-lg">
-        <h3 className="text-lg font-semibold mb-4">Quick Examples</h3>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+      <div className="bg-gray-50 p-4 rounded-lg">
+        <h3 className="text-lg font-semibold mb-3">Quick Examples</h3>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
           <button
             onClick={() => {
               setQuery(`query GetGraphs {
