@@ -249,93 +249,27 @@ If you still want to try Codespaces:
 - **Web**: Create collections in Postman web interface
 - **Desktop**: Create collections in Postman desktop app
 
-## 📊 Current Status
-
-✅ **Working**: OpenAI, Anthropic, Ollama integrations  
-✅ **Complete**: Postman integration, UI, error handling, success celebrations  
-✅ **Features**: Custom collection names, collection preview, status indicators  
-✅ **MCP Integration**: GitHub, Filesystem, and SQLite MCP servers with Postman collections  
-✅ **GPT-5 Streaming**: Implemented streaming for GPT-5 models to fix empty response issues  
-✅ **GraphRAG Integration**: Document upload, knowledge graph building, and GraphRAG vs traditional RAG comparison  
-✅ **Protocol Comparison**: REST vs GraphQL vs gRPC vs gRPC-Web vs WebSocket vs SSE performance testing with Postman integration  
-✅ **Port Configuration**: Centralized port management with configurable ports  
-✅ **Concise Quickstart**: Streamlined setup with minimal verbosity  
-
 ## 🛠️ Usage
 
-### **LLM Testing & Comparison**
-1. **Enter your prompt** and optional context
-2. **Select providers** (defaults to "All Local" if Ollama models available)
-3. **Submit** to compare responses side-by-side
-4. **Preview collection** details before creation
-5. **Create Postman collection** with custom name for direct API testing
-6. **Celebrate success** with engaging animations
+For comprehensive usage instructions, see our detailed guides:
 
-### **MCP Server Integration**
-1. **Navigate to MCP tab** to see available integrations
-2. **Install collections** for GitHub, Filesystem, or SQLite MCP servers
-3. **Set up servers** using the provided setup scripts
-4. **Test connections** with health check endpoints
-5. **Use in Postman** for automated testing and data operations
+- **[📖 Usage Guide](docs/usage.md)** - Complete step-by-step instructions for all features
+- **[✨ Features Guide](docs/features.md)** - Detailed feature descriptions and capabilities
+- **[📈 Roadmap](docs/roadmap.md)** - Development phases and planned features
 
-### **GraphRAG Integration**
-1. **Navigate to GraphRAG tab** to access graph-based RAG functionality
-2. **Upload documents** (text files) to build knowledge graphs
-3. **Build knowledge graph** with entity extraction and relationship mapping
-4. **Query and compare** GraphRAG vs traditional RAG responses
-5. **Test protocols** with REST, GraphQL, gRPC, gRPC-Web, WebSocket, and SSE comparison
-6. **Export Postman collections** for API testing and integration
-7. **Direct Postman integration** for all collections (REST, GraphQL, gRPC, gRPC-Web, WebSocket, SSE, Protocol Comparison)
+### **Quick Start**
+1. **Clone and setup**: `git clone https://github.com/arun-gupta/llm-lab.git && cd llm-lab && ./quickstart.sh`
+2. **Add API keys** to `.env.local`
+3. **Start the app**: `npm run dev`
+4. **Explore features**: LLM testing, GraphRAG, protocol comparison, and Postman integration
 
-## 📈 Planned Features
+## 📈 Development Status
 
-### **Phase 1: Enhanced Integration** ✅
-- [x] One-click Postman workspace setup
-- [x] Interactive onboarding wizard
-- [x] Collection preview before creation
-- [x] Success celebration moments
-- [x] Improved error handling
-- [x] Custom collection names
-- [x] MCP server integration (GitHub, Filesystem, SQLite)
-- [x] HTTP wrappers for direct API testing
-- [x] GraphRAG integration with protocol comparison
-- [x] gRPC server with HTTP proxy
-- [x] Centralized port configuration
-- [x] Streamlined quickstart experience
+For detailed development phases and planned features, see our **[📈 Roadmap](docs/roadmap.md)**.
 
-### **Phase 2: Enhanced Postman Integration** 📱
-- [ ] **Collection Templates**: Pre-built templates for common AI/ML workflows
-- [ ] **Environment Management**: Dynamic environment variables for different AI providers
-- [ ] **Test Automation**: Advanced test scripts for model validation and performance testing
-- [ ] **Mock Server Integration**: AI response mocking for development and testing
-- [ ] **Collection Analytics**: Usage analytics and performance insights for collections
-- [ ] **Team Collaboration**: Shared collections and team workspace integration
-
-### **Phase 3: Advanced Protocol Support** 🌐 ✅
-- [x] **gRPC-Web Collections**: Postman collections for browser-based gRPC endpoints
-- [x] **WebSocket Collections**: Postman collections for real-time streaming endpoints
-- [x] **Server-Sent Events (SSE)**: Postman collections for one-way streaming endpoints
-- [ ] **Enhanced gRPC Collections**: Improved gRPC collection generation with Protocol Buffers
-- [ ] **GraphQL Subscriptions**: Postman collections for GraphQL subscription endpoints
-- [ ] **Webhook Collections**: Postman collections for webhook testing and validation
-- [ ] **HTTP/3 Support**: Postman collections optimized for HTTP/3 endpoints
-
-### **Phase 4: AI/ML Service Integration** 🧠
-- [ ] **Vector Database Collections**: Postman collections for Pinecone, Weaviate, Chroma, Qdrant APIs
-- [ ] **Agentic System Collections**: Postman collections for LangChain, AutoGen, CrewAI agent APIs
-- [ ] **Model Training Collections**: Postman collections for fine-tuning and training APIs
-- [ ] **RAG Pipeline Collections**: Postman collections for RAG pipeline configuration and testing
-- [ ] **Model Monitoring Collections**: Postman collections for A/B testing and performance monitoring APIs
-- [ ] **Embedding Service Collections**: Postman collections for custom embedding model APIs
-- [ ] **Multi-Modal API Collections**: Postman collections for image, audio, and video processing APIs
-
-### **Phase 5: Agentic System Integration** 🤖
-- [ ] **Agent Orchestration Collections**: Postman collections for multi-agent coordination APIs
-- [ ] **Agent Memory Collections**: Postman collections for agent memory and context management APIs
-- [ ] **Tool Integration Collections**: Postman collections for external API and service integrations
-- [ ] **Agent Decision Collections**: Postman collections for autonomous decision-making APIs
-- [ ] **Agent Marketplace Collections**: Postman collections for agent discovery and deployment APIs
-- [ ] **Workflow Automation Collections**: Postman collections for workflow orchestration APIs
+**✅ Completed**: Multi-protocol support (REST, GraphQL, gRPC, gRPC-Web, WebSocket, SSE), Postman integration, GraphRAG, MCP servers  
+**🔄 In Progress**: Enhanced Postman features, advanced protocol support  
+**📋 Planned**: AI/ML service integrations, agentic systems, vector databases
 
 ## 🔧 Development
 
