@@ -20,10 +20,10 @@ export function HomeTab({ onTabChange, apiKeyStatus }: HomeTabProps) {
       color: 'bg-blue-500 hover:bg-blue-600'
     },
     {
-      title: 'MCP Integrations',
-      description: 'Explore Model Context Protocol integrations and collections',
+      title: 'Multi-Protocol Lab',
+      description: 'Explore REST, GraphQL, gRPC, WebSocket, and MCP integrations',
       icon: Library,
-      action: () => onTabChange('collections'),
+      action: () => onTabChange('graphrag'),
       color: 'bg-purple-500 hover:bg-purple-600'
     },
     {
@@ -45,8 +45,48 @@ export function HomeTab({ onTabChange, apiKeyStatus }: HomeTabProps) {
           </div>
         </div>
         <h1 className="text-3xl font-bold text-gray-900 mb-2">
-          Welcome to LLM Lab
+          Welcome to Multi-Protocol Lab
         </h1>
+        <p className="text-lg text-gray-600 mb-4">
+          Test & compare REST, GraphQL, gRPC, WebSocket, and MCP integrations
+        </p>
+      </div>
+
+      {/* Protocol Overview */}
+      <div className="mb-8">
+        <h2 className="text-xl font-semibold text-gray-900 mb-4">🚀 Supported Protocols</h2>
+        <div className="grid grid-cols-2 md:grid-cols-5 gap-4 mb-6">
+          <div className="text-center p-4 bg-blue-50 rounded-lg border border-blue-200">
+            <div className="text-2xl mb-2">🔍</div>
+            <div className="font-medium text-blue-800">REST API</div>
+            <div className="text-xs text-blue-600">HTTP/JSON</div>
+          </div>
+          <div className="text-center p-4 bg-purple-50 rounded-lg border border-purple-200">
+            <div className="text-2xl mb-2">🔧</div>
+            <div className="font-medium text-purple-800">GraphQL</div>
+            <div className="text-xs text-purple-600">Flexible Queries</div>
+          </div>
+          <div className="text-center p-4 bg-green-50 rounded-lg border border-green-200">
+            <div className="text-2xl mb-2">⚡</div>
+            <div className="font-medium text-green-800">gRPC</div>
+            <div className="text-xs text-green-600">High Performance</div>
+          </div>
+          <div className="text-center p-4 bg-red-50 rounded-lg border border-red-200">
+            <div className="text-2xl mb-2">📡</div>
+            <div className="font-medium text-red-800">SSE</div>
+            <div className="text-xs text-red-600">Server Streaming</div>
+          </div>
+          <div className="text-center p-4 bg-orange-50 rounded-lg border border-orange-200">
+            <div className="text-2xl mb-2">🔌</div>
+            <div className="font-medium text-orange-800">WebSocket</div>
+            <div className="text-xs text-orange-600">Real-time</div>
+          </div>
+          <div className="text-center p-4 bg-indigo-50 rounded-lg border border-indigo-200">
+            <div className="text-2xl mb-2">📡</div>
+            <div className="font-medium text-indigo-800">MCP</div>
+            <div className="text-xs text-indigo-600">Model Context</div>
+          </div>
+        </div>
       </div>
 
       {/* Quick Actions */}

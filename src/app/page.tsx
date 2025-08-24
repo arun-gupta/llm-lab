@@ -62,8 +62,8 @@ export default function Home() {
                 <Zap className="w-5 h-5 text-white" />
               </div>
               <div>
-                <h1 className="text-xl font-bold text-gray-900">LLM Lab</h1>
-                <p className="text-xs text-gray-600">Use Postman to test & compare LLMs and MCP integration</p>
+                <h1 className="text-xl font-bold text-gray-900">Multi-Protocol Lab</h1>
+                <p className="text-xs text-gray-600">Test & compare REST, GraphQL, gRPC, WebSocket, and MCP integrations</p>
               </div>
             </button>
             

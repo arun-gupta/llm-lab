@@ -91,7 +91,7 @@ export function GraphRAGTab() {
   const [responses, setResponses] = useState<GraphRAGResponse | null>(null);
   const [isQuerying, setIsQuerying] = useState(false);
   const [processingProgress, setProcessingProgress] = useState(0);
-  const [activeTab, setActiveTab] = useState<'upload' | 'graph' | 'rest' | 'graphql' | 'grpc' | 'websocket' | 'compare'>('upload');
+  const [activeTab, setActiveTab] = useState<'upload' | 'graph' | 'rest' | 'graphql' | 'grpc' | 'sse' | 'websocket' | 'compare'>('upload');
   const [grpcSubTab, setGrpcSubTab] = useState<'grpc' | 'grpc-web'>('grpc');
   const [buildSuccess, setBuildSuccess] = useState(false);
   const [buildError, setBuildError] = useState<string | null>(null);
@@ -102,6 +102,7 @@ export function GraphRAGTab() {
   const [grpcWebResults, setGrpcWebResults] = useState<any>(null);
   const [grpcResults, setGrpcResults] = useState<any>(null);
   const [websocketResults, setWebsocketResults] = useState<any>(null);
+  const [sseResults, setSseResults] = useState<any>(null);
 
 
   const fetchOllamaModels = async () => {
@@ -968,6 +969,289 @@ export function GraphRAGTab() {
     }
   };
 
+  const handleSseQuery = async () => {
+    if (!query.trim() || !graphData) return;
+
+    setIsQuerying(true);
+    setSseResults(null);
+
+    try {
+      // Simulate SSE query with realistic timing and responses
+      const startTime = performance.now();
+      
+      // Parse the query type from the input
+      const queryText = query.trim();
+      let queryType = 'streaming';
+      let actualQuery = queryText;
+      
+      if (queryText.startsWith('StreamGraph:')) {
+        queryType = 'graph-streaming';
+        actualQuery = queryText.replace('StreamGraph:', '').trim();
+      } else if (queryText.startsWith('StreamContext:')) {
+        queryType = 'context-streaming';
+        actualQuery = queryText.replace('StreamContext:', '').trim();
+      } else if (queryText.startsWith('StreamResults:')) {
+        queryType = 'results-streaming';
+        actualQuery = queryText.replace('StreamResults:', '').trim();
+      }
+
+      // Simulate different response times based on query type (SSE is fast for streaming)
+      let delay = 40 + Math.random() * 50; // Base delay (faster than WebSocket for streaming)
+      if (queryType === 'graph-streaming') delay += 15;
+      if (queryType === 'context-streaming') delay += 10;
+      if (queryType === 'results-streaming') delay += 20;
+
+      await new Promise(resolve => setTimeout(resolve, delay));
+      
+      const endTime = performance.now();
+      const latency = Math.round(endTime - startTime);
+
+      // Generate appropriate response based on query type
+      let response = '';
+      let streamingData: any[] = [];
+      let payloadSize = 1600; // SSE typically has smaller payloads than WebSocket
+
+      switch (queryType) {
+        case 'graph-streaming':
+          response = `SSE graph streaming initiated for "${actualQuery}": Streaming graph traversal results via EventSource.`;
+          streamingData = [
+            { content: `Event: graph_node\nData: {"node": "Stanford Medical Center", "type": "organization"}` },
+            { content: `Event: graph_node\nData: {"node": "Dr. Sarah Chen", "type": "person", "role": "AI researcher"}` },
+            { content: `Event: graph_edge\nData: {"from": "Stanford Medical Center", "to": "Dr. Sarah Chen", "relation": "employs"}` },
+            { content: `Event: graph_node\nData: {"node": "Machine Learning", "type": "concept", "domain": "diagnostic algorithms"}` },
+            { content: `Event: complete\nData: {"total_nodes": 5, "total_edges": 8}` }
+          ];
+          payloadSize = 1680;
+          break;
+        case 'context-streaming':
+          response = `SSE context streaming for "${actualQuery}": Retrieving relevant context chunks via EventSource.`;
+          streamingData = [
+            { content: `Event: context_chunk\nData: {"chunk": 1, "content": "AI improves diagnostic accuracy by 15-20%"}` },
+            { content: `Event: context_chunk\nData: {"chunk": 2, "content": "Machine learning reduces false positives in screening"}` },
+            { content: `Event: context_chunk\nData: {"chunk": 3, "content": "Predictive analytics enhance patient outcomes"}` },
+            { content: `Event: context_chunk\nData: {"chunk": 4, "content": "Automated analysis saves 30% of radiologist time"}` },
+            { content: `Event: complete\nData: {"total_chunks": 4, "total_tokens": 156}` }
+          ];
+          payloadSize = 1650;
+          break;
+        case 'results-streaming':
+          response = `SSE results streaming for "${actualQuery}": Streaming GraphRAG results via EventSource.`;
+          streamingData = [
+            { content: `Event: result_start\nData: {"query": "${actualQuery}", "timestamp": "${new Date().toISOString()}"}` },
+            { content: `Event: result_chunk\nData: {"chunk": 1, "content": "Based on the knowledge graph analysis..."}` },
+            { content: `Event: result_chunk\nData: {"chunk": 2, "content": "The graph reveals key relationships between..."}` },
+            { content: `Event: result_chunk\nData: {"chunk": 3, "content": "This demonstrates the effectiveness of..."}` },
+            { content: `Event: complete\nData: {"status": "success", "total_chunks": 3}` }
+          ];
+          payloadSize = 1720;
+          break;
+        default:
+          response = `SSE streaming query "${actualQuery}" processed successfully via EventSource.`;
+          streamingData = [
+            { content: `Event: default\nData: {"message": "SSE streaming initiated", "query": "${actualQuery}"}` },
+            { content: `Event: complete\nData: {"status": "success"}` }
+          ];
+          payloadSize = 1600;
+      }
+
+      setSseResults({
+        query: actualQuery,
+        queryType,
+        response,
+        latency,
+        payloadSize,
+        streaming: streamingData.length > 0,
+        streamingData,
+        timestamp: new Date().toISOString()
+      });
+
+    } catch (error) {
+      console.error('Error running SSE query:', error);
+      setSseResults({
+        query: query.trim(),
+        error: 'Failed to execute SSE query',
+        timestamp: new Date().toISOString()
+      });
+    } finally {
+      setIsQuerying(false);
+    }
+  };
+
+  const generateSsePostmanCollection = async () => {
+    if (!graphData) return;
+
+    setImportStatus('importing');
+    setImportMessage('Generating SSE collection...');
+    
+    try {
+      const collection = {
+        info: {
+          name: 'GraphRAG SSE API',
+          description: 'Server-Sent Events endpoints for streaming GraphRAG queries',
+          schema: 'https://schema.getpostman.com/json/collection/v2.1.0/collection.json'
+        },
+        item: [
+          {
+            name: 'SSE Graph Streaming',
+            request: {
+              method: 'GET',
+              header: [
+                {
+                  key: 'Accept',
+                  value: 'text/event-stream'
+                },
+                {
+                  key: 'Cache-Control',
+                  value: 'no-cache'
+                }
+              ],
+              url: {
+                raw: 'http://localhost:3000/api/sse/graphrag/stream?query=AI healthcare relationships&graphId=your-graph-id',
+                protocol: 'http',
+                host: ['localhost'],
+                port: '3000',
+                path: ['api', 'sse', 'graphrag', 'stream'],
+                query: [
+                  {
+                    key: 'query',
+                    value: 'AI healthcare relationships'
+                  },
+                  {
+                    key: 'graphId',
+                    value: 'your-graph-id'
+                  }
+                ]
+              }
+            }
+          },
+          {
+            name: 'SSE Context Streaming',
+            request: {
+              method: 'GET',
+              header: [
+                {
+                  key: 'Accept',
+                  value: 'text/event-stream'
+                },
+                {
+                  key: 'Cache-Control',
+                  value: 'no-cache'
+                }
+              ],
+              url: {
+                raw: 'http://localhost:3000/api/sse/graphrag/context?query=AI benefits in healthcare&graphId=your-graph-id',
+                protocol: 'http',
+                host: ['localhost'],
+                port: '3000',
+                path: ['api', 'sse', 'graphrag', 'context'],
+                query: [
+                  {
+                    key: 'query',
+                    value: 'AI benefits in healthcare'
+                  },
+                  {
+                    key: 'graphId',
+                    value: 'your-graph-id'
+                  }
+                ]
+              }
+            }
+          },
+          {
+            name: 'SSE Results Streaming',
+            request: {
+              method: 'GET',
+              header: [
+                {
+                  key: 'Accept',
+                  value: 'text/event-stream'
+                },
+                {
+                  key: 'Cache-Control',
+                  value: 'no-cache'
+                }
+              ],
+              url: {
+                raw: 'http://localhost:3000/api/sse/graphrag/results?query=Machine learning diagnosis&graphId=your-graph-id',
+                protocol: 'http',
+                host: ['localhost'],
+                port: '3000',
+                path: ['api', 'sse', 'graphrag', 'results'],
+                query: [
+                  {
+                    key: 'query',
+                    value: 'Machine learning diagnosis'
+                  },
+                  {
+                    key: 'graphId',
+                    value: 'your-graph-id'
+                  }
+                ]
+              }
+            }
+          }
+        ]
+      };
+
+      // Try to create collection directly in Postman Desktop using API
+      const createInPostman = async () => {
+        try {
+          setImportMessage('Creating SSE collection in Postman Desktop...');
+          
+          const postmanResponse = await fetch('/api/postman/create-collection', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+              collection: collection,
+              createInWeb: false, // Create in Desktop
+            }),
+          });
+
+          const result = await postmanResponse.json();
+
+          if (result.success) {
+            setImportStatus('success');
+            setImportMessage('✅ SSE Collection created successfully in Postman Desktop! Set base_url to http://localhost:3000 in your environment.');
+          } else {
+            // Fallback to download if API key not configured
+            if (result.fallback) {
+              setImportMessage('Downloading SSE collection file...');
+              
+              const blob = new Blob([JSON.stringify(collection, null, 2)], {
+                type: 'application/json'
+              });
+              const url = window.URL.createObjectURL(blob);
+              const a = document.createElement('a');
+              a.href = url;
+              a.download = 'sse-graphrag-collection.json';
+              document.body.appendChild(a);
+              a.click();
+              window.URL.revokeObjectURL(url);
+              document.body.removeChild(a);
+              
+              setImportStatus('manual');
+              setImportMessage('📥 SSE Collection downloaded! Import manually into Postman Desktop.');
+            } else {
+              throw new Error(result.message || 'Failed to create collection');
+            }
+          }
+        } catch (error) {
+          console.error('Error creating SSE collection:', error);
+          setImportStatus('error');
+          setImportMessage('Failed to create SSE collection. Try downloading manually.');
+        }
+      };
+
+      await createInPostman();
+    } catch (error) {
+      console.error('Error generating SSE collection:', error);
+      setImportStatus('error');
+      setImportMessage('Error generating SSE collection');
+    }
+  };
+
   const generateWebSocketPostmanCollection = async () => {
     if (!graphData) return;
 
@@ -1295,6 +1579,17 @@ export function GraphRAGTab() {
             disabled={!graphData}
           >
             ⚡ gRPC Streaming {graphData && <span className="ml-1 text-green-500">✓</span>}
+          </button>
+          <button 
+            className={`px-4 py-2 text-sm font-medium border-b-2 transition-colors ${
+              activeTab === 'sse' 
+                ? 'border-red-500 text-red-600 bg-red-50' 
+                : 'border-transparent text-gray-500 hover:text-gray-700 hover:bg-gray-50'
+            } ${!graphData ? 'opacity-50 cursor-not-allowed' : ''}`}
+            onClick={() => graphData && setActiveTab('sse')}
+            disabled={!graphData}
+          >
+            📡 SSE {graphData && <span className="ml-1 text-green-500">✓</span>}
           </button>
           <button 
             className={`px-4 py-2 text-sm font-medium border-b-2 transition-colors ${
@@ -2535,72 +2830,7 @@ export function GraphRAGTab() {
                 {/* gRPC Sub-tab Navigation */}
                 <div className="bg-white rounded-lg border shadow-sm">
                   <div className="p-6 border-b">
-                    {/* Protocol Overview */}
-        <div className="mb-6 bg-gradient-to-r from-blue-50 via-purple-50 to-green-50 border border-gray-200 rounded-lg p-4">
-          <h3 className="text-lg font-semibold text-gray-900 mb-3">🚀 Available Protocols</h3>
-          <div className="grid grid-cols-2 md:grid-cols-5 gap-3 mb-4">
-            <div className="text-center p-3 bg-blue-100 rounded-lg">
-              <div className="text-2xl mb-1">🔍</div>
-              <div className="text-sm font-medium text-blue-800">REST API</div>
-              <div className="text-xs text-blue-600">Simple HTTP</div>
-            </div>
-            <div className="text-center p-3 bg-purple-100 rounded-lg">
-              <div className="text-2xl mb-1">🔧</div>
-              <div className="text-sm font-medium text-purple-800">GraphQL</div>
-              <div className="text-xs text-purple-600">Flexible Queries</div>
-            </div>
-            <div className="text-center p-3 bg-green-100 rounded-lg">
-              <div className="text-2xl mb-1">⚡</div>
-              <div className="text-sm font-medium text-green-800">gRPC</div>
-              <div className="text-xs text-green-600">High Performance</div>
-            </div>
-            <div className="text-center p-3 bg-orange-100 rounded-lg">
-              <div className="text-2xl mb-1">🔌</div>
-              <div className="text-sm font-medium text-orange-800">WebSocket</div>
-              <div className="text-xs text-orange-600">Real-time</div>
-            </div>
-            <div className="text-center p-3 bg-indigo-100 rounded-lg">
-              <div className="text-2xl mb-1">🏁</div>
-              <div className="text-sm font-medium text-indigo-800">Compare</div>
-              <div className="text-xs text-indigo-600">Performance</div>
-            </div>
-          </div>
-          
-          {/* Protocol Comparison Chart */}
-          <div className="bg-white rounded-lg p-4 border">
-            <h4 className="text-sm font-medium text-gray-900 mb-3">📊 Protocol Characteristics</h4>
-            <div className="grid grid-cols-1 md:grid-cols-4 gap-4 text-xs">
-              <div className="space-y-2">
-                <div className="font-medium text-blue-800">🔍 REST API</div>
-                <div className="text-gray-600">• Simple HTTP requests</div>
-                <div className="text-gray-600">• JSON payloads</div>
-                <div className="text-gray-600">• Easy to debug</div>
-                <div className="text-gray-600">• Wide compatibility</div>
-              </div>
-              <div className="space-y-2">
-                <div className="font-medium text-purple-800">🔧 GraphQL</div>
-                <div className="text-gray-600">• Flexible queries</div>
-                <div className="text-gray-600">• Single endpoint</div>
-                <div className="text-gray-600">• Type-safe</div>
-                <div className="text-gray-600">• Reduced over-fetching</div>
-              </div>
-              <div className="space-y-2">
-                <div className="font-medium text-green-800">⚡ gRPC</div>
-                <div className="text-gray-600">• Binary Protocol Buffers</div>
-                <div className="text-gray-600">• HTTP/2 streaming</div>
-                <div className="text-gray-600">• High performance</div>
-                <div className="text-gray-600">• Strong typing</div>
-              </div>
-              <div className="space-y-2">
-                <div className="font-medium text-orange-800">🔌 WebSocket</div>
-                <div className="text-gray-600">• Real-time bidirectional</div>
-                <div className="text-gray-600">• Persistent connections</div>
-                <div className="text-gray-600">• Low latency</div>
-                <div className="text-gray-600">• Event-driven</div>
-              </div>
-            </div>
-          </div>
-        </div>
+            
 
         <div className="flex space-x-1">
                       <button
@@ -2994,6 +3224,196 @@ export function GraphRAGTab() {
                 <h3 className="text-lg font-medium text-yellow-800 mb-2">Graph Required</h3>
                 <p className="text-yellow-700 mb-4">
                   Please upload documents and build a knowledge graph first to use gRPC streaming services.
+                </p>
+                <button
+                  onClick={() => setActiveTab('upload')}
+                  className="px-4 py-2 bg-yellow-600 text-white rounded-lg hover:bg-yellow-700 transition-colors"
+                >
+                  Go to Document Upload
+                </button>
+              </div>
+            )}
+          </div>
+        )}
+
+        {activeTab === 'sse' && (
+          <div>
+            {graphData ? (
+              <div className="space-y-6">
+                {/* SSE Header with Add to Postman Button */}
+                <div className="flex justify-between items-center mb-4">
+                  <div>
+                    <h3 className="text-lg font-semibold text-gray-900">📡 SSE Services</h3>
+                    <p className="text-gray-700 mt-1">
+                      Server-Sent Events for real-time streaming GraphRAG results
+                    </p>
+                  </div>
+                  <button 
+                    onClick={generateSsePostmanCollection}
+                    disabled={!graphData || importStatus === 'importing'}
+                    className="flex items-center px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 disabled:opacity-50 disabled:cursor-not-allowed"
+                  >
+                    <Download className="w-4 h-4 mr-2" />
+                    {importStatus === 'importing' ? 'Importing...' : 'Add SSE to Postman'}
+                  </button>
+                </div>
+
+                {/* Live SSE Client */}
+                <div className="bg-white rounded-lg border shadow-sm">
+                  <div className="p-6 border-b">
+                    <h3 className="text-lg font-semibold text-gray-900">📡 Live SSE Client</h3>
+                    <p className="text-gray-700 mt-1">
+                      Test Server-Sent Events functionality directly from your browser
+                    </p>
+                  </div>
+                  <div className="p-6">
+                    <div className="space-y-4">
+                      {/* Query Input */}
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-2">
+                          SSE Query
+                        </label>
+                        <input
+                          type="text"
+                          value={query}
+                          onChange={(e) => setQuery(e.target.value)}
+                          placeholder="Enter a GraphRAG query for SSE testing..."
+                          className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-gray-900 placeholder-gray-500"
+                        />
+                      </div>
+
+                      {/* Sample Queries */}
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-2">
+                          Sample SSE Queries
+                        </label>
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
+                          <button
+                            onClick={() => setQuery("StreamGraph: AI healthcare relationships")}
+                            className="text-left p-3 bg-blue-50 border border-blue-200 rounded-lg hover:bg-blue-100 transition-colors"
+                          >
+                            <div className="text-sm font-medium text-blue-800">Graph Streaming</div>
+                            <div className="text-xs text-blue-600">StreamGraph: AI healthcare relationships</div>
+                          </button>
+                          <button
+                            onClick={() => setQuery("StreamContext: AI benefits in healthcare")}
+                            className="text-left p-3 bg-green-50 border border-green-200 rounded-lg hover:bg-green-100 transition-colors"
+                          >
+                            <div className="text-sm font-medium text-green-800">Context Streaming</div>
+                            <div className="text-xs text-green-600">StreamContext: AI benefits in healthcare</div>
+                          </button>
+                          <button
+                            onClick={() => setQuery("StreamResults: Machine learning diagnosis")}
+                            className="text-left p-3 bg-purple-50 border border-purple-200 rounded-lg hover:bg-purple-100 transition-colors"
+                          >
+                            <div className="text-sm font-medium text-purple-800">Results Streaming</div>
+                            <div className="text-xs text-purple-600">StreamResults: Machine learning diagnosis</div>
+                          </button>
+                          <button
+                            onClick={() => setQuery("Stanford researchers and their work")}
+                            className="text-left p-3 bg-red-50 border border-red-200 rounded-lg hover:bg-red-100 transition-colors"
+                          >
+                            <div className="text-sm font-medium text-red-800">Default Streaming</div>
+                            <div className="text-xs text-red-600">Stanford researchers and their work</div>
+                          </button>
+                        </div>
+                      </div>
+
+                      {/* Run SSE Query Button */}
+                      <div className="flex space-x-3">
+                        <button
+                          onClick={handleSseQuery}
+                          disabled={!query.trim() || !graphData || isQuerying}
+                          className="flex items-center px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 disabled:opacity-50 disabled:cursor-not-allowed"
+                        >
+                          <Zap className="w-4 h-4 mr-2" />
+                          {isQuerying ? 'Running SSE Query...' : 'Run SSE Query'}
+                        </button>
+                      </div>
+
+                      {/* SSE Results */}
+                      {sseResults && (
+                        <div className="bg-gray-50 border border-gray-200 rounded-lg p-4">
+                          <h4 className="font-medium text-gray-900 mb-3">SSE Results</h4>
+                          <div className="space-y-3">
+                            <div className="flex justify-between items-center">
+                              <span className="text-sm font-medium text-gray-700">Protocol:</span>
+                              <span className="text-sm text-red-600">SSE (Server-Sent Events)</span>
+                            </div>
+                            <div className="flex justify-between items-center">
+                              <span className="text-sm font-medium text-gray-700">Latency:</span>
+                              <span className="text-sm text-green-600">{sseResults.latency}ms</span>
+                            </div>
+                            <div className="flex justify-between items-center">
+                              <span className="text-sm font-medium text-gray-700">Payload Size:</span>
+                              <span className="text-sm text-gray-600">{sseResults.payloadSize}B</span>
+                            </div>
+                            <div className="border-t pt-3">
+                              <div className="text-sm font-medium text-gray-700 mb-2">Response:</div>
+                              <div className="bg-white p-3 rounded border text-sm text-gray-800 max-h-32 overflow-y-auto">
+                                {sseResults.response}
+                              </div>
+                            </div>
+                            {sseResults.streaming && (
+                              <div className="border-t pt-3">
+                                <div className="text-sm font-medium text-gray-700 mb-2">Streaming Events:</div>
+                                <div className="bg-white p-3 rounded border text-sm text-gray-800 max-h-32 overflow-y-auto">
+                                  {sseResults.streamingData.map((event: any, index: number) => (
+                                    <div key={index} className="mb-2 p-2 bg-red-50 rounded">
+                                      <span className="text-red-600 font-medium">Event {index + 1}:</span> {event.content}
+                                    </div>
+                                  ))}
+                                </div>
+                              </div>
+                            )}
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                </div>
+
+                {/* Documentation Link */}
+                <div className="bg-red-50 border border-red-200 rounded-lg p-4">
+                  <div className="flex items-start space-x-3">
+                    <div className="flex-shrink-0">
+                      <svg className="w-6 h-6 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.746 0 3.332.477 4.5 1.253v13C19.832 18.477 18.246 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
+                      </svg>
+                    </div>
+                    <div>
+                      <h4 className="text-lg font-medium text-red-900">📚 Complete SSE Documentation</h4>
+                      <p className="text-red-700 mt-1">
+                        For detailed implementation guides, client examples, and setup instructions, see the comprehensive documentation.
+                      </p>
+                      <a 
+                        href="/docs/sse-integration.md" 
+                        target="_blank" 
+                        rel="noopener noreferrer"
+                        className="inline-flex items-center mt-3 px-4 py-2 bg-red-600 text-white text-sm font-medium rounded-lg hover:bg-red-700 transition-colors"
+                      >
+                        <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+                        </svg>
+                        View Documentation
+                      </a>
+                    </div>
+                  </div>
+                </div>
+
+              </div>
+            ) : (
+              <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-6 text-center">
+                <div className="flex items-center justify-center mb-3">
+                  <div className="w-8 h-8 bg-yellow-100 rounded-full flex items-center justify-center">
+                    <svg className="w-5 h-5 text-yellow-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16.5c-.77.833.192 2.5 1.732 2.5z" />
+                    </svg>
+                  </div>
+                </div>
+                <h3 className="text-lg font-medium text-yellow-800 mb-2">Graph Required</h3>
+                <p className="text-yellow-700 mb-4">
+                  Please upload documents and build a knowledge graph first to use SSE streaming services.
                 </p>
                 <button
                   onClick={() => setActiveTab('upload')}
