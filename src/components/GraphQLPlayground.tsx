@@ -182,8 +182,8 @@ query GetAnalytics {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h2 className="text-2xl font-bold mb-4">GraphQL Playground</h2>
-          <p className="text-gray-600 mb-4">
+          <h2 className="text-2xl font-bold text-gray-900 mb-4">GraphQL Playground</h2>
+          <p className="text-gray-700 mb-4">
             Test GraphQL queries for the GraphRAG system. The playground includes example queries to get you started.
           </p>
         </div>

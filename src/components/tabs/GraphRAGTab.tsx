@@ -845,11 +845,11 @@ export function GraphRAGTab() {
             <div className="bg-white rounded-lg border shadow-sm">
               <div className="p-6 border-b flex justify-between items-center">
                 <div>
-                  <h3 className="flex items-center gap-2 text-lg font-semibold">
+                  <h3 className="flex items-center gap-2 text-lg font-semibold text-gray-900">
                     <Download className="w-5 h-5" />
                     GraphRAG REST API Integration
                   </h3>
-                  <p className="text-gray-600 mt-1">
+                  <p className="text-gray-700 mt-1">
                     Import GraphRAG REST API collection to test HTTP endpoints in Postman
                   </p>
                 </div>
@@ -889,11 +889,11 @@ export function GraphRAGTab() {
             {/* Query & Compare Section */}
             <div className="bg-white rounded-lg border shadow-sm">
               <div className="p-6 border-b">
-                <h3 className="flex items-center gap-2 text-lg font-semibold">
+                <h3 className="flex items-center gap-2 text-lg font-semibold text-gray-900">
                   <Search className="w-5 h-5" />
                   Query & Compare
                 </h3>
-                <p className="text-gray-600 mt-1">
+                <p className="text-gray-700 mt-1">
                   Test GraphRAG vs traditional RAG responses
                 </p>
               </div>
@@ -1324,11 +1324,11 @@ export function GraphRAGTab() {
                 <div className="bg-white rounded-lg border shadow-sm">
                   <div className="p-6 border-b flex justify-between items-center">
                     <div>
-                      <h3 className="flex items-center gap-2 text-lg font-semibold">
+                      <h3 className="flex items-center gap-2 text-lg font-semibold text-gray-900">
                         <BarChart3 className="w-5 h-5" />
                         Protocol Performance Comparison
                       </h3>
-                      <p className="text-gray-600 mt-1">
+                      <p className="text-gray-700 mt-1">
                         Compare REST, GraphQL, and gRPC performance using the same GraphRAG query
                       </p>
                     </div>
@@ -1455,16 +1455,16 @@ export function GraphRAGTab() {
                       <div className="p-4 space-y-3">
                         <div className="space-y-2">
                           <div className="text-sm">
-                            <span className="font-medium">Latency:</span>
+                            <span className="font-medium text-gray-900">Latency:</span>
                             <span className="ml-2 text-green-600">{responses.performance.traditionalRAGLatency}ms</span>
                           </div>
                           <div className="text-sm">
-                            <span className="font-medium">Protocol:</span>
-                            <span className="ml-2">HTTP/1.1 + JSON</span>
+                            <span className="font-medium text-gray-900">Protocol:</span>
+                            <span className="ml-2 text-gray-700">HTTP/1.1 + JSON</span>
                           </div>
                           <div className="text-sm">
-                            <span className="font-medium">Payload Size:</span>
-                            <span className="ml-2">~2.5KB</span>
+                            <span className="font-medium text-gray-900">Payload Size:</span>
+                            <span className="ml-2 text-gray-700">~2.5KB</span>
                           </div>
                         </div>
                         <div className="border-t pt-3">
@@ -1487,16 +1487,16 @@ export function GraphRAGTab() {
                       <div className="p-4 space-y-3">
                         <div className="space-y-2">
                           <div className="text-sm">
-                            <span className="font-medium">Latency:</span>
+                            <span className="font-medium text-gray-900">Latency:</span>
                             <span className="ml-2 text-green-600">{Math.round(responses.performance.graphRAGLatency * 0.85)}ms</span>
                           </div>
                           <div className="text-sm">
-                            <span className="font-medium">Protocol:</span>
-                            <span className="ml-2">HTTP/1.1 + JSON</span>
+                            <span className="font-medium text-gray-900">Protocol:</span>
+                            <span className="ml-2 text-gray-700">HTTP/1.1 + JSON</span>
                           </div>
                           <div className="text-sm">
-                            <span className="font-medium">Payload Size:</span>
-                            <span className="ml-2">~1.8KB</span>
+                            <span className="font-medium text-gray-900">Payload Size:</span>
+                            <span className="ml-2 text-gray-700">~1.8KB</span>
                           </div>
                         </div>
                         <div className="border-t pt-3">
@@ -1519,16 +1519,16 @@ export function GraphRAGTab() {
                       <div className="p-4 space-y-3">
                         <div className="space-y-2">
                           <div className="text-sm">
-                            <span className="font-medium">Latency:</span>
+                            <span className="font-medium text-gray-900">Latency:</span>
                             <span className="ml-2 text-green-600">{Math.round(responses.performance.graphRAGLatency * 0.4)}ms</span>
                           </div>
                           <div className="text-sm">
-                            <span className="font-medium">Protocol:</span>
-                            <span className="ml-2">HTTP/2 + Protobuf</span>
+                            <span className="font-medium text-gray-900">Protocol:</span>
+                            <span className="ml-2 text-gray-700">HTTP/2 + Protobuf</span>
                           </div>
                           <div className="text-sm">
-                            <span className="font-medium">Payload Size:</span>
-                            <span className="ml-2">~800B</span>
+                            <span className="font-medium text-gray-900">Payload Size:</span>
+                            <span className="ml-2 text-gray-700">~800B</span>
                           </div>
                         </div>
                         <div className="border-t pt-3">
@@ -1546,7 +1546,7 @@ export function GraphRAGTab() {
                 {responses && (
                   <div className="bg-white rounded-lg border shadow-sm">
                     <div className="p-6 border-b">
-                      <h3 className="flex items-center gap-2 text-lg font-semibold">
+                      <h3 className="flex items-center gap-2 text-lg font-semibold text-gray-900">
                         <BarChart3 className="w-5 h-5" />
                         Performance Analytics
                       </h3>
@@ -1558,7 +1558,7 @@ export function GraphRAGTab() {
                           <h4 className="font-medium text-gray-800">Latency Comparison</h4>
                           <div className="space-y-2">
                             <div className="flex justify-between items-center">
-                              <span className="text-sm">REST</span>
+                              <span className="text-sm text-gray-900">REST</span>
                               <div className="flex items-center space-x-2">
                                 <div className="w-20 bg-gray-200 rounded-full h-2">
                                   <div className="bg-blue-500 h-2 rounded-full" style={{width: '100%'}}></div>
@@ -1567,7 +1567,7 @@ export function GraphRAGTab() {
                               </div>
                             </div>
                             <div className="flex justify-between items-center">
-                              <span className="text-sm">GraphQL</span>
+                              <span className="text-sm text-gray-900">GraphQL</span>
                               <div className="flex items-center space-x-2">
                                 <div className="w-20 bg-gray-200 rounded-full h-2">
                                   <div className="bg-purple-500 h-2 rounded-full" style={{width: '85%'}}></div>
@@ -1576,7 +1576,7 @@ export function GraphRAGTab() {
                               </div>
                             </div>
                             <div className="flex justify-between items-center">
-                              <span className="text-sm">gRPC</span>
+                              <span className="text-sm text-gray-900">gRPC</span>
                               <div className="flex items-center space-x-2">
                                 <div className="w-20 bg-gray-200 rounded-full h-2">
                                   <div className="bg-green-500 h-2 rounded-full" style={{width: '40%'}}></div>
@@ -1592,7 +1592,7 @@ export function GraphRAGTab() {
                           <h4 className="font-medium text-gray-800">Payload Efficiency</h4>
                           <div className="space-y-2">
                             <div className="flex justify-between items-center">
-                              <span className="text-sm">REST (JSON)</span>
+                              <span className="text-sm text-gray-900">REST (JSON)</span>
                               <div className="flex items-center space-x-2">
                                 <div className="w-20 bg-gray-200 rounded-full h-2">
                                   <div className="bg-blue-500 h-2 rounded-full" style={{width: '100%'}}></div>
@@ -1601,7 +1601,7 @@ export function GraphRAGTab() {
                               </div>
                             </div>
                             <div className="flex justify-between items-center">
-                              <span className="text-sm">GraphQL (JSON)</span>
+                              <span className="text-sm text-gray-900">GraphQL (JSON)</span>
                               <div className="flex items-center space-x-2">
                                 <div className="w-20 bg-gray-200 rounded-full h-2">
                                   <div className="bg-purple-500 h-2 rounded-full" style={{width: '72%'}}></div>
@@ -1610,7 +1610,7 @@ export function GraphRAGTab() {
                               </div>
                             </div>
                             <div className="flex justify-between items-center">
-                              <span className="text-sm">gRPC (Protobuf)</span>
+                              <span className="text-sm text-gray-900">gRPC (Protobuf)</span>
                               <div className="flex items-center space-x-2">
                                 <div className="w-20 bg-gray-200 rounded-full h-2">
                                   <div className="bg-green-500 h-2 rounded-full" style={{width: '32%'}}></div>
@@ -1679,11 +1679,11 @@ export function GraphRAGTab() {
             <div className="bg-white rounded-lg border shadow-sm">
               <div className="p-6 border-b flex justify-between items-center">
                 <div>
-                  <h3 className="flex items-center gap-2 text-lg font-semibold">
+                  <h3 className="flex items-center gap-2 text-lg font-semibold text-gray-900">
                     <Download className="w-5 h-5" />
                     gRPC Postman Integration
                   </h3>
-                  <p className="text-gray-600 mt-1">
+                  <p className="text-gray-700 mt-1">
                     Import gRPC collection for testing GraphRAG services
                   </p>
                 </div>
@@ -1729,11 +1729,11 @@ export function GraphRAGTab() {
             {/* gRPC Service Overview */}
             <div className="bg-white rounded-lg border shadow-sm">
               <div className="p-6 border-b">
-                <h3 className="flex items-center gap-2 text-lg font-semibold">
+                <h3 className="flex items-center gap-2 text-lg font-semibold text-gray-900">
                   <Zap className="w-5 h-5" />
                   gRPC Streaming Services
                 </h3>
-                <p className="text-gray-600 mt-1">
+                <p className="text-gray-700 mt-1">
                   High-performance GraphRAG operations using gRPC with Protocol Buffers
                 </p>
               </div>
