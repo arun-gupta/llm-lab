@@ -1,6 +1,6 @@
 # Real Protocol Implementations
 
-This document describes the real protocol implementations that have replaced the mock dependencies in the Multi-Protocol Lab.
+This document describes the real protocol implementations that have replaced the mock dependencies in the Postman Protocol Playground.
 
 ## 🎯 Overview
 
@@ -319,4 +319,4 @@ curl -N http://localhost:3000/api/sse/graphrag/stream?query=test&graphId=123
 
 ---
 
-**Note**: All protocols now provide real implementations with authentic performance characteristics, making the Multi-Protocol Lab a true testing ground for protocol comparison and development.
+**Note**: All protocols now provide real implementations with authentic performance characteristics, making the Postman Protocol Playground a true testing ground for protocol comparison and development.

@@ -20,7 +20,7 @@ export function HomeTab({ onTabChange, apiKeyStatus }: HomeTabProps) {
       color: 'bg-blue-500 hover:bg-blue-600'
     },
     {
-      title: 'Multi-Protocol Lab',
+              title: 'Postman Protocol Playground',
       description: 'Explore REST, GraphQL, gRPC, WebSocket, and MCP integrations',
       icon: Library,
       action: () => onTabChange('graphrag'),
@@ -45,7 +45,7 @@ export function HomeTab({ onTabChange, apiKeyStatus }: HomeTabProps) {
           </div>
         </div>
         <h1 className="text-3xl font-bold text-gray-900 mb-2">
-          Welcome to Multi-Protocol Lab
+          Welcome to Postman Protocol Playground
         </h1>
         <p className="text-lg text-gray-600 mb-4">
           Test & compare REST, GraphQL, gRPC, WebSocket, and MCP integrations

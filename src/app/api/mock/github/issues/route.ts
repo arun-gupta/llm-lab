@@ -14,7 +14,7 @@ export async function POST(request: NextRequest) {
       created_at: new Date().toISOString(),
       updated_at: new Date().toISOString(),
       closed_at: null,
-              html_url: `https://github.com/arun-gupta/multi-protocol-lab/issues/${Math.floor(Math.random() * 1000) + 1}`,
+              html_url: `https://github.com/arun-gupta/postman-protocol-playground/issues/${Math.floor(Math.random() * 1000) + 1}`,
       assignees: [],
       milestone: null,
       comments: 0,
@@ -25,10 +25,10 @@ export async function POST(request: NextRequest) {
         type: 'User'
       },
       repository: {
-              name: 'multi-protocol-lab',
-      full_name: 'arun-gupta/multi-protocol-lab',
-      private: false,
-      html_url: 'https://github.com/arun-gupta/multi-protocol-lab'
+                      name: 'postman-protocol-playground',
+        full_name: 'arun-gupta/postman-protocol-playground',
+        private: false,
+        html_url: 'https://github.com/arun-gupta/postman-protocol-playground'
       }
     };
 

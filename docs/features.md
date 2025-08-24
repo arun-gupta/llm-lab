@@ -1,6 +1,6 @@
-# Multi-Protocol Lab Features
+# Postman Protocol Playground Features
 
-A comprehensive guide to all features available in Multi-Protocol Lab.
+A comprehensive guide to all features available in Postman Protocol Playground.
 
 ## 🕸️ GraphRAG (Graph-based Retrieval-Augmented Generation)
 

@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# LLM Prompt Lab QuickStart Script
+# Postman Protocol Playground QuickStart Script
 # This script installs dependencies, sets up environment, and starts the development server
 
 set -e  # Exit on any error
@@ -27,7 +27,7 @@ export NEXTJS_PORT
 export GRPC_PORT=$GRPC_SERVER_PORT
 export HTTP_PORT=$GRPC_HTTP_PORT
 
-echo "🚀 Setting up LLM Prompt Lab..."
+echo "🚀 Setting up Postman Protocol Playground..."
 echo ""
 
 # Check if Node.js is installed

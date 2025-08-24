@@ -1,8 +1,8 @@
-# Multi-Protocol Lab
+# Postman Protocol Playground
 
-[![Open in GitHub Codespaces](https://github.com/codespaces/badge.svg)](https://codespaces.new/arun-gupta/multi-protocol-lab) *(Outdated - Use Local Setup)*
+[![Open in GitHub Codespaces](https://github.com/codespaces/badge.svg)](https://codespaces.new/arun-gupta/postman-protocol-playground) *(Outdated - Use Local Setup)*
 
-A comprehensive **multi-protocol experimentation and GraphRAG development platform** that combines traditional LLM testing with advanced **Graph-based Retrieval-Augmented Generation (GraphRAG)** capabilities. Build knowledge graphs from documents, compare GraphRAG vs traditional RAG, and test multiple protocols (REST, GraphQL, gRPC, gRPC-Web, WebSocket, SSE) with seamless **Postman integration**.
+A comprehensive **Postman-focused protocol testing and GraphRAG development platform** that combines traditional LLM testing with advanced **Graph-based Retrieval-Augmented Generation (GraphRAG)** capabilities. Build knowledge graphs from documents, compare GraphRAG vs traditional RAG, and test multiple protocols (REST, GraphQL, gRPC, gRPC-Web, WebSocket, SSE) with seamless **Postman integration**. Perfect for API testing and protocol comparison.
 
 ## 🎯 **What Makes This Special**
 
@@ -53,8 +53,8 @@ A comprehensive **multi-protocol experimentation and GraphRAG development platfo
 **Quick and Easy Setup:**
 ```bash
 # Clone and run with one command
-git clone https://github.com/arun-gupta/multi-protocol-lab.git
-cd multi-protocol-lab
+git clone https://github.com/arun-gupta/postman-protocol-playground.git
+cd postman-protocol-playground
 ./quickstart.sh
 ```
 
@@ -80,8 +80,8 @@ If you still want to try Codespaces:
 - Use local setup for optimal performance and reliability
 ```bash
 # Clone and run
-git clone https://github.com/arun-gupta/multi-protocol-lab.git
-cd multi-protocol-lab
+git clone https://github.com/arun-gupta/postman-protocol-playground.git
+cd postman-protocol-playground
 ./quickstart.sh
 ```
 

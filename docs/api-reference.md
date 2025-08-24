@@ -1,6 +1,6 @@
-# Multi-Protocol Lab API Reference
+# Postman Protocol Playground API Reference
 
-Complete API documentation for Multi-Protocol Lab endpoints and integrations.
+Complete API documentation for Postman Protocol Playground endpoints and integrations.
 
 ## 🤖 LLM API Endpoint
 

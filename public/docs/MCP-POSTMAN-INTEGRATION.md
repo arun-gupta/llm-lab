@@ -218,7 +218,7 @@ try {
   await githubMCP.connect();
   const issues = await githubMCP.call('github/list_issues', {
     owner: 'arun-gupta',
-    repo: 'multi-protocol-lab',
+    repo: 'postman-protocol-playground',
     state: 'open'
   });
 

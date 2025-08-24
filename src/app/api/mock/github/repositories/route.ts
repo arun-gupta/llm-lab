@@ -7,10 +7,10 @@ export async function POST(request: NextRequest) {
     // Return mock GitHub repositories data
     const mockRepositories = [
       {
-        name: 'multi-protocol-lab',
-        full_name: 'arun-gupta/multi-protocol-lab',
-        description: 'Multi-protocol testing and GraphRAG development platform with Postman integration',
-        html_url: 'https://github.com/arun-gupta/multi-protocol-lab',
+        name: 'postman-protocol-playground',
+        full_name: 'arun-gupta/postman-protocol-playground',
+        description: 'Postman-focused protocol testing and GraphRAG development platform',
+        html_url: 'https://github.com/arun-gupta/postman-protocol-playground',
         stargazers_count: 42,
         language: 'TypeScript',
         created_at: '2024-01-15T10:00:00Z',

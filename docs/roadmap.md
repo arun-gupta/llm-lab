@@ -1,6 +1,6 @@
-# Multi-Protocol Lab Roadmap
+# Postman Protocol Playground Roadmap
 
-A comprehensive roadmap of planned features and development phases for Multi-Protocol Lab.
+A comprehensive roadmap of planned features and development phases for Postman Protocol Playground.
 
 ## 📈 Development Phases
 

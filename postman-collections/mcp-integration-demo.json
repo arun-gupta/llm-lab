@@ -115,7 +115,7 @@
                   "  await mcpClient.connect();",
                   "  const issue = await mcpClient.call('github/create_issue', {",
                   "    owner: 'arun-gupta',",
-                  "    repo: 'multi-protocol-lab',",
+                  "    repo: 'postman-protocol-playground',",
                   "    title: 'Test Issue via MCP Integration',",
                   "    body: 'This issue was created using MCP integration from Postman',",
                   "    labels: ['mcp', 'postman', 'integration']",
