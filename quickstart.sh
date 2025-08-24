@@ -100,6 +100,27 @@ if [ -f "$HOME/.mcp-servers/start-mcp-servers.sh" ]; then
     MCP_PID=$!
 fi
 
+# Start SQLite MCP Docker container
+echo "🐳 Starting SQLite MCP Docker container..."
+if command -v docker &> /dev/null; then
+    # Check if container is already running
+    if ! docker ps --format "{{.Names}}" | grep -q "sqlite-mcp-server"; then
+        # Check if container exists but is stopped
+        if docker ps -a --format "{{.Names}}" | grep -q "sqlite-mcp-server"; then
+            docker start sqlite-mcp-server > /dev/null 2>&1
+            echo "✅ SQLite MCP Docker container started"
+        else
+            # Create and start new container
+            docker run -d -p $MCP_SQLITE_PORT:$MCP_SQLITE_PORT --name sqlite-mcp-server arungupta/sqlite-mcp-server > /dev/null 2>&1
+            echo "✅ SQLite MCP Docker container created and started"
+        fi
+    else
+        echo "✅ SQLite MCP Docker container already running"
+    fi
+else
+    echo "⚠️  Docker not found - SQLite MCP server will not be available"
+fi
+
 # Start gRPC server in background
 if [ -f "grpc-server/start-grpc-server.sh" ]; then
     bash grpc-server/start-grpc-server.sh > /dev/null 2>&1 &
@@ -129,26 +150,26 @@ npm run dev &
 NEXTJS_PID=$!
 
 # Wait for servers to start
-sleep 5
+sleep 8
 
 # Test endpoints
 echo "🧪 Testing endpoints..."
-for i in {1..5}; do
+for i in {1..8}; do
     if curl -s http://localhost:$NEXTJS_PORT > /dev/null 2>&1; then
         echo "✅ Next.js ready"
         break
-    elif [ $i -eq 5 ]; then
+    elif [ $i -eq 8 ]; then
         echo "❌ Next.js not responding"
     else
         sleep 1
     fi
 done
 
-for i in {1..5}; do
+for i in {1..8}; do
     if curl -s http://localhost:$GRPC_HTTP_PORT/health > /dev/null 2>&1; then
         echo "✅ gRPC ready"
         break
-    elif [ $i -eq 5 ]; then
+    elif [ $i -eq 8 ]; then
         echo "❌ gRPC not responding"
     else
         sleep 1

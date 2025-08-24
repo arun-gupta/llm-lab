@@ -323,6 +323,85 @@ export function GraphRAGTab() {
     }
   };
 
+  const generateGrpcPostmanCollection = async () => {
+    setImportStatus('importing');
+    setImportMessage('Generating gRPC collection...');
+    
+    try {
+      // Fetch the gRPC collection from the public folder
+      const response = await fetch('/postman-collections/graphrag-grpc-collection.json');
+      
+      if (response.ok) {
+        const collectionData = await response.json();
+        
+        // Try to create collection directly in Postman Desktop using API
+        const createInPostman = async () => {
+          try {
+            setImportMessage('Creating gRPC collection in Postman Desktop...');
+            
+            const postmanResponse = await fetch('/api/postman/create-collection', {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+              },
+              body: JSON.stringify({
+                collection: collectionData,
+                createInWeb: false, // Create in Desktop
+              }),
+            });
+
+            const result = await postmanResponse.json();
+
+            if (result.success) {
+              setImportStatus('success');
+              setImportMessage('✅ gRPC Collection created successfully in Postman Desktop! Import the .proto file for service definitions.');
+              
+              // Open the collection in Postman Desktop
+              if (result.collectionUrl) {
+                window.open(result.collectionUrl, '_blank');
+              }
+            } else {
+              // Fallback to download if API key not configured
+              if (result.fallback) {
+                setImportMessage('Downloading gRPC collection file...');
+                
+                const blob = new Blob([JSON.stringify(collectionData, null, 2)], {
+                  type: 'application/json'
+                });
+                const url = window.URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = 'graphrag-grpc-collection.json';
+                document.body.appendChild(a);
+                a.click();
+                window.URL.revokeObjectURL(url);
+                document.body.removeChild(a);
+                
+                setImportStatus('manual');
+                setImportMessage('📥 gRPC Collection downloaded! Import manually into Postman Desktop and add the .proto file.');
+              } else {
+                throw new Error(result.message || 'Failed to create collection');
+              }
+            }
+          } catch (error) {
+            console.error('Error creating gRPC collection:', error);
+            setImportStatus('error');
+            setImportMessage('Failed to create gRPC collection. Try downloading manually.');
+          }
+        };
+
+        await createInPostman();
+      } else {
+        setImportStatus('error');
+        setImportMessage('Failed to load gRPC collection');
+      }
+    } catch (error) {
+      console.error('Error generating gRPC Postman collection:', error);
+      setImportStatus('error');
+      setImportMessage('Error generating gRPC collection');
+    }
+  };
+
   const handleProtocolComparison = async () => {
     if (!query.trim() || !graphData) return;
 
@@ -764,25 +843,27 @@ export function GraphRAGTab() {
               <div className="space-y-6">
             {/* Postman Integration Section */}
             <div className="bg-white rounded-lg border shadow-sm">
-              <div className="p-6 border-b">
-                <h3 className="flex items-center gap-2 text-lg font-semibold">
-                  <Download className="w-5 h-5" />
-                  GraphRAG REST API Integration
-                </h3>
-                <p className="text-gray-600 mt-1">
-                  Import GraphRAG REST API collection to test HTTP endpoints in Postman
-                </p>
+              <div className="p-6 border-b flex justify-between items-center">
+                <div>
+                  <h3 className="flex items-center gap-2 text-lg font-semibold">
+                    <Download className="w-5 h-5" />
+                    GraphRAG REST API Integration
+                  </h3>
+                  <p className="text-gray-600 mt-1">
+                    Import GraphRAG REST API collection to test HTTP endpoints in Postman
+                  </p>
+                </div>
+                <button 
+                  onClick={generatePostmanCollection} 
+                  disabled={!responses || importStatus === 'importing'}
+                  className="flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  <Download className="w-4 h-4 mr-2" />
+                  {importStatus === 'importing' ? 'Importing...' : 'Add GraphRAG REST to Postman'}
+                </button>
               </div>
               <div className="p-6">
                 <div className="flex flex-col space-y-3">
-                  <button 
-                    onClick={generatePostmanCollection} 
-                    disabled={!responses || importStatus === 'importing'}
-                    className="flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed w-fit"
-                  >
-                    <Download className="w-4 h-4 mr-2" />
-                                            {importStatus === 'importing' ? 'Importing...' : 'Add GraphRAG REST to Postman'}
-                  </button>
                   
                   {importStatus !== 'idle' && (
                     <div className={`px-4 py-3 rounded-lg text-sm max-w-md ${
@@ -1241,14 +1322,24 @@ export function GraphRAGTab() {
               <div className="space-y-6">
                 {/* Protocol Comparison Overview */}
                 <div className="bg-white rounded-lg border shadow-sm">
-                  <div className="p-6 border-b">
-                    <h3 className="flex items-center gap-2 text-lg font-semibold">
-                      <BarChart3 className="w-5 h-5" />
-                      Protocol Performance Comparison
-                    </h3>
-                    <p className="text-gray-600 mt-1">
-                      Compare REST, GraphQL, and gRPC performance using the same GraphRAG query
-                    </p>
+                  <div className="p-6 border-b flex justify-between items-center">
+                    <div>
+                      <h3 className="flex items-center gap-2 text-lg font-semibold">
+                        <BarChart3 className="w-5 h-5" />
+                        Protocol Performance Comparison
+                      </h3>
+                      <p className="text-gray-600 mt-1">
+                        Compare REST, GraphQL, and gRPC performance using the same GraphRAG query
+                      </p>
+                    </div>
+                    <button
+                      onClick={generateComparisonCollection}
+                      disabled={!graphData || importStatus === 'importing'}
+                      className="flex items-center px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 disabled:opacity-50 disabled:cursor-not-allowed"
+                    >
+                      <Download className="w-4 h-4 mr-2" />
+                      {importStatus === 'importing' ? 'Importing...' : 'Add Comparison Collection to Postman'}
+                    </button>
                   </div>
                   <div className="p-6">
                     <div className="space-y-4">
@@ -1326,15 +1417,6 @@ export function GraphRAGTab() {
                         >
                           <BarChart3 className="w-4 h-4 mr-2" />
                           {isQuerying ? 'Running Comparison...' : 'Run Protocol Comparison'}
-                        </button>
-                        
-                        <button
-                          onClick={generateComparisonCollection}
-                          disabled={!graphData || importStatus === 'importing'}
-                          className="flex items-center px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 disabled:opacity-50 disabled:cursor-not-allowed"
-                        >
-                          <Download className="w-4 h-4 mr-2" />
-                          {importStatus === 'importing' ? 'Importing...' : 'Get Comparison Collection'}
                         </button>
                         
                         {importStatus !== 'idle' && (
@@ -1595,33 +1677,45 @@ export function GraphRAGTab() {
               <div className="space-y-6">
             {/* gRPC Postman Integration */}
             <div className="bg-white rounded-lg border shadow-sm">
-              <div className="p-6 border-b">
-                <h3 className="flex items-center gap-2 text-lg font-semibold">
-                  <Download className="w-5 h-5" />
-                  gRPC Postman Integration
-                </h3>
-                <p className="text-gray-600 mt-1">
-                  Import gRPC collection for testing GraphRAG services
-                </p>
+              <div className="p-6 border-b flex justify-between items-center">
+                <div>
+                  <h3 className="flex items-center gap-2 text-lg font-semibold">
+                    <Download className="w-5 h-5" />
+                    gRPC Postman Integration
+                  </h3>
+                  <p className="text-gray-600 mt-1">
+                    Import gRPC collection for testing GraphRAG services
+                  </p>
+                </div>
+                <button 
+                  onClick={generateGrpcPostmanCollection}
+                  disabled={!graphData || importStatus === 'importing'}
+                  className="flex items-center px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  <Download className="w-4 h-4 mr-2" />
+                  {importStatus === 'importing' ? 'Importing...' : 'Add gRPC to Postman'}
+                </button>
               </div>
               <div className="p-6">
                 <div className="flex flex-col space-y-3">
-                  <button 
-                    onClick={() => {
-                      // Download gRPC Postman collection
-                      const link = document.createElement('a');
-                      link.href = '/postman-collections/graphrag-grpc-collection.json';
-                      link.download = 'graphrag-grpc-collection.json';
-                      document.body.appendChild(link);
-                      link.click();
-                      document.body.removeChild(link);
-                    }}
-                    disabled={!graphData}
-                    className="flex items-center px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 disabled:opacity-50 disabled:cursor-not-allowed w-fit"
-                  >
-                    <Download className="w-4 h-4 mr-2" />
-                    Add gRPC to Postman
-                  </button>
+                  
+                  {importStatus !== 'idle' && (
+                    <div className={`px-4 py-3 rounded-lg text-sm max-w-md ${
+                      importStatus === 'success' ? 'bg-green-50 border border-green-200 text-green-800' :
+                      importStatus === 'manual' ? 'bg-yellow-50 border border-yellow-200 text-yellow-800' :
+                      importStatus === 'error' ? 'bg-red-50 border border-red-200 text-red-800' :
+                      'bg-blue-50 border border-blue-200 text-blue-800'
+                    }`}>
+                      <div className="flex items-start space-x-2">
+                        {importStatus === 'success' && (
+                          <svg className="w-4 h-4 mt-0.5 text-green-600 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                            <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                          </svg>
+                        )}
+                        <span className="leading-relaxed">{importMessage}</span>
+                      </div>
+                    </div>
+                  )}
                   
                   <div className="text-sm text-gray-600">
                     <p>• Requires Postman's gRPC support</p>

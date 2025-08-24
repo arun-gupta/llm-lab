@@ -70,92 +70,6 @@ print_success "All prerequisites are installed"
 # Create MCP server infrastructure
 print_section "Setting Up MCP Server Infrastructure"
 
-# Create a simple MCP server template for local testing
-print_step "Creating local MCP server template"
-mkdir -p "mcp-server-template"
-cd "mcp-server-template"
-
-cat > package.json << 'EOF'
-{
-  "name": "mcp-server-template",
-  "version": "1.0.0",
-  "description": "Template MCP server for LLM Lab",
-  "main": "index.js",
-  "scripts": {
-    "start": "node index.js",
-    "dev": "node index.js"
-  },
-  "dependencies": {
-    "@modelcontextprotocol/sdk": "^0.4.0",
-    "ws": "^8.14.2"
-  }
-}
-EOF
-
-cat > index.js << 'EOF'
-const { Server } = require('@modelcontextprotocol/sdk/server/index.js');
-const { StdioServerTransport } = require('@modelcontextprotocol/sdk/server/stdio.js');
-
-const server = new Server(
-  {
-    name: 'llm-lab-mcp-server',
-    version: '1.0.0',
-  },
-  {
-    capabilities: {
-      tools: {},
-    },
-  }
-);
-
-server.setRequestHandler('tools/list', async () => {
-  return {
-    tools: [
-      {
-        name: 'test_tool',
-        description: 'A test tool for LLM Lab MCP integration',
-        inputSchema: {
-          type: 'object',
-          properties: {
-            message: {
-              type: 'string',
-              description: 'A test message',
-            },
-          },
-          required: ['message'],
-        },
-      },
-    ],
-  };
-});
-
-server.setRequestHandler('tools/call', async (request) => {
-  const { name, arguments: args } = request.params;
-  
-  if (name === 'test_tool') {
-    return {
-      content: [
-        {
-          type: 'text',
-          text: `Test tool called with message: ${args.message}`,
-        },
-      ],
-    };
-  }
-  
-  throw new Error(`Unknown tool: ${name}`);
-});
-
-const transport = new StdioServerTransport();
-server.connect(transport);
-console.log('MCP Server running on stdio');
-EOF
-
-npm install
-print_success "Local MCP server template created"
-
-cd ..
-
 # Create configuration files
 print_section "Creating Configuration Files"
 
@@ -173,16 +87,16 @@ cd "$MCP_DIR"
 
 echo "Starting MCP Server Infrastructure..."
 
-# Start the template MCP server on port 3001
-echo "Starting Local MCP Server Template on port 3001..."
-cd mcp-server-template
-nohup node index.js > ../mcp-server.log 2>&1 &
-MCP_PID=$!
-echo $MCP_PID > ../mcp-server.pid
+# Start the HTTP Filesystem MCP server on port 3002
+echo "Starting HTTP Filesystem MCP Server on port 3002..."
+cd http-filesystem-mcp-server
+PORT=3002 nohup node index.js > ../http-filesystem-mcp-server.log 2>&1 &
+FILESYSTEM_PID=$!
+echo $FILESYSTEM_PID > ../http-filesystem-mcp-server.pid
 cd ..
 
 echo "MCP server infrastructure started!"
-echo "Local MCP Server Template: http://localhost:3001"
+echo "HTTP Filesystem MCP Server: http://localhost:3002"
 echo ""
 echo "Available Remote MCP Servers:"
 echo "  • GitHub MCP Server: https://api.githubcopilot.com/mcp/"
@@ -191,8 +105,9 @@ echo "  • GitHub Issues: https://api.githubcopilot.com/mcp/x/issues"
 echo "  • GitHub Pull Requests: https://api.githubcopilot.com/mcp/x/pull_requests"
 echo "  • GitHub Actions: https://api.githubcopilot.com/mcp/x/actions"
 echo ""
-echo "Logs are available in $MCP_DIR/mcp-server.log"
-echo "PID is stored in $MCP_DIR/mcp-server.pid"
+echo "SQLite MCP Server: Docker container (managed separately)"
+echo "Logs are available in $MCP_DIR/http-filesystem-mcp-server.log"
+echo "PID is stored in $MCP_DIR/http-filesystem-mcp-server.pid"
 EOF
 
 # Create a stop script
@@ -207,19 +122,20 @@ cd "$MCP_DIR"
 
 echo "Stopping MCP Server Infrastructure..."
 
-# Stop the template MCP server
-if [ -f "mcp-server.pid" ]; then
-    PID=$(cat mcp-server.pid)
+# Stop the HTTP Filesystem MCP server
+if [ -f "http-filesystem-mcp-server.pid" ]; then
+    PID=$(cat http-filesystem-mcp-server.pid)
     if kill -0 $PID 2>/dev/null; then
         kill $PID
-        echo "Stopped Local MCP Server Template (PID: $PID)"
+        echo "Stopped HTTP Filesystem MCP Server (PID: $PID)"
     else
-        echo "Local MCP Server Template was not running"
+        echo "HTTP Filesystem MCP Server was not running"
     fi
-    rm -f mcp-server.pid
+    rm -f http-filesystem-mcp-server.pid
 fi
 
 echo "MCP server infrastructure stopped!"
+echo "Note: SQLite MCP Docker container must be stopped separately with: docker stop sqlite-mcp-server"
 EOF
 
 # Create a status script
@@ -235,17 +151,28 @@ cd "$MCP_DIR"
 echo "MCP Server Infrastructure Status:"
 echo "================================="
 
-# Check template MCP server
-if [ -f "mcp-server.pid" ]; then
-    PID=$(cat mcp-server.pid)
+# Check HTTP Filesystem MCP server
+if [ -f "http-filesystem-mcp-server.pid" ]; then
+    PID=$(cat http-filesystem-mcp-server.pid)
     if kill -0 $PID 2>/dev/null; then
-        echo "✅ Local MCP Server Template: Running (PID: $PID, Port: 3001)"
+        echo "✅ HTTP Filesystem MCP Server: Running (PID: $PID, Port: 3002)"
     else
-        echo "❌ Local MCP Server Template: Not running (stale PID file)"
-        rm -f mcp-server.pid
+        echo "❌ HTTP Filesystem MCP Server: Not running (stale PID file)"
+        rm -f http-filesystem-mcp-server.pid
     fi
 else
-    echo "❌ Local MCP Server Template: Not running"
+    echo "❌ HTTP Filesystem MCP Server: Not running"
+fi
+
+# Check SQLite MCP Docker container
+if command -v docker &> /dev/null; then
+    if docker ps --format "{{.Names}}" | grep -q "sqlite-mcp-server"; then
+        echo "✅ SQLite MCP Server: Running (Docker container)"
+    else
+        echo "❌ SQLite MCP Server: Not running (Docker container)"
+    fi
+else
+    echo "⚠️  SQLite MCP Server: Docker not available"
 fi
 
 echo ""
@@ -267,7 +194,8 @@ echo "✅ GitHub Experiments: https://api.githubcopilot.com/mcp/x/experiments"
 echo "✅ GitHub Copilot: https://api.githubcopilot.com/mcp/x/copilot"
 echo ""
 echo "Port Usage:"
-echo "3001: Local MCP Server Template"
+echo "3001: SQLite MCP Server (Docker)"
+echo "3002: HTTP Filesystem MCP Server"
 echo ""
 echo "Note: Remote GitHub MCP servers are always available and don't require local installation."
 echo "For more information, see: https://github.com/github/github-mcp-server/blob/main/docs/remote-server.md"
@@ -287,8 +215,9 @@ cat > .env.mcp << 'EOF'
 # MCP Server Configuration
 # Copy these variables to your .env.local file
 
-# Local MCP Server URL (for testing)
-NEXT_PUBLIC_MCP_LOCAL_URL=ws://localhost:3001
+# Local MCP Server URLs
+NEXT_PUBLIC_MCP_FILESYSTEM_URL=http://localhost:3002
+NEXT_PUBLIC_MCP_SQLITE_URL=http://localhost:3001
 
 # Remote GitHub MCP Server URLs (always available)
 NEXT_PUBLIC_MCP_GITHUB_URL=https://api.githubcopilot.com/mcp/
@@ -322,7 +251,8 @@ This directory contains the MCP (Model Context Protocol) server infrastructure f
 
 ## Current Setup
 
-- **Local MCP Server Template** (Port 3001): A basic MCP server template for testing
+- **HTTP Filesystem MCP Server** (Port 3002): Official MCP server with HTTP wrapper for Postman integration
+- **SQLite MCP Server** (Port 3001): Database operations with Docker HTTP mode for Postman integration
 
 ## Available Remote MCP Servers
 
@@ -349,38 +279,51 @@ GitHub provides official remote MCP servers that are always available:
 
 ## Quick Start
 
-1. **Start local server (optional):**
+1. **Start local servers:**
    ```bash
    ./start-mcp-servers.sh
    ```
 
-2. **Check status:**
+2. **Start SQLite MCP Docker container:**
+   ```bash
+   docker run -d -p 3001:3001 --name sqlite-mcp-server arungupta/sqlite-mcp-server
+   ```
+
+3. **Check status:**
    ```bash
    ./status-mcp-servers.sh
    ```
 
-3. **Stop local server:**
+4. **Stop local servers:**
    ```bash
    ./stop-mcp-servers.sh
+   ```
+
+5. **Stop SQLite MCP Docker container:**
+   ```bash
+   docker stop sqlite-mcp-server
    ```
 
 ## Usage with Postman
 
 The MCP Integration collection in LLM Lab is configured to use these servers:
 
-- Local Template Server: `ws://localhost:3001`
+- HTTP Filesystem Server: `http://localhost:3002`
+- SQLite Server: `http://localhost:3001`
 - Remote GitHub Servers: `https://api.githubcopilot.com/mcp/` (and variants)
 
 ## Authentication
 
-- **Local Server**: No authentication required
+- **Local Servers**: No authentication required
 - **Remote GitHub Servers**: Uses GitHub authentication (your GitHub account)
 
 ## Troubleshooting
 
-- Check local logs: `tail -f mcp-server.log`
-- Check local ports: `lsof -i :3001`
+- Check local logs: `tail -f http-filesystem-mcp-server.log`
+- Check local ports: `lsof -i :3002`
+- Check Docker container: `docker ps | grep sqlite-mcp-server`
 - Restart local server: `./stop-mcp-servers.sh && ./start-mcp-servers.sh`
+- Restart Docker container: `docker restart sqlite-mcp-server`
 - Remote servers are always available and don't require local setup
 
 ## More Information
@@ -399,10 +342,11 @@ print_info "Installation directory: $MCP_DIR"
 
 echo ""
 echo "Next steps:"
-echo "1. Start local server (optional): ./start-mcp-servers.sh"
-echo "2. Check status: ./status-mcp-servers.sh"
-echo "3. Remote GitHub MCP servers are always available"
-echo "4. Import the MCP collection in Postman"
+echo "1. Start local server: ./start-mcp-servers.sh"
+echo "2. Start SQLite MCP Docker container: docker run -d -p 3001:3001 --name sqlite-mcp-server arungupta/sqlite-mcp-server"
+echo "3. Check status: ./status-mcp-servers.sh"
+echo "4. Remote GitHub MCP servers are always available"
+echo "5. Import the MCP collection in Postman"
 echo ""
 echo "Available commands:"
 echo "  ./start-mcp-servers.sh  - Start local MCP server infrastructure"

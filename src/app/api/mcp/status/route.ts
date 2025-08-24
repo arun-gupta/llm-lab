@@ -22,26 +22,18 @@ export async function GET() {
     
     const servers = [
       { 
-        name: 'template', 
-        port: portConfig.mcp.sqlite, 
-        pidFile: 'mcp-server.pid',
-        displayName: 'Local MCP Server Template',
-        description: 'Basic MCP server template for testing',
-        docker: false
-      },
-      { 
         name: 'filesystem', 
         port: portConfig.mcp.filesystem, 
         pidFile: 'http-filesystem-mcp-server.pid',
-        displayName: 'Filesystem MCP Server',
-        description: 'File and directory operations with HTTP wrapper for Postman integration',
+        displayName: 'Filesystem MCP',
+        description: 'Official MCP server with HTTP wrapper for Postman integration',
         docker: false
       },
       { 
         name: 'sqlite', 
         port: portConfig.mcp.sqlite, 
         pidFile: null,
-        displayName: 'SQLite MCP Server',
+        displayName: 'SQLite MCP',
         description: 'Database operations with Docker HTTP mode for Postman integration',
         docker: true
       }
