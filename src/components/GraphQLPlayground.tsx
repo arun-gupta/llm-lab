@@ -131,10 +131,7 @@ query GetAnalytics {
               setImportStatus('success');
               setImportMessage('✅ GraphQL Collection created successfully in Postman Desktop! Set base_url to http://localhost:3000 in your environment.');
               
-              // Open the collection in Postman Desktop
-              if (result.collectionUrl) {
-                window.open(result.collectionUrl, '_blank');
-              }
+              // Don't open Postman Desktop automatically - just show success message
             } else {
               // Fallback to download if API key not configured
               if (result.fallback) {

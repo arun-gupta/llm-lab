@@ -137,7 +137,7 @@ export function MCPTab() {
               className="w-full inline-flex items-center justify-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-purple-600 hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500 transition-colors mt-auto"
             >
               <Zap className="w-4 h-4 mr-2" />
-              Install GitHub MCP
+              Add GitHub MCP to Postman
             </button>
           </div>
           <div className="bg-white rounded-lg p-6 border border-gray-200 hover:shadow-lg transition-shadow flex flex-col">
@@ -209,7 +209,7 @@ export function MCPTab() {
               className="w-full inline-flex items-center justify-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 transition-colors mt-auto"
             >
               <Database className="w-4 h-4 mr-2" />
-              Install Filesystem MCP
+              Add Filesystem MCP to Postman
             </button>
           </div>
           <div className="bg-white rounded-lg p-6 border border-gray-200 hover:shadow-lg transition-shadow flex flex-col">
@@ -281,7 +281,7 @@ export function MCPTab() {
               className="w-full inline-flex items-center justify-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors mt-auto"
             >
               <Zap className="w-4 h-4 mr-2" />
-              Install SQLite MCP
+              Add SQLite MCP to Postman
             </button>
           </div>
           <div className="bg-white rounded-lg p-6 border border-gray-200 hover:shadow-lg transition-shadow opacity-60">
