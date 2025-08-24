@@ -2327,7 +2327,7 @@ export function GraphRAGTab() {
                         Protocol Performance Comparison
                       </h3>
                       <p className="text-gray-700 mt-1">
-                        Compare REST, GraphQL, gRPC, gRPC-Web, and WebSocket performance using the same GraphRAG query
+                        Compare REST, GraphQL, gRPC, gRPC-Web, WebSocket, and SSE performance using the same GraphRAG query
                       </p>
                     </div>
                     <button
@@ -2352,7 +2352,7 @@ export function GraphRAGTab() {
                           value={query}
                           onChange={(e) => setQuery(e.target.value)}
                           placeholder="Enter a question about your knowledge graph..."
-                          className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                          className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-gray-900 placeholder-gray-500"
                         />
                       </div>
 
@@ -2442,7 +2442,7 @@ export function GraphRAGTab() {
 
                 {/* Results Comparison */}
                 {responses && (
-                  <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-5 gap-6">
+                  <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-6 gap-6">
                     {/* REST Results */}
                     <div className="bg-white rounded-lg border shadow-sm">
                       <div className="p-4 border-b bg-blue-50">
@@ -2713,6 +2713,15 @@ export function GraphRAGTab() {
                                 <span className="text-xs text-gray-600">{Math.round(responses.performance.graphRAGLatency * 0.25)}ms</span>
                               </div>
                             </div>
+                            <div className="flex justify-between items-center">
+                              <span className="text-sm text-gray-900">SSE</span>
+                              <div className="flex items-center space-x-2">
+                                <div className="w-20 bg-gray-200 rounded-full h-2">
+                                  <div className="bg-red-500 h-2 rounded-full" style={{width: '20%'}}></div>
+                                </div>
+                                <span className="text-xs text-gray-600">{Math.round(responses.performance.graphRAGLatency * 0.2)}ms</span>
+                              </div>
+                            </div>
                           </div>
                         </div>
 
@@ -2765,6 +2774,15 @@ export function GraphRAGTab() {
                                 <span className="text-xs text-gray-600">2.2KB</span>
                               </div>
                             </div>
+                            <div className="flex justify-between items-center">
+                              <span className="text-sm text-gray-900">SSE (EventSource)</span>
+                              <div className="flex items-center space-x-2">
+                                <div className="w-20 bg-gray-200 rounded-full h-2">
+                                  <div className="bg-red-500 h-2 rounded-full" style={{width: '68%'}}></div>
+                                </div>
+                                <span className="text-xs text-gray-600">1.7KB</span>
+                              </div>
+                            </div>
                           </div>
                         </div>
 
@@ -2791,6 +2809,11 @@ export function GraphRAGTab() {
                               <div className="font-medium text-orange-600">WebSocket</div>
                               <div className="text-xs text-gray-600">✓ Real-time bidirectional</div>
                               <div className="text-xs text-gray-600">✓ Persistent connection</div>
+                            </div>
+                            <div className="text-sm">
+                              <div className="font-medium text-red-600">SSE</div>
+                              <div className="text-xs text-gray-600">✓ Server-to-client streaming</div>
+                              <div className="text-xs text-gray-600">✓ Automatic reconnection</div>
                             </div>
                           </div>
                         </div>

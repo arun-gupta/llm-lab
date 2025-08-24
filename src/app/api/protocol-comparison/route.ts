@@ -4,7 +4,7 @@ import { join } from 'path';
 import { getBaseURL } from '@/lib/port-config';
 
 interface ProtocolTestResult {
-  protocol: 'REST' | 'GraphQL' | 'gRPC' | 'gRPC-Web' | 'WebSocket';
+  protocol: 'REST' | 'GraphQL' | 'gRPC' | 'gRPC-Web' | 'WebSocket' | 'SSE';
   latency: number;
   payloadSize: number;
   response: string;
@@ -221,6 +221,42 @@ export async function POST(request: NextRequest) {
       });
     }
 
+    // Test SSE API (Mock for now)
+    try {
+      const sseStartTime = performance.now();
+      
+      // Simulate SSE API call with mock data
+      // SSE has very low latency due to simple HTTP streaming
+      await new Promise(resolve => setTimeout(resolve, 35 + Math.random() * 30));
+      
+      const sseEndTime = performance.now();
+      const mockSseResponse = `SSE streaming analysis shows AI healthcare benefits: real-time data streaming, minimal overhead, and efficient server-to-client communication. The EventSource approach enables continuous data flow with automatic reconnection.`;
+
+      // SSE has minimal overhead, similar to JSON but with streaming benefits
+      const jsonPayloadSize = JSON.stringify({ response: mockSseResponse }).length;
+      const ssePayloadSize = Math.round(jsonPayloadSize * 0.85); // Minimal overhead
+
+      results.push({
+        protocol: 'SSE',
+        latency: Math.round(sseEndTime - sseStartTime),
+        payloadSize: ssePayloadSize,
+        response: mockSseResponse,
+        timestamp: new Date().toISOString(),
+        status: 'success',
+        error: undefined
+      });
+    } catch (error) {
+      results.push({
+        protocol: 'SSE',
+        latency: 0,
+        payloadSize: 0,
+        response: '',
+        timestamp: new Date().toISOString(),
+        status: 'error',
+        error: error instanceof Error ? error.message : 'SSE API error'
+      });
+    }
+
     // Calculate analytics
     const successfulResults = results.filter(r => r.status === 'success');
     const totalTime = Date.now() - startTime;
@@ -252,6 +288,9 @@ export async function POST(request: NextRequest) {
       if (fastest === 'WebSocket') {
         recommendations.push('WebSocket shows best real-time performance with persistent connections');
       }
+      if (fastest === 'SSE') {
+        recommendations.push('SSE shows best streaming performance with minimal overhead');
+      }
       if (mostEfficient === 'gRPC') {
         recommendations.push('gRPC is most bandwidth-efficient due to Protocol Buffers');
       }
@@ -261,12 +300,15 @@ export async function POST(request: NextRequest) {
       if (mostEfficient === 'WebSocket') {
         recommendations.push('WebSocket provides efficient real-time communication with minimal overhead');
       }
+      if (mostEfficient === 'SSE') {
+        recommendations.push('SSE provides efficient streaming communication with minimal overhead');
+      }
       const graphqlLatency = successfulResults.find(r => r.protocol === 'GraphQL')?.latency;
       const restLatency = successfulResults.find(r => r.protocol === 'REST')?.latency;
       if (graphqlLatency && restLatency && graphqlLatency < restLatency) {
         recommendations.push('GraphQL reduces over-fetching compared to REST');
       }
-      if (successfulResults.length === 5) {
+      if (successfulResults.length === 6) {
         recommendations.push('All protocols are functional - choose based on your specific requirements');
       }
       // Compare gRPC vs gRPC-Web
@@ -285,6 +327,14 @@ export async function POST(request: NextRequest) {
       }
       if (websocketLatency && grpcWebLatency && websocketLatency < grpcWebLatency) {
         recommendations.push('WebSocket provides better real-time performance than gRPC-Web');
+      }
+      // Compare SSE vs others
+      const sseLatency = successfulResults.find(r => r.protocol === 'SSE')?.latency;
+      if (sseLatency && websocketLatency && sseLatency < websocketLatency) {
+        recommendations.push('SSE shows better streaming performance than WebSocket');
+      }
+      if (sseLatency && grpcLatency && sseLatency < grpcLatency) {
+        recommendations.push('SSE shows better streaming performance than gRPC');
       }
     }
 

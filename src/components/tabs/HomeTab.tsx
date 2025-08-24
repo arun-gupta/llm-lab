@@ -55,7 +55,7 @@ export function HomeTab({ onTabChange, apiKeyStatus }: HomeTabProps) {
       {/* Protocol Overview */}
       <div className="mb-8">
         <h2 className="text-xl font-semibold text-gray-900 mb-4">🚀 Supported Protocols</h2>
-        <div className="grid grid-cols-2 md:grid-cols-5 gap-4 mb-6">
+        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4 mb-6">
           <div className="text-center p-4 bg-blue-50 rounded-lg border border-blue-200">
             <div className="text-2xl mb-2">🔍</div>
             <div className="font-medium text-blue-800">REST API</div>
@@ -82,7 +82,7 @@ export function HomeTab({ onTabChange, apiKeyStatus }: HomeTabProps) {
             <div className="text-xs text-orange-600">Real-time</div>
           </div>
           <div className="text-center p-4 bg-indigo-50 rounded-lg border border-indigo-200">
-            <div className="text-2xl mb-2">📡</div>
+            <div className="text-2xl mb-2">🤖</div>
             <div className="font-medium text-indigo-800">MCP</div>
             <div className="text-xs text-indigo-600">Model Context</div>
           </div>
