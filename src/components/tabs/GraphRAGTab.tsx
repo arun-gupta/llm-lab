@@ -2203,6 +2203,24 @@ export function GraphRAGTab() {
 
                 {grpcSubTab === 'grpc' && (
                   <>
+                    {/* gRPC Header with Add to Postman Button */}
+                    <div className="flex justify-between items-center mb-4">
+                      <div>
+                        <h3 className="text-lg font-semibold text-gray-900">⚡ gRPC Services</h3>
+                        <p className="text-gray-700 mt-1">
+                          High-performance GraphRAG operations using gRPC with Protocol Buffers
+                        </p>
+                      </div>
+                      <button 
+                        onClick={generateGrpcPostmanCollection}
+                        disabled={!graphData || importStatus === 'importing'}
+                        className="flex items-center px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 disabled:opacity-50 disabled:cursor-not-allowed"
+                      >
+                        <Download className="w-4 h-4 mr-2" />
+                        {importStatus === 'importing' ? 'Importing...' : 'Add gRPC to Postman'}
+                      </button>
+                    </div>
+
                     {/* Live gRPC Client */}
                     <div className="bg-white rounded-lg border shadow-sm">
                       <div className="p-6 border-b">
@@ -2318,328 +2336,7 @@ export function GraphRAGTab() {
                       </div>
                     </div>
 
-                    {/* gRPC Postman Integration */}
-                    <div className="bg-white rounded-lg border shadow-sm">
-                      <div className="p-6 border-b flex justify-between items-center">
-                        <div>
-                          <h3 className="flex items-center gap-2 text-lg font-semibold text-gray-900">
-                            <Download className="w-5 h-5" />
-                            gRPC Postman Integration
-                          </h3>
-                          <p className="text-gray-700 mt-1">
-                            Import gRPC collection for testing GraphRAG services
-                          </p>
-                        </div>
-                        <button 
-                          onClick={generateGrpcPostmanCollection}
-                          disabled={!graphData || importStatus === 'importing'}
-                          className="flex items-center px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 disabled:opacity-50 disabled:cursor-not-allowed"
-                        >
-                          <Download className="w-4 h-4 mr-2" />
-                          {importStatus === 'importing' ? 'Importing...' : 'Add gRPC to Postman'}
-                        </button>
-                      </div>
-                      <div className="p-6">
-                        <div className="flex flex-col space-y-3">
-                          
-                          {importStatus !== 'idle' && (
-                            <div className={`px-4 py-3 rounded-lg text-sm max-w-md ${
-                              importStatus === 'success' ? 'bg-green-50 border border-green-200 text-green-800' :
-                              importStatus === 'manual' ? 'bg-yellow-50 border border-yellow-200 text-yellow-800' :
-                              importStatus === 'error' ? 'bg-red-50 border border-red-200 text-red-800' :
-                              'bg-blue-50 border border-blue-200 text-blue-800'
-                            }`}>
-                              <div className="flex items-start space-x-2">
-                                {importStatus === 'success' && (
-                                  <svg className="w-4 h-4 mt-0.5 text-green-600 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
-                                    <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
-                                  </svg>
-                                )}
-                                <span className="leading-relaxed">{importMessage}</span>
-                              </div>
-                            </div>
-                          )}
-                          
-                          <div className="text-sm text-gray-600">
-                            <p>• Requires Postman's gRPC support</p>
-                            <p>• Import .proto files for service definitions</p>
-                            <p>• Test streaming operations in real-time</p>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
 
-            {/* gRPC Service Overview */}
-            <div className="bg-white rounded-lg border shadow-sm">
-              <div className="p-6 border-b">
-                <h3 className="flex items-center gap-2 text-lg font-semibold text-gray-900">
-                  <Zap className="w-5 h-5" />
-                  gRPC Streaming Services
-                </h3>
-                <p className="text-gray-700 mt-1">
-                  High-performance GraphRAG operations using gRPC with Protocol Buffers
-                </p>
-              </div>
-              <div className="p-6">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  {/* Service Overview */}
-                  <div className="space-y-4">
-                    <h4 className="font-medium text-blue-600">Available Services</h4>
-                    <div className="space-y-3">
-                      <div className="p-3 bg-blue-50 rounded-lg">
-                        <div className="font-medium text-blue-800">GraphTraversalService</div>
-                        <div className="text-sm text-blue-600">Real-time graph traversal with streaming results</div>
-                      </div>
-                      <div className="p-3 bg-green-50 rounded-lg">
-                        <div className="font-medium text-green-800">ContextStreamingService</div>
-                        <div className="text-sm text-green-600">Streaming context retrieval for GraphRAG</div>
-                      </div>
-                      <div className="p-3 bg-purple-50 rounded-lg">
-                        <div className="font-medium text-purple-800">EntityResolutionService</div>
-                        <div className="text-sm text-purple-600">High-performance entity lookups</div>
-                      </div>
-                      <div className="p-3 bg-orange-50 rounded-lg">
-                        <div className="font-medium text-orange-800">GraphBuildService</div>
-                        <div className="text-sm text-orange-600">Incremental graph construction</div>
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* Performance Benefits */}
-                  <div className="space-y-4">
-                    <h4 className="font-medium text-green-600">Performance Benefits</h4>
-                    <div className="space-y-3">
-                      <div className="flex items-center space-x-2">
-                        <div className="w-2 h-2 bg-green-500 rounded-full"></div>
-                        <span className="text-sm text-gray-900">3-10x faster than REST</span>
-                      </div>
-                      <div className="flex items-center space-x-2">
-                        <div className="w-2 h-2 bg-green-500 rounded-full"></div>
-                        <span className="text-sm text-gray-900">Binary Protocol Buffers</span>
-                      </div>
-                      <div className="flex items-center space-x-2">
-                        <div className="w-2 h-2 bg-green-500 rounded-full"></div>
-                        <span className="text-sm text-gray-900">HTTP/2 multiplexing</span>
-                      </div>
-                      <div className="flex items-center space-x-2">
-                        <div className="w-2 h-2 bg-green-500 rounded-full"></div>
-                        <span className="text-sm text-gray-900">Bidirectional streaming</span>
-                      </div>
-                      <div className="flex items-center space-x-2">
-                        <div className="w-2 h-2 bg-green-500 rounded-full"></div>
-                        <span className="text-sm text-gray-900">Strong type safety</span>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            {/* gRPC Service Definition */}
-            <div className="bg-white rounded-lg border shadow-sm">
-              <div className="p-6 border-b">
-                <h3 className="text-lg font-semibold">Protocol Buffer Definition</h3>
-                <p className="text-gray-600 mt-1">
-                  Service definitions for GraphRAG gRPC operations
-                </p>
-              </div>
-              <div className="p-6">
-                <div className="bg-gray-900 text-green-400 p-4 rounded-lg overflow-x-auto">
-                  <pre className="text-sm">
-{`syntax = "proto3";
-
-package graphrag;
-
-service GraphRAGService {
-  // Stream graph traversal results
-  rpc TraverseGraph(GraphQuery) returns (stream GraphNode);
-  
-  // Stream context retrieval for GraphRAG
-  rpc GetContextStream(ContextRequest) returns (stream ContextChunk);
-  
-  // High-performance entity resolution
-  rpc ResolveEntities(EntityQuery) returns (EntityResolution);
-  
-  // Incremental graph building
-  rpc BuildGraph(stream Document) returns (GraphBuildProgress);
-  
-  // Real-time graph updates
-  rpc StreamGraphUpdates(GraphFilter) returns (stream GraphUpdate);
-}
-
-message GraphQuery {
-  string query = 1;
-  string graph_id = 2;
-  int32 max_depth = 3;
-  repeated string node_types = 4;
-}
-
-message GraphNode {
-  string id = 1;
-  string label = 2;
-  string type = 3;
-  map<string, string> properties = 4;
-  repeated string connections = 5;
-}
-
-message ContextRequest {
-  string query = 1;
-  string graph_id = 2;
-  int32 max_context_size = 3;
-  float relevance_threshold = 4;
-}
-
-message ContextChunk {
-  string entity_id = 1;
-  string description = 2;
-  float relevance_score = 3;
-  repeated string relationships = 4;
-}
-
-message EntityQuery {
-  string entity_name = 1;
-  string graph_id = 2;
-  repeated string entity_types = 3;
-}
-
-message EntityResolution {
-  repeated EntityMatch matches = 1;
-  float confidence = 2;
-}
-
-message EntityMatch {
-  string entity_id = 1;
-  string name = 2;
-  string type = 3;
-  float similarity_score = 4;
-}
-
-message Document {
-  string content = 1;
-  string filename = 2;
-  string type = 3;
-}
-
-message GraphBuildProgress {
-  string status = 1;
-  float percentage = 2;
-  string message = 3;
-  GraphStats stats = 4;
-}
-
-message GraphStats {
-  int32 total_nodes = 1;
-  int32 total_edges = 2;
-  map<string, int32> node_types = 3;
-  map<string, int32> edge_types = 4;
-}
-
-message GraphFilter {
-  string graph_id = 1;
-  repeated string node_types = 2;
-  repeated string edge_types = 3;
-}
-
-message GraphUpdate {
-  string operation = 1; // "ADD_NODE", "ADD_EDGE", "UPDATE_NODE"
-  GraphNode node = 2;
-  GraphEdge edge = 3;
-  int64 timestamp = 4;
-}
-
-message GraphEdge {
-  string id = 1;
-  string source = 2;
-  string target = 3;
-  string label = 4;
-  string type = 5;
-  map<string, string> properties = 6;
-}`}
-                  </pre>
-                </div>
-              </div>
-            </div>
-
-            {/* gRPC Client Examples */}
-            <div className="bg-white rounded-lg border shadow-sm">
-              <div className="p-6 border-b">
-                <h3 className="text-lg font-semibold">Client Examples</h3>
-                <p className="text-gray-600 mt-1">
-                  Example code for using GraphRAG gRPC services
-                </p>
-              </div>
-              <div className="p-6">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  {/* JavaScript/TypeScript Example */}
-                  <div>
-                    <h4 className="font-medium text-blue-600 mb-3">JavaScript/TypeScript</h4>
-                    <div className="bg-gray-900 text-green-400 p-4 rounded-lg overflow-x-auto">
-                      <pre className="text-sm">
-{`import { GraphRAGServiceClient } from './generated/graphrag_grpc_web_pb';
-import { GraphQuery, ContextRequest } from './generated/graphrag_pb';
-
-const client = new GraphRAGServiceClient('http://localhost:8080');
-
-// Stream graph traversal
-const query = new GraphQuery();
-query.setQuery('AI healthcare relationships');
-query.setGraphId('graph_123');
-query.setMaxDepth(3);
-
-const stream = client.traverseGraph(query);
-stream.on('data', (node) => {
-  console.log('Node:', node.getLabel(), node.getType());
-});
-
-// Stream context retrieval
-const contextReq = new ContextRequest();
-contextReq.setQuery('What are AI benefits in healthcare?');
-contextReq.setGraphId('graph_123');
-
-const contextStream = client.getContextStream(contextReq);
-contextStream.on('data', (chunk) => {
-  console.log('Context:', chunk.getDescription());
-});`}
-                      </pre>
-                    </div>
-                  </div>
-
-                  {/* Python Example */}
-                  <div>
-                    <h4 className="font-medium text-green-600 mb-3">Python</h4>
-                    <div className="bg-gray-900 text-green-400 p-4 rounded-lg overflow-x-auto">
-                      <pre className="text-sm">
-{`import grpc
-from graphrag_pb2 import GraphQuery, ContextRequest
-from graphrag_pb2_grpc import GraphRAGServiceStub
-
-channel = grpc.insecure_channel('localhost:8080')
-stub = GraphRAGServiceStub(channel)
-
-# Stream graph traversal
-query = GraphQuery(
-    query="AI healthcare relationships",
-    graph_id="graph_123",
-    max_depth=3
-)
-
-for node in stub.TraverseGraph(query):
-    print(f"Node: {node.label} ({node.type})")
-
-# Stream context retrieval
-context_req = ContextRequest(
-    query="What are AI benefits in healthcare?",
-    graph_id="graph_123"
-)
-
-for chunk in stub.GetContextStream(context_req):
-    print(f"Context: {chunk.description}")`}
-                      </pre>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
           </>
                 )}
 
@@ -2818,6 +2515,34 @@ for chunk in stub.GetContextStream(context_req):
                             target="_blank" 
                             rel="noopener noreferrer"
                             className="inline-flex items-center mt-3 px-4 py-2 bg-blue-600 text-white text-sm font-medium rounded-lg hover:bg-blue-700 transition-colors"
+                          >
+                            <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+                            </svg>
+                            View Documentation
+                          </a>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Documentation Link */}
+                    <div className="bg-green-50 border border-green-200 rounded-lg p-4">
+                      <div className="flex items-start space-x-3">
+                        <div className="flex-shrink-0">
+                          <svg className="w-6 h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.746 0 3.332.477 4.5 1.253v13C19.832 18.477 18.246 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
+                          </svg>
+                        </div>
+                        <div>
+                          <h4 className="text-lg font-medium text-green-900">📚 Complete gRPC Documentation</h4>
+                          <p className="text-green-700 mt-1">
+                            For detailed implementation guides, Protocol Buffer definitions, client examples, and setup instructions, see the comprehensive documentation.
+                          </p>
+                          <a 
+                            href="/docs/grpc-integration.md" 
+                            target="_blank" 
+                            rel="noopener noreferrer"
+                            className="inline-flex items-center mt-3 px-4 py-2 bg-green-600 text-white text-sm font-medium rounded-lg hover:bg-green-700 transition-colors"
                           >
                             <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
