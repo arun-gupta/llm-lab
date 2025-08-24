@@ -32,7 +32,7 @@ export function SettingsTab() {
     },
     {
       icon: Settings,
-      title: 'MCP Settings',
+              title: 'GitHub & Token Settings',
       description: 'Configure token limits and MCP-specific settings',
       action: () => setShowMCPSettingsPanel(true),
       status: '✅ Available',

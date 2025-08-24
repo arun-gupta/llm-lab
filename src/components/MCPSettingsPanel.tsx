@@ -103,7 +103,7 @@ export function MCPSettingsPanel({ isOpen, onClose, onConfigChange }: MCPSetting
 
       if (settingsResponse.ok && tokenLimitsResponse.ok) {
         setSaveStatus('success');
-        setStatusMessage('MCP settings saved successfully!');
+        setStatusMessage('GitHub & Token settings saved successfully!');
         onConfigChange?.();
         
         // Clear success message after 3 seconds
@@ -112,11 +112,11 @@ export function MCPSettingsPanel({ isOpen, onClose, onConfigChange }: MCPSetting
           setStatusMessage('');
         }, 3000);
       } else {
-        throw new Error('Failed to save MCP settings');
+        throw new Error('Failed to save GitHub & Token settings');
       }
     } catch (error) {
       setSaveStatus('error');
-      setStatusMessage('Failed to save MCP settings. Please try again.');
+              setStatusMessage('Failed to save GitHub & Token settings. Please try again.');
     } finally {
       setIsSaving(false);
     }
@@ -142,8 +142,8 @@ export function MCPSettingsPanel({ isOpen, onClose, onConfigChange }: MCPSetting
               <Server className="w-5 h-5 text-green-600" />
             </div>
             <div>
-              <h2 className="text-xl font-semibold text-gray-900">MCP Settings</h2>
-              <p className="text-sm text-gray-600">Configure Model Context Protocol settings and token limits</p>
+              <h2 className="text-xl font-semibold text-gray-900">GitHub & Token Settings</h2>
+              <p className="text-sm text-gray-600">Configure GitHub MCP integration and AI model token limits</p>
             </div>
           </div>
           <button
