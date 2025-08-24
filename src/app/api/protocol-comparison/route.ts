@@ -4,7 +4,7 @@ import { join } from 'path';
 import { getBaseURL } from '@/lib/port-config';
 
 interface ProtocolTestResult {
-  protocol: 'REST' | 'GraphQL' | 'gRPC';
+  protocol: 'REST' | 'GraphQL' | 'gRPC' | 'gRPC-Web';
   latency: number;
   payloadSize: number;
   response: string;
@@ -149,6 +149,42 @@ export async function POST(request: NextRequest) {
       });
     }
 
+    // Test gRPC-Web API (Mock for now)
+    try {
+      const grpcWebStartTime = performance.now();
+      
+      // Simulate gRPC-Web API call with mock data
+      // gRPC-Web has slightly higher latency than gRPC due to HTTP/1.1 transport
+      await new Promise(resolve => setTimeout(resolve, 100 + Math.random() * 80));
+      
+      const grpcWebEndTime = performance.now();
+      const mockGrpcWebResponse = `gRPC-Web browser analysis demonstrates AI healthcare advantages: client-side streaming, HTTP/1.1 compatibility, and browser-optimized communication. The web-friendly approach enables direct browser-to-server communication without proxies.`;
+
+      // gRPC-Web has similar protobuf efficiency but slightly larger headers due to HTTP/1.1
+      const jsonPayloadSize = JSON.stringify({ response: mockGrpcWebResponse }).length;
+      const protobufPayloadSize = Math.round(jsonPayloadSize * 0.4); // Slightly larger than gRPC due to HTTP headers
+
+      results.push({
+        protocol: 'gRPC-Web',
+        latency: Math.round(grpcWebEndTime - grpcWebStartTime),
+        payloadSize: protobufPayloadSize,
+        response: mockGrpcWebResponse,
+        timestamp: new Date().toISOString(),
+        status: 'success',
+        error: undefined
+      });
+    } catch (error) {
+      results.push({
+        protocol: 'gRPC-Web',
+        latency: 0,
+        payloadSize: 0,
+        response: '',
+        timestamp: new Date().toISOString(),
+        status: 'error',
+        error: error instanceof Error ? error.message : 'gRPC-Web API error'
+      });
+    }
+
     // Calculate analytics
     const successfulResults = results.filter(r => r.status === 'success');
     const totalTime = Date.now() - startTime;
@@ -174,16 +210,31 @@ export async function POST(request: NextRequest) {
       if (fastest === 'gRPC') {
         recommendations.push('gRPC shows best latency performance for real-time applications');
       }
+      if (fastest === 'gRPC-Web') {
+        recommendations.push('gRPC-Web provides excellent browser performance with Protocol Buffers');
+      }
       if (mostEfficient === 'gRPC') {
         recommendations.push('gRPC is most bandwidth-efficient due to Protocol Buffers');
+      }
+      if (mostEfficient === 'gRPC-Web') {
+        recommendations.push('gRPC-Web offers efficient browser communication with Protocol Buffers');
       }
       const graphqlLatency = successfulResults.find(r => r.protocol === 'GraphQL')?.latency;
       const restLatency = successfulResults.find(r => r.protocol === 'REST')?.latency;
       if (graphqlLatency && restLatency && graphqlLatency < restLatency) {
         recommendations.push('GraphQL reduces over-fetching compared to REST');
       }
-      if (successfulResults.length === 3) {
+      if (successfulResults.length === 4) {
         recommendations.push('All protocols are functional - choose based on your specific requirements');
+      }
+      // Compare gRPC vs gRPC-Web
+      const grpcLatency = successfulResults.find(r => r.protocol === 'gRPC')?.latency;
+      const grpcWebLatency = successfulResults.find(r => r.protocol === 'gRPC-Web')?.latency;
+      if (grpcLatency && grpcWebLatency && grpcLatency < grpcWebLatency) {
+        recommendations.push('gRPC has lower latency than gRPC-Web due to HTTP/2 vs HTTP/1.1');
+      }
+      if (grpcLatency && grpcWebLatency && grpcWebLatency < grpcLatency) {
+        recommendations.push('gRPC-Web shows better performance in this test');
       }
     }
 

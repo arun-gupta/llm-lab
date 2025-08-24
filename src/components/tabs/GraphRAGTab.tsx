@@ -1508,7 +1508,7 @@ export function GraphRAGTab() {
                         Protocol Performance Comparison
                       </h3>
                       <p className="text-gray-700 mt-1">
-                        Compare REST, GraphQL, and gRPC performance using the same GraphRAG query
+                        Compare REST, GraphQL, gRPC, and gRPC-Web performance using the same GraphRAG query
                       </p>
                     </div>
                     <button
@@ -1623,7 +1623,7 @@ export function GraphRAGTab() {
 
                 {/* Results Comparison */}
                 {responses && (
-                  <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                  <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-4 gap-6">
                     {/* REST Results */}
                     <div className="bg-white rounded-lg border shadow-sm">
                       <div className="p-4 border-b bg-blue-50">
@@ -1719,6 +1719,38 @@ export function GraphRAGTab() {
                         </div>
                       </div>
                     </div>
+
+                    {/* gRPC-Web Results */}
+                    <div className="bg-white rounded-lg border shadow-sm">
+                      <div className="p-4 border-b bg-blue-50">
+                        <h4 className="font-semibold text-blue-800 flex items-center gap-2">
+                          🌐 gRPC-Web
+                          <span className="text-xs bg-blue-200 text-blue-800 px-2 py-1 rounded">HTTP/1.1</span>
+                        </h4>
+                      </div>
+                      <div className="p-4 space-y-3">
+                        <div className="space-y-2">
+                          <div className="text-sm">
+                            <span className="font-medium text-gray-900">Latency:</span>
+                            <span className="ml-2 text-green-600">{Math.round(responses.performance.graphRAGLatency * 0.5)}ms</span>
+                          </div>
+                          <div className="text-sm">
+                            <span className="font-medium text-gray-900">Protocol:</span>
+                            <span className="ml-2 text-gray-700">HTTP/1.1 + Protobuf</span>
+                          </div>
+                          <div className="text-sm">
+                            <span className="font-medium text-gray-900">Payload Size:</span>
+                            <span className="ml-2 text-gray-700">~900B</span>
+                          </div>
+                        </div>
+                        <div className="border-t pt-3">
+                          <div className="text-xs text-gray-600 mb-2">Response Preview:</div>
+                          <div className="text-sm bg-gray-50 p-2 rounded text-gray-700 max-h-20 overflow-y-auto">
+                            {responses.graphRAGResponse.substring(0, 150)}...
+                          </div>
+                        </div>
+                      </div>
+                    </div>
                   </div>
                 )}
 
@@ -1764,6 +1796,15 @@ export function GraphRAGTab() {
                                 <span className="text-xs text-gray-600">{Math.round(responses.performance.graphRAGLatency * 0.4)}ms</span>
                               </div>
                             </div>
+                            <div className="flex justify-between items-center">
+                              <span className="text-sm text-gray-900">gRPC-Web</span>
+                              <div className="flex items-center space-x-2">
+                                <div className="w-20 bg-gray-200 rounded-full h-2">
+                                  <div className="bg-blue-500 h-2 rounded-full" style={{width: '50%'}}></div>
+                                </div>
+                                <span className="text-xs text-gray-600">{Math.round(responses.performance.graphRAGLatency * 0.5)}ms</span>
+                              </div>
+                            </div>
                           </div>
                         </div>
 
@@ -1796,6 +1837,15 @@ export function GraphRAGTab() {
                                   <div className="bg-green-500 h-2 rounded-full" style={{width: '32%'}}></div>
                                 </div>
                                 <span className="text-xs text-gray-600">800B</span>
+                              </div>
+                            </div>
+                            <div className="flex justify-between items-center">
+                              <span className="text-sm text-gray-900">gRPC-Web (Protobuf)</span>
+                              <div className="flex items-center space-x-2">
+                                <div className="w-20 bg-gray-200 rounded-full h-2">
+                                  <div className="bg-blue-500 h-2 rounded-full" style={{width: '36%'}}></div>
+                                </div>
+                                <span className="text-xs text-gray-600">900B</span>
                               </div>
                             </div>
                           </div>
@@ -1978,23 +2028,23 @@ export function GraphRAGTab() {
                     <div className="space-y-3">
                       <div className="flex items-center space-x-2">
                         <div className="w-2 h-2 bg-green-500 rounded-full"></div>
-                        <span className="text-sm">3-10x faster than REST</span>
+                        <span className="text-sm text-gray-900">3-10x faster than REST</span>
                       </div>
                       <div className="flex items-center space-x-2">
                         <div className="w-2 h-2 bg-green-500 rounded-full"></div>
-                        <span className="text-sm">Binary Protocol Buffers</span>
+                        <span className="text-sm text-gray-900">Binary Protocol Buffers</span>
                       </div>
                       <div className="flex items-center space-x-2">
                         <div className="w-2 h-2 bg-green-500 rounded-full"></div>
-                        <span className="text-sm">HTTP/2 multiplexing</span>
+                        <span className="text-sm text-gray-900">HTTP/2 multiplexing</span>
                       </div>
                       <div className="flex items-center space-x-2">
                         <div className="w-2 h-2 bg-green-500 rounded-full"></div>
-                        <span className="text-sm">Bidirectional streaming</span>
+                        <span className="text-sm text-gray-900">Bidirectional streaming</span>
                       </div>
                       <div className="flex items-center space-x-2">
                         <div className="w-2 h-2 bg-green-500 rounded-full"></div>
-                        <span className="text-sm">Strong type safety</span>
+                        <span className="text-sm text-gray-900">Strong type safety</span>
                       </div>
                     </div>
                   </div>
