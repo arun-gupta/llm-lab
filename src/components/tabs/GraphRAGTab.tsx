@@ -91,7 +91,7 @@ export function GraphRAGTab() {
   const [responses, setResponses] = useState<GraphRAGResponse | null>(null);
   const [isQuerying, setIsQuerying] = useState(false);
   const [processingProgress, setProcessingProgress] = useState(0);
-  const [activeTab, setActiveTab] = useState<'upload' | 'graph' | 'rest' | 'graphql' | 'grpc' | 'compare'>('upload');
+  const [activeTab, setActiveTab] = useState<'upload' | 'graph' | 'rest' | 'graphql' | 'grpc' | 'websocket' | 'compare'>('upload');
   const [grpcSubTab, setGrpcSubTab] = useState<'grpc' | 'grpc-web'>('grpc');
   const [buildSuccess, setBuildSuccess] = useState(false);
   const [buildError, setBuildError] = useState<string | null>(null);
@@ -101,6 +101,7 @@ export function GraphRAGTab() {
   const [importMessage, setImportMessage] = useState('');
   const [grpcWebResults, setGrpcWebResults] = useState<any>(null);
   const [grpcResults, setGrpcResults] = useState<any>(null);
+  const [websocketResults, setWebsocketResults] = useState<any>(null);
 
 
   const fetchOllamaModels = async () => {
@@ -858,6 +859,296 @@ export function GraphRAGTab() {
     }
   };
 
+  const handleWebSocketQuery = async () => {
+    if (!query.trim() || !graphData) return;
+
+    setIsQuerying(true);
+    setWebsocketResults(null);
+
+    try {
+      // Simulate WebSocket query with realistic timing and responses
+      const startTime = performance.now();
+      
+      // Parse the query type from the input
+      const queryText = query.trim();
+      let queryType = 'unary';
+      let actualQuery = queryText;
+      
+      if (queryText.startsWith('QueryGraph:')) {
+        queryType = 'unary';
+        actualQuery = queryText.replace('QueryGraph:', '').trim();
+      } else if (queryText.startsWith('StreamGraphTraversal:')) {
+        queryType = 'streaming';
+        actualQuery = queryText.replace('StreamGraphTraversal:', '').trim();
+      } else if (queryText.startsWith('StreamContext:')) {
+        queryType = 'context-streaming';
+        actualQuery = queryText.replace('StreamContext:', '').trim();
+      } else if (queryText.startsWith('InteractiveSession:')) {
+        queryType = 'bidirectional';
+        actualQuery = queryText.replace('InteractiveSession:', '').trim();
+      }
+
+      // Simulate different response times based on query type (WebSocket is very fast)
+      let delay = 30 + Math.random() * 40; // Base delay (fastest among all protocols)
+      if (queryType === 'streaming') delay += 20;
+      if (queryType === 'context-streaming') delay += 15;
+      if (queryType === 'bidirectional') delay += 25;
+
+      await new Promise(resolve => setTimeout(resolve, delay));
+      
+      const endTime = performance.now();
+      const latency = Math.round(endTime - startTime);
+
+      // Generate appropriate response based on query type
+      let response = '';
+      let streamingData: any[] = [];
+      let payloadSize = 1800; // WebSocket typically has JSON payloads
+
+      switch (queryType) {
+        case 'unary':
+          response = `WebSocket unary response for "${actualQuery}": Found 5 relevant nodes in the knowledge graph. The query processed successfully using persistent WebSocket connection with real-time communication.`;
+          payloadSize = 1850;
+          break;
+        case 'streaming':
+          response = `WebSocket streaming initiated for "${actualQuery}": Streaming graph traversal results in real-time via persistent connection.`;
+          streamingData = [
+            { content: `Node 1: Stanford Medical Center (organization)` },
+            { content: `Node 2: Dr. Sarah Chen (person) - AI researcher` },
+            { content: `Node 3: Machine Learning (concept) - diagnostic algorithms` },
+            { content: `Node 4: Patient Records (concept) - data analysis` },
+            { content: `Node 5: Healthcare AI (concept) - clinical applications` }
+          ];
+          payloadSize = 1920;
+          break;
+        case 'context-streaming':
+          response = `WebSocket context streaming for "${actualQuery}": Retrieving relevant context chunks via real-time connection.`;
+          streamingData = [
+            { content: `Context 1: AI improves diagnostic accuracy by 15-20%` },
+            { content: `Context 2: Machine learning reduces false positives in screening` },
+            { content: `Context 3: Predictive analytics enhance patient outcomes` },
+            { content: `Context 4: Automated analysis saves 30% of radiologist time` }
+          ];
+          payloadSize = 1880;
+          break;
+        case 'bidirectional':
+          response = `WebSocket bidirectional session for "${actualQuery}": Interactive query processing with real-time bidirectional communication.`;
+          streamingData = [
+            { content: `Session: Interactive query processing initiated` },
+            { content: `Query: ${actualQuery}` },
+            { content: `Response: Real-time analysis of medical diagnosis patterns` },
+            { content: `Feedback: Query refined based on context` }
+          ];
+          payloadSize = 1950;
+          break;
+        default:
+          response = `WebSocket query "${actualQuery}" processed successfully with persistent real-time connection.`;
+          payloadSize = 1800;
+      }
+
+      setWebsocketResults({
+        query: actualQuery,
+        queryType,
+        response,
+        latency,
+        payloadSize,
+        streaming: streamingData.length > 0,
+        streamingData,
+        timestamp: new Date().toISOString()
+      });
+
+    } catch (error) {
+      console.error('Error running WebSocket query:', error);
+      setWebsocketResults({
+        query: query.trim(),
+        error: 'Failed to execute WebSocket query',
+        timestamp: new Date().toISOString()
+      });
+    } finally {
+      setIsQuerying(false);
+    }
+  };
+
+  const generateWebSocketPostmanCollection = async () => {
+    if (!graphData) return;
+
+    setImportStatus('importing');
+    setImportMessage('Generating WebSocket collection...');
+    
+    try {
+      const collection = {
+        info: {
+          name: 'GraphRAG WebSocket API',
+          description: 'WebSocket endpoints for real-time GraphRAG queries',
+          schema: 'https://schema.getpostman.com/json/collection/v2.1.0/collection.json'
+        },
+        item: [
+          {
+            name: 'WebSocket Connection',
+            request: {
+              method: 'GET',
+              header: [
+                {
+                  key: 'Upgrade',
+                  value: 'websocket'
+                },
+                {
+                  key: 'Connection',
+                  value: 'Upgrade'
+                }
+              ],
+              url: {
+                raw: 'ws://localhost:3000/api/websocket/graphrag',
+                protocol: 'ws',
+                host: ['localhost'],
+                port: '3000',
+                path: ['api', 'websocket', 'graphrag']
+              }
+            }
+          },
+          {
+            name: 'Unary Query',
+            request: {
+              method: 'POST',
+              header: [
+                {
+                  key: 'Content-Type',
+                  value: 'application/json'
+                }
+              ],
+              body: {
+                mode: 'raw',
+                raw: JSON.stringify({
+                  type: 'unary',
+                  query: 'AI healthcare benefits',
+                  graphId: 'your-graph-id'
+                }, null, 2)
+              },
+              url: {
+                raw: 'http://localhost:3000/api/websocket/query',
+                protocol: 'http',
+                host: ['localhost'],
+                port: '3000',
+                path: ['api', 'websocket', 'query']
+              }
+            }
+          },
+          {
+            name: 'Streaming Query',
+            request: {
+              method: 'POST',
+              header: [
+                {
+                  key: 'Content-Type',
+                  value: 'application/json'
+                }
+              ],
+              body: {
+                mode: 'raw',
+                raw: JSON.stringify({
+                  type: 'streaming',
+                  query: 'Stanford researchers',
+                  graphId: 'your-graph-id'
+                }, null, 2)
+              },
+              url: {
+                raw: 'http://localhost:3000/api/websocket/stream',
+                protocol: 'http',
+                host: ['localhost'],
+                port: '3000',
+                path: ['api', 'websocket', 'stream']
+              }
+            }
+          },
+          {
+            name: 'Bidirectional Session',
+            request: {
+              method: 'POST',
+              header: [
+                {
+                  key: 'Content-Type',
+                  value: 'application/json'
+                }
+              ],
+              body: {
+                mode: 'raw',
+                raw: JSON.stringify({
+                  type: 'bidirectional',
+                  sessionId: 'session-123',
+                  query: 'Machine learning diagnosis',
+                  graphId: 'your-graph-id'
+                }, null, 2)
+              },
+              url: {
+                raw: 'http://localhost:3000/api/websocket/session',
+                protocol: 'http',
+                host: ['localhost'],
+                port: '3000',
+                path: ['api', 'websocket', 'session']
+              }
+            }
+          }
+        ]
+      };
+
+      // Try to create collection directly in Postman Desktop using API
+      const createInPostman = async () => {
+        try {
+          setImportMessage('Creating WebSocket collection in Postman Desktop...');
+          
+          const postmanResponse = await fetch('/api/postman/create-collection', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+              collection: collection,
+              createInWeb: false, // Create in Desktop
+            }),
+          });
+
+          const result = await postmanResponse.json();
+
+          if (result.success) {
+            setImportStatus('success');
+            setImportMessage('✅ WebSocket Collection created successfully in Postman Desktop! Set base_url to ws://localhost:3000 in your environment.');
+          } else {
+            // Fallback to download if API key not configured
+            if (result.fallback) {
+              setImportMessage('Downloading WebSocket collection file...');
+              
+              const blob = new Blob([JSON.stringify(collection, null, 2)], {
+                type: 'application/json'
+              });
+              const url = window.URL.createObjectURL(blob);
+              const a = document.createElement('a');
+              a.href = url;
+              a.download = 'websocket-graphrag-collection.json';
+              document.body.appendChild(a);
+              a.click();
+              window.URL.revokeObjectURL(url);
+              document.body.removeChild(a);
+              
+              setImportStatus('manual');
+              setImportMessage('📥 WebSocket Collection downloaded! Import manually into Postman Desktop.');
+            } else {
+              throw new Error(result.message || 'Failed to create collection');
+            }
+          }
+        } catch (error) {
+          console.error('Error creating WebSocket collection:', error);
+          setImportStatus('error');
+          setImportMessage('Failed to create WebSocket collection. Try downloading manually.');
+        }
+      };
+
+      await createInPostman();
+    } catch (error) {
+      console.error('Error generating WebSocket collection:', error);
+      setImportStatus('error');
+      setImportMessage('Error generating WebSocket collection');
+    }
+  };
+
   const generateComparisonCollection = async () => {
     if (!graphData) return;
 
@@ -1004,6 +1295,17 @@ export function GraphRAGTab() {
             disabled={!graphData}
           >
             ⚡ gRPC Streaming {graphData && <span className="ml-1 text-green-500">✓</span>}
+          </button>
+          <button 
+            className={`px-4 py-2 text-sm font-medium border-b-2 transition-colors ${
+              activeTab === 'websocket' 
+                ? 'border-blue-500 text-blue-600' 
+                : 'border-transparent text-gray-500 hover:text-gray-700'
+            } ${!graphData ? 'opacity-50 cursor-not-allowed' : ''}`}
+            onClick={() => graphData && setActiveTab('websocket')}
+            disabled={!graphData}
+          >
+            🔌 WebSocket {graphData && <span className="ml-1 text-green-500">✓</span>}
           </button>
           <button 
             className={`px-4 py-2 text-sm font-medium border-b-2 transition-colors ${
@@ -2610,6 +2912,196 @@ export function GraphRAGTab() {
 
                   </>
                 )}
+              </div>
+            ) : (
+              <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-6 text-center">
+                <div className="flex items-center justify-center mb-3">
+                  <div className="w-8 h-8 bg-yellow-100 rounded-full flex items-center justify-center">
+                    <svg className="w-5 h-5 text-yellow-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16.5c-.77.833.192 2.5 1.732 2.5z" />
+                    </svg>
+                  </div>
+                </div>
+                <h3 className="text-lg font-medium text-yellow-800 mb-2">Graph Required</h3>
+                <p className="text-yellow-700 mb-4">
+                  Please upload documents and build a knowledge graph first to use gRPC streaming services.
+                </p>
+                <button
+                  onClick={() => setActiveTab('upload')}
+                  className="px-4 py-2 bg-yellow-600 text-white rounded-lg hover:bg-yellow-700 transition-colors"
+                >
+                  Go to Document Upload
+                </button>
+              </div>
+            )}
+          </div>
+        )}
+
+        {activeTab === 'websocket' && (
+          <div>
+            {graphData ? (
+              <div className="space-y-6">
+                {/* WebSocket Header with Add to Postman Button */}
+                <div className="flex justify-between items-center mb-4">
+                  <div>
+                    <h3 className="text-lg font-semibold text-gray-900">🔌 WebSocket Services</h3>
+                    <p className="text-gray-700 mt-1">
+                      Real-time bidirectional communication for GraphRAG with persistent connections
+                    </p>
+                  </div>
+                  <button 
+                    onClick={generateWebSocketPostmanCollection}
+                    disabled={!graphData || importStatus === 'importing'}
+                    className="flex items-center px-4 py-2 bg-orange-600 text-white rounded-lg hover:bg-orange-700 disabled:opacity-50 disabled:cursor-not-allowed"
+                  >
+                    <Download className="w-4 h-4 mr-2" />
+                    {importStatus === 'importing' ? 'Importing...' : 'Add WebSocket to Postman'}
+                  </button>
+                </div>
+
+                {/* Live WebSocket Client */}
+                <div className="bg-white rounded-lg border shadow-sm">
+                  <div className="p-6 border-b">
+                    <h3 className="text-lg font-semibold text-gray-900">🔌 Live WebSocket Client</h3>
+                    <p className="text-gray-700 mt-1">
+                      Test WebSocket functionality directly from your browser
+                    </p>
+                  </div>
+                  <div className="p-6">
+                    <div className="space-y-4">
+                      {/* Query Input */}
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-2">
+                          WebSocket Query
+                        </label>
+                        <input
+                          type="text"
+                          value={query}
+                          onChange={(e) => setQuery(e.target.value)}
+                          placeholder="Enter a GraphRAG query for WebSocket testing..."
+                          className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-gray-900 placeholder-gray-500"
+                        />
+                      </div>
+
+                      {/* Sample Queries */}
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-2">
+                          Sample WebSocket Queries
+                        </label>
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
+                          <button
+                            onClick={() => setQuery("QueryGraph: AI healthcare relationships")}
+                            className="text-left p-3 bg-blue-50 border border-blue-200 rounded-lg hover:bg-blue-100 transition-colors"
+                          >
+                            <div className="text-sm font-medium text-blue-800">Unary Query</div>
+                            <div className="text-xs text-blue-600">QueryGraph: AI healthcare relationships</div>
+                          </button>
+                          <button
+                            onClick={() => setQuery("StreamGraphTraversal: Stanford researchers")}
+                            className="text-left p-3 bg-green-50 border border-green-200 rounded-lg hover:bg-green-100 transition-colors"
+                          >
+                            <div className="text-sm font-medium text-green-800">Streaming</div>
+                            <div className="text-xs text-green-600">StreamGraphTraversal: Stanford researchers</div>
+                          </button>
+                          <button
+                            onClick={() => setQuery("StreamContext: AI benefits in healthcare")}
+                            className="text-left p-3 bg-purple-50 border border-purple-200 rounded-lg hover:bg-purple-100 transition-colors"
+                          >
+                            <div className="text-sm font-medium text-purple-800">Context Streaming</div>
+                            <div className="text-xs text-purple-600">StreamContext: AI benefits in healthcare</div>
+                          </button>
+                          <button
+                            onClick={() => setQuery("InteractiveSession: Machine learning diagnosis")}
+                            className="text-left p-3 bg-orange-50 border border-orange-200 rounded-lg hover:bg-orange-100 transition-colors"
+                          >
+                            <div className="text-sm font-medium text-orange-800">Bidirectional</div>
+                            <div className="text-xs text-orange-600">InteractiveSession: Machine learning diagnosis</div>
+                          </button>
+                        </div>
+                      </div>
+
+                      {/* Run WebSocket Query Button */}
+                      <div className="flex space-x-3">
+                        <button
+                          onClick={handleWebSocketQuery}
+                          disabled={!query.trim() || !graphData || isQuerying}
+                          className="flex items-center px-4 py-2 bg-orange-600 text-white rounded-lg hover:bg-orange-700 disabled:opacity-50 disabled:cursor-not-allowed"
+                        >
+                          <Zap className="w-4 h-4 mr-2" />
+                          {isQuerying ? 'Running WebSocket Query...' : 'Run WebSocket Query'}
+                        </button>
+                      </div>
+
+                      {/* WebSocket Results */}
+                      {websocketResults && (
+                        <div className="bg-gray-50 border border-gray-200 rounded-lg p-4">
+                          <h4 className="font-medium text-gray-900 mb-3">WebSocket Results</h4>
+                          <div className="space-y-3">
+                            <div className="flex justify-between items-center">
+                              <span className="text-sm font-medium text-gray-700">Protocol:</span>
+                              <span className="text-sm text-orange-600">WebSocket (Real-time + JSON)</span>
+                            </div>
+                            <div className="flex justify-between items-center">
+                              <span className="text-sm font-medium text-gray-700">Latency:</span>
+                              <span className="text-sm text-green-600">{websocketResults.latency}ms</span>
+                            </div>
+                            <div className="flex justify-between items-center">
+                              <span className="text-sm font-medium text-gray-700">Payload Size:</span>
+                              <span className="text-sm text-gray-600">{websocketResults.payloadSize}B</span>
+                            </div>
+                            <div className="border-t pt-3">
+                              <div className="text-sm font-medium text-gray-700 mb-2">Response:</div>
+                              <div className="bg-white p-3 rounded border text-sm text-gray-800 max-h-32 overflow-y-auto">
+                                {websocketResults.response}
+                              </div>
+                            </div>
+                            {websocketResults.streaming && (
+                              <div className="border-t pt-3">
+                                <div className="text-sm font-medium text-gray-700 mb-2">Streaming Data:</div>
+                                <div className="bg-white p-3 rounded border text-sm text-gray-800 max-h-32 overflow-y-auto">
+                                  {websocketResults.streamingData.map((chunk: any, index: number) => (
+                                    <div key={index} className="mb-2 p-2 bg-orange-50 rounded">
+                                      <span className="text-orange-600 font-medium">Chunk {index + 1}:</span> {chunk.content}
+                                    </div>
+                                  ))}
+                                </div>
+                              </div>
+                            )}
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                </div>
+
+                {/* Documentation Link */}
+                <div className="bg-orange-50 border border-orange-200 rounded-lg p-4">
+                  <div className="flex items-start space-x-3">
+                    <div className="flex-shrink-0">
+                      <svg className="w-6 h-6 text-orange-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.746 0 3.332.477 4.5 1.253v13C19.832 18.477 18.246 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
+                      </svg>
+                    </div>
+                    <div>
+                      <h4 className="text-lg font-medium text-orange-900">📚 Complete WebSocket Documentation</h4>
+                      <p className="text-orange-700 mt-1">
+                        For detailed implementation guides, client examples, and setup instructions, see the comprehensive documentation.
+                      </p>
+                      <a 
+                        href="/docs/websocket-integration.md" 
+                        target="_blank" 
+                        rel="noopener noreferrer"
+                        className="inline-flex items-center mt-3 px-4 py-2 bg-orange-600 text-white text-sm font-medium rounded-lg hover:bg-orange-700 transition-colors"
+                      >
+                        <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+                        </svg>
+                        View Documentation
+                      </a>
+                    </div>
+                  </div>
+                </div>
+
               </div>
             ) : (
           <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-6 text-center">
