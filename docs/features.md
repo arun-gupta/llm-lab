@@ -6,6 +6,7 @@ A comprehensive guide to all features available in Postman Protocol Playground.
 
 ### **Document Upload & Processing**
 - Upload text documents and automatically extract entities and relationships
+- **In-Memory Storage**: Fast access to knowledge graphs and comparison data
 - Support for multiple document formats (.txt files)
 - Automatic entity recognition and relationship mapping
 - Sample documents included: AI healthcare and tech companies datasets
