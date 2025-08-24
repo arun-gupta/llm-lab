@@ -4,7 +4,7 @@ import { join } from 'path';
 import { getBaseURL } from '@/lib/port-config';
 
 interface ProtocolTestResult {
-  protocol: 'REST' | 'GraphQL' | 'gRPC' | 'gRPC-Web';
+  protocol: 'REST' | 'GraphQL' | 'gRPC' | 'gRPC-Web' | 'WebSocket';
   latency: number;
   payloadSize: number;
   response: string;
@@ -185,6 +185,42 @@ export async function POST(request: NextRequest) {
       });
     }
 
+    // Test WebSocket API (Mock for now)
+    try {
+      const websocketStartTime = performance.now();
+      
+      // Simulate WebSocket API call with mock data
+      // WebSocket has low latency due to persistent connection
+      await new Promise(resolve => setTimeout(resolve, 50 + Math.random() * 40));
+      
+      const websocketEndTime = performance.now();
+      const mockWebSocketResponse = `WebSocket real-time analysis reveals AI healthcare benefits: persistent bidirectional communication, minimal overhead, and instant data streaming. The connection-oriented approach enables continuous data flow and real-time updates.`;
+
+      // WebSocket has minimal overhead, similar to JSON but with connection benefits
+      const jsonPayloadSize = JSON.stringify({ response: mockWebSocketResponse }).length;
+      const websocketPayloadSize = Math.round(jsonPayloadSize * 0.9); // Minimal overhead
+
+      results.push({
+        protocol: 'WebSocket',
+        latency: Math.round(websocketEndTime - websocketStartTime),
+        payloadSize: websocketPayloadSize,
+        response: mockWebSocketResponse,
+        timestamp: new Date().toISOString(),
+        status: 'success',
+        error: undefined
+      });
+    } catch (error) {
+      results.push({
+        protocol: 'WebSocket',
+        latency: 0,
+        payloadSize: 0,
+        response: '',
+        timestamp: new Date().toISOString(),
+        status: 'error',
+        error: error instanceof Error ? error.message : 'WebSocket API error'
+      });
+    }
+
     // Calculate analytics
     const successfulResults = results.filter(r => r.status === 'success');
     const totalTime = Date.now() - startTime;
@@ -213,18 +249,24 @@ export async function POST(request: NextRequest) {
       if (fastest === 'gRPC-Web') {
         recommendations.push('gRPC-Web provides excellent browser performance with Protocol Buffers');
       }
+      if (fastest === 'WebSocket') {
+        recommendations.push('WebSocket shows best real-time performance with persistent connections');
+      }
       if (mostEfficient === 'gRPC') {
         recommendations.push('gRPC is most bandwidth-efficient due to Protocol Buffers');
       }
       if (mostEfficient === 'gRPC-Web') {
         recommendations.push('gRPC-Web offers efficient browser communication with Protocol Buffers');
       }
+      if (mostEfficient === 'WebSocket') {
+        recommendations.push('WebSocket provides efficient real-time communication with minimal overhead');
+      }
       const graphqlLatency = successfulResults.find(r => r.protocol === 'GraphQL')?.latency;
       const restLatency = successfulResults.find(r => r.protocol === 'REST')?.latency;
       if (graphqlLatency && restLatency && graphqlLatency < restLatency) {
         recommendations.push('GraphQL reduces over-fetching compared to REST');
       }
-      if (successfulResults.length === 4) {
+      if (successfulResults.length === 5) {
         recommendations.push('All protocols are functional - choose based on your specific requirements');
       }
       // Compare gRPC vs gRPC-Web
@@ -235,6 +277,14 @@ export async function POST(request: NextRequest) {
       }
       if (grpcLatency && grpcWebLatency && grpcWebLatency < grpcLatency) {
         recommendations.push('gRPC-Web shows better performance in this test');
+      }
+      // Compare WebSocket vs others
+      const websocketLatency = successfulResults.find(r => r.protocol === 'WebSocket')?.latency;
+      if (websocketLatency && grpcLatency && websocketLatency < grpcLatency) {
+        recommendations.push('WebSocket shows better real-time performance than gRPC');
+      }
+      if (websocketLatency && grpcWebLatency && websocketLatency < grpcWebLatency) {
+        recommendations.push('WebSocket provides better real-time performance than gRPC-Web');
       }
     }
 
