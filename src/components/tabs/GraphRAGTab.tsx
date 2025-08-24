@@ -2382,8 +2382,8 @@ for chunk in stub.GetContextStream(context_req):
                     {/* gRPC-Web Protocol Buffer Definition */}
                     <div className="bg-white rounded-lg border shadow-sm">
                       <div className="p-6 border-b">
-                        <h3 className="text-lg font-semibold">gRPC-Web Protocol Buffer Definition</h3>
-                        <p className="text-gray-600 mt-1">
+                        <h3 className="text-lg font-semibold text-gray-900">gRPC-Web Protocol Buffer Definition</h3>
+                        <p className="text-gray-700 mt-1">
                           Service definitions for GraphRAG gRPC-Web operations
                         </p>
                       </div>
