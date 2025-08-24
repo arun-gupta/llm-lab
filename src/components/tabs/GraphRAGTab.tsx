@@ -2516,74 +2516,26 @@ export function GraphRAGTab() {
                         </h4>
                       </div>
                       <div className="p-4 space-y-3">
-                        {grpcResults ? (
-                          <>
-                            <div className="space-y-2">
-                              <div className="text-sm">
-                                <span className="font-medium text-gray-900">Latency:</span>
-                                <span className="ml-2 text-green-600">{grpcResults.latency}ms</span>
-                              </div>
-                              <div className="text-sm">
-                                <span className="font-medium text-gray-900">Protocol:</span>
-                                <span className="ml-2 text-gray-700">HTTP/2 + Protobuf</span>
-                              </div>
-                              <div className="text-sm">
-                                <span className="font-medium text-gray-900">Payload Size:</span>
-                                <span className="ml-2 text-gray-700">~{grpcResults.payloadSize}B</span>
-                              </div>
-                            </div>
-                            <div className="border-t pt-3">
-                              <div className="text-xs text-gray-600 mb-2">Response Preview:</div>
-                              <div className="text-sm bg-gray-50 p-2 rounded text-gray-700 max-h-20 overflow-y-auto">
-                                {grpcResults.response.substring(0, 150)}...
-                              </div>
-                            </div>
-                            {grpcResults.streaming && (
-                              <div className="border-t pt-3">
-                                <div className="text-xs text-gray-600 mb-2">Streaming Data:</div>
-                                <div className="text-sm bg-gray-50 p-2 rounded text-gray-700 max-h-20 overflow-y-auto">
-                                  {grpcResults.streamingData.map((chunk: any, index: number) => (
-                                    <div key={index} className="mb-1 text-xs">
-                                      <span className="text-green-600 font-medium">Chunk {index + 1}:</span> {chunk.content}
-                                    </div>
-                                  ))}
-                                </div>
-                              </div>
-                            )}
-                          </>
-                        ) : (
-                          <>
-                            <div className="space-y-2">
-                              <div className="text-sm">
-                                <span className="font-medium text-gray-900">Latency:</span>
-                                <span className="ml-2 text-green-600">{Math.round(responses.performance.graphRAGLatency * 0.4)}ms</span>
-                              </div>
-                              <div className="text-sm">
-                                <span className="font-medium text-gray-900">Protocol:</span>
-                                <span className="ml-2 text-gray-700">HTTP/2 + Protobuf</span>
-                              </div>
-                              <div className="text-sm">
-                                <span className="font-medium text-gray-900">Payload Size:</span>
-                                <span className="ml-2 text-gray-700">~800B</span>
-                              </div>
-                            </div>
-                            <div className="border-t pt-3">
-                              <div className="text-xs text-gray-600 mb-2">Response Preview:</div>
-                              <div className="text-sm bg-gray-50 p-2 rounded text-gray-700 max-h-20 overflow-y-auto">
-                                {responses.graphRAGResponse.substring(0, 150)}...
-                              </div>
-                            </div>
-                            <div className="mt-3">
-                              <button
-                                onClick={handleGrpcQuery}
-                                disabled={!query.trim() || isQuerying}
-                                className="w-full px-3 py-2 bg-green-600 text-white text-sm rounded-lg hover:bg-green-700 disabled:opacity-50 disabled:cursor-not-allowed"
-                              >
-                                {isQuerying ? 'Running gRPC Test...' : 'Run Live gRPC Test'}
-                              </button>
-                            </div>
-                          </>
-                        )}
+                        <div className="space-y-2">
+                          <div className="text-sm">
+                            <span className="font-medium text-gray-900">Latency:</span>
+                            <span className="ml-2 text-green-600">{Math.round(responses.performance.graphRAGLatency * 0.4)}ms</span>
+                          </div>
+                          <div className="text-sm">
+                            <span className="font-medium text-gray-900">Protocol:</span>
+                            <span className="ml-2 text-gray-700">HTTP/2 + Protobuf</span>
+                          </div>
+                          <div className="text-sm">
+                            <span className="font-medium text-gray-900">Payload Size:</span>
+                            <span className="ml-2 text-gray-700">~800B</span>
+                          </div>
+                        </div>
+                        <div className="border-t pt-3">
+                          <div className="text-xs text-gray-600 mb-2">Response Preview:</div>
+                          <div className="text-sm bg-gray-50 p-2 rounded text-gray-700 max-h-20 overflow-y-auto">
+                            {responses.graphRAGResponse.substring(0, 150)}...
+                          </div>
+                        </div>
                       </div>
                     </div>
 
@@ -2640,6 +2592,38 @@ export function GraphRAGTab() {
                           <div className="text-sm">
                             <span className="font-medium text-gray-900">Payload Size:</span>
                             <span className="ml-2 text-gray-700">~2.2KB</span>
+                          </div>
+                        </div>
+                        <div className="border-t pt-3">
+                          <div className="text-xs text-gray-600 mb-2">Response Preview:</div>
+                          <div className="text-sm bg-gray-50 p-2 rounded text-gray-700 max-h-20 overflow-y-auto">
+                            {responses.graphRAGResponse.substring(0, 150)}...
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* SSE Results */}
+                    <div className="bg-white rounded-lg border shadow-sm">
+                      <div className="p-4 border-b bg-red-50">
+                        <h4 className="font-semibold text-red-800 flex items-center gap-2">
+                          📡 SSE
+                          <span className="text-xs bg-red-200 text-red-800 px-2 py-1 rounded">Streaming</span>
+                        </h4>
+                      </div>
+                      <div className="p-4 space-y-3">
+                        <div className="space-y-2">
+                          <div className="text-sm">
+                            <span className="font-medium text-gray-900">Latency:</span>
+                            <span className="ml-2 text-green-600">{Math.round(responses.performance.graphRAGLatency * 0.2)}ms</span>
+                          </div>
+                          <div className="text-sm">
+                            <span className="font-medium text-gray-900">Protocol:</span>
+                            <span className="ml-2 text-gray-700">HTTP/1.1 + EventSource</span>
+                          </div>
+                          <div className="text-sm">
+                            <span className="font-medium text-gray-900">Payload Size:</span>
+                            <span className="ml-2 text-gray-700">~1.7KB</span>
                           </div>
                         </div>
                         <div className="border-t pt-3">
