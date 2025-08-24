@@ -1266,8 +1266,8 @@ export function GraphRAGTab() {
           <button 
             className={`px-4 py-2 text-sm font-medium border-b-2 transition-colors ${
               activeTab === 'rest' 
-                ? 'border-blue-500 text-blue-600' 
-                : 'border-transparent text-gray-500 hover:text-gray-700'
+                ? 'border-blue-500 text-blue-600 bg-blue-50' 
+                : 'border-transparent text-gray-500 hover:text-gray-700 hover:bg-gray-50'
             } ${!graphData ? 'opacity-50 cursor-not-allowed' : ''}`}
             onClick={() => graphData && setActiveTab('rest')}
             disabled={!graphData}
@@ -1277,8 +1277,8 @@ export function GraphRAGTab() {
           <button 
             className={`px-4 py-2 text-sm font-medium border-b-2 transition-colors ${
               activeTab === 'graphql' 
-                ? 'border-blue-500 text-blue-600' 
-                : 'border-transparent text-gray-500 hover:text-gray-700'
+                ? 'border-purple-500 text-purple-600 bg-purple-50' 
+                : 'border-transparent text-gray-500 hover:text-gray-700 hover:bg-gray-50'
             } ${!graphData ? 'opacity-50 cursor-not-allowed' : ''}`}
             onClick={() => graphData && setActiveTab('graphql')}
             disabled={!graphData}
@@ -1288,8 +1288,8 @@ export function GraphRAGTab() {
           <button 
             className={`px-4 py-2 text-sm font-medium border-b-2 transition-colors ${
               activeTab === 'grpc' 
-                ? 'border-blue-500 text-blue-600' 
-                : 'border-transparent text-gray-500 hover:text-gray-700'
+                ? 'border-green-500 text-green-600 bg-green-50' 
+                : 'border-transparent text-gray-500 hover:text-gray-700 hover:bg-gray-50'
             } ${!graphData ? 'opacity-50 cursor-not-allowed' : ''}`}
             onClick={() => graphData && setActiveTab('grpc')}
             disabled={!graphData}
@@ -1299,8 +1299,8 @@ export function GraphRAGTab() {
           <button 
             className={`px-4 py-2 text-sm font-medium border-b-2 transition-colors ${
               activeTab === 'websocket' 
-                ? 'border-blue-500 text-blue-600' 
-                : 'border-transparent text-gray-500 hover:text-gray-700'
+                ? 'border-orange-500 text-orange-600 bg-orange-50' 
+                : 'border-transparent text-gray-500 hover:text-gray-700 hover:bg-gray-50'
             } ${!graphData ? 'opacity-50 cursor-not-allowed' : ''}`}
             onClick={() => graphData && setActiveTab('websocket')}
             disabled={!graphData}
@@ -1310,8 +1310,8 @@ export function GraphRAGTab() {
           <button 
             className={`px-4 py-2 text-sm font-medium border-b-2 transition-colors ${
               activeTab === 'compare' 
-                ? 'border-blue-500 text-blue-600' 
-                : 'border-transparent text-gray-500 hover:text-gray-700'
+                ? 'border-indigo-500 text-indigo-600 bg-indigo-50' 
+                : 'border-transparent text-gray-500 hover:text-gray-700 hover:bg-gray-50'
             } ${!graphData ? 'opacity-50 cursor-not-allowed' : ''}`}
             onClick={() => graphData && setActiveTab('compare')}
             disabled={!graphData}
@@ -1322,12 +1322,13 @@ export function GraphRAGTab() {
 
         {activeTab === 'upload' && (
           <div className="space-y-4">
-            <div className="bg-white rounded-lg border shadow-sm">
-              <div className="p-6 border-b">
-                <h3 className="flex items-center gap-2 text-lg font-semibold">
-                  <Upload className="w-5 h-5" />
-                  Upload Documents
-                </h3>
+                            <div className="bg-white rounded-lg border shadow-sm">
+                  <div className="p-6 border-b bg-gray-50">
+                    <h3 className="flex items-center gap-2 text-lg font-semibold">
+                      <Upload className="w-5 h-5" />
+                      Upload Documents
+                      <span className="ml-auto text-xs bg-gray-200 text-gray-700 px-2 py-1 rounded-full">Setup</span>
+                    </h3>
                 <p className="text-gray-600 mt-1">
                   Upload text files to build a knowledge graph. The system will extract entities and relationships.
                 </p>
@@ -1549,6 +1550,7 @@ export function GraphRAGTab() {
                   <h3 className="flex items-center gap-2 text-lg font-semibold text-gray-900">
                     <Download className="w-5 h-5" />
                     GraphRAG REST API Integration
+                    <span className="ml-auto text-xs bg-blue-200 text-blue-800 px-2 py-1 rounded-full">HTTP/JSON</span>
                   </h3>
                   <p className="text-gray-700 mt-1">
                     Import GraphRAG REST API collection to test HTTP endpoints in Postman
@@ -2533,7 +2535,74 @@ export function GraphRAGTab() {
                 {/* gRPC Sub-tab Navigation */}
                 <div className="bg-white rounded-lg border shadow-sm">
                   <div className="p-6 border-b">
-                    <div className="flex space-x-1">
+                    {/* Protocol Overview */}
+        <div className="mb-6 bg-gradient-to-r from-blue-50 via-purple-50 to-green-50 border border-gray-200 rounded-lg p-4">
+          <h3 className="text-lg font-semibold text-gray-900 mb-3">🚀 Available Protocols</h3>
+          <div className="grid grid-cols-2 md:grid-cols-5 gap-3 mb-4">
+            <div className="text-center p-3 bg-blue-100 rounded-lg">
+              <div className="text-2xl mb-1">🔍</div>
+              <div className="text-sm font-medium text-blue-800">REST API</div>
+              <div className="text-xs text-blue-600">Simple HTTP</div>
+            </div>
+            <div className="text-center p-3 bg-purple-100 rounded-lg">
+              <div className="text-2xl mb-1">🔧</div>
+              <div className="text-sm font-medium text-purple-800">GraphQL</div>
+              <div className="text-xs text-purple-600">Flexible Queries</div>
+            </div>
+            <div className="text-center p-3 bg-green-100 rounded-lg">
+              <div className="text-2xl mb-1">⚡</div>
+              <div className="text-sm font-medium text-green-800">gRPC</div>
+              <div className="text-xs text-green-600">High Performance</div>
+            </div>
+            <div className="text-center p-3 bg-orange-100 rounded-lg">
+              <div className="text-2xl mb-1">🔌</div>
+              <div className="text-sm font-medium text-orange-800">WebSocket</div>
+              <div className="text-xs text-orange-600">Real-time</div>
+            </div>
+            <div className="text-center p-3 bg-indigo-100 rounded-lg">
+              <div className="text-2xl mb-1">🏁</div>
+              <div className="text-sm font-medium text-indigo-800">Compare</div>
+              <div className="text-xs text-indigo-600">Performance</div>
+            </div>
+          </div>
+          
+          {/* Protocol Comparison Chart */}
+          <div className="bg-white rounded-lg p-4 border">
+            <h4 className="text-sm font-medium text-gray-900 mb-3">📊 Protocol Characteristics</h4>
+            <div className="grid grid-cols-1 md:grid-cols-4 gap-4 text-xs">
+              <div className="space-y-2">
+                <div className="font-medium text-blue-800">🔍 REST API</div>
+                <div className="text-gray-600">• Simple HTTP requests</div>
+                <div className="text-gray-600">• JSON payloads</div>
+                <div className="text-gray-600">• Easy to debug</div>
+                <div className="text-gray-600">• Wide compatibility</div>
+              </div>
+              <div className="space-y-2">
+                <div className="font-medium text-purple-800">🔧 GraphQL</div>
+                <div className="text-gray-600">• Flexible queries</div>
+                <div className="text-gray-600">• Single endpoint</div>
+                <div className="text-gray-600">• Type-safe</div>
+                <div className="text-gray-600">• Reduced over-fetching</div>
+              </div>
+              <div className="space-y-2">
+                <div className="font-medium text-green-800">⚡ gRPC</div>
+                <div className="text-gray-600">• Binary Protocol Buffers</div>
+                <div className="text-gray-600">• HTTP/2 streaming</div>
+                <div className="text-gray-600">• High performance</div>
+                <div className="text-gray-600">• Strong typing</div>
+              </div>
+              <div className="space-y-2">
+                <div className="font-medium text-orange-800">🔌 WebSocket</div>
+                <div className="text-gray-600">• Real-time bidirectional</div>
+                <div className="text-gray-600">• Persistent connections</div>
+                <div className="text-gray-600">• Low latency</div>
+                <div className="text-gray-600">• Event-driven</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div className="flex space-x-1">
                       <button
                         onClick={() => setGrpcSubTab('grpc')}
                         className={`px-4 py-2 text-sm font-medium rounded-lg transition-colors ${
