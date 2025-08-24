@@ -36,9 +36,15 @@ A comprehensive **LLM experimentation and GraphRAG development platform** that c
 - **GraphQL**: HTTP/1.1 with GraphQL queries for flexible data fetching
 - **gRPC**: HTTP/2 with Protocol Buffers for high-performance streaming
 - **MCP (Model Context Protocol)**: HTTP wrappers for GitHub, Filesystem, and SQLite integrations
-- **WebSocket**: Real-time streaming for GraphRAG updates and LLM responses
 - **HTTP/2**: Multiplexed connections for improved performance
 - **Protocol Buffers**: Binary serialization for efficient data transfer
+
+**🚧 Coming Soon:**
+- **gRPC-Web**: Browser-based gRPC for web applications
+- **WebSocket**: Real-time streaming for GraphRAG updates and LLM responses
+- **Server-Sent Events (SSE)**: One-way streaming for LLM responses
+- **Vector Database APIs**: Pinecone, Weaviate, Chroma, Qdrant integrations
+- **Agentic Systems**: LangChain, AutoGen, CrewAI agent orchestration
 
 ## 🚀 Quick Start
 
@@ -300,14 +306,17 @@ If you still want to try Codespaces:
 - [ ] **Team Collaboration**: Shared collections and team workspace integration
 
 ### **Phase 3: Advanced Protocol Support** 🌐
+- [ ] **gRPC-Web Collections**: Postman collections for browser-based gRPC endpoints
 - [ ] **WebSocket Collections**: Postman collections for real-time streaming endpoints
+- [ ] **Server-Sent Events (SSE)**: Postman collections for one-way streaming endpoints
 - [ ] **Enhanced gRPC Collections**: Improved gRPC collection generation with Protocol Buffers
 - [ ] **GraphQL Subscriptions**: Postman collections for GraphQL subscription endpoints
 - [ ] **Webhook Collections**: Postman collections for webhook testing and validation
 - [ ] **HTTP/3 Support**: Postman collections optimized for HTTP/3 endpoints
 
 ### **Phase 4: AI/ML Service Integration** 🧠
-- [ ] **Vector Database Collections**: Postman collections for Pinecone, Weaviate, Chroma APIs
+- [ ] **Vector Database Collections**: Postman collections for Pinecone, Weaviate, Chroma, Qdrant APIs
+- [ ] **Agentic System Collections**: Postman collections for LangChain, AutoGen, CrewAI agent APIs
 - [ ] **Model Training Collections**: Postman collections for fine-tuning and training APIs
 - [ ] **RAG Pipeline Collections**: Postman collections for RAG pipeline configuration and testing
 - [ ] **Model Monitoring Collections**: Postman collections for A/B testing and performance monitoring APIs

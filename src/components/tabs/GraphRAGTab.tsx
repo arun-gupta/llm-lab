@@ -92,6 +92,7 @@ export function GraphRAGTab() {
   const [isQuerying, setIsQuerying] = useState(false);
   const [processingProgress, setProcessingProgress] = useState(0);
   const [activeTab, setActiveTab] = useState<'upload' | 'graph' | 'rest' | 'graphql' | 'grpc' | 'compare'>('upload');
+  const [grpcSubTab, setGrpcSubTab] = useState<'grpc' | 'grpc-web'>('grpc');
   const [buildSuccess, setBuildSuccess] = useState(false);
   const [buildError, setBuildError] = useState<string | null>(null);
   const [selectedModel, setSelectedModel] = useState('gpt-5-nano');
@@ -393,6 +394,193 @@ export function GraphRAGTab() {
       console.error('Error generating gRPC Postman collection:', error);
       setImportStatus('error');
       setImportMessage('Error generating gRPC collection');
+    }
+  };
+
+  const generateGrpcWebPostmanCollection = async () => {
+    setImportStatus('importing');
+    setImportMessage('Generating gRPC-Web collection...');
+    
+    try {
+      // Create gRPC-Web collection data
+      const collectionData = {
+        info: {
+          name: "GraphRAG gRPC-Web Collection",
+          description: "Postman collection for testing GraphRAG gRPC-Web services",
+          schema: "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+        },
+        item: [
+          {
+            name: "Query Graph (Unary)",
+            request: {
+              method: "POST",
+              header: [
+                {
+                  key: "Content-Type",
+                  value: "application/grpc-web+proto"
+                }
+              ],
+              url: {
+                raw: "{{base_url}}/graphrag.GraphRAGWebService/QueryGraph",
+                host: ["{{base_url}}"],
+                path: ["graphrag.GraphRAGWebService", "QueryGraph"]
+              },
+              body: {
+                mode: "raw",
+                raw: JSON.stringify({
+                  query: "AI healthcare relationships",
+                  graph_id: "graph_123",
+                  max_depth: 3,
+                  node_types: ["person", "organization", "concept"]
+                }, null, 2)
+              }
+            }
+          },
+          {
+            name: "Stream Graph Traversal",
+            request: {
+              method: "POST",
+              header: [
+                {
+                  key: "Content-Type",
+                  value: "application/grpc-web+proto"
+                }
+              ],
+              url: {
+                raw: "{{base_url}}/graphrag.GraphRAGWebService/StreamGraphTraversal",
+                host: ["{{base_url}}"],
+                path: ["graphrag.GraphRAGWebService", "StreamGraphTraversal"]
+              },
+              body: {
+                mode: "raw",
+                raw: JSON.stringify({
+                  query: "AI healthcare relationships",
+                  graph_id: "graph_123",
+                  max_depth: 3
+                }, null, 2)
+              }
+            }
+          },
+          {
+            name: "Stream Context",
+            request: {
+              method: "POST",
+              header: [
+                {
+                  key: "Content-Type",
+                  value: "application/grpc-web+proto"
+                }
+              ],
+              url: {
+                raw: "{{base_url}}/graphrag.GraphRAGWebService/StreamContext",
+                host: ["{{base_url}}"],
+                path: ["graphrag.GraphRAGWebService", "StreamContext"]
+              },
+              body: {
+                mode: "raw",
+                raw: JSON.stringify({
+                  query: "What are AI benefits in healthcare?",
+                  graph_id: "graph_123",
+                  max_context_size: 10,
+                  relevance_threshold: 0.7,
+                  client_id: "browser_session_123"
+                }, null, 2)
+              }
+            }
+          },
+          {
+            name: "Interactive Graph Session",
+            request: {
+              method: "POST",
+              header: [
+                {
+                  key: "Content-Type",
+                  value: "application/grpc-web+proto"
+                }
+              ],
+              url: {
+                raw: "{{base_url}}/graphrag.GraphRAGWebService/InteractiveGraphSession",
+                host: ["{{base_url}}"],
+                path: ["graphrag.GraphRAGWebService", "InteractiveGraphSession"]
+              },
+              body: {
+                mode: "raw",
+                raw: JSON.stringify({
+                  query: "AI healthcare",
+                  graph_id: "graph_123",
+                  session_id: "session_123"
+                }, null, 2)
+              }
+            }
+          }
+        ],
+        variable: [
+          {
+            key: "base_url",
+            value: "http://localhost:8080",
+            type: "string"
+          }
+        ]
+      };
+      
+      // Try to create collection directly in Postman Desktop using API
+      const createInPostman = async () => {
+        try {
+          setImportMessage('Creating gRPC-Web collection in Postman Desktop...');
+          
+          const postmanResponse = await fetch('/api/postman/create-collection', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+              collection: collectionData,
+              createInWeb: false, // Create in Desktop
+            }),
+          });
+
+          const result = await postmanResponse.json();
+
+          if (result.success) {
+            setImportStatus('success');
+            setImportMessage('✅ gRPC-Web Collection created successfully in Postman Desktop! Configure your gRPC-Web proxy endpoint.');
+            
+            // Don't open Postman Desktop automatically - just show success message
+          } else {
+            // Fallback to download if API key not configured
+            if (result.fallback) {
+              setImportMessage('Downloading gRPC-Web collection file...');
+              
+              const blob = new Blob([JSON.stringify(collectionData, null, 2)], {
+                type: 'application/json'
+              });
+              const url = window.URL.createObjectURL(blob);
+              const a = document.createElement('a');
+              a.href = url;
+              a.download = 'graphrag-grpc-web-collection.json';
+              document.body.appendChild(a);
+              a.click();
+              window.URL.revokeObjectURL(url);
+              document.body.removeChild(a);
+              
+              setImportStatus('manual');
+              setImportMessage('📥 gRPC-Web Collection downloaded! Import manually into Postman Desktop and configure your proxy endpoint.');
+            } else {
+              throw new Error(result.message || 'Failed to create collection');
+            }
+          }
+        } catch (error) {
+          console.error('Error creating gRPC-Web collection:', error);
+          setImportStatus('error');
+          setImportMessage('Failed to create gRPC-Web collection. Try downloading manually.');
+        }
+      };
+
+      await createInPostman();
+    } catch (error) {
+      console.error('Error generating gRPC-Web Postman collection:', error);
+      setImportStatus('error');
+      setImportMessage('Error generating gRPC-Web collection');
     }
   };
 
@@ -1667,56 +1855,86 @@ export function GraphRAGTab() {
           <div>
             {graphData ? (
               <div className="space-y-6">
-            {/* gRPC Postman Integration */}
-            <div className="bg-white rounded-lg border shadow-sm">
-              <div className="p-6 border-b flex justify-between items-center">
-                <div>
-                  <h3 className="flex items-center gap-2 text-lg font-semibold text-gray-900">
-                    <Download className="w-5 h-5" />
-                    gRPC Postman Integration
-                  </h3>
-                  <p className="text-gray-700 mt-1">
-                    Import gRPC collection for testing GraphRAG services
-                  </p>
-                </div>
-                <button 
-                  onClick={generateGrpcPostmanCollection}
-                  disabled={!graphData || importStatus === 'importing'}
-                  className="flex items-center px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 disabled:opacity-50 disabled:cursor-not-allowed"
-                >
-                  <Download className="w-4 h-4 mr-2" />
-                  {importStatus === 'importing' ? 'Importing...' : 'Add gRPC to Postman'}
-                </button>
-              </div>
-              <div className="p-6">
-                <div className="flex flex-col space-y-3">
-                  
-                  {importStatus !== 'idle' && (
-                    <div className={`px-4 py-3 rounded-lg text-sm max-w-md ${
-                      importStatus === 'success' ? 'bg-green-50 border border-green-200 text-green-800' :
-                      importStatus === 'manual' ? 'bg-yellow-50 border border-yellow-200 text-yellow-800' :
-                      importStatus === 'error' ? 'bg-red-50 border border-red-200 text-red-800' :
-                      'bg-blue-50 border border-blue-200 text-blue-800'
-                    }`}>
-                      <div className="flex items-start space-x-2">
-                        {importStatus === 'success' && (
-                          <svg className="w-4 h-4 mt-0.5 text-green-600 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
-                            <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
-                          </svg>
-                        )}
-                        <span className="leading-relaxed">{importMessage}</span>
-                      </div>
+                {/* gRPC Sub-tab Navigation */}
+                <div className="bg-white rounded-lg border shadow-sm">
+                  <div className="p-6 border-b">
+                    <div className="flex space-x-1">
+                      <button
+                        onClick={() => setGrpcSubTab('grpc')}
+                        className={`px-4 py-2 text-sm font-medium rounded-lg transition-colors ${
+                          grpcSubTab === 'grpc'
+                            ? 'bg-blue-100 text-blue-700 border border-blue-200'
+                            : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                        }`}
+                      >
+                        ⚡ gRPC
+                      </button>
+                      <button
+                        onClick={() => setGrpcSubTab('grpc-web')}
+                        className={`px-4 py-2 text-sm font-medium rounded-lg transition-colors ${
+                          grpcSubTab === 'grpc-web'
+                            ? 'bg-blue-100 text-blue-700 border border-blue-200'
+                            : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                        }`}
+                      >
+                        🌐 gRPC-Web
+                      </button>
                     </div>
-                  )}
-                  
-                  <div className="text-sm text-gray-600">
-                    <p>• Requires Postman's gRPC support</p>
-                    <p>• Import .proto files for service definitions</p>
-                    <p>• Test streaming operations in real-time</p>
                   </div>
                 </div>
-              </div>
-            </div>
+
+                {grpcSubTab === 'grpc' && (
+                  <>
+                    {/* gRPC Postman Integration */}
+                    <div className="bg-white rounded-lg border shadow-sm">
+                      <div className="p-6 border-b flex justify-between items-center">
+                        <div>
+                          <h3 className="flex items-center gap-2 text-lg font-semibold text-gray-900">
+                            <Download className="w-5 h-5" />
+                            gRPC Postman Integration
+                          </h3>
+                          <p className="text-gray-700 mt-1">
+                            Import gRPC collection for testing GraphRAG services
+                          </p>
+                        </div>
+                        <button 
+                          onClick={generateGrpcPostmanCollection}
+                          disabled={!graphData || importStatus === 'importing'}
+                          className="flex items-center px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 disabled:opacity-50 disabled:cursor-not-allowed"
+                        >
+                          <Download className="w-4 h-4 mr-2" />
+                          {importStatus === 'importing' ? 'Importing...' : 'Add gRPC to Postman'}
+                        </button>
+                      </div>
+                      <div className="p-6">
+                        <div className="flex flex-col space-y-3">
+                          
+                          {importStatus !== 'idle' && (
+                            <div className={`px-4 py-3 rounded-lg text-sm max-w-md ${
+                              importStatus === 'success' ? 'bg-green-50 border border-green-200 text-green-800' :
+                              importStatus === 'manual' ? 'bg-yellow-50 border border-yellow-200 text-yellow-800' :
+                              importStatus === 'error' ? 'bg-red-50 border border-red-200 text-red-800' :
+                              'bg-blue-50 border border-blue-200 text-blue-800'
+                            }`}>
+                              <div className="flex items-start space-x-2">
+                                {importStatus === 'success' && (
+                                  <svg className="w-4 h-4 mt-0.5 text-green-600 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                                    <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                                  </svg>
+                                )}
+                                <span className="leading-relaxed">{importMessage}</span>
+                              </div>
+                            </div>
+                          )}
+                          
+                          <div className="text-sm text-gray-600">
+                            <p>• Requires Postman's gRPC support</p>
+                            <p>• Import .proto files for service definitions</p>
+                            <p>• Test streaming operations in real-time</p>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
 
             {/* gRPC Service Overview */}
             <div className="bg-white rounded-lg border shadow-sm">
@@ -1989,8 +2207,400 @@ for chunk in stub.GetContextStream(context_req):
                 </div>
               </div>
             </div>
-          </div>
-        ) : (
+          </>
+                )}
+
+                {grpcSubTab === 'grpc-web' && (
+                  <>
+                    {/* gRPC-Web Postman Integration */}
+                    <div className="bg-white rounded-lg border shadow-sm">
+                      <div className="p-6 border-b flex justify-between items-center">
+                        <div>
+                          <h3 className="flex items-center gap-2 text-lg font-semibold text-gray-900">
+                            <Download className="w-5 h-5" />
+                            gRPC-Web Postman Integration
+                          </h3>
+                          <p className="text-gray-700 mt-1">
+                            Import gRPC-Web collection for browser-based GraphRAG services
+                          </p>
+                        </div>
+                        <button 
+                          onClick={generateGrpcWebPostmanCollection}
+                          disabled={!graphData || importStatus === 'importing'}
+                          className="flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed"
+                        >
+                          <Download className="w-4 h-4 mr-2" />
+                          {importStatus === 'importing' ? 'Importing...' : 'Add gRPC-Web to Postman'}
+                        </button>
+                      </div>
+                      <div className="p-6">
+                        <div className="flex flex-col space-y-3">
+                          
+                          {importStatus !== 'idle' && (
+                            <div className={`px-4 py-3 rounded-lg text-sm max-w-md ${
+                              importStatus === 'success' ? 'bg-green-50 border border-green-200 text-green-800' :
+                              importStatus === 'manual' ? 'bg-yellow-50 border border-yellow-200 text-yellow-800' :
+                              importStatus === 'error' ? 'bg-red-50 border border-red-200 text-red-800' :
+                              'bg-blue-50 border border-blue-200 text-blue-800'
+                            }`}>
+                              <div className="flex items-start space-x-2">
+                                {importStatus === 'success' && (
+                                  <svg className="w-4 h-4 mt-0.5 text-green-600 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                                    <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                                  </svg>
+                                )}
+                                <span className="leading-relaxed">{importMessage}</span>
+                              </div>
+                            </div>
+                          )}
+                          
+                          <div className="text-sm text-gray-600">
+                            <p>• Browser-compatible gRPC implementation</p>
+                            <p>• HTTP/1.1 transport with Protocol Buffers</p>
+                            <p>• No proxy required for web applications</p>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* gRPC-Web Service Overview */}
+                    <div className="bg-white rounded-lg border shadow-sm">
+                      <div className="p-6 border-b">
+                        <h3 className="flex items-center gap-2 text-lg font-semibold text-gray-900">
+                          <Zap className="w-5 h-5" />
+                          gRPC-Web Services
+                        </h3>
+                        <p className="text-gray-700 mt-1">
+                          Browser-optimized GraphRAG operations using gRPC-Web with Protocol Buffers
+                        </p>
+                      </div>
+                      <div className="p-6">
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                          {/* Service Overview */}
+                          <div className="space-y-4">
+                            <h4 className="font-medium text-blue-600">Browser Services</h4>
+                            <div className="space-y-3">
+                              <div className="p-3 bg-blue-50 rounded-lg">
+                                <div className="font-medium text-blue-800">GraphTraversalService</div>
+                                <div className="text-sm text-blue-600">Client-side graph traversal with streaming</div>
+                              </div>
+                              <div className="p-3 bg-green-50 rounded-lg">
+                                <div className="font-medium text-green-800">ContextStreamingService</div>
+                                <div className="text-sm text-green-600">Browser-based context retrieval</div>
+                              </div>
+                              <div className="p-3 bg-purple-50 rounded-lg">
+                                <div className="font-medium text-purple-800">EntityResolutionService</div>
+                                <div className="text-sm text-purple-600">Client-side entity lookups</div>
+                              </div>
+                              <div className="p-3 bg-orange-50 rounded-lg">
+                                <div className="font-medium text-orange-800">GraphBuildService</div>
+                                <div className="text-sm text-orange-600">Incremental graph construction</div>
+                              </div>
+                            </div>
+                          </div>
+
+                          {/* Browser Benefits */}
+                          <div className="space-y-4">
+                            <h4 className="font-medium text-green-600">Browser Benefits</h4>
+                            <div className="space-y-3">
+                              <div className="flex items-center space-x-2">
+                                <div className="w-2 h-2 bg-green-500 rounded-full"></div>
+                                <span className="text-sm">Direct browser communication</span>
+                              </div>
+                              <div className="flex items-center space-x-2">
+                                <div className="w-2 h-2 bg-green-500 rounded-full"></div>
+                                <span className="text-sm">No proxy or gateway required</span>
+                              </div>
+                              <div className="flex items-center space-x-2">
+                                <div className="w-2 h-2 bg-green-500 rounded-full"></div>
+                                <span className="text-sm">HTTP/1.1 compatibility</span>
+                              </div>
+                              <div className="flex items-center space-x-2">
+                                <div className="w-2 h-2 bg-green-500 rounded-full"></div>
+                                <span className="text-sm">Protocol Buffer serialization</span>
+                              </div>
+                              <div className="flex items-center space-x-2">
+                                <div className="w-2 h-2 bg-green-500 rounded-full"></div>
+                                <span className="text-sm">Type-safe client generation</span>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* gRPC-Web Protocol Buffer Definition */}
+                    <div className="bg-white rounded-lg border shadow-sm">
+                      <div className="p-6 border-b">
+                        <h3 className="text-lg font-semibold">gRPC-Web Protocol Buffer Definition</h3>
+                        <p className="text-gray-600 mt-1">
+                          Service definitions for GraphRAG gRPC-Web operations
+                        </p>
+                      </div>
+                      <div className="p-6">
+                        <div className="bg-gray-900 text-green-400 p-4 rounded-lg overflow-x-auto">
+                          <pre className="text-sm">
+{`syntax = "proto3";
+
+package graphrag;
+
+// gRPC-Web service definition
+service GraphRAGWebService {
+  // Unary call for simple queries
+  rpc QueryGraph(GraphQuery) returns (GraphResponse);
+  
+  // Server streaming for real-time results
+  rpc StreamGraphTraversal(GraphQuery) returns (stream GraphNode);
+  
+  // Server streaming for context retrieval
+  rpc StreamContext(ContextRequest) returns (stream ContextChunk);
+  
+  // Client streaming for batch operations
+  rpc BatchEntityResolution(stream EntityQuery) returns (EntityResolution);
+  
+  // Bidirectional streaming for interactive sessions
+  rpc InteractiveGraphSession(stream GraphQuery) returns (stream GraphNode);
+}
+
+message GraphQuery {
+  string query = 1;
+  string graph_id = 2;
+  int32 max_depth = 3;
+  repeated string node_types = 4;
+  string session_id = 5; // For interactive sessions
+}
+
+message GraphResponse {
+  repeated GraphNode nodes = 1;
+  repeated GraphEdge edges = 2;
+  GraphStats stats = 3;
+  string session_id = 4;
+}
+
+message GraphNode {
+  string id = 1;
+  string label = 2;
+  string type = 3;
+  map<string, string> properties = 4;
+  repeated string connections = 5;
+  float relevance_score = 6;
+}
+
+message ContextRequest {
+  string query = 1;
+  string graph_id = 2;
+  int32 max_context_size = 3;
+  float relevance_threshold = 4;
+  string client_id = 5; // For browser session tracking
+}
+
+message ContextChunk {
+  string entity_id = 1;
+  string description = 2;
+  float relevance_score = 3;
+  repeated string relationships = 4;
+  int32 chunk_index = 5;
+  bool is_final = 6;
+}
+
+message EntityQuery {
+  string entity_name = 1;
+  string graph_id = 2;
+  repeated string entity_types = 3;
+  string client_id = 4;
+}
+
+message EntityResolution {
+  repeated EntityMatch matches = 1;
+  float confidence = 2;
+  string session_id = 3;
+}
+
+message EntityMatch {
+  string entity_id = 1;
+  string name = 2;
+  string type = 3;
+  float similarity_score = 4;
+}
+
+message GraphEdge {
+  string id = 1;
+  string source = 2;
+  string target = 3;
+  string label = 4;
+  string type = 5;
+  map<string, string> properties = 6;
+}
+
+message GraphStats {
+  int32 total_nodes = 1;
+  int32 total_edges = 2;
+  map<string, int32> node_types = 3;
+  map<string, int32> edge_types = 4;
+  float query_performance_ms = 5;
+}`}
+                          </pre>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* gRPC-Web Client Examples */}
+                    <div className="bg-white rounded-lg border shadow-sm">
+                      <div className="p-6 border-b">
+                        <h3 className="text-lg font-semibold">gRPC-Web Client Examples</h3>
+                        <p className="text-gray-600 mt-1">
+                          Example code for using GraphRAG gRPC-Web services in browsers
+                        </p>
+                      </div>
+                      <div className="p-6">
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                          {/* JavaScript/TypeScript Example */}
+                          <div>
+                            <h4 className="font-medium text-blue-600 mb-3">JavaScript/TypeScript</h4>
+                            <div className="bg-gray-900 text-green-400 p-4 rounded-lg overflow-x-auto">
+                              <pre className="text-sm">
+{`import { GraphRAGWebServiceClient } from './generated/graphrag_web_grpc_web_pb';
+import { GraphQuery, ContextRequest } from './generated/graphrag_web_pb';
+
+const client = new GraphRAGWebServiceClient('http://localhost:8080');
+
+// Unary call
+const query = new GraphQuery();
+query.setQuery('AI healthcare relationships');
+query.setGraphId('graph_123');
+
+client.queryGraph(query, {}, (err, response) => {
+  if (err) {
+    console.error('Error:', err);
+    return;
+  }
+  console.log('Graph response:', response.toObject());
+});
+
+// Server streaming
+const streamQuery = new GraphQuery();
+streamQuery.setQuery('AI healthcare relationships');
+streamQuery.setGraphId('graph_123');
+
+const stream = client.streamGraphTraversal(streamQuery, {});
+stream.on('data', (node) => {
+  console.log('Node:', node.getLabel(), node.getType());
+});
+stream.on('end', () => {
+  console.log('Stream completed');
+});
+
+// Context streaming
+const contextReq = new ContextRequest();
+contextReq.setQuery('What are AI benefits in healthcare?');
+contextReq.setGraphId('graph_123');
+contextReq.setClientId('browser_session_123');
+
+const contextStream = client.streamContext(contextReq, {});
+contextStream.on('data', (chunk) => {
+  console.log('Context chunk:', chunk.getDescription());
+  if (chunk.getIsFinal()) {
+    console.log('Context streaming completed');
+  }
+});`}
+                              </pre>
+                            </div>
+                          </div>
+
+                          {/* HTML Integration Example */}
+                          <div>
+                            <h4 className="font-medium text-green-600 mb-3">HTML Integration</h4>
+                            <div className="bg-gray-900 text-green-400 p-4 rounded-lg overflow-x-auto">
+                              <pre className="text-sm">
+{`<!DOCTYPE html>
+<html>
+<head>
+    <script src="https://unpkg.com/grpc-web@1.4.2/dist/grpc-web-client.js"></script>
+    <script src="./generated/graphrag_web_grpc_web_pb.js"></script>
+</head>
+<body>
+    <div id="results"></div>
+    
+    <script>
+        const client = new GraphRAGWebServiceClient('http://localhost:8080');
+        
+        // Simple query
+        const query = new GraphQuery();
+        query.setQuery('AI healthcare');
+        query.setGraphId('graph_123');
+        
+        client.queryGraph(query, {}, (err, response) => {
+            if (err) {
+                document.getElementById('results').innerHTML = 
+                    '<p style="color: red;">Error: ' + err.message + '</p>';
+                return;
+            }
+            
+            const results = response.toObject();
+            document.getElementById('results').innerHTML = 
+                '<h3>Found ' + results.nodesList.length + ' nodes</h3>';
+        });
+        
+        // Streaming results
+        const stream = client.streamGraphTraversal(query, {});
+        stream.on('data', (node) => {
+            const div = document.createElement('div');
+            div.textContent = 'Node: ' + node.getLabel();
+            document.getElementById('results').appendChild(div);
+        });
+    </script>
+</body>
+</html>`}
+                              </pre>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* gRPC-Web Setup Instructions */}
+                    <div className="bg-white rounded-lg border shadow-sm">
+                      <div className="p-6 border-b">
+                        <h3 className="text-lg font-semibold">gRPC-Web Setup Instructions</h3>
+                        <p className="text-gray-600 mt-1">
+                          How to set up and use gRPC-Web for GraphRAG services
+                        </p>
+                      </div>
+                      <div className="p-6">
+                        <div className="space-y-4">
+                          <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+                            <h4 className="font-medium text-blue-800 mb-2">1. Server Setup</h4>
+                            <div className="text-sm text-blue-700 space-y-1">
+                              <p>• Install gRPC-Web proxy (Envoy or similar)</p>
+                              <p>• Configure HTTP/1.1 to gRPC translation</p>
+                              <p>• Set up CORS for browser access</p>
+                            </div>
+                          </div>
+                          
+                          <div className="bg-green-50 border border-green-200 rounded-lg p-4">
+                            <h4 className="font-medium text-green-800 mb-2">2. Client Generation</h4>
+                            <div className="text-sm text-green-700 space-y-1">
+                              <p>• Generate JavaScript/TypeScript client from .proto</p>
+                              <p>• Include grpc-web library in your project</p>
+                              <p>• Configure client for your server endpoint</p>
+                            </div>
+                          </div>
+                          
+                          <div className="bg-purple-50 border border-purple-200 rounded-lg p-4">
+                            <h4 className="font-medium text-purple-800 mb-2">3. Postman Testing</h4>
+                            <div className="text-sm text-purple-700 space-y-1">
+                              <p>• Import gRPC-Web collection</p>
+                              <p>• Configure environment variables</p>
+                              <p>• Test both unary and streaming calls</p>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </>
+                )}
+              </div>
+            ) : (
           <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-6 text-center">
             <div className="flex items-center justify-center mb-3">
               <div className="w-8 h-8 bg-yellow-100 rounded-full flex items-center justify-center">
