@@ -2305,23 +2305,23 @@ for chunk in stub.GetContextStream(context_req):
                             <div className="space-y-3">
                               <div className="flex items-center space-x-2">
                                 <div className="w-2 h-2 bg-green-500 rounded-full"></div>
-                                <span className="text-sm">Direct browser communication</span>
+                                <span className="text-sm text-gray-900">Direct browser communication</span>
                               </div>
                               <div className="flex items-center space-x-2">
                                 <div className="w-2 h-2 bg-green-500 rounded-full"></div>
-                                <span className="text-sm">No proxy or gateway required</span>
+                                <span className="text-sm text-gray-900">No proxy or gateway required</span>
                               </div>
                               <div className="flex items-center space-x-2">
                                 <div className="w-2 h-2 bg-green-500 rounded-full"></div>
-                                <span className="text-sm">HTTP/1.1 compatibility</span>
+                                <span className="text-sm text-gray-900">HTTP/1.1 compatibility</span>
                               </div>
                               <div className="flex items-center space-x-2">
                                 <div className="w-2 h-2 bg-green-500 rounded-full"></div>
-                                <span className="text-sm">Protocol Buffer serialization</span>
+                                <span className="text-sm text-gray-900">Protocol Buffer serialization</span>
                               </div>
                               <div className="flex items-center space-x-2">
                                 <div className="w-2 h-2 bg-green-500 rounded-full"></div>
-                                <span className="text-sm">Type-safe client generation</span>
+                                <span className="text-sm text-gray-900">Type-safe client generation</span>
                               </div>
                             </div>
                           </div>
