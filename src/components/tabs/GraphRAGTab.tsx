@@ -2373,7 +2373,7 @@ for chunk in stub.GetContextStream(context_req):
                 {grpcSubTab === 'grpc-web' && (
                   <>
                     {/* Live gRPC-Web Client */}
-                    <div className="bg-white rounded-lg border shadow-sm">
+                    <div className="bg-white rounded-lg border shadow-sm mt-4">
                       <div className="p-6 border-b">
                         <h3 className="text-lg font-semibold text-gray-900">🌐 Live gRPC-Web Client</h3>
                         <p className="text-gray-700 mt-1">
@@ -2392,7 +2392,7 @@ for chunk in stub.GetContextStream(context_req):
                               value={query}
                               onChange={(e) => setQuery(e.target.value)}
                               placeholder="Enter a GraphRAG query for gRPC-Web testing..."
-                              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-gray-900 placeholder-gray-500"
                             />
                           </div>
 
@@ -2565,126 +2565,6 @@ for chunk in stub.GetContextStream(context_req):
                         </div>
                       </div>
                     </div>
-
-
-
-
-
-                    {/* Live gRPC-Web Client */}
-                    <div className="bg-white rounded-lg border shadow-sm">
-                      <div className="p-6 border-b">
-                        <h3 className="text-lg font-semibold text-gray-900">🌐 Live gRPC-Web Client</h3>
-                        <p className="text-gray-700 mt-1">
-                          Test gRPC-Web functionality directly from your browser
-                        </p>
-                      </div>
-                      <div className="p-6">
-                        <div className="space-y-4">
-                          {/* Query Input */}
-                          <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-2">
-                              gRPC-Web Query
-                            </label>
-                            <input
-                              type="text"
-                              value={query}
-                              onChange={(e) => setQuery(e.target.value)}
-                              placeholder="Enter a GraphRAG query for gRPC-Web testing..."
-                              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                            />
-                          </div>
-
-                          {/* Sample Queries */}
-                          <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-2">
-                              Sample gRPC-Web Queries
-                            </label>
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
-                              <button
-                                onClick={() => setQuery("QueryGraph: AI healthcare relationships")}
-                                className="text-left p-3 bg-blue-50 border border-blue-200 rounded-lg hover:bg-blue-100 transition-colors"
-                              >
-                                <div className="text-sm font-medium text-blue-800">Unary Query</div>
-                                <div className="text-xs text-blue-600">QueryGraph: AI healthcare relationships</div>
-                              </button>
-                              <button
-                                onClick={() => setQuery("StreamGraphTraversal: Stanford researchers")}
-                                className="text-left p-3 bg-green-50 border border-green-200 rounded-lg hover:bg-green-100 transition-colors"
-                              >
-                                <div className="text-sm font-medium text-green-800">Server Streaming</div>
-                                <div className="text-xs text-green-600">StreamGraphTraversal: Stanford researchers</div>
-                              </button>
-                              <button
-                                onClick={() => setQuery("StreamContext: AI benefits in healthcare")}
-                                className="text-left p-3 bg-purple-50 border border-purple-200 rounded-lg hover:bg-purple-100 transition-colors"
-                              >
-                                <div className="text-sm font-medium text-purple-800">Context Streaming</div>
-                                <div className="text-xs text-purple-600">StreamContext: AI benefits in healthcare</div>
-                              </button>
-                              <button
-                                onClick={() => setQuery("InteractiveSession: Machine learning diagnosis")}
-                                className="text-left p-3 bg-orange-50 border border-orange-200 rounded-lg hover:bg-orange-100 transition-colors"
-                              >
-                                <div className="text-sm font-medium text-orange-800">Bidirectional</div>
-                                <div className="text-xs text-orange-600">InteractiveSession: Machine learning diagnosis</div>
-                              </button>
-                            </div>
-                          </div>
-
-                          {/* Run gRPC-Web Query Button */}
-                          <div className="flex space-x-3">
-                            <button
-                              onClick={handleGrpcWebQuery}
-                              disabled={!query.trim() || !graphData || isQuerying}
-                              className="flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed"
-                            >
-                              <Zap className="w-4 h-4 mr-2" />
-                              {isQuerying ? 'Running gRPC-Web Query...' : 'Run gRPC-Web Query'}
-                            </button>
-                          </div>
-
-                          {/* gRPC-Web Results */}
-                          {grpcWebResults && (
-                            <div className="bg-gray-50 border border-gray-200 rounded-lg p-4">
-                              <h4 className="font-medium text-gray-900 mb-3">gRPC-Web Results</h4>
-                              <div className="space-y-3">
-                                <div className="flex justify-between items-center">
-                                  <span className="text-sm font-medium text-gray-700">Protocol:</span>
-                                  <span className="text-sm text-blue-600">gRPC-Web (HTTP/1.1 + Protobuf)</span>
-                                </div>
-                                <div className="flex justify-between items-center">
-                                  <span className="text-sm font-medium text-gray-700">Latency:</span>
-                                  <span className="text-sm text-green-600">{grpcWebResults.latency}ms</span>
-                                </div>
-                                <div className="flex justify-between items-center">
-                                  <span className="text-sm font-medium text-gray-700">Payload Size:</span>
-                                  <span className="text-sm text-gray-600">{grpcWebResults.payloadSize}B</span>
-                                </div>
-                                <div className="border-t pt-3">
-                                  <div className="text-sm font-medium text-gray-700 mb-2">Response:</div>
-                                  <div className="bg-white p-3 rounded border text-sm text-gray-800 max-h-32 overflow-y-auto">
-                                    {grpcWebResults.response}
-                                  </div>
-                                </div>
-                                {grpcWebResults.streaming && (
-                                  <div className="border-t pt-3">
-                                    <div className="text-sm font-medium text-gray-700 mb-2">Streaming Data:</div>
-                                    <div className="bg-white p-3 rounded border text-sm text-gray-800 max-h-32 overflow-y-auto">
-                                      {grpcWebResults.streamingData.map((chunk: any, index: number) => (
-                                        <div key={index} className="mb-2 p-2 bg-blue-50 rounded">
-                                          <span className="text-blue-600 font-medium">Chunk {index + 1}:</span> {chunk.content}
-                                        </div>
-                                      ))}
-                                    </div>
-                                  </div>
-                                )}
-                              </div>
-                            </div>
-                          )}
-                        </div>
-                      </div>
-                    </div>
-
 
                   </>
                 )}
