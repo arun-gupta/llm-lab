@@ -2413,7 +2413,7 @@ for chunk in stub.GetContextStream(context_req):
                     {/* Live gRPC-Web Client */}
                     <div className="bg-white rounded-lg border shadow-sm">
                       <div className="p-6 border-b">
-                        <h3 className="text-lg font-semibold text-gray-900">🌐 Live gRPC-Web Client</h3>
+                        <h3 className="text-lg font-semibold text-gray-900">Live gRPC-Web Client</h3>
                         <p className="text-gray-700 mt-1">
                           Test gRPC-Web functionality directly from your browser
                         </p>
