@@ -2372,8 +2372,26 @@ for chunk in stub.GetContextStream(context_req):
 
                 {grpcSubTab === 'grpc-web' && (
                   <>
+                    {/* gRPC-Web Header with Add to Postman Button */}
+                    <div className="flex justify-between items-center mb-4">
+                      <div>
+                        <h3 className="text-lg font-semibold text-gray-900">🌐 gRPC-Web Services</h3>
+                        <p className="text-gray-700 mt-1">
+                          Browser-compatible gRPC implementation for GraphRAG services
+                        </p>
+                      </div>
+                      <button 
+                        onClick={generateGrpcWebPostmanCollection}
+                        disabled={!graphData || importStatus === 'importing'}
+                        className="flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed"
+                      >
+                        <Download className="w-4 h-4 mr-2" />
+                        {importStatus === 'importing' ? 'Importing...' : 'Add gRPC-Web to Postman'}
+                      </button>
+                    </div>
+
                     {/* Live gRPC-Web Client */}
-                    <div className="bg-white rounded-lg border shadow-sm mt-4">
+                    <div className="bg-white rounded-lg border shadow-sm">
                       <div className="p-6 border-b">
                         <h3 className="text-lg font-semibold text-gray-900">🌐 Live gRPC-Web Client</h3>
                         <p className="text-gray-700 mt-1">
@@ -2489,24 +2507,14 @@ for chunk in stub.GetContextStream(context_req):
 
                     {/* gRPC-Web Postman Integration */}
                     <div className="bg-white rounded-lg border shadow-sm">
-                      <div className="p-6 border-b flex justify-between items-center">
-                        <div>
-                          <h3 className="flex items-center gap-2 text-lg font-semibold text-gray-900">
-                            <Download className="w-5 h-5" />
-                            gRPC-Web Postman Integration
-                          </h3>
-                          <p className="text-gray-700 mt-1">
-                            Import gRPC-Web collection for browser-based GraphRAG services
-                          </p>
-                        </div>
-                        <button 
-                          onClick={generateGrpcWebPostmanCollection}
-                          disabled={!graphData || importStatus === 'importing'}
-                          className="flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed"
-                        >
-                          <Download className="w-4 h-4 mr-2" />
-                          {importStatus === 'importing' ? 'Importing...' : 'Add gRPC-Web to Postman'}
-                        </button>
+                      <div className="p-6 border-b">
+                        <h3 className="flex items-center gap-2 text-lg font-semibold text-gray-900">
+                          <Download className="w-5 h-5" />
+                          gRPC-Web Postman Integration
+                        </h3>
+                        <p className="text-gray-700 mt-1">
+                          Import gRPC-Web collection for browser-based GraphRAG services
+                        </p>
                       </div>
                       <div className="p-6">
                         <div className="flex flex-col space-y-3">
