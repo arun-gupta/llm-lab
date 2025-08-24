@@ -108,11 +108,11 @@ export function MCPServerManager({ className = '', onClose }: MCPServerManagerPr
     try {
       const response = await fetch('/api/mcp/start', { method: 'POST' });
       if (response.ok) {
-        setMessage({ type: 'success', text: 'All MCP servers started successfully!' });
+        setMessage({ type: 'success', text: 'Local MCP servers started successfully!' });
         // Wait a moment then check status
         setTimeout(checkServerStatus, 2000);
       } else {
-        setMessage({ type: 'error', text: 'Failed to start MCP servers' });
+        setMessage({ type: 'error', text: 'Failed to start local MCP servers' });
       }
     } catch (error) {
       setMessage({ type: 'error', text: 'Error starting MCP servers' });
@@ -128,11 +128,11 @@ export function MCPServerManager({ className = '', onClose }: MCPServerManagerPr
     try {
       const response = await fetch('/api/mcp/stop', { method: 'POST' });
       if (response.ok) {
-        setMessage({ type: 'success', text: 'All MCP servers stopped successfully!' });
+        setMessage({ type: 'success', text: 'Local MCP servers stopped successfully!' });
         // Wait a moment then check status
         setTimeout(checkServerStatus, 1000);
       } else {
-        setMessage({ type: 'error', text: 'Failed to stop MCP servers' });
+        setMessage({ type: 'error', text: 'Failed to stop local MCP servers' });
       }
     } catch (error) {
       setMessage({ type: 'error', text: 'Error stopping MCP servers' });
@@ -225,8 +225,14 @@ export function MCPServerManager({ className = '', onClose }: MCPServerManagerPr
                   </div>
                   <p className="text-sm text-gray-600 mb-2">{server.description}</p>
                   <div className="flex items-center space-x-4 text-xs text-gray-500">
-                    <span>Port: {server.port}</span>
-                    {server.pid && <span>PID: {server.pid}</span>}
+                    {server.type === 'remote' ? (
+                      <span className="text-purple-600 font-medium">Remote Server</span>
+                    ) : (
+                      <>
+                        <span>Port: {server.port}</span>
+                        {server.pid && <span>PID: {server.pid}</span>}
+                      </>
+                    )}
                   </div>
                 </div>
                 <div className={`px-2 py-1 rounded-full text-xs font-medium border ${getStatusColor(server.status)}`}>
@@ -248,7 +254,7 @@ export function MCPServerManager({ className = '', onClose }: MCPServerManagerPr
           className="flex items-center justify-center space-x-2 px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors disabled:opacity-50"
         >
           <Play className="w-4 h-4" />
-          <span>Start All Servers</span>
+          <span>Start Local Servers</span>
         </button>
         
         <button
@@ -257,7 +263,7 @@ export function MCPServerManager({ className = '', onClose }: MCPServerManagerPr
           className="flex items-center justify-center space-x-2 px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors disabled:opacity-50"
         >
           <Square className="w-4 h-4" />
-          <span>Stop All Servers</span>
+          <span>Stop Local Servers</span>
         </button>
       </div>
 
