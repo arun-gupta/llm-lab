@@ -1,8 +1,8 @@
-# LLM Prompt Lab
+# Multi-Protocol Lab
 
 [![Open in GitHub Codespaces](https://github.com/codespaces/badge.svg)](https://codespaces.new/arun-gupta/llm-prompt-lab) *(Outdated - Use Local Setup)*
 
-A comprehensive **LLM experimentation and GraphRAG development platform** that combines traditional LLM testing with advanced **Graph-based Retrieval-Augmented Generation (GraphRAG)** capabilities. Build knowledge graphs from documents, compare GraphRAG vs traditional RAG, and test multiple protocols (REST, GraphQL, gRPC) with seamless **Postman integration**.
+A comprehensive **multi-protocol experimentation and GraphRAG development platform** that combines traditional LLM testing with advanced **Graph-based Retrieval-Augmented Generation (GraphRAG)** capabilities. Build knowledge graphs from documents, compare GraphRAG vs traditional RAG, and test multiple protocols (REST, GraphQL, gRPC, gRPC-Web, WebSocket, SSE) with seamless **Postman integration**.
 
 ## 🎯 **What Makes This Special**
 
@@ -35,14 +35,14 @@ A comprehensive **LLM experimentation and GraphRAG development platform** that c
 - **REST API**: HTTP/1.1 with JSON payloads for traditional API interactions
 - **GraphQL**: HTTP/1.1 with GraphQL queries for flexible data fetching
 - **gRPC**: HTTP/2 with Protocol Buffers for high-performance streaming
+- **gRPC-Web**: HTTP/1.1 with Protocol Buffers for browser-based gRPC applications
+- **WebSocket**: Real-time bidirectional streaming for GraphRAG updates and LLM responses
+- **Server-Sent Events (SSE)**: HTTP/1.1 with EventSource for one-way streaming responses
 - **MCP (Model Context Protocol)**: HTTP wrappers for GitHub, Filesystem, and SQLite integrations
 - **HTTP/2**: Multiplexed connections for improved performance
 - **Protocol Buffers**: Binary serialization for efficient data transfer
 
 **🚧 Coming Soon:**
-- **gRPC-Web**: Browser-based gRPC for web applications
-- **WebSocket**: Real-time streaming for GraphRAG updates and LLM responses
-- **Server-Sent Events (SSE)**: One-way streaming for LLM responses
 - **Vector Database APIs**: Pinecone, Weaviate, Chroma, Qdrant integrations
 - **Agentic Systems**: LangChain, AutoGen, CrewAI agent orchestration
 
@@ -191,12 +191,15 @@ If you still want to try Codespaces:
 - **Document Upload & Processing**: Upload text documents and automatically extract entities and relationships
 - **Knowledge Graph Building**: Create interactive knowledge graphs with entity extraction and relationship mapping
 - **Graph Visualization**: Explore and analyze knowledge graphs with interactive visualizations
-- **Protocol Comparison**: Test REST vs GraphQL vs gRPC performance with detailed analytics
+- **Protocol Comparison**: Test REST vs GraphQL vs gRPC vs gRPC-Web vs WebSocket vs SSE performance with detailed analytics
 - **Performance Metrics**: Compare GraphRAG vs traditional RAG with latency, payload size, and response quality
 - **Multi-Protocol Support**: 
   - **REST API**: HTTP/1.1 endpoints for traditional CRUD operations
   - **GraphQL**: HTTP/1.1 with flexible querying and schema introspection
   - **gRPC**: HTTP/2 with Protocol Buffers for streaming and high-performance operations
+  - **gRPC-Web**: HTTP/1.1 with Protocol Buffers for browser-based applications
+  - **WebSocket**: Real-time bidirectional streaming for live updates
+  - **SSE**: HTTP/1.1 with EventSource for server-to-client streaming
 
 ### **🤖 LLM Testing & Comparison**
 - **Multi-Provider Support**: OpenAI, Anthropic, and Ollama models side-by-side
@@ -206,12 +209,15 @@ If you still want to try Codespaces:
 - **Local Model Support**: Ollama integration with auto-detection
 
 ### **📱 Postman Integration**
-- **Multi-Protocol Collections**: Generate Postman collections for REST, GraphQL, gRPC, and MCP protocols
+- **Multi-Protocol Collections**: Generate Postman collections for REST, GraphQL, gRPC, gRPC-Web, WebSocket, SSE, and MCP protocols
 - **Direct Integration**: Create collections directly in Postman Desktop or Web
 - **Protocol-Specific Features**:
   - **REST Collections**: HTTP/1.1 endpoints with JSON request/response examples
   - **GraphQL Collections**: HTTP/1.1 with GraphQL queries and variables
   - **gRPC Collections**: HTTP/2 endpoints with Protocol Buffer message examples
+  - **gRPC-Web Collections**: HTTP/1.1 endpoints with Protocol Buffer message examples
+  - **WebSocket Collections**: WebSocket endpoints with JSON message examples
+  - **SSE Collections**: HTTP/1.1 endpoints with EventSource message examples
   - **MCP Collections**: HTTP wrappers for GitHub, Filesystem, and SQLite integrations
 - **Automated Testing**: Pre-built test scripts and environment templates
 - **Custom Naming**: Personalized collection names and organization
@@ -251,7 +257,7 @@ If you still want to try Codespaces:
 ✅ **MCP Integration**: GitHub, Filesystem, and SQLite MCP servers with Postman collections  
 ✅ **GPT-5 Streaming**: Implemented streaming for GPT-5 models to fix empty response issues  
 ✅ **GraphRAG Integration**: Document upload, knowledge graph building, and GraphRAG vs traditional RAG comparison  
-✅ **Protocol Comparison**: REST vs GraphQL vs gRPC performance testing with Postman integration  
+✅ **Protocol Comparison**: REST vs GraphQL vs gRPC vs gRPC-Web vs WebSocket vs SSE performance testing with Postman integration  
 ✅ **Port Configuration**: Centralized port management with configurable ports  
 ✅ **Concise Quickstart**: Streamlined setup with minimal verbosity  
 
@@ -277,9 +283,9 @@ If you still want to try Codespaces:
 2. **Upload documents** (text files) to build knowledge graphs
 3. **Build knowledge graph** with entity extraction and relationship mapping
 4. **Query and compare** GraphRAG vs traditional RAG responses
-5. **Test protocols** with REST, GraphQL, and gRPC comparison
+5. **Test protocols** with REST, GraphQL, gRPC, gRPC-Web, WebSocket, and SSE comparison
 6. **Export Postman collections** for API testing and integration
-7. **Direct Postman integration** for all collections (REST, GraphQL, gRPC, Protocol Comparison)
+7. **Direct Postman integration** for all collections (REST, GraphQL, gRPC, gRPC-Web, WebSocket, SSE, Protocol Comparison)
 
 ## 📈 Planned Features
 
@@ -305,10 +311,10 @@ If you still want to try Codespaces:
 - [ ] **Collection Analytics**: Usage analytics and performance insights for collections
 - [ ] **Team Collaboration**: Shared collections and team workspace integration
 
-### **Phase 3: Advanced Protocol Support** 🌐
-- [ ] **gRPC-Web Collections**: Postman collections for browser-based gRPC endpoints
-- [ ] **WebSocket Collections**: Postman collections for real-time streaming endpoints
-- [ ] **Server-Sent Events (SSE)**: Postman collections for one-way streaming endpoints
+### **Phase 3: Advanced Protocol Support** 🌐 ✅
+- [x] **gRPC-Web Collections**: Postman collections for browser-based gRPC endpoints
+- [x] **WebSocket Collections**: Postman collections for real-time streaming endpoints
+- [x] **Server-Sent Events (SSE)**: Postman collections for one-way streaming endpoints
 - [ ] **Enhanced gRPC Collections**: Improved gRPC collection generation with Protocol Buffers
 - [ ] **GraphQL Subscriptions**: Postman collections for GraphQL subscription endpoints
 - [ ] **Webhook Collections**: Postman collections for webhook testing and validation
