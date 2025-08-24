@@ -38,6 +38,20 @@ export async function POST() {
 
     console.log('MCP start script output:', stdout);
 
+    // Start SQLite MCP Docker container
+    try {
+      const dockerOutput = await execAsync('docker run -d -p 3001:3001 --name sqlite-mcp-server arungupta/sqlite-mcp-server', {
+        timeout: 15000 // 15 second timeout
+      });
+      console.log('SQLite MCP Docker container started:', dockerOutput.stdout);
+    } catch (dockerError: any) {
+      if (dockerError.message.includes('already in use')) {
+        console.log('SQLite MCP Docker container already running');
+      } else {
+        console.error('Error starting SQLite MCP Docker container:', dockerError);
+      }
+    }
+
     return NextResponse.json({
       success: true,
       message: 'MCP servers started successfully',

@@ -26,58 +26,46 @@ export async function GET() {
         port: portConfig.mcp.sqlite, 
         pidFile: 'mcp-server.pid',
         displayName: 'Local MCP Server Template',
-        description: 'Basic MCP server template for testing'
+        description: 'Basic MCP server template for testing',
+        docker: false
       },
       { 
         name: 'filesystem', 
         port: portConfig.mcp.filesystem, 
         pidFile: 'http-filesystem-mcp-server.pid',
         displayName: 'Filesystem MCP Server',
-        description: 'File and directory operations with HTTP wrapper for Postman integration'
+        description: 'File and directory operations with HTTP wrapper for Postman integration',
+        docker: false
+      },
+      { 
+        name: 'sqlite', 
+        port: portConfig.mcp.sqlite, 
+        pidFile: null,
+        displayName: 'SQLite MCP Server',
+        description: 'Database operations with Docker HTTP mode for Postman integration',
+        docker: true
       }
     ];
 
     const statusData: Record<number, ServerStatus> = {};
 
     for (const server of servers) {
-      const pidFilePath = path.join(mcpDir, server.pidFile);
-      
       try {
-        // Check if PID file exists
-        if (fs.existsSync(pidFilePath)) {
-          const pid = parseInt(fs.readFileSync(pidFilePath, 'utf8').trim());
-          
-          // Check if process is running
+        if (server.docker) {
+          // Check Docker container status
           try {
-            await execAsync(`kill -0 ${pid}`);
+            // Check if Docker container is running and listening on the port
+            await execAsync(`docker ps --filter "publish=${server.port}" --format "{{.Names}}"`);
+            await execAsync(`lsof -i :${server.port} | grep LISTEN`);
             
-            // Check if port is actually listening
-            try {
-              await execAsync(`lsof -i :${server.port} | grep LISTEN`);
-              statusData[server.port] = {
-                status: 'running',
-                pid,
-                port: server.port,
-                name: server.displayName,
-                description: server.description
-              };
-            } catch (portError) {
-              // Process exists but port not listening
-              statusData[server.port] = {
-                status: 'error',
-                pid,
-                port: server.port,
-                name: server.displayName,
-                description: server.description
-              };
-            }
-          } catch (processError) {
-            // Process not running, remove stale PID file
-            try {
-              fs.unlinkSync(pidFilePath);
-            } catch (unlinkError) {
-              // Ignore unlink errors
-            }
+            statusData[server.port] = {
+              status: 'running',
+              port: server.port,
+              name: server.displayName,
+              description: server.description
+            };
+          } catch (dockerError) {
+            // Docker container not running or port not listening
             statusData[server.port] = {
               status: 'stopped',
               port: server.port,
@@ -86,12 +74,59 @@ export async function GET() {
             };
           }
         } else {
-          statusData[server.port] = {
-            status: 'stopped',
-            port: server.port,
-            name: server.displayName,
-            description: server.description
-          };
+          // Check local process status
+          const pidFilePath = path.join(mcpDir, server.pidFile);
+          
+          // Check if PID file exists
+          if (fs.existsSync(pidFilePath)) {
+            const pid = parseInt(fs.readFileSync(pidFilePath, 'utf8').trim());
+            
+            // Check if process is running
+            try {
+              await execAsync(`kill -0 ${pid}`);
+              
+              // Check if port is actually listening
+              try {
+                await execAsync(`lsof -i :${server.port} | grep LISTEN`);
+                statusData[server.port] = {
+                  status: 'running',
+                  pid,
+                  port: server.port,
+                  name: server.displayName,
+                  description: server.description
+                };
+              } catch (portError) {
+                // Process exists but port not listening
+                statusData[server.port] = {
+                  status: 'error',
+                  pid,
+                  port: server.port,
+                  name: server.displayName,
+                  description: server.description
+                };
+              }
+            } catch (processError) {
+              // Process not running, remove stale PID file
+              try {
+                fs.unlinkSync(pidFilePath);
+              } catch (unlinkError) {
+                // Ignore unlink errors
+              }
+              statusData[server.port] = {
+                status: 'stopped',
+                port: server.port,
+                name: server.displayName,
+                description: server.description
+              };
+            }
+          } else {
+            statusData[server.port] = {
+              status: 'stopped',
+              port: server.port,
+              name: server.displayName,
+              description: server.description
+            };
+          }
         }
       } catch (error) {
         statusData[server.port] = {

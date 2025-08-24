@@ -16,6 +16,7 @@ interface MCPServer {
   pid?: number;
   description: string;
   type: 'remote' | 'local';
+  docker?: boolean;
 }
 
 interface MCPServerManagerProps {
@@ -44,7 +45,8 @@ export function MCPServerManager({ className = '', onClose }: MCPServerManagerPr
       port: DEFAULT_MCP_PORTS.sqlite,
       status: 'stopped',
       description: 'Database operations with Docker HTTP mode for Postman integration',
-      type: 'local'
+      type: 'local',
+      docker: true
     }
   ]);
   const [isLoading, setIsLoading] = useState(false);
@@ -230,6 +232,7 @@ export function MCPServerManager({ className = '', onClose }: MCPServerManagerPr
                     ) : (
                       <>
                         <span>Port: {server.port}</span>
+                        {server.docker && <span className="text-blue-600 font-medium">🐳 Docker</span>}
                         {server.pid && <span>PID: {server.pid}</span>}
                       </>
                     )}
@@ -277,7 +280,7 @@ export function MCPServerManager({ className = '', onClose }: MCPServerManagerPr
           npm run setup-mcp
         </div>
         <p className="text-xs text-blue-700 mt-2">
-          <strong>SQLite MCP Server:</strong> Use Docker: <code className="bg-gray-200 px-1 rounded">docker run -p 4000:4000 arungupta/sqlite-mcp-server</code>
+          <strong>SQLite MCP Server:</strong> Requires Docker - Run: <code className="bg-gray-200 px-1 rounded">docker run -p 3001:3001 arungupta/sqlite-mcp-server</code>
         </p>
         <p className="text-xs text-blue-700 mt-1">
           <strong>Filesystem MCP Server:</strong> Run: <code className="bg-gray-200 px-1 rounded">./scripts/setup-http-filesystem-mcp.sh</code>

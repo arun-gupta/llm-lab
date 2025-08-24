@@ -38,6 +38,20 @@ export async function POST() {
 
     console.log('MCP stop script output:', stdout);
 
+    // Stop SQLite MCP Docker container
+    try {
+      const dockerOutput = await execAsync('docker stop sqlite-mcp-server', {
+        timeout: 10000 // 10 second timeout
+      });
+      console.log('SQLite MCP Docker container stopped:', dockerOutput.stdout);
+    } catch (dockerError: any) {
+      if (dockerError.message.includes('No such container')) {
+        console.log('SQLite MCP Docker container not running');
+      } else {
+        console.error('Error stopping SQLite MCP Docker container:', dockerError);
+      }
+    }
+
     return NextResponse.json({
       success: true,
       message: 'MCP servers stopped successfully',
