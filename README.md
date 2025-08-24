@@ -185,49 +185,7 @@ If you still want to try Codespaces:
 2. Edit `.env.local` directly in the Codespace
 3. Set `NEXT_PUBLIC_BASE_URL` to your Codespaces URL
 
-## ✨ Key Features
 
-### **🕸️ GraphRAG (Graph-based Retrieval-Augmented Generation)**
-- **Document Upload & Processing**: Upload text documents and automatically extract entities and relationships
-- **Knowledge Graph Building**: Create interactive knowledge graphs with entity extraction and relationship mapping
-- **Graph Visualization**: Explore and analyze knowledge graphs with interactive visualizations
-- **Protocol Comparison**: Test REST vs GraphQL vs gRPC vs gRPC-Web vs WebSocket vs SSE performance with detailed analytics
-- **Performance Metrics**: Compare GraphRAG vs traditional RAG with latency, payload size, and response quality
-- **Multi-Protocol Support**: 
-  - **REST API**: HTTP/1.1 endpoints for traditional CRUD operations
-  - **GraphQL**: HTTP/1.1 with flexible querying and schema introspection
-  - **gRPC**: HTTP/2 with Protocol Buffers for streaming and high-performance operations
-  - **gRPC-Web**: HTTP/1.1 with Protocol Buffers for browser-based applications
-  - **WebSocket**: Real-time bidirectional streaming for live updates
-  - **SSE**: HTTP/1.1 with EventSource for server-to-client streaming
-
-### **🤖 LLM Testing & Comparison**
-- **Multi-Provider Support**: OpenAI, Anthropic, and Ollama models side-by-side
-- **Real-Time Streaming**: GPT-5 and other models with live response streaming
-- **Performance Analytics**: Latency, token usage, and response quality metrics
-- **Advanced Prompting**: Context-aware prompts with examples and templates
-- **Local Model Support**: Ollama integration with auto-detection
-
-### **📱 Postman Integration**
-- **Multi-Protocol Collections**: Generate Postman collections for REST, GraphQL, gRPC, gRPC-Web, WebSocket, SSE, and MCP protocols
-- **Direct Integration**: Create collections directly in Postman Desktop or Web
-- **Protocol-Specific Features**:
-  - **REST Collections**: HTTP/1.1 endpoints with JSON request/response examples
-  - **GraphQL Collections**: HTTP/1.1 with GraphQL queries and variables
-  - **gRPC Collections**: HTTP/2 endpoints with Protocol Buffer message examples
-  - **gRPC-Web Collections**: HTTP/1.1 endpoints with Protocol Buffer message examples
-  - **WebSocket Collections**: WebSocket endpoints with JSON message examples
-  - **SSE Collections**: HTTP/1.1 endpoints with EventSource message examples
-  - **MCP Collections**: HTTP wrappers for GitHub, Filesystem, and SQLite integrations
-- **Automated Testing**: Pre-built test scripts and environment templates
-- **Custom Naming**: Personalized collection names and organization
-
-### **⚡ Developer Experience**
-- **One-Command Setup**: `./quickstart.sh` with automatic dependency installation
-- **Configurable Architecture**: Centralized port management for all services
-- **Real-Time Feedback**: Live status updates and comprehensive error handling
-- **Production Ready**: Docker support, environment management, and deployment guides
-- **Comprehensive Documentation**: Detailed guides for all features and integrations
 
 ## 🎯 Postman Integration
 
