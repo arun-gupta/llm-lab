@@ -6,30 +6,18 @@ A comprehensive **multi-protocol experimentation and GraphRAG development platfo
 
 ## 🎯 **What Makes This Special**
 
-### **🕸️ GraphRAG Lab**
-- **Document Processing**: Upload text documents and automatically build knowledge graphs
-- **Entity Extraction**: Extract entities, relationships, and context from your documents
-- **Graph Visualization**: Interactive knowledge graph exploration and analysis
-- **Protocol Comparison**: Test REST vs GraphQL vs gRPC performance side-by-side
-- **Performance Analytics**: Compare GraphRAG vs traditional RAG with detailed metrics
-
 ### **🤖 Multi-Provider LLM Testing**
 - **Side-by-Side Comparison**: Test OpenAI, Anthropic, and Ollama models simultaneously
 - **Performance Metrics**: Latency, token usage, and response quality analysis
 - **Streaming Support**: Real-time response streaming for GPT-5 and other models
 - **Custom Prompts**: Advanced prompt engineering with context and examples
 
-### **📱 Postman Integration**
-- **Direct Collection Creation**: Generate Postman collections with one click
-- **Multi-Protocol Support**: REST, GraphQL, and gRPC collections
-- **MCP Server Integration**: GitHub, Filesystem, and SQLite MCP servers
-- **Automated Testing**: Pre-built test scripts and environment templates
-
-### **⚡ Developer Experience**
-- **One-Command Setup**: `./quickstart.sh` sets up everything automatically
-- **Configurable Ports**: Centralized port management for all services
-- **Real-Time Feedback**: Live status updates and error handling
-- **Production Ready**: Docker support, environment management, and deployment guides
+### **🕸️ GraphRAG Lab**
+- **Document Processing**: Upload text documents and automatically build knowledge graphs
+- **Entity Extraction**: Extract entities, relationships, and context from your documents
+- **Graph Visualization**: Interactive knowledge graph exploration and analysis
+- **Protocol Comparison**: Test REST vs GraphQL vs gRPC vs gRPC-Web vs WebSocket vs SSE performance side-by-side
+- **Performance Analytics**: Compare GraphRAG vs traditional RAG with detailed metrics
 
 ### **🌐 Multi-Protocol & Transport Support**
 - **REST API**: HTTP/1.1 with JSON payloads for traditional API interactions
@@ -41,6 +29,18 @@ A comprehensive **multi-protocol experimentation and GraphRAG development platfo
 - **MCP (Model Context Protocol)**: HTTP wrappers for GitHub, Filesystem, and SQLite integrations
 - **HTTP/2**: Multiplexed connections for improved performance
 - **Protocol Buffers**: Binary serialization for efficient data transfer
+
+### **⚡ Developer Experience**
+- **One-Command Setup**: `./quickstart.sh` sets up everything automatically
+- **Configurable Ports**: Centralized port management for all services
+- **Real-Time Feedback**: Live status updates and error handling
+- **Production Ready**: Docker support, environment management, and deployment guides
+
+### **📱 Postman Integration**
+- **Direct Collection Creation**: Generate Postman collections with one click
+- **Multi-Protocol Support**: REST, GraphQL, gRPC, gRPC-Web, WebSocket, SSE, and MCP collections
+- **MCP Server Integration**: GitHub, Filesystem, and SQLite MCP servers
+- **Automated Testing**: Pre-built test scripts and environment templates
 
 **🚧 Coming Soon:**
 - **Vector Database APIs**: Pinecone, Weaviate, Chroma, Qdrant integrations
