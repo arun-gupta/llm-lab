@@ -44,6 +44,7 @@ A comprehensive **Postman-focused protocol testing and GraphRAG development plat
 
 **🚧 Coming Soon:**
 - **Vector Database APIs**: Pinecone, Weaviate, Chroma, Qdrant integrations
+- **Neo4j Backend**: Native graph database integration for scalable knowledge graph storage
 - **Agentic Systems**: LangChain, AutoGen, CrewAI agent orchestration
 
 ## 🚀 Quick Start
@@ -134,7 +135,10 @@ LLM Lab includes **MCP (Model Context Protocol) server integration** for enhance
 
 **📖 Documentation**: [MCP-Postman Integration Guide](docs/mcp-postman-integration.md)
 
-## 🔑 Required API Keys
+
+## 🔑 API Keys & Configuration
+
+### **Required API Keys**
 
 Add to `.env.local`:
 ```env
@@ -160,24 +164,23 @@ GITHUB_TOKEN=your_github_personal_access_token_here
 3. **Ensure your API key** has access to GPT-5 models
 
 **Why streaming?** GPT-5 models require streaming to capture partial content and avoid empty responses. This enables:
+
 - ✅ **Actual content generation** instead of empty responses
 - ✅ **Better token utilization** with balanced limits
 - ✅ **Graceful truncation handling** for long responses
-- ✅ **Real-time content capture** as it's generated
+- ✅ **Real-time content capture** as it is generated
 
-### **🔑 Setting Up API Keys**
+### **💾 Data Storage**
 
-**For Local Development:**
-1. Copy `.env.local.example` to `.env.local`
-2. Add your API keys to `.env.local`:
-   ```env
-   OPENAI_API_KEY=your_key_here
-   ANTHROPIC_API_KEY=your_key_here
-   POSTMAN_API_KEY=your_key_here  # optional
-   GITHUB_TOKEN=your_github_token_here  # optional, for MCP integration
-   ```
+**Current Implementation:**
+- **In-Memory Database**: All data (graphs, comparisons, settings) is stored in memory for fast access
+- **File System**: Sample documents and generated collections are stored locally
+- **Session Storage**: User preferences and temporary data persist during browser sessions
 
-**For GitHub Codespaces (Outdated):**
+**Planned Enhancements:**
+- **Neo4j Backend**: Native graph database integration for scalable knowledge graph storage
+- **Persistent Storage**: Database-backed storage for long-term data persistence
+- **Cloud Integration**: Optional cloud storage for collaborative features
 ⚠️ **Note**: Codespaces setup is outdated. Use local development instead.
 
 If you still want to try Codespaces:
@@ -258,4 +261,4 @@ This project is licensed under the Apache License 2.0 - see the [LICENSE](LICENS
 
 ---
 
-Built with ❤️ for the developer community. **Perfect for generating Postman collections and testing LLM APIs.**
+Built with ❤️ for the developer community. **Perfect for protocol testing, Postman integration, and GraphRAG development.**
