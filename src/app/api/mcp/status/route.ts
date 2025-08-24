@@ -3,6 +3,7 @@ import { exec } from 'child_process';
 import { promisify } from 'util';
 import fs from 'fs';
 import path from 'path';
+import { loadPortConfig } from '@/lib/port-config';
 
 const execAsync = promisify(exec);
 
@@ -10,16 +11,30 @@ interface ServerStatus {
   status: 'running' | 'stopped' | 'error';
   pid?: number;
   port: number;
+  name: string;
+  description: string;
 }
 
 export async function GET() {
   try {
     const mcpDir = path.join(process.env.HOME || '', '.mcp-servers');
+    const portConfig = loadPortConfig();
+    
     const servers = [
-      { name: 'github', port: 3001, pidFile: 'github-mcp.pid' },
-      { name: 'filesystem', port: 3002, pidFile: 'filesystem-mcp.pid' },
-      { name: 'websearch', port: 3003, pidFile: 'web-search-mcp.pid' },
-      { name: 'database', port: 3004, pidFile: 'database-mcp.pid' }
+      { 
+        name: 'template', 
+        port: portConfig.mcp.sqlite, 
+        pidFile: 'mcp-server.pid',
+        displayName: 'Local MCP Server Template',
+        description: 'Basic MCP server template for testing'
+      },
+      { 
+        name: 'filesystem', 
+        port: portConfig.mcp.filesystem, 
+        pidFile: 'http-filesystem-mcp-server.pid',
+        displayName: 'Filesystem MCP Server',
+        description: 'File and directory operations with HTTP wrapper for Postman integration'
+      }
     ];
 
     const statusData: Record<number, ServerStatus> = {};
@@ -42,14 +57,18 @@ export async function GET() {
               statusData[server.port] = {
                 status: 'running',
                 pid,
-                port: server.port
+                port: server.port,
+                name: server.displayName,
+                description: server.description
               };
             } catch (portError) {
               // Process exists but port not listening
               statusData[server.port] = {
                 status: 'error',
                 pid,
-                port: server.port
+                port: server.port,
+                name: server.displayName,
+                description: server.description
               };
             }
           } catch (processError) {
@@ -61,19 +80,25 @@ export async function GET() {
             }
             statusData[server.port] = {
               status: 'stopped',
-              port: server.port
+              port: server.port,
+              name: server.displayName,
+              description: server.description
             };
           }
         } else {
           statusData[server.port] = {
             status: 'stopped',
-            port: server.port
+            port: server.port,
+            name: server.displayName,
+            description: server.description
           };
         }
       } catch (error) {
         statusData[server.port] = {
           status: 'error',
-          port: server.port
+          port: server.port,
+          name: server.displayName,
+          description: server.description
         };
       }
     }

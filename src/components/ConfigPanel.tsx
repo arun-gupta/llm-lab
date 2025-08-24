@@ -49,6 +49,20 @@ export function ConfigPanel({ isOpen, onClose, onConfigChange }: ConfigPanelProp
     }
   }, [isOpen]);
 
+  // Add Esc key listener for closing
+  useEffect(() => {
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === 'Escape' && isOpen) {
+        onClose();
+      }
+    };
+
+    document.addEventListener('keydown', handleKeyDown);
+    return () => {
+      document.removeEventListener('keydown', handleKeyDown);
+    };
+  }, [isOpen, onClose]);
+
   const loadApiKeys = async () => {
     try {
       const response = await fetch('/api/config/keys');

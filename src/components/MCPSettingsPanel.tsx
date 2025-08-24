@@ -63,6 +63,20 @@ export function MCPSettingsPanel({ isOpen, onClose, onConfigChange }: MCPSetting
     }
   };
 
+  // Add Esc key listener for closing
+  useEffect(() => {
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === 'Escape' && isOpen) {
+        onClose();
+      }
+    };
+
+    document.addEventListener('keydown', handleKeyDown);
+    return () => {
+      document.removeEventListener('keydown', handleKeyDown);
+    };
+  }, [isOpen, onClose]);
+
   const handleSave = async () => {
     setIsSaving(true);
     setSaveStatus('idle');
