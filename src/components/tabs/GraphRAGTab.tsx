@@ -2529,11 +2529,7 @@ for chunk in stub.GetContextStream(context_req):
                             </div>
                           )}
                           
-                          <div className="text-sm text-gray-600">
-                            <p>• Browser-compatible gRPC implementation</p>
-                            <p>• HTTP/1.1 transport with Protocol Buffers</p>
-                            <p>• No proxy required for web applications</p>
-                          </div>
+
                         </div>
                       </div>
                     </div>
