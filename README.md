@@ -215,12 +215,6 @@ For comprehensive usage instructions, see our detailed guides:
 - **[✨ Features Guide](docs/features.md)** - Detailed feature descriptions and capabilities
 - **[📈 Roadmap](docs/roadmap.md)** - Development phases and planned features
 
-### **Quick Start**
-1. **Clone and setup**: `git clone https://github.com/arun-gupta/llm-lab.git && cd llm-lab && ./quickstart.sh`
-2. **Add API keys** to `.env.local`
-3. **Start the app**: `npm run dev`
-4. **Explore features**: LLM testing, GraphRAG, protocol comparison, and Postman integration
-
 ## 📈 Development Status
 
 For detailed development phases and planned features, see our **[📈 Roadmap](docs/roadmap.md)**.
