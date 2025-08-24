@@ -546,8 +546,8 @@ export function GraphRAGTab() {
   return (
     <div className="space-y-6">
       <div>
-        <h2 className="text-2xl font-bold">GraphRAG Lab</h2>
-        <p className="text-gray-600">Build knowledge graphs and compare GraphRAG vs traditional RAG</p>
+        <h2 className="text-2xl font-bold text-gray-900">GraphRAG Lab</h2>
+        <p className="text-gray-700">Build knowledge graphs and compare GraphRAG vs traditional RAG</p>
       </div>
 
       <div className="space-y-4">
@@ -651,7 +651,7 @@ export function GraphRAGTab() {
                   </div>
 
                   <div className="text-center">
-                    <div className="text-sm text-gray-500 mb-2">or load sample documents:</div>
+                    <div className="text-sm text-gray-700 mb-2">or load sample documents:</div>
                     <div className="flex flex-col sm:flex-row gap-2 justify-center">
                       <button
                         onClick={() => loadSampleDocument('ai-healthcare')}
@@ -672,7 +672,7 @@ export function GraphRAGTab() {
                         Tech Companies
                       </button>
                     </div>
-                    <p className="text-xs text-gray-500 mt-1">
+                    <p className="text-xs text-gray-600 mt-1">
                       Click to load individual sample datasets
                     </p>
                   </div>
@@ -680,7 +680,7 @@ export function GraphRAGTab() {
 
                 {documents.length > 0 && (
                   <div className="space-y-2">
-                    <h4 className="font-medium">Selected Files:</h4>
+                    <h4 className="font-medium text-gray-900">Selected Files:</h4>
                     <div className="space-y-1">
                       {documents.map((doc, index) => (
                         <div key={index} className="flex items-center justify-between p-2 bg-gray-50 rounded">
@@ -701,7 +701,7 @@ export function GraphRAGTab() {
                       ))}
                     </div>
                     <div className="flex justify-between items-center pt-2">
-                      <span className="text-xs text-gray-500">{documents.length} document{documents.length !== 1 ? 's' : ''} selected</span>
+                      <span className="text-xs text-gray-700">{documents.length} document{documents.length !== 1 ? 's' : ''} selected</span>
                       <button
                         onClick={() => setDocuments([])}
                         className="text-xs text-red-600 hover:text-red-800 hover:underline"
