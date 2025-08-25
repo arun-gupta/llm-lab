@@ -127,5 +127,4 @@ sample-docs/
 postman-collections/
 grpc-server/
 websocket-server.js
-grpc-web-proxy.js
 *.sh 
