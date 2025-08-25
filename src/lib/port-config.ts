@@ -10,6 +10,7 @@ interface PortConfig {
   grpc: {
     server: number;
     http: number;
+    web_proxy: number;
   };
 }
 
@@ -45,7 +46,8 @@ export function loadPortConfig(): PortConfig {
       },
       grpc: {
         server: 50051,
-        http: 50052
+        http: 50052,
+        web_proxy: 50053
       }
     };
   }

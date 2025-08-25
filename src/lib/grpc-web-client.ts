@@ -1,14 +1,16 @@
 import { GraphRAGServiceClient } from './generated/graphrag_grpc_web_pb';
 import type { GraphQuery, GraphRAGResponse, ContextRequest, EntityQuery } from './generated/graphrag_pb';
+import { loadPortConfig } from './port-config';
 
 // gRPC-Web client for GraphRAG service
 export class GraphRAGWebClient {
   private client: GraphRAGServiceClient;
   private serverUrl: string;
 
-  constructor(serverUrl: string = 'http://localhost:50052') {
-    this.serverUrl = serverUrl;
-    this.client = new GraphRAGServiceClient(serverUrl);
+  constructor(serverUrl?: string) {
+    const config = loadPortConfig();
+    this.serverUrl = serverUrl || `http://localhost:${config.grpc.web_proxy}`;
+    this.client = new GraphRAGServiceClient(this.serverUrl);
   }
 
   // Query the knowledge graph with GraphRAG
