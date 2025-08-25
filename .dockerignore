@@ -120,7 +120,6 @@ temp/
 
 # Project specific
 data/
-scripts/
 docs/
 sample-docs/
 postman-collections/
