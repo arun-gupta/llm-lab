@@ -28,8 +28,8 @@ services:
 
   grpc-server:
     build:
-      context: .
-      dockerfile: grpc-server/Dockerfile
+      context: ./grpc-server
+      dockerfile: Dockerfile
     ports:
       - "50051:50051"
     environment:

@@ -6,14 +6,14 @@ RUN apk add --no-cache libc6-compat curl
 WORKDIR /app
 
 # Install dependencies based on the preferred package manager
-COPY grpc-server/package.json grpc-server/package-lock.json* ./
+COPY package.json package-lock.json* ./
 RUN npm ci --only=production
 
 # Rebuild the source code only when needed
 FROM base AS builder
 WORKDIR /app
 COPY --from=deps /app/node_modules ./node_modules
-COPY grpc-server/ .
+COPY . .
 
 # Production image, copy all the files and run the app
 FROM base AS runner
