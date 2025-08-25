@@ -1855,7 +1855,9 @@ export function GraphRAGTab() {
                   disabled={!responses || importStatus === 'importing'}
                   className="flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed"
                 >
-                  <Download className="w-4 h-4 mr-2" />
+                  <svg className="w-4 h-4 mr-2" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M12 2L2 7v10c0 5.55 3.84 9.74 9 11 5.16-1.26 9-5.45 9-11V7l-10-5z"/>
+                  </svg>
                   {importStatus === 'importing' ? 'Importing...' : 'Add GraphRAG REST to Postman'}
                 </button>
               </div>
@@ -2334,7 +2336,9 @@ export function GraphRAGTab() {
                       disabled={!graphData || importStatus === 'importing'}
                       className="flex items-center px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 disabled:opacity-50 disabled:cursor-not-allowed"
                     >
-                      <Download className="w-4 h-4 mr-2" />
+                      <svg className="w-4 h-4 mr-2" viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M12 2L2 7v10c0 5.55 3.84 9.74 9 11 5.16-1.26 9-5.45 9-11V7l-10-5z"/>
+                      </svg>
                       {importStatus === 'importing' ? 'Importing...' : 'Add Comparison Collection to Postman'}
                     </button>
                   </div>
@@ -2711,7 +2715,9 @@ export function GraphRAGTab() {
                         disabled={!graphData || importStatus === 'importing'}
                         className="flex items-center px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 disabled:opacity-50 disabled:cursor-not-allowed"
                       >
-                        <Download className="w-4 h-4 mr-2" />
+                        <svg className="w-4 h-4 mr-2" viewBox="0 0 24 24" fill="currentColor">
+                          <path d="M12 2L2 7v10c0 5.55 3.84 9.74 9 11 5.16-1.26 9-5.45 9-11V7l-10-5z"/>
+                        </svg>
                         {importStatus === 'importing' ? 'Importing...' : 'Add gRPC to Postman'}
                       </button>
                     </div>
@@ -2851,7 +2857,9 @@ export function GraphRAGTab() {
                           disabled={!graphData || importStatus === 'importing'}
                           className="flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed"
                         >
-                          <Download className="w-4 h-4 mr-2" />
+                          <svg className="w-4 h-4 mr-2" viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M12 2L2 7v10c0 5.55 3.84 9.74 9 11 5.16-1.26 9-5.45 9-11V7l-10-5z"/>
+                          </svg>
                           {importStatus === 'importing' ? 'Importing...' : 'Add gRPC-Web to Postman'}
                         </button>
                       </div>
@@ -3092,7 +3100,9 @@ export function GraphRAGTab() {
                     disabled={!graphData || importStatus === 'importing'}
                     className="flex items-center px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 disabled:opacity-50 disabled:cursor-not-allowed"
                   >
-                    <Download className="w-4 h-4 mr-2" />
+                    <svg className="w-4 h-4 mr-2" viewBox="0 0 24 24" fill="currentColor">
+                      <path d="M12 2L2 7v10c0 5.55 3.84 9.74 9 11 5.16-1.26 9-5.45 9-11V7l-10-5z"/>
+                    </svg>
                     {importStatus === 'importing' ? 'Importing...' : 'Add SSE to Postman'}
                   </button>
                 </div>
@@ -3282,7 +3292,9 @@ export function GraphRAGTab() {
                     disabled={!graphData || importStatus === 'importing'}
                     className="flex items-center px-4 py-2 bg-orange-600 text-white rounded-lg hover:bg-orange-700 disabled:opacity-50 disabled:cursor-not-allowed"
                   >
-                    <Download className="w-4 h-4 mr-2" />
+                    <svg className="w-4 h-4 mr-2" viewBox="0 0 24 24" fill="currentColor">
+                      <path d="M12 2L2 7v10c0 5.55 3.84 9.74 9 11 5.16-1.26 9-5.45 9-11V7l-10-5z"/>
+                    </svg>
                     {importStatus === 'importing' ? 'Importing...' : 'Add WebSocket to Postman'}
                   </button>
                 </div>
