@@ -15,7 +15,9 @@ import {
   Download,
   Play,
   Pause,
-  RefreshCw
+  RefreshCw,
+  MessageSquare,
+  FileText
 } from 'lucide-react';
 import { SuccessCelebration } from '../SuccessCelebration';
 
@@ -47,7 +49,7 @@ interface TestResult {
 }
 
 export function ModelMonitoringTab({ onTabChange }: ModelMonitoringTabProps) {
-  const [activeTab, setActiveTab] = useState<'ab-testing' | 'monitoring' | 'analytics'>('ab-testing');
+  const [activeTab, setActiveTab] = useState<'ab-testing' | 'response-comparison' | 'monitoring' | 'analytics'>('ab-testing');
   const [importStatus, setImportStatus] = useState<'idle' | 'importing' | 'success' | 'error'>('idle');
   const [showSuccessCelebration, setShowSuccessCelebration] = useState(false);
   const [celebrationType, setCelebrationType] = useState<'collection-created' | 'api-key-setup' | 'first-response' | 'postman-connected'>('collection-created');
@@ -105,6 +107,12 @@ export function ModelMonitoringTab({ onTabChange }: ModelMonitoringTabProps) {
   const [testPrompt, setTestPrompt] = useState('');
   const [isRunningTest, setIsRunningTest] = useState(false);
   const [testResults, setTestResults] = useState<TestResult[]>([]);
+
+  // Response Comparison State
+  const [comparisonPrompt, setComparisonPrompt] = useState('');
+  const [comparisonContext, setComparisonContext] = useState('');
+  const [isRunningComparison, setIsRunningComparison] = useState(false);
+  const [comparisonResponses, setComparisonResponses] = useState<any[]>([]);
 
   // Performance Monitoring State
   const [monitoringEnabled, setMonitoringEnabled] = useState(false);
@@ -314,6 +322,150 @@ export function ModelMonitoringTab({ onTabChange }: ModelMonitoringTabProps) {
     }
   };
 
+  const generateResponseComparisonCollection = async () => {
+    if (!comparisonResponses || comparisonResponses.length === 0) return;
+
+    setImportStatus('importing');
+    
+    try {
+      const collection = {
+        info: {
+          name: `Response Comparison Collection - ${new Date().toLocaleDateString()}`,
+          description: `Response comparison collection with ${comparisonResponses.length} model responses`,
+          schema: "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+        },
+        variable: [
+          {
+            key: "base_url",
+            value: "http://localhost:3000",
+            type: "string"
+          }
+        ],
+        item: comparisonResponses.map((response, index) => ({
+          name: `${response.provider} - ${response.modelName}`,
+          request: {
+            method: "POST",
+            header: [
+              {
+                key: "Content-Type",
+                value: "application/json"
+              }
+            ],
+            body: {
+              mode: "raw",
+              raw: JSON.stringify({
+                prompt: comparisonPrompt,
+                context: comparisonContext,
+                provider: response.provider,
+                model: response.model
+              }, null, 2)
+            },
+            url: {
+              raw: "{{base_url}}/api/llm",
+              host: ["{{base_url}}"],
+              path: ["api", "llm"]
+            }
+          },
+          response: [
+            {
+              name: "Sample Response",
+              originalRequest: {
+                method: "POST",
+                header: [
+                  {
+                    key: "Content-Type",
+                    value: "application/json"
+                  }
+                ],
+                body: {
+                  mode: "raw",
+                  raw: JSON.stringify({
+                    prompt: comparisonPrompt,
+                    context: comparisonContext,
+                    provider: response.provider,
+                    model: response.model
+                  }, null, 2)
+                },
+                url: {
+                  raw: "{{base_url}}/api/llm",
+                  host: ["{{base_url}}"],
+                  path: ["api", "llm"]
+                }
+              },
+              status: "OK",
+              code: 200,
+              _postman_previewlanguage: "json",
+              header: [
+                {
+                  key: "Content-Type",
+                  value: "application/json"
+                }
+              ],
+              cookie: [],
+              body: JSON.stringify({
+                provider: response.provider,
+                model: response.model,
+                content: response.content,
+                latency: response.latency,
+                tokens: response.tokens,
+                cost: response.cost,
+                error: response.error
+              }, null, 2)
+            }
+          ]
+        }))
+      };
+
+      const apiResponse = await fetch('/api/postman/create-collection', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          collection: collection,
+          createInWeb: false,
+        }),
+      });
+
+      const result = await apiResponse.json();
+
+      if (result.success) {
+        setImportStatus('success');
+        setShowSuccessCelebration(true);
+        setCelebrationType('collection-created');
+        setCelebrationData({
+          collectionUrl: result.data?.collectionUrl
+        });
+      } else {
+        if (result.fallback) {
+          const blob = new Blob([JSON.stringify(collection, null, 2)], {
+            type: 'application/json',
+          });
+          const url = URL.createObjectURL(blob);
+          const a = document.createElement('a');
+          a.href = url;
+          a.download = `response-comparison-collection-${new Date().toISOString().split('T')[0]}.json`;
+          document.body.appendChild(a);
+          a.click();
+          document.body.removeChild(a);
+          URL.revokeObjectURL(url);
+          setImportStatus('success');
+          setShowSuccessCelebration(true);
+          setCelebrationType('collection-created');
+          setCelebrationData({});
+        } else {
+          throw new Error(result.message || 'Failed to create collection');
+        }
+      }
+    } catch (error) {
+      console.error('Error creating collection:', error);
+      setImportStatus('error');
+      setShowSuccessCelebration(true);
+      setCelebrationType('collection-created');
+      setCelebrationData({});
+    }
+  };
+
   const generateMonitoringCollection = async () => {
     setImportStatus('importing');
     
@@ -516,6 +668,40 @@ export function ModelMonitoringTab({ onTabChange }: ModelMonitoringTabProps) {
     setIsRunningTest(false);
   };
 
+  const runResponseComparison = async () => {
+    if (!comparisonPrompt.trim() || !models.filter(m => m.enabled).length) return;
+    
+    setIsRunningComparison(true);
+    setComparisonResponses([]);
+    
+    // Simulate response comparison
+    const enabledModels = models.filter(m => m.enabled);
+    const responses: any[] = [];
+    
+    for (const model of enabledModels) {
+      // Simulate API call delay
+      await new Promise(resolve => setTimeout(resolve, 1000 + Math.random() * 2000));
+      
+      const response = {
+        id: `${model.id}-${Date.now()}`,
+        provider: model.provider,
+        model: model.model,
+        modelName: model.name,
+        content: `This is a detailed response from ${model.name} for the prompt: "${comparisonPrompt}". ${model.name} provides comprehensive analysis and insights based on the given context. The response demonstrates the model's capabilities in understanding and processing the input while maintaining coherence and relevance.`,
+        latency: Math.floor(Math.random() * 2000) + 500,
+        tokens: Math.floor(Math.random() * 1000) + 100,
+        cost: parseFloat((Math.random() * 0.1).toFixed(4)),
+        timestamp: new Date().toISOString(),
+        error: null
+      };
+      
+      responses.push(response);
+      setComparisonResponses(prev => [...prev, response]);
+    }
+    
+    setIsRunningComparison(false);
+  };
+
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
       {/* Header */}
@@ -535,6 +721,14 @@ export function ModelMonitoringTab({ onTabChange }: ModelMonitoringTabProps) {
             >
               <img src="/postman-logo.svg" alt="Postman" className="w-4 h-4 mr-2" />
               {importStatus === 'importing' ? 'Importing...' : 'Add A/B Testing Collection'}
+            </button>
+            <button
+              onClick={generateResponseComparisonCollection}
+              disabled={!comparisonResponses.length || importStatus === 'importing'}
+              className="flex items-center px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              <img src="/postman-logo.svg" alt="Postman" className="w-4 h-4 mr-2" />
+              {importStatus === 'importing' ? 'Importing...' : 'Add Response Collection'}
             </button>
             <button
               onClick={generateMonitoringCollection}
@@ -561,6 +755,17 @@ export function ModelMonitoringTab({ onTabChange }: ModelMonitoringTabProps) {
           >
             <GitCompare className="w-4 h-4" />
             <span>A/B Testing</span>
+          </button>
+          <button
+            onClick={() => setActiveTab('response-comparison')}
+            className={`flex items-center space-x-2 py-2 px-1 border-b-2 font-medium text-sm transition-colors ${
+              activeTab === 'response-comparison'
+                ? 'border-blue-500 text-blue-600'
+                : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+            }`}
+          >
+            <MessageSquare className="w-4 h-4" />
+            <span>Response Comparison</span>
           </button>
           <button
             onClick={() => setActiveTab('monitoring')}
@@ -733,6 +938,154 @@ export function ModelMonitoringTab({ onTabChange }: ModelMonitoringTabProps) {
                       })}
                     </tbody>
                   </table>
+                </div>
+              </div>
+            </div>
+          )}
+        </div>
+      )}
+
+      {/* Response Comparison Tab */}
+      {activeTab === 'response-comparison' && (
+        <div className="space-y-6">
+          {/* Model Configuration */}
+          <div className="bg-white rounded-lg border shadow-sm">
+            <div className="p-6 border-b">
+              <h3 className="text-lg font-semibold text-gray-900">Model Configuration</h3>
+              <p className="text-gray-600 mt-1">Select models to include in response comparison</p>
+            </div>
+            <div className="p-6">
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                {models.map((model) => (
+                  <div key={model.id} className="border rounded-lg p-4 hover:shadow-md transition-shadow">
+                    <div className="flex items-center justify-between mb-3">
+                      <div className="flex items-center space-x-2">
+                        <div className={`w-3 h-3 rounded-full bg-${model.color}-500`}></div>
+                        <h4 className="font-medium text-gray-900">{model.name}</h4>
+                      </div>
+                      <label className="relative inline-flex items-center cursor-pointer">
+                        <input
+                          type="checkbox"
+                          checked={model.enabled}
+                          onChange={() => toggleModel(model.id)}
+                          className="sr-only peer"
+                        />
+                        <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
+                      </label>
+                    </div>
+                    <p className="text-sm text-gray-600 mb-2">{model.description}</p>
+                    <div className="text-xs text-gray-500">
+                      Provider: {model.provider} | Model: {model.model}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+
+          {/* Comparison Configuration */}
+          <div className="bg-white rounded-lg border shadow-sm">
+            <div className="p-6 border-b">
+              <h3 className="text-lg font-semibold text-gray-900">Response Comparison</h3>
+              <p className="text-gray-600 mt-1">Compare responses from different models side-by-side</p>
+            </div>
+            <div className="p-6 space-y-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Prompt
+                </label>
+                <textarea
+                  value={comparisonPrompt}
+                  onChange={(e) => setComparisonPrompt(e.target.value)}
+                  placeholder="Enter a prompt to test across all selected models..."
+                  rows={3}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                />
+              </div>
+              
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Context (Optional)
+                </label>
+                <textarea
+                  value={comparisonContext}
+                  onChange={(e) => setComparisonContext(e.target.value)}
+                  placeholder="Add context or additional information..."
+                  rows={2}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                />
+              </div>
+              
+              <div className="flex items-center space-x-4">
+                <button
+                  onClick={runResponseComparison}
+                  disabled={!comparisonPrompt.trim() || !models.filter(m => m.enabled).length || isRunningComparison}
+                  className="flex items-center px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  {isRunningComparison ? (
+                    <>
+                      <RefreshCw className="w-4 h-4 mr-2 animate-spin" />
+                      Running Comparison...
+                    </>
+                  ) : (
+                    <>
+                      <MessageSquare className="w-4 h-4 mr-2" />
+                      Run Response Comparison
+                    </>
+                  )}
+                </button>
+                
+                <div className="text-sm text-gray-600">
+                  {models.filter(m => m.enabled).length} model(s) selected
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Comparison Results */}
+          {comparisonResponses.length > 0 && (
+            <div className="bg-white rounded-lg border shadow-sm">
+              <div className="p-6 border-b">
+                <h3 className="text-lg font-semibold text-gray-900">Response Comparison Results</h3>
+                <p className="text-gray-600 mt-1">Side-by-side comparison of model responses</p>
+              </div>
+              <div className="p-6">
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                  {comparisonResponses.map((response) => (
+                    <div key={response.id} className="border rounded-lg p-4">
+                      <div className="flex items-center justify-between mb-3">
+                        <div className="flex items-center space-x-2">
+                          <div className={`w-3 h-3 rounded-full bg-${models.find(m => m.id === response.model)?.color || 'gray'}-500`}></div>
+                          <h4 className="font-medium text-gray-900">{response.modelName}</h4>
+                        </div>
+                        <div className="text-xs text-gray-500">
+                          {response.provider}
+                        </div>
+                      </div>
+                      
+                      <div className="space-y-3">
+                        <div className="text-sm bg-gray-50 p-3 rounded border">
+                          <div className="text-xs text-gray-500 mb-1">Response:</div>
+                          <div className="text-gray-700">{response.content}</div>
+                        </div>
+                        
+                        <div className="grid grid-cols-3 gap-2 text-xs">
+                          <div className="text-center p-2 bg-blue-50 rounded">
+                            <div className="font-medium text-blue-900">{response.latency}ms</div>
+                            <div className="text-blue-600">Latency</div>
+                          </div>
+                          <div className="text-center p-2 bg-green-50 rounded">
+                            <div className="font-medium text-green-900">{response.tokens}</div>
+                            <div className="text-green-600">Tokens</div>
+                          </div>
+                          <div className="text-center p-2 bg-yellow-50 rounded">
+                            <div className="font-medium text-yellow-900">${response.cost}</div>
+                            <div className="text-yellow-600">Cost</div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
                 </div>
               </div>
             </div>

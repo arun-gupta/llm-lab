@@ -12,13 +12,7 @@ interface HomeTabProps {
 
 export function HomeTab({ onTabChange, apiKeyStatus }: HomeTabProps) {
   const quickActions = [
-    {
-      title: 'LLM Testing',
-      description: 'Test prompts across OpenAI, Anthropic, and Ollama with side-by-side comparison',
-      icon: TestTube,
-      action: () => onTabChange('test'),
-      color: 'bg-blue-500 hover:bg-blue-600'
-    },
+
 
     {
       title: 'GraphRAG Lab',
@@ -36,7 +30,7 @@ export function HomeTab({ onTabChange, apiKeyStatus }: HomeTabProps) {
     },
     {
       title: 'Model Monitoring',
-      description: 'A/B testing and performance monitoring for LLM models with analytics',
+      description: 'A/B testing, response comparison, and performance monitoring for LLM models',
       icon: Activity,
       action: () => onTabChange('monitoring'),
       color: 'bg-orange-500 hover:bg-orange-600'

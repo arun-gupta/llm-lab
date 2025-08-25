@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import { TabNavigation, TabType } from '@/components/TabNavigation';
 import { HomeTab } from '@/components/tabs/HomeTab';
-import { TestTab } from '@/components/tabs/TestTab';
+
 import { GraphRAGTab } from '@/components/tabs/GraphRAGTab';
 import { MCPTab } from '@/components/tabs/MCPTab';
 import { ModelMonitoringTab } from '@/components/tabs/ModelMonitoringTab';
@@ -94,9 +94,7 @@ export default function Home() {
         {activeTab === 'home' && (
           <HomeTab onTabChange={setActiveTab} apiKeyStatus={{}} />
         )}
-        {activeTab === 'test' && (
-          <TestTab onTabChange={setActiveTab} />
-        )}
+
 
 
 
