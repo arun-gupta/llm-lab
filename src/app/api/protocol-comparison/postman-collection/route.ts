@@ -11,7 +11,7 @@ export async function POST(request: NextRequest) {
       variable: [
         {
           key: "base_url",
-          value: "http://localhost:3001",
+          value: "http://localhost:3000",
           type: "string"
         },
         {
