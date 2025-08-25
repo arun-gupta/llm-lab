@@ -21,7 +21,7 @@ export function MCPTab() {
   const sampleQueries = {
     github: [
       "Initialize MCP Session",
-      "List User Repositories (Top 5)",
+      "List User Repositories (First 5)",
       "Get Specific Repository Details",
       "Get Repository Issues", 
       "Get Pull Requests",
