@@ -64,14 +64,14 @@ export default function Home() {
                 <Zap className="w-5 h-5 text-white" />
               </div>
               <div>
-                <h1 className="text-xl font-bold text-gray-900">Postman Protocol Playground</h1>
+                <h1 className="text-xl font-bold text-gray-900">Postman Labs</h1>
                 <p className="text-xs text-gray-600">Advanced GraphRAG development, protocol comparison, and model monitoring platform with MCP integration</p>
               </div>
             </button>
             
             <div className="flex items-center space-x-3">
               <a
-                href="https://github.com/arun-gupta/postman-protocol-playground"
+                href="https://github.com/arun-gupta/postman-labs"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="flex items-center justify-center w-9 h-9 text-gray-600 hover:text-gray-900 hover:bg-gray-100 rounded-lg transition-colors"

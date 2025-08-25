@@ -1,6 +1,6 @@
-# Postman Protocol Playground
+# Postman Labs
 
-[![Open in GitHub Codespaces](https://github.com/codespaces/badge.svg)](https://codespaces.new/arun-gupta/postman-protocol-playground) *(Outdated - Use Local Setup)*
+[![Open in GitHub Codespaces](https://github.com/codespaces/badge.svg)](https://codespaces.new/arun-gupta/postman-labs) *(Outdated - Use Local Setup)*
 
 A comprehensive **Postman-focused protocol testing and GraphRAG development platform** that combines traditional LLM testing with advanced **Graph-based Retrieval-Augmented Generation (GraphRAG)** capabilities. Build knowledge graphs from documents, compare GraphRAG vs traditional RAG, and test multiple protocols (REST, GraphQL, gRPC, gRPC-Web, WebSocket, SSE) with seamless **Postman integration**. Perfect for API testing and protocol comparison.
 
@@ -94,8 +94,8 @@ If you still want to try Codespaces:
 - Use local setup for optimal performance and reliability
 ```bash
 # Clone and run
-git clone https://github.com/arun-gupta/postman-protocol-playground.git
-cd postman-protocol-playground
+git clone https://github.com/arun-gupta/postman-labs.git
+cd postman-labs
 ./quickstart.sh
 ```
 

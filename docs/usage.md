@@ -5,8 +5,8 @@ A comprehensive guide on how to use all features of Postman Protocol Playground.
 ## 🚀 Getting Started
 
 ### **Quick Start**
-1. **Clone the repository**: `git clone https://github.com/arun-gupta/postman-protocol-playground.git`
-2. **Navigate to directory**: `cd postman-protocol-playground`
+1. **Clone the repository**: `git clone https://github.com/arun-gupta/postman-labs.git`
+2. **Navigate to directory**: `cd postman-labs`
 3. **Run setup script**: `./quickstart.sh`
 4. **Add API keys** to `.env.local`
 5. **Start the application**: `npm run dev`
