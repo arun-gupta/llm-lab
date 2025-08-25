@@ -100,11 +100,14 @@ npm run dev
 git clone https://github.com/arun-gupta/postman-labs.git
 cd postman-labs
 
-# Full production setup with all services
+# Quick start with pre-built images (fastest)
 docker-compose up -d
 
-# Or use development setup (simpler, fewer services)
+# Development setup (simpler, fewer services)
 docker-compose -f docker-compose.dev.yml up -d
+
+# Local build from source (for development/testing)
+docker-compose -f docker-compose.build.yml up -d
 ```
 
 # Option 1: Use .env.local (recommended for local development)
@@ -159,8 +162,16 @@ Docker Compose reads environment files in this order (later files override earli
 2. `.env` (can be committed to git for default values)
 
 **Docker Compose Options:**
-- **Full Production** (`docker-compose.yml`): All services including gRPC server, gRPC-Web proxy, and MCP servers
+- **Quick Start** (`docker-compose.yml`): All services using pre-built images from GHCR (fastest startup)
 - **Development** (`docker-compose.dev.yml`): Simplified setup with just the main app and SQLite MCP server
+- **Local Build** (`docker-compose.build.yml`): All services built locally from source (for development/testing)
+
+**Pre-built Images Available:**
+- `ghcr.io/arun-gupta/postman-labs:latest` - Main Next.js application
+- `ghcr.io/arun-gupta/postman-labs-grpc:latest` - gRPC server for GraphRAG
+- `ghcr.io/arun-gupta/postman-labs-grpc-web:latest` - gRPC-Web proxy
+- `ghcr.io/arun-gupta/postman-labs-filesystem-mcp:latest` - Filesystem MCP server
+- `arungupta/sqlite-mcp-server:latest` - SQLite MCP server (Docker Hub)
 
 **Example .env.local file:**
 ```bash

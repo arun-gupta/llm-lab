@@ -1,20 +1,16 @@
 services:
   app:
-    image: ghcr.io/arun-gupta/postman-labs:latest
+    build:
+      context: .
+      dockerfile: Dockerfile
     ports:
       - "3000:3000"
     environment:
       - NODE_ENV=production
       - NEXT_TELEMETRY_DISABLED=1
-      # Add your API keys here or use a .env file
-      # - OPENAI_API_KEY=your_openai_key
-      # - ANTHROPIC_API_KEY=your_anthropic_key
-      # - POSTMAN_API_KEY=your_postman_key
-      # - OLLAMA_BASE_URL=http://host.docker.internal:11434
     env_file:
-      # Docker Compose will read these files in order, with later files overriding earlier ones
-      - .env.local  # Local development environment variables (gitignored)
-      - .env        # Default environment variables (can be committed to git)
+      - .env.local
+      - .env
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:3000/api/health"]
       interval: 30s
@@ -31,7 +27,9 @@ services:
       - postman-labs-network
 
   grpc-server:
-    image: ghcr.io/arun-gupta/postman-labs-grpc:latest
+    build:
+      context: .
+      dockerfile: grpc-server/Dockerfile
     ports:
       - "50051:50051"
     environment:
@@ -47,7 +45,9 @@ services:
       - postman-labs-network
 
   grpc-web-proxy:
-    image: ghcr.io/arun-gupta/postman-labs-grpc-web:latest
+    build:
+      context: .
+      dockerfile: Dockerfile.grpc-web-proxy
     ports:
       - "50052:50052"
     environment:
@@ -83,7 +83,9 @@ services:
       - postman-labs-network
 
   filesystem-mcp-server:
-    image: ghcr.io/arun-gupta/postman-labs-filesystem-mcp:latest
+    build:
+      context: .
+      dockerfile: Dockerfile.filesystem-mcp
     ports:
       - "3002:3002"
     environment:

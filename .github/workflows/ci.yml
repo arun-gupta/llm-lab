@@ -34,8 +34,8 @@ jobs:
         username: ${{ github.actor }}
         password: ${{ secrets.GITHUB_TOKEN }}
 
-    - name: Extract metadata
-      id: meta
+    - name: Extract metadata for main app
+      id: meta-app
       uses: docker/metadata-action@v5
       with:
         images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
@@ -45,18 +45,88 @@ jobs:
           type=sha,prefix={{branch}}-
           type=raw,value=latest,enable={{is_default_branch}}
 
-    - name: Build and test Docker image
+    - name: Extract metadata for gRPC server
+      id: meta-grpc
+      uses: docker/metadata-action@v5
+      with:
+        images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}-grpc
+        tags: |
+          type=ref,event=branch
+          type=ref,event=pr
+          type=sha,prefix={{branch}}-
+          type=raw,value=latest,enable={{is_default_branch}}
+
+    - name: Extract metadata for gRPC-Web proxy
+      id: meta-grpc-web
+      uses: docker/metadata-action@v5
+      with:
+        images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}-grpc-web
+        tags: |
+          type=ref,event=branch
+          type=ref,event=pr
+          type=sha,prefix={{branch}}-
+          type=raw,value=latest,enable={{is_default_branch}}
+
+    - name: Extract metadata for filesystem MCP
+      id: meta-filesystem-mcp
+      uses: docker/metadata-action@v5
+      with:
+        images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}-filesystem-mcp
+        tags: |
+          type=ref,event=branch
+          type=ref,event=pr
+          type=sha,prefix={{branch}}-
+          type=raw,value=latest,enable={{is_default_branch}}
+
+    - name: Build and push main app image
       uses: docker/build-push-action@v5
       with:
         context: .
+        file: ./Dockerfile
         push: ${{ github.event_name != 'pull_request' }}
-        tags: ${{ steps.meta.outputs.tags }}
-        labels: ${{ steps.meta.outputs.labels }}
+        tags: ${{ steps.meta-app.outputs.tags }}
+        labels: ${{ steps.meta-app.outputs.labels }}
         cache-from: type=gha
         cache-to: type=gha,mode=max
         platforms: linux/amd64
 
-    - name: Test container health
+    - name: Build and push gRPC server image
+      uses: docker/build-push-action@v5
+      with:
+        context: .
+        file: ./grpc-server/Dockerfile
+        push: ${{ github.event_name != 'pull_request' }}
+        tags: ${{ steps.meta-grpc.outputs.tags }}
+        labels: ${{ steps.meta-grpc.outputs.labels }}
+        cache-from: type=gha
+        cache-to: type=gha,mode=max
+        platforms: linux/amd64
+
+    - name: Build and push gRPC-Web proxy image
+      uses: docker/build-push-action@v5
+      with:
+        context: .
+        file: ./Dockerfile.grpc-web-proxy
+        push: ${{ github.event_name != 'pull_request' }}
+        tags: ${{ steps.meta-grpc-web.outputs.tags }}
+        labels: ${{ steps.meta-grpc-web.outputs.labels }}
+        cache-from: type=gha
+        cache-to: type=gha,mode=max
+        platforms: linux/amd64
+
+    - name: Build and push filesystem MCP image
+      uses: docker/build-push-action@v5
+      with:
+        context: .
+        file: ./Dockerfile.filesystem-mcp
+        push: ${{ github.event_name != 'pull_request' }}
+        tags: ${{ steps.meta-filesystem-mcp.outputs.tags }}
+        labels: ${{ steps.meta-filesystem-mcp.outputs.labels }}
+        cache-from: type=gha
+        cache-to: type=gha,mode=max
+        platforms: linux/amd64
+
+    - name: Test main app container health
       run: |
         # Start container and test health endpoint
         docker run -d --name test-container -p 3000:3000 ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:latest
