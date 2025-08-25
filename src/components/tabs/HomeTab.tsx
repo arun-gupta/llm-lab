@@ -13,22 +13,8 @@ interface HomeTabProps {
 export function HomeTab({ onTabChange, apiKeyStatus }: HomeTabProps) {
   const quickActions = [
     {
-              title: 'LLM Testing',
-      description: 'Test prompts across all providers with side-by-side comparison',
-      icon: TestTube,
-      action: () => onTabChange('test'),
-      color: 'bg-blue-500 hover:bg-blue-600'
-    },
-    {
-              title: 'Postman Protocol Playground',
-      description: 'Explore REST, GraphQL, gRPC, WebSocket, and MCP integrations',
-      icon: Library,
-      action: () => onTabChange('graphrag'),
-      color: 'bg-purple-500 hover:bg-purple-600'
-    },
-    {
       title: 'GraphRAG Lab',
-      description: 'Build knowledge graphs and compare GraphRAG vs traditional RAG',
+      description: 'Build knowledge graphs, compare protocols, and test GraphRAG vs traditional RAG',
       icon: Network,
       action: () => onTabChange('graphrag'),
       color: 'bg-green-500 hover:bg-green-600'
@@ -48,7 +34,7 @@ export function HomeTab({ onTabChange, apiKeyStatus }: HomeTabProps) {
           Welcome to Postman Protocol Playground
         </h1>
         <p className="text-lg text-gray-600 mb-4">
-          Test and compare LLM providers with side-by-side performance analysis
+          Test LLM providers, build knowledge graphs, and compare communication protocols
         </p>
       </div>
 
@@ -92,7 +78,7 @@ export function HomeTab({ onTabChange, apiKeyStatus }: HomeTabProps) {
       {/* Quick Actions */}
       <div className="mb-8">
         <h2 className="text-xl font-semibold text-gray-900 mb-4">Quick Actions</h2>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-1 gap-6 max-w-md mx-auto">
           {quickActions.map((action, index) => {
             const Icon = action.icon;
             return (
@@ -112,6 +98,41 @@ export function HomeTab({ onTabChange, apiKeyStatus }: HomeTabProps) {
               </button>
             );
           })}
+        </div>
+      </div>
+
+      {/* What You Can Do */}
+      <div className="mb-8">
+        <h2 className="text-xl font-semibold text-gray-900 mb-4">What You Can Do</h2>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+          <div className="p-4 bg-gray-50 rounded-lg border">
+            <div className="flex items-center mb-2">
+              <TestTube className="w-5 h-5 text-blue-600 mr-2" />
+              <h3 className="font-semibold text-gray-900">LLM Testing</h3>
+            </div>
+            <p className="text-sm text-gray-600">Test prompts across OpenAI, Anthropic, and Ollama with side-by-side comparison</p>
+          </div>
+          <div className="p-4 bg-gray-50 rounded-lg border">
+            <div className="flex items-center mb-2">
+              <Network className="w-5 h-5 text-green-600 mr-2" />
+              <h3 className="font-semibold text-gray-900">GraphRAG</h3>
+            </div>
+            <p className="text-sm text-gray-600">Build knowledge graphs and compare REST, GraphQL, gRPC, WebSocket, and SSE protocols</p>
+          </div>
+          <div className="p-4 bg-gray-50 rounded-lg border">
+            <div className="flex items-center mb-2">
+              <Library className="w-5 h-5 text-purple-600 mr-2" />
+              <h3 className="font-semibold text-gray-900">MCP</h3>
+            </div>
+            <p className="text-sm text-gray-600">Model Context Protocol integrations for GitHub, Filesystem, and SQLite</p>
+          </div>
+          <div className="p-4 bg-gray-50 rounded-lg border">
+            <div className="flex items-center mb-2">
+              <Settings className="w-5 h-5 text-gray-600 mr-2" />
+              <h3 className="font-semibold text-gray-900">Settings</h3>
+            </div>
+            <p className="text-sm text-gray-600">Configure API keys, manage preferences, and customize your experience</p>
+          </div>
         </div>
       </div>
 
@@ -153,7 +174,7 @@ export function HomeTab({ onTabChange, apiKeyStatus }: HomeTabProps) {
               </div>
               <h3 className="font-semibold text-gray-900 mb-2">Try GraphRAG</h3>
               <p className="text-gray-600 text-sm">
-                Upload documents, build knowledge graphs, and compare GraphRAG vs traditional RAG responses.
+                Upload documents, build knowledge graphs, and compare protocols (REST, GraphQL, gRPC, WebSocket, SSE).
               </p>
             </div>
           </div>
