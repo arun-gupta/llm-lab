@@ -28,7 +28,7 @@ export async function POST(request: NextRequest) {
       const lowerQuery = q.toLowerCase();
       
       // Check for specific patterns first
-      if (lowerQuery.includes('user repositories') || lowerQuery.includes('list repositories')) {
+      if (lowerQuery.includes('user repositories') || lowerQuery.includes('list repositories') || lowerQuery === 'get user repositories') {
         return { operation: 'list_repositories', params: {} };
       } else if (lowerQuery.includes('repository information') || lowerQuery.includes('get repository')) {
         const repoMatch = q.match(/['"`]([^'"`]+)['"`]/);
@@ -55,9 +55,12 @@ export async function POST(request: NextRequest) {
     const { operation, params } = parseQuery(query);
     
     // Debug logging
-    console.log('GitHub MCP Query:', query);
+    console.log('=== GitHub MCP Debug ===');
+    console.log('Original Query:', query);
+    console.log('Lowercase Query:', query.toLowerCase());
     console.log('Parsed Operation:', operation);
     console.log('Parsed Params:', params);
+    console.log('========================');
 
     // Simulate GitHub MCP operations with realistic data
     const executeGitHubMCP = async (op: string, p: Record<string, any>): Promise<any> => {
