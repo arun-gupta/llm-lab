@@ -20,11 +20,12 @@ export function MCPTab() {
   // Sample queries for each MCP type
   const sampleQueries = {
     github: [
-      "List my repositories",
-      "Get repository 'postman-labs'",
-      "Show issues for 'postman-labs'",
-      "Get pull requests for 'postman-labs'",
-      "Show repository health for 'postman-labs'"
+      "Initialize MCP Session",
+      "Get User Repositories",
+      "Get Repository Information",
+      "Get Repository Issues", 
+      "Get Pull Requests",
+      "Generate Repository Health Report"
     ],
     filesystem: [
       "List files in sample-docs",
