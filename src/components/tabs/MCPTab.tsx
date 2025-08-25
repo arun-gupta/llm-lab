@@ -215,21 +215,7 @@ export function MCPTab() {
                   <div className="text-xs text-purple-600 mb-4">🔧 Environment variables for security</div>
                 </div>
                 
-                {/* Sample Queries */}
-                <div>
-                  <h4 className="text-sm font-medium text-gray-900 mb-3">Sample Queries</h4>
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
-                    {sampleQueries.github.map((query, index) => (
-                      <button
-                        key={index}
-                        onClick={() => setMcpQuery(query)}
-                        className="text-left p-3 border border-gray-200 rounded-md hover:bg-gray-50 transition-colors text-sm text-gray-700"
-                      >
-                        {query}
-                      </button>
-                    ))}
-                  </div>
-                </div>
+
 
                 <div className="flex space-x-3 pt-4">
                   <button
@@ -303,21 +289,7 @@ export function MCPTab() {
                   <div className="text-xs text-green-600 mb-4">🌐 HTTP wrapper for Postman</div>
                 </div>
                 
-                {/* Sample Queries */}
-                <div>
-                  <h4 className="text-sm font-medium text-gray-900 mb-3">Sample Queries</h4>
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
-                    {sampleQueries.filesystem.map((query, index) => (
-                      <button
-                        key={index}
-                        onClick={() => setMcpQuery(query)}
-                        className="text-left p-3 border border-gray-200 rounded-md hover:bg-gray-50 transition-colors text-sm text-gray-700"
-                      >
-                        {query}
-                      </button>
-                    ))}
-                  </div>
-                </div>
+
 
                 <div className="flex space-x-3 pt-4">
                   <button
@@ -391,21 +363,7 @@ export function MCPTab() {
                   <div className="text-xs text-blue-600 mb-4">🐳 Docker HTTP mode for API testing</div>
                 </div>
                 
-                {/* Sample Queries */}
-                <div>
-                  <h4 className="text-sm font-medium text-gray-900 mb-3">Sample Queries</h4>
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
-                    {sampleQueries.sqlite.map((query, index) => (
-                      <button
-                        key={index}
-                        onClick={() => setMcpQuery(query)}
-                        className="text-left p-3 border border-gray-200 rounded-md hover:bg-gray-50 transition-colors text-sm text-gray-700"
-                      >
-                        {query}
-                      </button>
-                    ))}
-                  </div>
-                </div>
+
 
                 <div className="flex space-x-3 pt-4">
                   <button
