@@ -62,146 +62,112 @@ export async function POST(request: NextRequest) {
     console.log('Parsed Params:', params);
     console.log('========================');
 
-    // Simulate GitHub MCP operations with realistic data
+    // Execute GitHub MCP operations using real MCP API
     const executeGitHubMCP = async (op: string, p: Record<string, any>): Promise<any> => {
-      // Simulate network delay
-      await new Promise(resolve => setTimeout(resolve, 100 + Math.random() * 200));
+      const githubToken = process.env.GITHUB_TOKEN;
+      
+      if (!githubToken) {
+        throw new Error('GitHub token not configured. Please set GITHUB_TOKEN environment variable.');
+      }
+
+      // Initialize MCP session
+      const initResponse = await fetch('https://api.githubcopilot.com/mcp/', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${githubToken}`
+        },
+        body: JSON.stringify({
+          jsonrpc: '2.0',
+          method: 'initialize',
+          params: {
+            protocolVersion: '2024-11-05',
+            capabilities: { tools: {} },
+            clientInfo: { name: 'postman-labs-mcp-client', version: '1.0.0' }
+          },
+          id: 1
+        })
+      });
+
+      if (!initResponse.ok) {
+        throw new Error(`MCP initialization failed: ${initResponse.status} ${initResponse.statusText}`);
+      }
+
+      const sessionId = initResponse.headers.get('mcp-session-id');
+      if (!sessionId) {
+        throw new Error('No session ID received from MCP server');
+      }
+
+      // Execute the requested operation
+      let mcpMethod = '';
+      let mcpArguments = {};
 
       switch (op) {
         case 'list_repositories':
-          return {
-            repositories: [
-              {
-                id: 123456789,
-                name: 'postman-labs',
-                full_name: 'arun-gupta/postman-labs',
-                description: 'Advanced platform for GraphRAG development, protocol comparison, model monitoring, and MCP integration',
-                private: false,
-                fork: false,
-                stargazers_count: 42,
-                language: 'TypeScript',
-                updated_at: new Date().toISOString(),
-                topics: ['graphrag', 'mcp', 'postman', 'protocol-comparison']
-              },
-              {
-                id: 987654321,
-                name: 'mcp-server-examples',
-                full_name: 'arun-gupta/mcp-server-examples',
-                description: 'Example MCP servers for testing and development',
-                private: false,
-                fork: true,
-                stargazers_count: 15,
-                language: 'Python',
-                updated_at: new Date(Date.now() - 86400000).toISOString(),
-                topics: ['mcp', 'examples', 'development']
-              },
-              {
-                id: 555666777,
-                name: 'protocol-comparison-demo',
-                full_name: 'arun-gupta/protocol-comparison-demo',
-                description: 'Demonstration of REST, GraphQL, gRPC, WebSocket, and SSE protocols',
-                private: false,
-                fork: false,
-                stargazers_count: 28,
-                language: 'JavaScript',
-                updated_at: new Date(Date.now() - 172800000).toISOString(),
-                topics: ['protocols', 'demo', 'comparison', 'api']
-              }
-            ],
-            total_count: 3,
-            search_limitations: {
-              note: "⚠️ Search API Limitations",
-              details: "GitHub's search API may return fewer repositories than the profile count due to indexing delays, rate limiting, and visibility settings. The actual profile may show more repositories than search results.",
-              profile_count: "183 repositories (from GitHub profile)",
-              search_count: "3 repositories (from search API)",
-              explanation: "This discrepancy is normal and expected due to GitHub's search API limitations."
-            }
-          };
+          mcpMethod = 'search_repositories';
+          mcpArguments = { query: 'user:arun-gupta', perPage: 5 };
+          break;
 
         case 'get_repository':
-          return {
-            repository: {
-              id: 123456789,
-              name: 'postman-labs',
-              full_name: 'arun-gupta/postman-labs',
-              description: 'Advanced platform for GraphRAG development, protocol comparison, model monitoring, and MCP integration',
-              private: false,
-              fork: false,
-              stargazers_count: 42,
-              language: 'TypeScript',
-              updated_at: new Date().toISOString(),
-              topics: ['graphrag', 'mcp', 'postman', 'protocol-comparison'],
-              default_branch: 'main',
-              size: 2048,
-              open_issues_count: 3,
-              license: { name: 'MIT' }
-            }
-          };
-
+          mcpMethod = 'search_repositories';
+          mcpArguments = { query: `repo:arun-gupta/${p.repo || 'postman-labs'}`, perPage: 1 };
+          break;
         case 'list_issues':
-          return {
-            issues: [
-              {
-                id: 1,
-                number: 1,
-                title: 'Add comprehensive protocol comparison',
-                state: 'open',
-                created_at: new Date(Date.now() - 172800000).toISOString(),
-                updated_at: new Date().toISOString(),
-                user: { login: 'arun-gupta', avatar_url: 'https://github.com/arun-gupta.png' },
-                labels: [{ name: 'enhancement', color: '0366d6' }]
-              },
-              {
-                id: 2,
-                number: 2,
-                title: 'Fix gRPC-Web proxy configuration',
-                state: 'closed',
-                created_at: new Date(Date.now() - 259200000).toISOString(),
-                updated_at: new Date(Date.now() - 86400000).toISOString(),
-                user: { login: 'arun-gupta', avatar_url: 'https://github.com/arun-gupta.png' },
-                labels: [{ name: 'bug', color: 'd73a4a' }]
-              }
-            ]
-          };
-
+          mcpMethod = 'search_issues';
+          mcpArguments = { query: `repo:arun-gupta/${p.repo || 'postman-labs'} is:issue`, perPage: 10 };
+          break;
         case 'get_pull_requests':
-          return {
-            pull_requests: [
-              {
-                id: 1,
-                number: 1,
-                title: 'Implement MCP server integration',
-                state: 'open',
-                created_at: new Date(Date.now() - 86400000).toISOString(),
-                updated_at: new Date().toISOString(),
-                user: { login: 'arun-gupta', avatar_url: 'https://github.com/arun-gupta.png' },
-                head: { ref: 'feature/mcp-integration' },
-                base: { ref: 'main' }
-              }
-            ]
-          };
-
+          mcpMethod = 'search_issues';
+          mcpArguments = { query: `repo:arun-gupta/${p.repo || 'postman-labs'} is:pr`, perPage: 10 };
+          break;
         case 'get_repository_health':
-          return {
-            health: {
-              score: 85,
-              metrics: {
-                code_coverage: 78,
-                test_passing: 95,
-                documentation: 80,
-                security: 90,
-                maintainability: 85
-              },
-              recommendations: [
-                'Increase test coverage to 90%',
-                'Add more comprehensive documentation',
-                'Consider adding security scanning'
-              ]
-            }
-          };
-
+          mcpMethod = 'search_repositories';
+          mcpArguments = { query: `repo:arun-gupta/${p.repo || 'postman-labs'}`, perPage: 1 };
+          break;
         default:
           throw new Error(`Unknown operation: ${op}`);
+      }
+
+      // Call MCP tool
+      const toolResponse = await fetch('https://api.githubcopilot.com/mcp/', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${githubToken}`,
+          'Mcp-Session-Id': sessionId
+        },
+        body: JSON.stringify({
+          jsonrpc: '2.0',
+          method: 'tools/call',
+          params: {
+            name: mcpMethod,
+            arguments: mcpArguments
+          },
+          id: 2
+        })
+      });
+
+      if (!toolResponse.ok) {
+        throw new Error(`MCP tool call failed: ${toolResponse.status} ${toolResponse.statusText}`);
+      }
+
+      const toolData = await toolResponse.json();
+      
+      if (toolData.error) {
+        throw new Error(`MCP tool error: ${toolData.error.message}`);
+      }
+
+      // Parse the MCP response
+      if (toolData.result?.content && toolData.result.content.length > 0) {
+        const contentText = toolData.result.content[0].text;
+        try {
+          const parsedData = JSON.parse(contentText);
+          return parsedData;
+        } catch (parseError) {
+          throw new Error(`Failed to parse MCP response: ${parseError.message}`);
+        }
+      } else {
+        throw new Error('No content received from MCP server');
       }
     };
 

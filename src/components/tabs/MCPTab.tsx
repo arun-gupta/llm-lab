@@ -484,6 +484,8 @@ export function MCPTab() {
                             </div>
                           ) : (
                             <div>
+
+                              
                               {/* Show search limitations caveat for GitHub MCP */}
                               {activeMCP === 'github' && mcpResult.search_limitations && (
                                 <div className="mb-4 p-3 bg-yellow-50 border border-yellow-200 rounded-md">
