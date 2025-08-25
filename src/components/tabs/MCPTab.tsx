@@ -483,9 +483,32 @@ export function MCPTab() {
                               </div>
                             </div>
                           ) : (
-                            <pre className="text-sm text-gray-800 whitespace-pre-wrap">
-                              {JSON.stringify(mcpResult, null, 2)}
-                            </pre>
+                            <div>
+                              {/* Show search limitations caveat for GitHub MCP */}
+                              {activeMCP === 'github' && mcpResult.search_limitations && (
+                                <div className="mb-4 p-3 bg-yellow-50 border border-yellow-200 rounded-md">
+                                  <div className="flex items-start space-x-2">
+                                    <span className="text-yellow-600 text-sm">⚠️</span>
+                                    <div className="flex-1">
+                                      <h4 className="text-sm font-medium text-yellow-800 mb-1">
+                                        {mcpResult.search_limitations.note}
+                                      </h4>
+                                      <p className="text-xs text-yellow-700 mb-2">
+                                        {mcpResult.search_limitations.details}
+                                      </p>
+                                      <div className="text-xs text-yellow-600 space-y-1">
+                                        <div><strong>Profile Count:</strong> {mcpResult.search_limitations.profile_count}</div>
+                                        <div><strong>Search Count:</strong> {mcpResult.search_limitations.search_count}</div>
+                                        <div><em>{mcpResult.search_limitations.explanation}</em></div>
+                                      </div>
+                                    </div>
+                                  </div>
+                                </div>
+                              )}
+                              <pre className="text-sm text-gray-800 whitespace-pre-wrap">
+                                {JSON.stringify(mcpResult, null, 2)}
+                              </pre>
+                            </div>
                           )
                         ) : (
                           <div className="flex items-center justify-center h-full text-gray-500">

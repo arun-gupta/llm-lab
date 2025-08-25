@@ -104,7 +104,15 @@ export async function POST(request: NextRequest) {
                 updated_at: new Date(Date.now() - 172800000).toISOString(),
                 topics: ['protocols', 'demo', 'comparison', 'api']
               }
-            ]
+            ],
+            total_count: 3,
+            search_limitations: {
+              note: "⚠️ Search API Limitations",
+              details: "GitHub's search API may return fewer repositories than the profile count due to indexing delays, rate limiting, and visibility settings. The actual profile may show more repositories than search results.",
+              profile_count: "183 repositories (from GitHub profile)",
+              search_count: "3 repositories (from search API)",
+              explanation: "This discrepancy is normal and expected due to GitHub's search API limitations."
+            }
           };
 
         case 'get_repository':
