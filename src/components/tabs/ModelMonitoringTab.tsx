@@ -213,11 +213,48 @@ export function ModelMonitoringTab({ onTabChange }: ModelMonitoringTabProps) {
     }
   ];
 
+  // Quick Combos for testing
+  const quickCombos = [
+    {
+      id: 'speed-test',
+      title: 'Speed Test',
+      description: 'Compare response times across models',
+      models: ['gpt-5-nano', 'gpt-5-mini', 'claude-3-5-haiku'],
+      prompt: 'Write a 100-word summary of the benefits of renewable energy sources.',
+      icon: '⚡'
+    },
+    {
+      id: 'quality-test',
+      title: 'Quality Test',
+      description: 'Compare response quality across models',
+      models: ['gpt-5', 'claude-3-5-sonnet', 'gpt-4'],
+      prompt: 'Explain the concept of machine learning in detail, including its applications, limitations, and future prospects.',
+      icon: '🎯'
+    },
+    {
+      id: 'cost-test',
+      title: 'Cost Test',
+      description: 'Compare cost-effectiveness across models',
+      models: ['gpt-5-nano', 'claude-3-5-haiku', 'gpt-3.5-turbo'],
+      prompt: 'Provide a brief analysis of the current trends in remote work.',
+      icon: '💰'
+    },
+    {
+      id: 'creative-test',
+      title: 'Creative Test',
+      description: 'Test creative writing capabilities',
+      models: ['gpt-5', 'claude-3-5-sonnet', 'gpt-5-mini'],
+      prompt: 'Write a creative story about a robot learning to paint.',
+      icon: '🎨'
+    }
+  ];
+
   // Response Comparison State
   const [comparisonPrompt, setComparisonPrompt] = useState('');
   const [comparisonContext, setComparisonContext] = useState('');
   const [isRunningComparison, setIsRunningComparison] = useState(false);
   const [comparisonResponses, setComparisonResponses] = useState<any[]>([]);
+  const [showMorePrompts, setShowMorePrompts] = useState(false);
 
   // Performance Monitoring State
   const [monitoringEnabled, setMonitoringEnabled] = useState(false);
@@ -744,6 +781,18 @@ export function ModelMonitoringTab({ onTabChange }: ModelMonitoringTabProps) {
     setComparisonPrompt(prompt);
   };
 
+  const selectQuickCombo = (combo: any) => {
+    // Set the prompt
+    setTestPrompt(combo.prompt);
+    setComparisonPrompt(combo.prompt);
+    
+    // Enable only the models in the combo
+    setModels(prev => prev.map(m => ({
+      ...m,
+      enabled: combo.models.includes(m.id)
+    })));
+  };
+
   const runABTest = async () => {
     if (!testPrompt.trim() || !models.filter(m => m.enabled).length) return;
     
@@ -904,128 +953,196 @@ export function ModelMonitoringTab({ onTabChange }: ModelMonitoringTabProps) {
 
       {/* A/B Testing Tab */}
       {activeTab === 'ab-testing' && (
-        <div className="space-y-6">
-          {/* Model Configuration */}
-          <div className="bg-white rounded-lg border shadow-sm">
-            <div className="p-6 border-b">
-              <h3 className="text-lg font-semibold text-gray-900">Model Configuration</h3>
-              <p className="text-gray-600 mt-1">Select models to include in A/B testing</p>
-            </div>
-            <div className="p-6">
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                {models.map((model) => (
-                  <div key={model.id} className="border rounded-lg p-4 hover:shadow-md transition-shadow">
-                    <div className="flex items-center justify-between mb-3">
-                      <div className="flex items-center space-x-2">
-                        <div className={`w-3 h-3 rounded-full bg-${model.color}-500`}></div>
-                        <h4 className="font-medium text-gray-900">{model.name}</h4>
-                      </div>
-                      <label className="relative inline-flex items-center cursor-pointer">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          {/* Left Panel - Model Configuration */}
+          <div className="lg:col-span-1 space-y-6">
+            {/* Model Configuration */}
+            <div className="bg-white rounded-lg border shadow-sm">
+              <div className="p-4 border-b">
+                <h3 className="text-lg font-semibold text-gray-900">Model Configuration</h3>
+                <p className="text-gray-600 text-sm mt-1">Select models to include in A/B testing</p>
+              </div>
+              <div className="p-4">
+                <div className="space-y-3">
+                  {models.map((model) => (
+                    <div
+                      key={model.id}
+                      className={`border rounded-lg p-3 cursor-pointer transition-all ${
+                        model.enabled
+                          ? 'border-blue-500 bg-blue-50'
+                          : 'border-gray-200 hover:border-gray-300'
+                      }`}
+                      onClick={() => toggleModel(model.id)}
+                    >
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center space-x-2">
+                          <div className={`w-3 h-3 rounded-full bg-${model.color}-500`}></div>
+                          <span className="font-medium text-gray-900 text-sm">{model.name}</span>
+                        </div>
                         <input
                           type="checkbox"
                           checked={model.enabled}
                           onChange={() => toggleModel(model.id)}
-                          className="sr-only peer"
+                          className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
                         />
-                        <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
-                      </label>
+                      </div>
+                      <p className="text-xs text-gray-600 mt-1">{model.provider}</p>
+                      <p className="text-xs text-gray-500 mt-1">{model.description}</p>
                     </div>
-                    <p className="text-sm text-gray-600 mb-2">{model.description}</p>
-                    <div className="text-xs text-gray-500">
-                      Provider: {model.provider} | Model: {model.model}
-                    </div>
-                  </div>
-                ))}
+                  ))}
+                </div>
               </div>
             </div>
-          </div>
 
-          {/* Sample Prompts */}
-          <div className="bg-white rounded-lg border shadow-sm">
-            <div className="p-6 border-b">
-              <h3 className="text-lg font-semibold text-gray-900">Sample Prompts</h3>
-              <p className="text-gray-600 mt-1">Choose from predefined prompts for quick testing</p>
-            </div>
-            <div className="p-6">
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                {samplePrompts.map((sample) => (
-                  <div 
-                    key={sample.id} 
-                    className="border rounded-lg p-4 hover:shadow-md transition-shadow cursor-pointer"
-                    onClick={() => selectSamplePrompt(sample.prompt)}
-                  >
-                    <div className="flex items-center justify-between mb-2">
-                      <h4 className="font-medium text-gray-900">{sample.title}</h4>
-                      <span className={`text-xs px-2 py-1 rounded-full ${
-                        sample.difficulty === 'Easy' ? 'bg-green-100 text-green-800' :
-                        sample.difficulty === 'Medium' ? 'bg-yellow-100 text-yellow-800' :
-                        'bg-red-100 text-red-800'
-                      }`}>
-                        {sample.difficulty}
-                      </span>
-                    </div>
-                    <p className="text-xs text-gray-500 mb-2">{sample.category}</p>
-                    <p className="text-sm text-gray-600 line-clamp-3">{sample.prompt.substring(0, 100)}...</p>
-                    <button 
-                      className="mt-2 text-xs text-blue-600 hover:text-blue-800 font-medium"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        selectSamplePrompt(sample.prompt);
-                      }}
+            {/* Quick Combos */}
+            <div className="bg-white rounded-lg border shadow-sm">
+              <div className="p-4 border-b">
+                <h3 className="text-lg font-semibold text-gray-900">Quick Combos</h3>
+                <p className="text-gray-600 text-sm mt-1">Pre-configured test scenarios</p>
+              </div>
+              <div className="p-4">
+                <div className="space-y-3">
+                  {quickCombos.map((combo) => (
+                    <div
+                      key={combo.id}
+                      className="border rounded-lg p-3 hover:shadow-md transition-shadow cursor-pointer"
+                      onClick={() => selectQuickCombo(combo)}
                     >
-                      Use this prompt →
-                    </button>
-                  </div>
-                ))}
+                      <div className="flex items-center space-x-2 mb-2">
+                        <span className="text-lg">{combo.icon}</span>
+                        <div>
+                          <h4 className="font-medium text-gray-900 text-sm">{combo.title}</h4>
+                          <p className="text-xs text-gray-600">{combo.description}</p>
+                        </div>
+                      </div>
+                      <div className="flex flex-wrap gap-1">
+                        {combo.models.map((modelId) => {
+                          const model = models.find(m => m.id === modelId);
+                          return model ? (
+                            <span
+                              key={modelId}
+                              className={`text-xs px-2 py-1 rounded-full ${
+                                model.enabled ? 'bg-blue-100 text-blue-800' : 'bg-gray-100 text-gray-600'
+                              }`}
+                            >
+                              {model.name}
+                            </span>
+                          ) : null;
+                        })}
+                      </div>
+                    </div>
+                  ))}
+                </div>
               </div>
             </div>
-          </div>
 
-          {/* Test Configuration */}
-          <div className="bg-white rounded-lg border shadow-sm">
-            <div className="p-6 border-b">
-              <h3 className="text-lg font-semibold text-gray-900">Test Configuration</h3>
-              <p className="text-gray-600 mt-1">Configure your A/B test parameters</p>
-            </div>
-            <div className="p-6 space-y-4">
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Test Prompt
-                </label>
-                <textarea
-                  value={testPrompt}
-                  onChange={(e) => setTestPrompt(e.target.value)}
-                  placeholder="Enter a prompt to test across all selected models..."
-                  rows={3}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                />
+            {/* Sample Prompts */}
+            <div className="bg-white rounded-lg border shadow-sm">
+              <div className="p-4 border-b">
+                <h3 className="text-lg font-semibold text-gray-900">Sample Prompts</h3>
+                <p className="text-gray-600 text-sm mt-1">Choose from predefined prompts</p>
               </div>
-              
-              <div className="flex items-center space-x-4">
-                <button
-                  onClick={runABTest}
-                  disabled={!testPrompt.trim() || !models.filter(m => m.enabled).length || isRunningTest}
-                  className="flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed"
-                >
-                  {isRunningTest ? (
-                    <>
-                      <RefreshCw className="w-4 h-4 mr-2 animate-spin" />
-                      Running Test...
-                    </>
-                  ) : (
-                    <>
-                      <Play className="w-4 h-4 mr-2" />
-                      Run A/B Test
-                    </>
+              <div className="p-4">
+                <div className="space-y-3">
+                  {(showMorePrompts ? samplePrompts : samplePrompts.slice(0, 3)).map((sample) => (
+                    <div 
+                      key={sample.id} 
+                      className="border rounded-lg p-3 hover:shadow-md transition-shadow cursor-pointer"
+                      onClick={() => selectSamplePrompt(sample.prompt)}
+                    >
+                      <div className="flex items-center justify-between mb-2">
+                        <h4 className="font-medium text-gray-900 text-sm">{sample.title}</h4>
+                        <span className={`text-xs px-2 py-1 rounded-full ${
+                          sample.difficulty === 'Easy' ? 'bg-green-100 text-green-800' :
+                          sample.difficulty === 'Medium' ? 'bg-yellow-100 text-yellow-800' :
+                          'bg-red-100 text-red-800'
+                        }`}>
+                          {sample.difficulty}
+                        </span>
+                      </div>
+                      <p className="text-xs text-gray-500 mb-2">{sample.category}</p>
+                      <p className="text-sm text-gray-600 line-clamp-2">{sample.prompt.substring(0, 80)}...</p>
+                      <button 
+                        className="mt-2 text-xs text-blue-600 hover:text-blue-800 font-medium"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          selectSamplePrompt(sample.prompt);
+                        }}
+                      >
+                        Use this prompt →
+                      </button>
+                    </div>
+                  ))}
+                  {!showMorePrompts && samplePrompts.length > 3 && (
+                    <button
+                      onClick={() => setShowMorePrompts(true)}
+                      className="w-full text-sm text-blue-600 hover:text-blue-800 font-medium py-2"
+                    >
+                      Show More Prompts ({samplePrompts.length - 3} more)
+                    </button>
                   )}
-                </button>
-                
-                <div className="text-sm text-gray-600">
-                  {models.filter(m => m.enabled).length} model(s) selected
+                  {showMorePrompts && (
+                    <button
+                      onClick={() => setShowMorePrompts(false)}
+                      className="w-full text-sm text-blue-600 hover:text-blue-800 font-medium py-2"
+                    >
+                      Show Less
+                    </button>
+                  )}
                 </div>
               </div>
             </div>
           </div>
+
+          {/* Right Panel - Test Configuration */}
+          <div className="lg:col-span-2">
+            <div className="bg-white rounded-lg border shadow-sm">
+              <div className="p-6 border-b">
+                <h3 className="text-lg font-semibold text-gray-900">Test Configuration</h3>
+                <p className="text-gray-600 mt-1">Configure your A/B test parameters</p>
+              </div>
+              <div className="p-6 space-y-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Test Prompt
+                  </label>
+                  <textarea
+                    value={testPrompt}
+                    onChange={(e) => setTestPrompt(e.target.value)}
+                    placeholder="Enter a prompt to test across all selected models..."
+                    rows={4}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  />
+                </div>
+                
+                <div className="flex items-center space-x-4">
+                  <button
+                    onClick={runABTest}
+                    disabled={!testPrompt.trim() || !models.filter(m => m.enabled).length || isRunningTest}
+                    className="flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed"
+                  >
+                    {isRunningTest ? (
+                      <>
+                        <RefreshCw className="w-4 h-4 mr-2 animate-spin" />
+                        Running Test...
+                      </>
+                    ) : (
+                      <>
+                        <Play className="w-4 h-4 mr-2" />
+                        Run A/B Test
+                      </>
+                    )}
+                  </button>
+                  
+                  <div className="text-sm text-gray-600">
+                    {models.filter(m => m.enabled).length} model(s) selected
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
 
           {/* Test Results */}
           {testResults.length > 0 && (
@@ -1098,191 +1215,258 @@ export function ModelMonitoringTab({ onTabChange }: ModelMonitoringTabProps) {
 
       {/* Response Comparison Tab */}
       {activeTab === 'response-comparison' && (
-        <div className="space-y-6">
-          {/* Model Configuration */}
-          <div className="bg-white rounded-lg border shadow-sm">
-            <div className="p-6 border-b">
-              <h3 className="text-lg font-semibold text-gray-900">Model Configuration</h3>
-              <p className="text-gray-600 mt-1">Select models to include in response comparison</p>
-            </div>
-            <div className="p-6">
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                {models.map((model) => (
-                  <div key={model.id} className="border rounded-lg p-4 hover:shadow-md transition-shadow">
-                    <div className="flex items-center justify-between mb-3">
-                      <div className="flex items-center space-x-2">
-                        <div className={`w-3 h-3 rounded-full bg-${model.color}-500`}></div>
-                        <h4 className="font-medium text-gray-900">{model.name}</h4>
-                      </div>
-                      <label className="relative inline-flex items-center cursor-pointer">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          {/* Left Panel - Model Configuration */}
+          <div className="lg:col-span-1 space-y-6">
+            {/* Model Configuration */}
+            <div className="bg-white rounded-lg border shadow-sm">
+              <div className="p-4 border-b">
+                <h3 className="text-lg font-semibold text-gray-900">Model Configuration</h3>
+                <p className="text-gray-600 text-sm mt-1">Select models to include in response comparison</p>
+              </div>
+              <div className="p-4">
+                <div className="space-y-3">
+                  {models.map((model) => (
+                    <div
+                      key={model.id}
+                      className={`border rounded-lg p-3 cursor-pointer transition-all ${
+                        model.enabled
+                          ? 'border-purple-500 bg-purple-50'
+                          : 'border-gray-200 hover:border-gray-300'
+                      }`}
+                      onClick={() => toggleModel(model.id)}
+                    >
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center space-x-2">
+                          <div className={`w-3 h-3 rounded-full bg-${model.color}-500`}></div>
+                          <span className="font-medium text-gray-900 text-sm">{model.name}</span>
+                        </div>
                         <input
                           type="checkbox"
                           checked={model.enabled}
                           onChange={() => toggleModel(model.id)}
-                          className="sr-only peer"
+                          className="w-4 h-4 text-purple-600 border-gray-300 rounded focus:ring-purple-500"
                         />
-                        <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
-                      </label>
+                      </div>
+                      <p className="text-xs text-gray-600 mt-1">{model.provider}</p>
+                      <p className="text-xs text-gray-500 mt-1">{model.description}</p>
                     </div>
-                    <p className="text-sm text-gray-600 mb-2">{model.description}</p>
-                    <div className="text-xs text-gray-500">
-                      Provider: {model.provider} | Model: {model.model}
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
-          </div>
-
-          {/* Sample Prompts */}
-          <div className="bg-white rounded-lg border shadow-sm">
-            <div className="p-6 border-b">
-              <h3 className="text-lg font-semibold text-gray-900">Sample Prompts</h3>
-              <p className="text-gray-600 mt-1">Choose from predefined prompts for quick comparison</p>
-            </div>
-            <div className="p-6">
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                {samplePrompts.map((sample) => (
-                  <div 
-                    key={sample.id} 
-                    className="border rounded-lg p-4 hover:shadow-md transition-shadow cursor-pointer"
-                    onClick={() => selectSamplePrompt(sample.prompt)}
-                  >
-                    <div className="flex items-center justify-between mb-2">
-                      <h4 className="font-medium text-gray-900">{sample.title}</h4>
-                      <span className={`text-xs px-2 py-1 rounded-full ${
-                        sample.difficulty === 'Easy' ? 'bg-green-100 text-green-800' :
-                        sample.difficulty === 'Medium' ? 'bg-yellow-100 text-yellow-800' :
-                        'bg-red-100 text-red-800'
-                      }`}>
-                        {sample.difficulty}
-                      </span>
-                    </div>
-                    <p className="text-xs text-gray-500 mb-2">{sample.category}</p>
-                    <p className="text-sm text-gray-600 line-clamp-3">{sample.prompt.substring(0, 100)}...</p>
-                    <button 
-                      className="mt-2 text-xs text-purple-600 hover:text-purple-800 font-medium"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        selectSamplePrompt(sample.prompt);
-                      }}
-                    >
-                      Use this prompt →
-                    </button>
-                  </div>
-                ))}
-              </div>
-            </div>
-          </div>
-
-          {/* Comparison Configuration */}
-          <div className="bg-white rounded-lg border shadow-sm">
-            <div className="p-6 border-b">
-              <h3 className="text-lg font-semibold text-gray-900">Response Comparison</h3>
-              <p className="text-gray-600 mt-1">Compare responses from different models side-by-side</p>
-            </div>
-            <div className="p-6 space-y-4">
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Prompt
-                </label>
-                <textarea
-                  value={comparisonPrompt}
-                  onChange={(e) => setComparisonPrompt(e.target.value)}
-                  placeholder="Enter a prompt to test across all selected models..."
-                  rows={3}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                />
-              </div>
-              
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Context (Optional)
-                </label>
-                <textarea
-                  value={comparisonContext}
-                  onChange={(e) => setComparisonContext(e.target.value)}
-                  placeholder="Add context or additional information..."
-                  rows={2}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                />
-              </div>
-              
-              <div className="flex items-center space-x-4">
-                <button
-                  onClick={runResponseComparison}
-                  disabled={!comparisonPrompt.trim() || !models.filter(m => m.enabled).length || isRunningComparison}
-                  className="flex items-center px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 disabled:opacity-50 disabled:cursor-not-allowed"
-                >
-                  {isRunningComparison ? (
-                    <>
-                      <RefreshCw className="w-4 h-4 mr-2 animate-spin" />
-                      Running Comparison...
-                    </>
-                  ) : (
-                    <>
-                      <MessageSquare className="w-4 h-4 mr-2" />
-                      Run Response Comparison
-                    </>
-                  )}
-                </button>
-                
-                <div className="text-sm text-gray-600">
-                  {models.filter(m => m.enabled).length} model(s) selected
+                  ))}
                 </div>
               </div>
             </div>
-          </div>
 
-          {/* Comparison Results */}
-          {comparisonResponses.length > 0 && (
+            {/* Quick Combos */}
             <div className="bg-white rounded-lg border shadow-sm">
-              <div className="p-6 border-b">
-                <h3 className="text-lg font-semibold text-gray-900">Response Comparison Results</h3>
-                <p className="text-gray-600 mt-1">Side-by-side comparison of model responses</p>
+              <div className="p-4 border-b">
+                <h3 className="text-lg font-semibold text-gray-900">Quick Combos</h3>
+                <p className="text-gray-600 text-sm mt-1">Pre-configured comparison scenarios</p>
               </div>
-              <div className="p-6">
-                <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                  {comparisonResponses.map((response) => (
-                    <div key={response.id} className="border rounded-lg p-4">
-                      <div className="flex items-center justify-between mb-3">
-                        <div className="flex items-center space-x-2">
-                          <div className={`w-3 h-3 rounded-full bg-${models.find(m => m.id === response.model)?.color || 'gray'}-500`}></div>
-                          <h4 className="font-medium text-gray-900">{response.modelName}</h4>
-                        </div>
-                        <div className="text-xs text-gray-500">
-                          {response.provider}
+              <div className="p-4">
+                <div className="space-y-3">
+                  {quickCombos.map((combo) => (
+                    <div
+                      key={combo.id}
+                      className="border rounded-lg p-3 hover:shadow-md transition-shadow cursor-pointer"
+                      onClick={() => selectQuickCombo(combo)}
+                    >
+                      <div className="flex items-center space-x-2 mb-2">
+                        <span className="text-lg">{combo.icon}</span>
+                        <div>
+                          <h4 className="font-medium text-gray-900 text-sm">{combo.title}</h4>
+                          <p className="text-xs text-gray-600">{combo.description}</p>
                         </div>
                       </div>
-                      
-                      <div className="space-y-3">
-                        <div className="text-sm bg-gray-50 p-3 rounded border">
-                          <div className="text-xs text-gray-500 mb-1">Response:</div>
-                          <div className="text-gray-700">{response.content}</div>
-                        </div>
-                        
-                        <div className="grid grid-cols-3 gap-2 text-xs">
-                          <div className="text-center p-2 bg-blue-50 rounded">
-                            <div className="font-medium text-blue-900">{response.latency}ms</div>
-                            <div className="text-blue-600">Latency</div>
-                          </div>
-                          <div className="text-center p-2 bg-green-50 rounded">
-                            <div className="font-medium text-green-900">{response.tokens}</div>
-                            <div className="text-green-600">Tokens</div>
-                          </div>
-                          <div className="text-center p-2 bg-yellow-50 rounded">
-                            <div className="font-medium text-yellow-900">${response.cost}</div>
-                            <div className="text-yellow-600">Cost</div>
-                          </div>
-                        </div>
+                      <div className="flex flex-wrap gap-1">
+                        {combo.models.map((modelId) => {
+                          const model = models.find(m => m.id === modelId);
+                          return model ? (
+                            <span
+                              key={modelId}
+                              className={`text-xs px-2 py-1 rounded-full ${
+                                model.enabled ? 'bg-purple-100 text-purple-800' : 'bg-gray-100 text-gray-600'
+                              }`}
+                            >
+                              {model.name}
+                            </span>
+                          ) : null;
+                        })}
                       </div>
                     </div>
                   ))}
                 </div>
               </div>
             </div>
-          )}
+
+            {/* Sample Prompts */}
+            <div className="bg-white rounded-lg border shadow-sm">
+              <div className="p-4 border-b">
+                <h3 className="text-lg font-semibold text-gray-900">Sample Prompts</h3>
+                <p className="text-gray-600 text-sm mt-1">Choose from predefined prompts</p>
+              </div>
+              <div className="p-4">
+                <div className="space-y-3">
+                  {(showMorePrompts ? samplePrompts : samplePrompts.slice(0, 3)).map((sample) => (
+                    <div 
+                      key={sample.id} 
+                      className="border rounded-lg p-3 hover:shadow-md transition-shadow cursor-pointer"
+                      onClick={() => selectSamplePrompt(sample.prompt)}
+                    >
+                      <div className="flex items-center justify-between mb-2">
+                        <h4 className="font-medium text-gray-900 text-sm">{sample.title}</h4>
+                        <span className={`text-xs px-2 py-1 rounded-full ${
+                          sample.difficulty === 'Easy' ? 'bg-green-100 text-green-800' :
+                          sample.difficulty === 'Medium' ? 'bg-yellow-100 text-yellow-800' :
+                          'bg-red-100 text-red-800'
+                        }`}>
+                          {sample.difficulty}
+                        </span>
+                      </div>
+                      <p className="text-xs text-gray-500 mb-2">{sample.category}</p>
+                      <p className="text-sm text-gray-600 line-clamp-2">{sample.prompt.substring(0, 80)}...</p>
+                      <button 
+                        className="mt-2 text-xs text-purple-600 hover:text-purple-800 font-medium"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          selectSamplePrompt(sample.prompt);
+                        }}
+                      >
+                        Use this prompt →
+                      </button>
+                    </div>
+                  ))}
+                  {!showMorePrompts && samplePrompts.length > 3 && (
+                    <button
+                      onClick={() => setShowMorePrompts(true)}
+                      className="w-full text-sm text-purple-600 hover:text-purple-800 font-medium py-2"
+                    >
+                      Show More Prompts ({samplePrompts.length - 3} more)
+                    </button>
+                  )}
+                  {showMorePrompts && (
+                    <button
+                      onClick={() => setShowMorePrompts(false)}
+                      className="w-full text-sm text-purple-600 hover:text-purple-800 font-medium py-2"
+                    >
+                      Show Less
+                    </button>
+                  )}
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Right Panel - Comparison Configuration */}
+          <div className="lg:col-span-2">
+            <div className="bg-white rounded-lg border shadow-sm">
+              <div className="p-6 border-b">
+                <h3 className="text-lg font-semibold text-gray-900">Response Comparison</h3>
+                <p className="text-gray-600 mt-1">Compare responses from different models side-by-side</p>
+              </div>
+              <div className="p-6 space-y-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Prompt
+                  </label>
+                  <textarea
+                    value={comparisonPrompt}
+                    onChange={(e) => setComparisonPrompt(e.target.value)}
+                    placeholder="Enter a prompt to test across all selected models..."
+                    rows={4}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500"
+                  />
+                </div>
+                
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Context (Optional)
+                  </label>
+                  <textarea
+                    value={comparisonContext}
+                    onChange={(e) => setComparisonContext(e.target.value)}
+                    placeholder="Add context or additional information..."
+                    rows={2}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500"
+                  />
+                </div>
+                
+                <div className="flex items-center space-x-4">
+                  <button
+                    onClick={runResponseComparison}
+                    disabled={!comparisonPrompt.trim() || !models.filter(m => m.enabled).length || isRunningComparison}
+                    className="flex items-center px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 disabled:opacity-50 disabled:cursor-not-allowed"
+                  >
+                    {isRunningComparison ? (
+                      <>
+                        <RefreshCw className="w-4 h-4 mr-2 animate-spin" />
+                        Running Comparison...
+                      </>
+                    ) : (
+                      <>
+                        <MessageSquare className="w-4 h-4 mr-2" />
+                        Run Response Comparison
+                      </>
+                    )}
+                  </button>
+                  
+                  <div className="text-sm text-gray-600">
+                    {models.filter(m => m.enabled).length} model(s) selected
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
+
+        {/* Comparison Results */}
+        {comparisonResponses.length > 0 && (
+          <div className="bg-white rounded-lg border shadow-sm">
+            <div className="p-6 border-b">
+              <h3 className="text-lg font-semibold text-gray-900">Response Comparison Results</h3>
+              <p className="text-gray-600 mt-1">Side-by-side comparison of model responses</p>
+            </div>
+            <div className="p-6">
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                {comparisonResponses.map((response) => (
+                  <div key={response.id} className="border rounded-lg p-4">
+                    <div className="flex items-center justify-between mb-3">
+                      <div className="flex items-center space-x-2">
+                        <div className={`w-3 h-3 rounded-full bg-${models.find(m => m.id === response.model)?.color || 'gray'}-500`}></div>
+                        <h4 className="font-medium text-gray-900">{response.modelName}</h4>
+                      </div>
+                      <div className="text-xs text-gray-500">
+                        {response.provider}
+                      </div>
+                    </div>
+                    
+                    <div className="space-y-3">
+                      <div className="text-sm bg-gray-50 p-3 rounded border">
+                        <div className="text-xs text-gray-500 mb-1">Response:</div>
+                        <div className="text-gray-700">{response.content}</div>
+                      </div>
+                      
+                      <div className="grid grid-cols-3 gap-2 text-xs">
+                        <div className="text-center p-2 bg-blue-50 rounded">
+                          <div className="font-medium text-blue-900">{response.latency}ms</div>
+                          <div className="text-blue-600">Latency</div>
+                        </div>
+                        <div className="text-center p-2 bg-green-50 rounded">
+                          <div className="font-medium text-green-900">{response.tokens}</div>
+                          <div className="text-green-600">Tokens</div>
+                        </div>
+                        <div className="text-center p-2 bg-yellow-50 rounded">
+                          <div className="font-medium text-yellow-900">${response.cost}</div>
+                          <div className="text-yellow-600">Cost</div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+        )}
+      </div>
       )}
 
       {/* Performance Monitoring Tab */}
