@@ -1855,7 +1855,9 @@ export function GraphRAGTab() {
                   disabled={!responses || importStatus === 'importing'}
                   className="flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed"
                 >
-                  <img src="https://www.postman.com/company/logo-and-branding-assets/img/logo/postman-logo-orange.svg" alt="Postman" className="w-4 h-4 mr-2" />
+                  <div className="w-4 h-4 mr-2 bg-orange-500 rounded-full flex items-center justify-center">
+                    <span className="text-white text-xs font-bold">P</span>
+                  </div>
                   {importStatus === 'importing' ? 'Importing...' : 'Add GraphRAG REST to Postman'}
                 </button>
               </div>
@@ -2334,7 +2336,9 @@ export function GraphRAGTab() {
                       disabled={!graphData || importStatus === 'importing'}
                       className="flex items-center px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 disabled:opacity-50 disabled:cursor-not-allowed"
                     >
-                      <img src="https://www.postman.com/company/logo-and-branding-assets/img/logo/postman-logo-orange.svg" alt="Postman" className="w-4 h-4 mr-2" />
+                      <div className="w-4 h-4 mr-2 bg-orange-500 rounded-full flex items-center justify-center">
+                        <span className="text-white text-xs font-bold">P</span>
+                      </div>
                       {importStatus === 'importing' ? 'Importing...' : 'Add Comparison Collection to Postman'}
                     </button>
                   </div>
@@ -2711,7 +2715,9 @@ export function GraphRAGTab() {
                         disabled={!graphData || importStatus === 'importing'}
                         className="flex items-center px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 disabled:opacity-50 disabled:cursor-not-allowed"
                       >
-                        <img src="https://www.postman.com/company/logo-and-branding-assets/img/logo/postman-logo-orange.svg" alt="Postman" className="w-4 h-4 mr-2" />
+                        <div className="w-4 h-4 mr-2 bg-orange-500 rounded-full flex items-center justify-center">
+                          <span className="text-white text-xs font-bold">P</span>
+                        </div>
                         {importStatus === 'importing' ? 'Importing...' : 'Add gRPC to Postman'}
                       </button>
                     </div>
@@ -2851,7 +2857,9 @@ export function GraphRAGTab() {
                           disabled={!graphData || importStatus === 'importing'}
                           className="flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed"
                         >
-                          <img src="https://www.postman.com/company/logo-and-branding-assets/img/logo/postman-logo-orange.svg" alt="Postman" className="w-4 h-4 mr-2" />
+                          <div className="w-4 h-4 mr-2 bg-orange-500 rounded-full flex items-center justify-center">
+                            <span className="text-white text-xs font-bold">P</span>
+                          </div>
                           {importStatus === 'importing' ? 'Importing...' : 'Add gRPC-Web to Postman'}
                         </button>
                       </div>
@@ -3092,7 +3100,9 @@ export function GraphRAGTab() {
                     disabled={!graphData || importStatus === 'importing'}
                     className="flex items-center px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 disabled:opacity-50 disabled:cursor-not-allowed"
                   >
-                    <img src="https://www.postman.com/company/logo-and-branding-assets/img/logo/postman-logo-orange.svg" alt="Postman" className="w-4 h-4 mr-2" />
+                    <div className="w-4 h-4 mr-2 bg-orange-500 rounded-full flex items-center justify-center">
+                      <span className="text-white text-xs font-bold">P</span>
+                    </div>
                     {importStatus === 'importing' ? 'Importing...' : 'Add SSE to Postman'}
                   </button>
                 </div>

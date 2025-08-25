@@ -190,7 +190,9 @@ query GetAnalytics {
             disabled={importStatus === 'importing'}
             className="flex items-center px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 disabled:opacity-50 disabled:cursor-not-allowed w-fit"
           >
-            <img src="https://www.postman.com/company/logo-and-branding-assets/img/logo/postman-logo-orange.svg" alt="Postman" className="w-4 h-4 mr-2" />
+            <div className="w-4 h-4 mr-2 bg-orange-500 rounded-full flex items-center justify-center">
+              <span className="text-white text-xs font-bold">P</span>
+            </div>
             {importStatus === 'importing' ? 'Importing...' : 'Add GraphQL to Postman'}
           </button>
           
