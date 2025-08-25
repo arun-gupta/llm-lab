@@ -1,5 +1,5 @@
 import { GraphRAGServiceClient } from './generated/graphrag_grpc_web_pb';
-import { GraphQuery, GraphRAGResponse, ContextRequest, EntityQuery } from './generated/graphrag_pb';
+import type { GraphQuery, GraphRAGResponse, ContextRequest, EntityQuery } from './generated/graphrag_pb';
 
 // gRPC-Web client for GraphRAG service
 export class GraphRAGWebClient {
