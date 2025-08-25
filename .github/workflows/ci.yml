@@ -88,7 +88,7 @@ jobs:
         labels: ${{ steps.meta-app.outputs.labels }}
         cache-from: type=gha
         cache-to: type=gha,mode=max
-        platforms: linux/amd64,linux/arm64
+        platforms: linux/amd64
 
     - name: Build and push gRPC server image
       uses: docker/build-push-action@v5
@@ -100,7 +100,7 @@ jobs:
         labels: ${{ steps.meta-grpc.outputs.labels }}
         cache-from: type=gha
         cache-to: type=gha,mode=max
-        platforms: linux/amd64,linux/arm64
+        platforms: linux/amd64
 
     - name: Build and push gRPC-Web proxy image
       uses: docker/build-push-action@v5
@@ -112,7 +112,7 @@ jobs:
         labels: ${{ steps.meta-grpc-web.outputs.labels }}
         cache-from: type=gha
         cache-to: type=gha,mode=max
-        platforms: linux/amd64,linux/arm64
+        platforms: linux/amd64
 
     - name: Build and push filesystem MCP image
       uses: docker/build-push-action@v5
@@ -124,7 +124,7 @@ jobs:
         labels: ${{ steps.meta-filesystem-mcp.outputs.labels }}
         cache-from: type=gha
         cache-to: type=gha,mode=max
-        platforms: linux/amd64,linux/arm64
+        platforms: linux/amd64
 
     - name: Test main app container health
       run: |
