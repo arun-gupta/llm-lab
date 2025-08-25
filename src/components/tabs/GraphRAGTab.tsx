@@ -533,7 +533,7 @@ export function GraphRAGTab() {
         variable: [
           {
             key: "base_url",
-            value: "http://localhost:8080",
+            value: "http://localhost:50052",
             type: "string"
           }
         ]
