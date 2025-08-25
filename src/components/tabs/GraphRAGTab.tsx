@@ -887,88 +887,44 @@ export function GraphRAGTab() {
         queryType = 'bidirectional_session';
         actualQuery = queryText.replace('InteractiveSession:', '').trim();
       }
-
-      // Try to connect to real WebSocket server first
-      try {
-        const ws = new WebSocket('ws://localhost:3001');
         
-        return new Promise((resolve, reject) => {
-          const timeout = setTimeout(() => {
-            reject(new Error('WebSocket connection timeout'));
-          }, 5000);
+      // Use API fallback for WebSocket functionality
+      const response = await fetch('/api/websocket/graphrag', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          message: { 
+            query: actualQuery, 
+            graph_id: graphData.graphId, 
+            model: 'gpt-4',
+            session_type: queryType === 'unary' ? 'unary' : 
+                         queryType === 'stream_query' ? 'streaming' : 
+                         queryType === 'bidirectional_session' ? 'bidirectional' : 'unary'
+          }
+        })
+      });
 
-          ws.onopen = () => {
-            clearTimeout(timeout);
-            
-            // Send the query
-            ws.send(JSON.stringify({
-              type: queryType,
-              query: actualQuery,
-              graph_id: graphData.graphId,
-              model: 'gpt-4'
-            }));
+      const endTime = performance.now();
+      const latency = Math.round(endTime - startTime);
+      
+      if (!response.ok) {
+        throw new Error('WebSocket API error');
+      }
 
-            const messages: any[] = [];
-            let response = '';
-            let streamingData: any[] = [];
-
-            ws.onmessage = (event) => {
-              const data = JSON.parse(event.data);
-              messages.push(data);
-
-              switch (data.type) {
-                case 'connection':
-                  console.log('WebSocket connected:', data.message);
-                  break;
-                case 'query_result':
-                  response = data.data?.response || 'WebSocket response received';
-                  break;
-                case 'stream_node':
-                case 'context_chunk':
-                case 'session_step':
-                  streamingData.push({ content: data.data?.message || JSON.stringify(data.data) });
-                  break;
-                case 'stream_complete':
-                case 'context_stream_complete':
-                case 'session_complete':
-                  ws.close();
-                  break;
-                case 'error':
-                  ws.close();
-                  reject(new Error(data.error));
-                  break;
-              }
-            };
-
-            ws.onclose = () => {
-              const endTime = performance.now();
-              const latency = Math.round(endTime - startTime);
-              
-              setWebsocketResults({
-                query: actualQuery,
-                queryType,
-                response: response || `WebSocket ${queryType} completed successfully`,
-                latency,
-                payloadSize: JSON.stringify(messages).length,
-                streaming: streamingData.length > 0,
-                streamingData,
-                timestamp: new Date().toISOString()
-              });
-              
-              setIsQuerying(false);
-              resolve(true);
-            };
-
-            ws.onerror = (error) => {
-              clearTimeout(timeout);
-              ws.close();
-              reject(error);
-            };
-          });
-        });
-      } catch (wsError) {
-        console.log('WebSocket server not available, falling back to API route');
-        
+      const data = await response.json();
+      
+      setWebsocketResults({
+        query: actualQuery,
+        queryType,
+        response: data.data?.response || 'WebSocket response received',
+        latency,
+        payloadSize: data.websocket_metadata?.payload_size_bytes || JSON.stringify(data).length,
+        streaming: data.data?.streaming_data ? true : false,
+        streamingData: data.data?.streaming_data ? Object.entries(data.data.streaming_data).map(([key, value]) => ({
+          content: `${key}: ${JSON.stringify(value).slice(0, 100)}...`
+        })) : [],
+        timestamp: new Date().toISOString()
+      });
         // Fallback to API route if WebSocket server is not available
         const response = await fetch('/api/websocket/graphrag', {
           method: 'POST',
