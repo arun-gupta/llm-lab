@@ -38,10 +38,10 @@ export async function POST(request: NextRequest) {
         return { operation: 'list_available_tools', params: {} };
       } else if (lowerQuery === 'list allowed directories') {
         return { operation: 'list_allowed_directories', params: {} };
-      } else if (lowerQuery === 'list directory contents (private tmp)' || lowerQuery === 'list directory contents (desktop)') {
-        const pathMatch = q.match(/\(([^)]+)\)/);
-        const path = pathMatch ? pathMatch[1] : 'sample-docs';
-        return { operation: 'list_directory', params: { path } };
+      } else if (lowerQuery === 'list directory contents (/private/tmp)') {
+        return { operation: 'list_directory', params: { path: '/private/tmp' } };
+      } else if (lowerQuery === 'list directory contents (/users/arungupta/desktop)') {
+        return { operation: 'list_directory', params: { path: '/Users/arungupta/Desktop' } };
       } else if (lowerQuery === 'write test file') {
         return { operation: 'write_test_file', params: {} };
       } else if (lowerQuery === 'read test file') {
