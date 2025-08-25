@@ -101,19 +101,19 @@ export async function POST(request: NextRequest) {
           body = { query: p.query };
           break;
         case 'insert_row':
-          endpoint = '/insert';
+          endpoint = '/tables/users/insert';
           method = 'POST';
-          body = { table: p.table, data: p.data };
+          body = { data: p.data };
           break;
         case 'update_row':
-          endpoint = '/update';
-          method = 'POST';
-          body = { table: p.table, id: p.id, data: p.data };
+          endpoint = '/tables/users/update';
+          method = 'PUT';
+          body = { data: p.data, where: { id: p.id } };
           break;
         case 'delete_row':
-          endpoint = '/delete';
-          method = 'POST';
-          body = { table: p.table, id: p.id };
+          endpoint = '/tables/users/delete';
+          method = 'DELETE';
+          body = { where: { id: p.id } };
           break;
         default:
           throw new Error(`Unknown operation: ${op}`);
