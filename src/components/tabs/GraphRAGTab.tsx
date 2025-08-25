@@ -1856,11 +1856,10 @@ export function GraphRAGTab() {
                   className="flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   <svg className="w-4 h-4 mr-2" viewBox="0 0 24 24" fill="currentColor">
-                    <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8l-6-6z"/>
-                    <path d="M14 2v6h6"/>
-                    <path d="M16 13H8"/>
-                    <path d="M16 17H8"/>
-                    <path d="M10 9H8"/>
+                    <circle cx="12" cy="12" r="10" fill="#FF6C37"/>
+                    <path d="M10 8c0-1.1.9-2 2-2s2 .9 2 2-.9 2-2 2-2-.9-2-2z" fill="white"/>
+                    <path d="M8 12h8v2H8z" fill="white"/>
+                    <path d="M10 16h4v2H10z" fill="white"/>
                   </svg>
                   {importStatus === 'importing' ? 'Importing...' : 'Add GraphRAG REST to Postman'}
                 </button>
@@ -2341,11 +2340,10 @@ export function GraphRAGTab() {
                       className="flex items-center px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 disabled:opacity-50 disabled:cursor-not-allowed"
                     >
                       <svg className="w-4 h-4 mr-2" viewBox="0 0 24 24" fill="currentColor">
-                        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8l-6-6z"/>
-                        <path d="M14 2v6h6"/>
-                        <path d="M16 13H8"/>
-                        <path d="M16 17H8"/>
-                        <path d="M10 9H8"/>
+                        <circle cx="12" cy="12" r="10" fill="#FF6C37"/>
+                        <path d="M10 8c0-1.1.9-2 2-2s2 .9 2 2-.9 2-2 2-2-.9-2-2z" fill="white"/>
+                        <path d="M8 12h8v2H8z" fill="white"/>
+                        <path d="M10 16h4v2H10z" fill="white"/>
                       </svg>
                       {importStatus === 'importing' ? 'Importing...' : 'Add Comparison Collection to Postman'}
                     </button>
@@ -2724,11 +2722,10 @@ export function GraphRAGTab() {
                         className="flex items-center px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 disabled:opacity-50 disabled:cursor-not-allowed"
                       >
                         <svg className="w-4 h-4 mr-2" viewBox="0 0 24 24" fill="currentColor">
-                          <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8l-6-6z"/>
-                          <path d="M14 2v6h6"/>
-                          <path d="M16 13H8"/>
-                          <path d="M16 17H8"/>
-                          <path d="M10 9H8"/>
+                          <circle cx="12" cy="12" r="10" fill="#FF6C37"/>
+                          <path d="M10 8c0-1.1.9-2 2-2s2 .9 2 2-.9 2-2 2-2-.9-2-2z" fill="white"/>
+                          <path d="M8 12h8v2H8z" fill="white"/>
+                          <path d="M10 16h4v2H10z" fill="white"/>
                         </svg>
                         {importStatus === 'importing' ? 'Importing...' : 'Add gRPC to Postman'}
                       </button>
@@ -2870,11 +2867,10 @@ export function GraphRAGTab() {
                           className="flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed"
                         >
                           <svg className="w-4 h-4 mr-2" viewBox="0 0 24 24" fill="currentColor">
-                            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8l-6-6z"/>
-                            <path d="M14 2v6h6"/>
-                            <path d="M16 13H8"/>
-                            <path d="M16 17H8"/>
-                            <path d="M10 9H8"/>
+                            <circle cx="12" cy="12" r="10" fill="#FF6C37"/>
+                            <path d="M10 8c0-1.1.9-2 2-2s2 .9 2 2-.9 2-2 2-2-.9-2-2z" fill="white"/>
+                            <path d="M8 12h8v2H8z" fill="white"/>
+                            <path d="M10 16h4v2H10z" fill="white"/>
                           </svg>
                           {importStatus === 'importing' ? 'Importing...' : 'Add gRPC-Web to Postman'}
                         </button>
@@ -3117,11 +3113,10 @@ export function GraphRAGTab() {
                     className="flex items-center px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 disabled:opacity-50 disabled:cursor-not-allowed"
                   >
                     <svg className="w-4 h-4 mr-2" viewBox="0 0 24 24" fill="currentColor">
-                      <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8l-6-6z"/>
-                      <path d="M14 2v6h6"/>
-                      <path d="M16 13H8"/>
-                      <path d="M16 17H8"/>
-                      <path d="M10 9H8"/>
+                      <circle cx="12" cy="12" r="10" fill="#FF6C37"/>
+                      <path d="M10 8c0-1.1.9-2 2-2s2 .9 2 2-.9 2-2 2-2-.9-2-2z" fill="white"/>
+                      <path d="M8 12h8v2H8z" fill="white"/>
+                      <path d="M10 16h4v2H10z" fill="white"/>
                     </svg>
                     {importStatus === 'importing' ? 'Importing...' : 'Add SSE to Postman'}
                   </button>
@@ -3313,11 +3308,10 @@ export function GraphRAGTab() {
                     className="flex items-center px-4 py-2 bg-orange-600 text-white rounded-lg hover:bg-orange-700 disabled:opacity-50 disabled:cursor-not-allowed"
                   >
                     <svg className="w-4 h-4 mr-2" viewBox="0 0 24 24" fill="currentColor">
-                      <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8l-6-6z"/>
-                      <path d="M14 2v6h6"/>
-                      <path d="M16 13H8"/>
-                      <path d="M16 17H8"/>
-                      <path d="M10 9H8"/>
+                      <circle cx="12" cy="12" r="10" fill="#FF6C37"/>
+                      <path d="M10 8c0-1.1.9-2 2-2s2 .9 2 2-.9 2-2 2-2-.9-2-2z" fill="white"/>
+                      <path d="M8 12h8v2H8z" fill="white"/>
+                      <path d="M10 16h4v2H10z" fill="white"/>
                     </svg>
                     {importStatus === 'importing' ? 'Importing...' : 'Add WebSocket to Postman'}
                   </button>
