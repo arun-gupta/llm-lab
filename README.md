@@ -25,7 +25,7 @@ A comprehensive **Postman-focused protocol testing and GraphRAG development plat
 - **gRPC**: HTTP/2 with Protocol Buffers for high-performance streaming
 - **gRPC-Web**: HTTP/1.1 with Protocol Buffers for browser-based gRPC applications
 - **WebSocket**: Real-time bidirectional streaming for GraphRAG updates and LLM responses
-- **Server-Sent Events (SSE)**: HTTP/1.1 with EventSource for one-way streaming responses
+- **Server-Sent Events (SSE)**: HTTP/1.1 with EventSource for meaningful context streaming with real content
 - **MCP (Model Context Protocol)**: HTTP wrappers for GitHub, Filesystem, and SQLite integrations
 - **HTTP/2**: Multiplexed connections for improved performance
 - **Protocol Buffers**: Binary serialization for efficient data transfer
@@ -46,6 +46,12 @@ A comprehensive **Postman-focused protocol testing and GraphRAG development plat
 - **Vector Database APIs**: Pinecone, Weaviate, Chroma, Qdrant integrations
 - **Neo4j Backend**: Native graph database integration for scalable knowledge graph storage
 - **Agentic Systems**: LangChain, AutoGen, CrewAI agent orchestration
+
+**✅ Recent Improvements:**
+- **SSE Streaming**: Meaningful context content instead of generic messages
+- **Protocol Comparison UI**: Previous results clear automatically for better UX
+- **gRPC-Web Integration**: Fixed port conflicts and dependency issues
+- **Quickstart Script**: Enhanced with gRPC server startup and clean shutdown
 
 ## 🚀 Quick Start
 
@@ -105,9 +111,10 @@ npm run dev
 
 The `quickstart.sh` script automatically starts gRPC services for high-performance GraphRAG operations:
 - **gRPC Server**: Port 50051 (Core GraphRAG service with Protocol Buffers)
-- **gRPC-Web Proxy**: Port 50052 (Browser-compatible gRPC over HTTP/1.1)
-- **Health Check**: http://localhost:50052/health
+- **gRPC-Web Proxy**: Port 50053 (Browser-compatible gRPC over HTTP/1.1)
+- **Health Check**: http://localhost:50053/health
 - **Performance**: ~50% latency reduction vs REST, ~36% payload size
+- **Clean Shutdown**: All services stop cleanly with Ctrl+C or `./quickstop.sh`
 
 ### **MCP Server Setup (Automatic)**
 
@@ -125,8 +132,10 @@ The `quickstart.sh` script also sets up GraphRAG functionality:
 - **Sample Documents**: AI healthcare and tech companies examples
 - **Knowledge Graph Storage**: JSON-based graph persistence
 - **API Endpoints**: Document upload, graph building, query comparison
-- **gRPC Server**: Port 50051 (gRPC protocol) and 50052 (HTTP proxy)
-- **Protocol Comparison**: REST vs GraphQL vs gRPC performance testing
+- **gRPC Server**: Port 50051 (gRPC protocol) and 50053 (gRPC-Web proxy)
+- **Protocol Comparison**: REST vs GraphQL vs gRPC vs gRPC-Web vs WebSocket vs SSE performance testing
+- **Real-time Streaming**: SSE with meaningful context content and WebSocket bidirectional communication
+- **UI Improvements**: Previous comparison results clear automatically for better UX
 
 **Manual Setup (if needed):**
 ```bash
