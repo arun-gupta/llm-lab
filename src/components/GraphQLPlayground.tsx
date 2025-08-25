@@ -191,7 +191,11 @@ query GetAnalytics {
             className="flex items-center px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 disabled:opacity-50 disabled:cursor-not-allowed w-fit"
           >
             <svg className="w-4 h-4 mr-2" viewBox="0 0 24 24" fill="currentColor">
-              <path d="M12 2L2 7v10c0 5.55 3.84 9.74 9 11 5.16-1.26 9-5.45 9-11V7l-10-5z"/>
+              <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8l-6-6z"/>
+              <path d="M14 2v6h6"/>
+              <path d="M16 13H8"/>
+              <path d="M16 17H8"/>
+              <path d="M10 9H8"/>
             </svg>
             {importStatus === 'importing' ? 'Importing...' : 'Add GraphQL to Postman'}
           </button>
