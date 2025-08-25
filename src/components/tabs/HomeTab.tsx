@@ -57,7 +57,7 @@ export function HomeTab({ onTabChange, apiKeyStatus }: HomeTabProps) {
           Welcome to Postman Protocol Playground
         </h1>
         <p className="text-lg text-gray-600 mb-4">
-          Test LLM providers, build knowledge graphs, and compare communication protocols
+          Advanced platform for GraphRAG development, protocol comparison, model monitoring, and MCP integration
         </p>
       </div>
 
