@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import { Upload, Network, Search, BarChart3, Download, Code, Zap } from 'lucide-react';
 import { GraphPreview } from '@/components/GraphPreview';
 import { GraphQLPlayground } from '@/components/GraphQLPlayground';
+import { SuccessCelebration } from '@/components/SuccessCelebration';
 
 interface GraphNode {
   id: string;
@@ -103,6 +104,8 @@ export function GraphRAGTab() {
   const [grpcResults, setGrpcResults] = useState<any>(null);
   const [websocketResults, setWebsocketResults] = useState<any>(null);
   const [sseResults, setSseResults] = useState<any>(null);
+  const [showSuccessCelebration, setShowSuccessCelebration] = useState(false);
+  const [celebrationData, setCelebrationData] = useState<any>({});
 
 
   const fetchOllamaModels = async () => {
@@ -1439,8 +1442,14 @@ export function GraphRAGTab() {
             const result = await postmanResponse.json();
 
             if (result.success) {
-              setImportStatus('success');
-              setImportMessage('✅ Protocol Comparison Collection created successfully in Postman Desktop! Set base_url to http://localhost:3000 in your environment.');
+                          setImportStatus('success');
+            setImportMessage('✅ Protocol Comparison Collection created successfully in Postman Desktop! Set base_url to http://localhost:3000 in your environment.');
+            setShowSuccessCelebration(true);
+            setCelebrationData({
+              type: 'collection-created',
+              title: '🎉 Protocol Comparison Collection Created!',
+              message: 'Your Postman collection has been created successfully in Postman Desktop!'
+            });
               
               // Don't open Postman Desktop automatically - just show success message
             } else {
@@ -3441,6 +3450,14 @@ export function GraphRAGTab() {
         </div>
         )}
       </div>
+
+      {/* Success Celebration */}
+      <SuccessCelebration
+        isVisible={showSuccessCelebration}
+        type="collection-created"
+        onClose={() => setShowSuccessCelebration(false)}
+        data={celebrationData}
+      />
     </div>
   );
 }
