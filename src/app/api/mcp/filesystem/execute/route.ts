@@ -131,7 +131,7 @@ export async function POST(request: NextRequest) {
           break;
         case 'search_files':
           mcpToolName = 'search_files';
-          mcpArguments = { query: p.query, path: p.path || '.' };
+          mcpArguments = { pattern: p.query, path: p.path || '.' };
           break;
         case 'get_file_info':
           mcpToolName = 'get_file_info';
