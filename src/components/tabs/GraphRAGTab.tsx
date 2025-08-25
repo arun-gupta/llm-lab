@@ -283,7 +283,6 @@ export function GraphRAGTab() {
 
             if (result.success) {
                                       setImportStatus('success');
-            setImportMessage('✅ GraphRAG REST API Collection created successfully in Postman Desktop! Set base_url to http://localhost:3000 in your environment.');
             setShowSuccessCelebration(true);
             setCelebrationData({
               type: 'collection-created',
@@ -365,7 +364,6 @@ export function GraphRAGTab() {
 
             if (result.success) {
                           setImportStatus('success');
-            setImportMessage('✅ gRPC Collection created successfully in Postman Desktop! Import the .proto file for service definitions.');
             setShowSuccessCelebration(true);
             setCelebrationData({
               type: 'collection-created',
@@ -562,7 +560,6 @@ export function GraphRAGTab() {
 
           if (result.success) {
             setImportStatus('success');
-            setImportMessage('✅ gRPC-Web Collection created successfully in Postman Desktop! Configure your gRPC-Web proxy endpoint.');
             setShowSuccessCelebration(true);
             setCelebrationData({
               type: 'collection-created',
@@ -1202,7 +1199,6 @@ export function GraphRAGTab() {
 
           if (result.success) {
             setImportStatus('success');
-            setImportMessage('✅ SSE Collection created successfully in Postman Desktop! Set base_url to http://localhost:3000 in your environment.');
             setShowSuccessCelebration(true);
             setCelebrationData({
               type: 'collection-created',
@@ -1389,7 +1385,6 @@ export function GraphRAGTab() {
 
           if (result.success) {
             setImportStatus('success');
-            setImportMessage('✅ WebSocket Collection created successfully in Postman Desktop! Set base_url to ws://localhost:3000 in your environment.');
             setShowSuccessCelebration(true);
             setCelebrationData({
               type: 'collection-created',
@@ -1473,7 +1468,6 @@ export function GraphRAGTab() {
 
             if (result.success) {
                           setImportStatus('success');
-            setImportMessage('✅ Protocol Comparison Collection created successfully in Postman Desktop! Set base_url to http://localhost:3000 in your environment.');
             setShowSuccessCelebration(true);
             setCelebrationData({
               type: 'collection-created',
