@@ -47,11 +47,18 @@ A comprehensive **Postman-focused protocol testing and GraphRAG development plat
 - **Neo4j Backend**: Native graph database integration for scalable knowledge graph storage
 - **Agentic Systems**: LangChain, AutoGen, CrewAI agent orchestration
 
+**🔧 Development Tools:**
+- **GitHub Actions**: Automated testing and deployment ([docs](docs/github-actions.md))
+- **Docker**: Production-ready containerization
+- **Health Checks**: Container monitoring and status endpoints
+
 **✅ Recent Improvements:**
 - **SSE Streaming**: Meaningful context content instead of generic messages
 - **Protocol Comparison UI**: Previous results clear automatically for better UX
 - **gRPC-Web Integration**: Fixed port conflicts and dependency issues
 - **Quickstart Script**: Enhanced with gRPC server startup and clean shutdown
+- **Docker Support**: Production-ready Dockerfile with multi-stage builds
+- **GitHub Actions**: Automated CI/CD pipelines for testing and deployment
 
 ## 🚀 Quick Start
 
