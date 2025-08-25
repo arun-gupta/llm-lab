@@ -888,41 +888,19 @@ export function GraphRAGTab() {
         actualQuery = queryText.replace('InteractiveSession:', '').trim();
       }
         
-      // Use API fallback for WebSocket functionality
-      const response = await fetch('/api/websocket/graphrag', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          message: { 
-            query: actualQuery, 
-            graph_id: graphData.graphId, 
-            model: 'gpt-4',
-            session_type: queryType === 'unary' ? 'unary' : 
-                         queryType === 'stream_query' ? 'streaming' : 
-                         queryType === 'bidirectional_session' ? 'bidirectional' : 'unary'
-          }
-        })
-      });
-
+      // Mock WebSocket response for now
+      await new Promise(resolve => setTimeout(resolve, 300));
       const endTime = performance.now();
       const latency = Math.round(endTime - startTime);
-      
-      if (!response.ok) {
-        throw new Error('WebSocket API error');
-      }
-
-      const data = await response.json();
       
       setWebsocketResults({
         query: actualQuery,
         queryType,
-        response: data.data?.response || 'WebSocket response received',
+        response: `Mock WebSocket response for: "${actualQuery}". Real WebSocket implementation coming soon.`,
         latency,
-        payloadSize: data.websocket_metadata?.payload_size_bytes || JSON.stringify(data).length,
-        streaming: data.data?.streaming_data ? true : false,
-        streamingData: data.data?.streaming_data ? Object.entries(data.data.streaming_data).map(([key, value]) => ({
-          content: `${key}: ${JSON.stringify(value).slice(0, 100)}...`
-        })) : [],
+        payloadSize: 1200,
+        streaming: false,
+        streamingData: [],
         timestamp: new Date().toISOString()
       });
         // Fallback to API route if WebSocket server is not available

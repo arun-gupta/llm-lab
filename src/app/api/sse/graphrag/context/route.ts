@@ -1,5 +1,5 @@
 import { NextRequest } from 'next/server';
-// // import { graphRAGWebClient } from '@/lib/grpc-web-client';
+// import { graphRAGWebClient } from '@/lib/grpc-web-client';
 
 // Real SSE streaming endpoint for GraphRAG context retrieval
 export async function GET(request: NextRequest) {

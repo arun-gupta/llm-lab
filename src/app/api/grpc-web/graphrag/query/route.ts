@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-// // import { graphRAGWebClient } from '@/lib/grpc-web-client';
+// import { graphRAGWebClient } from '@/lib/grpc-web-client';
 
 // Real gRPC-Web endpoint for protocol comparison
 // This connects to the actual gRPC server running on port 50051 via gRPC-Web proxy
