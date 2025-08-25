@@ -28,6 +28,21 @@ export async function POST(request: NextRequest) {
           key: "model",
           value: "gpt-5-nano",
           type: "string"
+        },
+        {
+          key: "grpc_server_url",
+          value: "localhost:50051",
+          type: "string"
+        },
+        {
+          key: "grpc_web_url",
+          value: "http://localhost:50053",
+          type: "string"
+        },
+        {
+          key: "websocket_url",
+          value: "ws://localhost:3000",
+          type: "string"
         }
       ],
       item: [
@@ -293,6 +308,166 @@ export async function POST(request: NextRequest) {
                   path: ["api", "grpc", "graph", "traverse"]
                 },
                 description: "Mock gRPC streaming traversal for performance comparison"
+              },
+              response: []
+            }
+          ]
+        },
+        {
+          name: "🌐 Individual gRPC-Web Tests",
+          item: [
+            {
+              name: "GraphRAG Query (gRPC-Web)",
+              request: {
+                method: "POST",
+                header: [
+                  {
+                    key: "Content-Type",
+                    value: "application/json"
+                  }
+                ],
+                body: {
+                  mode: "raw",
+                  raw: JSON.stringify({
+                    message: {
+                      query: "{{test_query}}",
+                      graph_id: "{{graph_id}}",
+                      model: "{{model}}",
+                      streaming: false
+                    }
+                  }, null, 2)
+                },
+                url: {
+                  raw: "{{base_url}}/api/grpc-web/graphrag/query",
+                  host: ["{{base_url}}"],
+                  path: ["api", "grpc-web", "graphrag", "query"]
+                },
+                description: "Test GraphRAG query via gRPC-Web with HTTP/1.1 transport and Protocol Buffers"
+              },
+              response: []
+            },
+            {
+              name: "Stream Graph Traversal (gRPC-Web)",
+              request: {
+                method: "POST",
+                header: [
+                  {
+                    key: "Content-Type",
+                    value: "application/json"
+                  }
+                ],
+                body: {
+                  mode: "raw",
+                  raw: JSON.stringify({
+                    message: {
+                      query: "{{test_query}}",
+                      graph_id: "{{graph_id}}",
+                      model: "{{model}}",
+                      streaming: true
+                    }
+                  }, null, 2)
+                },
+                url: {
+                  raw: "{{base_url}}/api/grpc-web/graphrag/query",
+                  host: ["{{base_url}}"],
+                  path: ["api", "grpc-web", "graphrag", "query"]
+                },
+                description: "Test gRPC-Web streaming with HTTP/1.1 and Protocol Buffers"
+              },
+              response: []
+            }
+          ]
+        },
+        {
+          name: "🔌 Individual WebSocket Tests",
+          item: [
+            {
+              name: "GraphRAG Query (WebSocket)",
+              request: {
+                method: "GET",
+                header: [],
+                url: {
+                  raw: "{{base_url}}/api/websocket/graphrag",
+                  host: ["{{base_url}}"],
+                  path: ["api", "websocket", "graphrag"]
+                },
+                description: "Test GraphRAG query via WebSocket for real-time bidirectional communication"
+              },
+              response: []
+            },
+            {
+              name: "WebSocket Connection Test",
+              request: {
+                method: "GET",
+                header: [],
+                url: {
+                  raw: "ws://localhost:3000/api/websocket/graphrag",
+                  host: ["localhost"],
+                  port: "3000",
+                  path: ["api", "websocket", "graphrag"]
+                },
+                description: "Test WebSocket connection and message exchange"
+              },
+              response: []
+            }
+          ]
+        },
+        {
+          name: "📡 Individual SSE Tests",
+          item: [
+            {
+              name: "GraphRAG Stream (SSE)",
+              request: {
+                method: "GET",
+                header: [],
+                url: {
+                  raw: "{{base_url}}/api/sse/graphrag/stream?query={{test_query}}&graphId={{graph_id}}&model={{model}}",
+                  host: ["{{base_url}}"],
+                  path: ["api", "sse", "graphrag", "stream"],
+                  query: [
+                    {
+                      key: "query",
+                      value: "{{test_query}}"
+                    },
+                    {
+                      key: "graphId",
+                      value: "{{graph_id}}"
+                    },
+                    {
+                      key: "model",
+                      value: "{{model}}"
+                    }
+                  ]
+                },
+                description: "Test GraphRAG streaming via Server-Sent Events (SSE)"
+              },
+              response: []
+            },
+            {
+              name: "GraphRAG Context Stream (SSE)",
+              request: {
+                method: "GET",
+                header: [],
+                url: {
+                  raw: "{{base_url}}/api/sse/graphrag/context?query={{test_query}}&graphId={{graph_id}}&maxContext=10",
+                  host: ["{{base_url}}"],
+                  path: ["api", "sse", "graphrag", "context"],
+                  query: [
+                    {
+                      key: "query",
+                      value: "{{test_query}}"
+                    },
+                    {
+                      key: "graphId",
+                      value: "{{graph_id}}"
+                    },
+                    {
+                      key: "maxContext",
+                      value: "10"
+                    }
+                  ]
+                },
+                description: "Test GraphRAG context streaming via Server-Sent Events (SSE)"
               },
               response: []
             }
