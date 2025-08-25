@@ -44,19 +44,29 @@ else
     echo "✅ Protocol Buffer definition ready"
 fi
 
+# Load port configuration
+CONFIG_FILE="../config/ports.json"
+if [ -f "$CONFIG_FILE" ] && command -v jq &> /dev/null; then
+    GRPC_SERVER_PORT=$(jq -r '.development.grpc.server' "$CONFIG_FILE")
+    GRPC_HTTP_PORT=$(jq -r '.development.grpc.http' "$CONFIG_FILE")
+else
+    GRPC_SERVER_PORT=50051
+    GRPC_HTTP_PORT=50052
+fi
+
 # Create startup script
 echo "📝 Creating gRPC server startup script..."
-cat > start-grpc-server.sh << 'EOF'
+cat > start-grpc-server.sh << EOF
 #!/bin/bash
 
 # Start GraphRAG gRPC Server
-cd "$(dirname "$0")/grpc-server"
+cd "\$(dirname "\$0")/grpc-server"
 
 echo "🚀 Starting GraphRAG gRPC Server..."
-echo "   • gRPC Server: localhost:50051"
-echo "   • HTTP Server: localhost:50052"
-echo "   • Health Check: http://localhost:50052/health"
-echo "   • Metrics: http://localhost:50052/metrics"
+echo "   • gRPC Server: localhost:$GRPC_SERVER_PORT"
+echo "   • HTTP Server: localhost:$GRPC_HTTP_PORT"
+echo "   • Health Check: http://localhost:$GRPC_HTTP_PORT/health"
+echo "   • Metrics: http://localhost:$GRPC_HTTP_PORT/metrics"
 echo ""
 
 # Start the server
@@ -99,10 +109,10 @@ echo "   • Manual start: cd grpc-server && npm start"
 echo "   • Manual test: cd grpc-server && node client.js"
 echo ""
 echo "🌐 Server endpoints:"
-echo "   • gRPC: localhost:50051"
-echo "   • HTTP: localhost:50052"
-echo "   • Health: http://localhost:50052/health"
-echo "   • Metrics: http://localhost:50052/metrics"
+echo "   • gRPC: localhost:$GRPC_SERVER_PORT"
+echo "   • HTTP: localhost:$GRPC_HTTP_PORT"
+echo "   • Health: http://localhost:$GRPC_HTTP_PORT/health"
+echo "   • Metrics: http://localhost:$GRPC_HTTP_PORT/metrics"
 echo ""
 echo "📊 gRPC Services:"
 echo "   • QueryGraph: Query knowledge graphs with GraphRAG"

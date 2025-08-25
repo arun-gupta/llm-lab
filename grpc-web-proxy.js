@@ -6,11 +6,29 @@ const protoLoader = require('@grpc/proto-loader');
 const path = require('path');
 
 const app = express();
-const PORT = 50052;
+
+// Load port configuration
+let PORT = 50052;
+let GRPC_SERVER_PORT = 50051;
+let NEXTJS_PORT = 3000;
+
+try {
+  const fs = require('fs');
+  const path = require('path');
+  const configPath = path.join(__dirname, 'config', 'ports.json');
+  if (fs.existsSync(configPath)) {
+    const config = JSON.parse(fs.readFileSync(configPath, 'utf-8'));
+    PORT = config.development.grpc.http;
+    GRPC_SERVER_PORT = config.development.grpc.server;
+    NEXTJS_PORT = config.development.nextjs;
+  }
+} catch (error) {
+  console.warn('Failed to load port config, using defaults:', error.message);
+}
 
 // Enable CORS for gRPC-Web
 app.use(cors({
-  origin: ['http://localhost:3000', 'http://localhost:3001'],
+  origin: [`http://localhost:${NEXTJS_PORT}`, 'http://localhost:3001'],
   credentials: true
 }));
 
@@ -28,7 +46,7 @@ const graphragProto = grpc.loadPackageDefinition(packageDefinition).graphrag;
 
 // Create gRPC client to connect to the main gRPC server
 const grpcClient = new graphragProto.GraphRAGService(
-  'localhost:50051',
+  `localhost:${GRPC_SERVER_PORT}`,
   grpc.credentials.createInsecure()
 );
 

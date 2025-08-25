@@ -87,16 +87,24 @@ cd "$MCP_DIR"
 
 echo "Starting MCP Server Infrastructure..."
 
-# Start the HTTP Filesystem MCP server on port 3002
-echo "Starting HTTP Filesystem MCP Server on port 3002..."
+# Load port configuration
+CONFIG_FILE="../../config/ports.json"
+if [ -f "$CONFIG_FILE" ] && command -v jq &> /dev/null; then
+    MCP_FILESYSTEM_PORT=$(jq -r '.development.mcp.filesystem' "$CONFIG_FILE")
+else
+    MCP_FILESYSTEM_PORT=3002
+fi
+
+# Start the HTTP Filesystem MCP server
+echo "Starting HTTP Filesystem MCP Server on port $MCP_FILESYSTEM_PORT..."
 cd http-filesystem-mcp-server
-PORT=3002 nohup node index.js > ../http-filesystem-mcp-server.log 2>&1 &
+PORT=$MCP_FILESYSTEM_PORT nohup node index.js > ../http-filesystem-mcp-server.log 2>&1 &
 FILESYSTEM_PID=$!
 echo $FILESYSTEM_PID > ../http-filesystem-mcp-server.pid
 cd ..
 
 echo "MCP server infrastructure started!"
-echo "HTTP Filesystem MCP Server: http://localhost:3002"
+echo "HTTP Filesystem MCP Server: http://localhost:$MCP_FILESYSTEM_PORT"
 echo ""
 echo "Available Remote MCP Servers:"
 echo "  • GitHub MCP Server: https://api.githubcopilot.com/mcp/"
@@ -155,7 +163,7 @@ echo "================================="
 if [ -f "http-filesystem-mcp-server.pid" ]; then
     PID=$(cat http-filesystem-mcp-server.pid)
     if kill -0 $PID 2>/dev/null; then
-        echo "✅ HTTP Filesystem MCP Server: Running (PID: $PID, Port: 3002)"
+        echo "✅ HTTP Filesystem MCP Server: Running (PID: $PID, Port: $MCP_FILESYSTEM_PORT)"
     else
         echo "❌ HTTP Filesystem MCP Server: Not running (stale PID file)"
         rm -f http-filesystem-mcp-server.pid

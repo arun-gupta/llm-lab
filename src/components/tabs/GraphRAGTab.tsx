@@ -893,54 +893,43 @@ export function GraphRAGTab() {
       const endTime = performance.now();
       const latency = Math.round(endTime - startTime);
       
+      // Fallback to API route if WebSocket server is not available
+      const response = await fetch('/api/websocket/graphrag', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          message: { 
+            query: actualQuery, 
+            graph_id: graphData.graphId, 
+            model: 'gpt-4',
+            session_type: queryType === 'unary' ? 'unary' : 
+                         queryType === 'stream_query' ? 'streaming' : 
+                         queryType === 'bidirectional_session' ? 'bidirectional' : 'unary'
+          }
+        })
+      });
+
+      const endTime = performance.now();
+      const latency = Math.round(endTime - startTime);
+      
+      if (!response.ok) {
+        throw new Error('WebSocket API error');
+      }
+
+      const data = await response.json();
+      
       setWebsocketResults({
         query: actualQuery,
         queryType,
-        response: `Mock WebSocket response for: "${actualQuery}". Real WebSocket implementation coming soon.`,
+        response: data.data?.response || 'WebSocket response received',
         latency,
-        payloadSize: 1200,
-        streaming: false,
-        streamingData: [],
+        payloadSize: data.websocket_metadata?.payload_size_bytes || JSON.stringify(data).length,
+        streaming: data.data?.streaming_data ? true : false,
+        streamingData: data.data?.streaming_data ? Object.entries(data.data.streaming_data).map(([key, value]) => ({
+          content: `${key}: ${JSON.stringify(value).slice(0, 100)}...`
+        })) : [],
         timestamp: new Date().toISOString()
       });
-        // Fallback to API route if WebSocket server is not available
-        const response = await fetch('/api/websocket/graphrag', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            message: { 
-              query: actualQuery, 
-              graph_id: graphData.graphId, 
-              model: 'gpt-4',
-              session_type: queryType === 'unary' ? 'unary' : 
-                           queryType === 'stream_query' ? 'streaming' : 
-                           queryType === 'bidirectional_session' ? 'bidirectional' : 'unary'
-            }
-          })
-        });
-
-        const endTime = performance.now();
-        const latency = Math.round(endTime - startTime);
-        
-        if (!response.ok) {
-          throw new Error('WebSocket API error');
-        }
-
-        const data = await response.json();
-        
-        setWebsocketResults({
-          query: actualQuery,
-          queryType,
-          response: data.data?.response || 'WebSocket response received',
-          latency,
-          payloadSize: data.websocket_metadata?.payload_size_bytes || JSON.stringify(data).length,
-          streaming: data.data?.streaming_data ? true : false,
-          streamingData: data.data?.streaming_data ? Object.entries(data.data.streaming_data).map(([key, value]) => ({
-            content: `${key}: ${JSON.stringify(value).slice(0, 100)}...`
-          })) : [],
-          timestamp: new Date().toISOString()
-        });
-      }
 
     } catch (error) {
       console.error('Error running WebSocket query:', error);
@@ -1045,55 +1034,6 @@ export function GraphRAGTab() {
           clearTimeout(timeout);
           reject(error);
         };
-      });
-
-    } catch (error) {
-      console.error('Error running SSE query:', error);
-      setSseResults({
-        query: query.trim(),
-        error: 'Failed to execute SSE query',
-        timestamp: new Date().toISOString()
-      });
-    } finally {
-      setIsQuerying(false);
-    }
-  };
-            { content: `Event: context_chunk\nData: {"chunk": 2, "content": "Machine learning reduces false positives in screening"}` },
-            { content: `Event: context_chunk\nData: {"chunk": 3, "content": "Predictive analytics enhance patient outcomes"}` },
-            { content: `Event: context_chunk\nData: {"chunk": 4, "content": "Automated analysis saves 30% of radiologist time"}` },
-            { content: `Event: complete\nData: {"total_chunks": 4, "total_tokens": 156}` }
-          ];
-          payloadSize = 1650;
-          break;
-        case 'results-streaming':
-          response = `SSE results streaming for "${actualQuery}": Streaming GraphRAG results via EventSource.`;
-          streamingData = [
-            { content: `Event: result_start\nData: {"query": "${actualQuery}", "timestamp": "${new Date().toISOString()}"}` },
-            { content: `Event: result_chunk\nData: {"chunk": 1, "content": "Based on the knowledge graph analysis..."}` },
-            { content: `Event: result_chunk\nData: {"chunk": 2, "content": "The graph reveals key relationships between..."}` },
-            { content: `Event: result_chunk\nData: {"chunk": 3, "content": "This demonstrates the effectiveness of..."}` },
-            { content: `Event: complete\nData: {"status": "success", "total_chunks": 3}` }
-          ];
-          payloadSize = 1720;
-          break;
-        default:
-          response = `SSE streaming query "${actualQuery}" processed successfully via EventSource.`;
-          streamingData = [
-            { content: `Event: default\nData: {"message": "SSE streaming initiated", "query": "${actualQuery}"}` },
-            { content: `Event: complete\nData: {"status": "success"}` }
-          ];
-          payloadSize = 1600;
-      }
-
-      setSseResults({
-        query: actualQuery,
-        queryType,
-        response,
-        latency,
-        payloadSize,
-        streaming: streamingData.length > 0,
-        streamingData,
-        timestamp: new Date().toISOString()
       });
 
     } catch (error) {

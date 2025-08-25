@@ -55,9 +55,11 @@ npm install
 echo "🕸️  Setting up GraphRAG data directories..."
 mkdir -p data/graphs
 mkdir -p sample-docs
+mkdir -p logs
 echo "✅ GraphRAG directories created"
 echo "   • data/graphs/ - Knowledge graph storage"
 echo "   • sample-docs/ - Sample documents for testing"
+echo "   • logs/ - Server logs"
 
 # Create sample documents if they don't exist
 if [ ! -f "sample-docs/ai-healthcare.txt" ] || [ ! -f "sample-docs/tech-companies.txt" ]; then
@@ -122,9 +124,35 @@ else
 fi
 
 # Start gRPC server in background
-if [ -f "grpc-server/start-grpc-server.sh" ]; then
-    bash grpc-server/start-grpc-server.sh > /dev/null 2>&1 &
-    GRPC_PID=$!
+echo "📡 Starting gRPC server..."
+if [ -d "grpc-server" ]; then
+    cd grpc-server
+    if ! lsof -Pi :$GRPC_SERVER_PORT -sTCP:LISTEN -t >/dev/null 2>&1; then
+        npm start > ../logs/grpc-server.log 2>&1 &
+        GRPC_PID=$!
+        echo $GRPC_PID > ../logs/grpc-server.pid
+        echo "✅ gRPC server started (PID: $GRPC_PID)"
+    else
+        echo "✅ gRPC server already running on port $GRPC_SERVER_PORT"
+    fi
+    cd ..
+else
+    echo "❌ gRPC server directory not found"
+fi
+
+# Start gRPC-Web proxy in background
+echo "🌐 Starting gRPC-Web proxy..."
+if [ -f "grpc-web-proxy.js" ]; then
+    if ! lsof -Pi :$GRPC_HTTP_PORT -sTCP:LISTEN -t >/dev/null 2>&1; then
+        node grpc-web-proxy.js > logs/grpc-web-proxy.log 2>&1 &
+        GRPC_WEB_PID=$!
+        echo $GRPC_WEB_PID > logs/grpc-web-proxy.pid
+        echo "✅ gRPC-Web proxy started (PID: $GRPC_WEB_PID)"
+    else
+        echo "✅ gRPC-Web proxy already running on port $GRPC_HTTP_PORT"
+    fi
+else
+    echo "❌ gRPC-Web proxy not found"
 fi
 
 # Function to open browser (works on macOS and Linux)
@@ -143,6 +171,49 @@ open_browser() {
         echo "🌐 Please open http://localhost:$NEXTJS_PORT in your browser"
     fi
 }
+
+# Function to cleanup on exit
+cleanup() {
+    echo ""
+    echo "🛑 Received interrupt signal, cleaning up..."
+    
+    # Stop gRPC servers
+    if [ ! -z "$GRPC_PID" ] && ps -p $GRPC_PID > /dev/null 2>&1; then
+        echo "Stopping gRPC server (PID: $GRPC_PID)..."
+        kill $GRPC_PID
+    fi
+    
+    if [ ! -z "$GRPC_WEB_PID" ] && ps -p $GRPC_WEB_PID > /dev/null 2>&1; then
+        echo "Stopping gRPC-Web proxy (PID: $GRPC_WEB_PID)..."
+        kill $GRPC_WEB_PID
+    fi
+    
+    # Stop MCP servers
+    if [ -f "$HOME/.mcp-servers/stop-mcp-servers.sh" ]; then
+        echo "Stopping MCP servers..."
+        bash "$HOME/.mcp-servers/stop-mcp-servers.sh" > /dev/null 2>&1
+    fi
+    
+    # Stop Docker container
+    if command -v docker &> /dev/null; then
+        if docker ps --format "{{.Names}}" | grep -q "sqlite-mcp-server"; then
+            echo "Stopping SQLite MCP Docker container..."
+            docker stop sqlite-mcp-server > /dev/null 2>&1
+        fi
+    fi
+    
+    # Stop Next.js
+    if [ ! -z "$NEXTJS_PID" ] && ps -p $NEXTJS_PID > /dev/null 2>&1; then
+        echo "Stopping Next.js development server (PID: $NEXTJS_PID)..."
+        kill $NEXTJS_PID
+    fi
+    
+    echo "✅ All services stopped"
+    exit 0
+}
+
+# Set up signal handlers
+trap cleanup SIGINT SIGTERM
 
 # Start the development server in background
 echo "🌐 Starting Next.js development server..."
@@ -167,19 +238,29 @@ done
 
 for i in {1..8}; do
     if curl -s http://localhost:$GRPC_HTTP_PORT/health > /dev/null 2>&1; then
-        echo "✅ gRPC ready"
+        echo "✅ gRPC-Web proxy ready"
         break
     elif [ $i -eq 8 ]; then
-        echo "❌ gRPC not responding"
+        echo "❌ gRPC-Web proxy not responding"
     else
         sleep 1
     fi
 done
 
+# Test gRPC server (basic check)
+if lsof -Pi :$GRPC_SERVER_PORT -sTCP:LISTEN -t >/dev/null 2>&1; then
+    echo "✅ gRPC server ready"
+else
+    echo "❌ gRPC server not responding"
+fi
+
 echo ""
-echo "🎉 LLM Prompt Lab is ready!"
+echo "🎉 Postman Protocol Playground is ready!"
 echo "   • App: http://localhost:$NEXTJS_PORT"
-echo "   • gRPC: http://localhost:$GRPC_HTTP_PORT/health"
+echo "   • gRPC Server: localhost:$GRPC_SERVER_PORT"
+echo "   • gRPC-Web Proxy: http://localhost:$GRPC_HTTP_PORT/health"
+echo "   • MCP Filesystem: localhost:$MCP_FILESYSTEM_PORT"
+echo "   • MCP SQLite: localhost:$MCP_SQLITE_PORT"
 
 # Start the browser opener in background
 open_browser &

@@ -133,7 +133,22 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 const app = express();
-const PORT = process.env.PORT || 3002;
+
+// Load port configuration
+let DEFAULT_PORT = 3002;
+try {
+  const fs = require('fs');
+  const path = require('path');
+  const configPath = path.join(__dirname, '../config/ports.json');
+  if (fs.existsSync(configPath)) {
+    const config = JSON.parse(fs.readFileSync(configPath, 'utf-8'));
+    DEFAULT_PORT = config.development.mcp.filesystem;
+  }
+} catch (error) {
+  console.warn('Failed to load port config, using default:', error.message);
+}
+
+const PORT = process.env.PORT || DEFAULT_PORT;
 
 // Middleware
 app.use(cors());
@@ -410,7 +425,7 @@ else
 fi
 
 # Start the HTTP filesystem MCP server
-echo "Starting HTTP filesystem MCP server on port 3002..."
+echo "Starting HTTP filesystem MCP server on port $DEFAULT_PORT..."
 cd http-filesystem-mcp-server
 nohup node index.js > ../http-filesystem-mcp-server.log 2>&1 &
 HTTP_FILESYSTEM_MCP_PID=$!
@@ -418,11 +433,11 @@ echo $HTTP_FILESYSTEM_MCP_PID > ../http-filesystem-mcp-server.pid
 cd ..
 
 echo "HTTP Filesystem MCP Server started!"
-echo "Server URL: http://localhost:3002"
-echo "Health check: http://localhost:3002/health"
-echo "Configuration: http://localhost:3002/config"
-echo "Tools endpoint: http://localhost:3002/tools"
-echo "MCP endpoint: http://localhost:3002/mcp"
+echo "Server URL: http://localhost:$DEFAULT_PORT"
+echo "Health check: http://localhost:$DEFAULT_PORT/health"
+echo "Configuration: http://localhost:$DEFAULT_PORT/config"
+echo "Tools endpoint: http://localhost:$DEFAULT_PORT/tools"
+echo "MCP endpoint: http://localhost:$DEFAULT_PORT/mcp"
 echo ""
 echo "Logs are available in $MCP_DIR/http-filesystem-mcp-server.log"
 echo "PID is stored in $MCP_DIR/http-filesystem-mcp-server.pid"
@@ -579,37 +594,37 @@ sleep 2
 
 # Test 1: Health check
 echo "Test 1: Health check"
-curl -s http://localhost:3002/health | jq .
+curl -s http://localhost:$DEFAULT_PORT/health | jq .
 
 # Test 2: Configuration
 echo "Test 2: Configuration"
-curl -s http://localhost:3002/config | jq .
+curl -s http://localhost:$DEFAULT_PORT/config | jq .
 
 # Test 3: List tools
 echo "Test 3: List available tools"
-curl -s http://localhost:3002/tools | jq .
+curl -s http://localhost:$DEFAULT_PORT/tools | jq .
 
 # Test 4: List allowed directories
 echo "Test 4: List allowed directories"
-curl -s -X POST http://localhost:3002/tools/call \
+curl -s -X POST http://localhost:$DEFAULT_PORT/tools/call \
   -H "Content-Type: application/json" \
   -d '{"name":"list_allowed_directories","arguments":{}}' | jq .
 
 # Test 5: Create a test file
 echo "Test 5: Create test file"
-curl -s -X POST http://localhost:3002/tools/call \
+curl -s -X POST http://localhost:$DEFAULT_PORT/tools/call \
   -H "Content-Type: application/json" \
   -d '{"name":"write_file","arguments":{"path":"/tmp/test.txt","content":"Hello from HTTP Filesystem MCP Server!"}}' | jq .
 
 # Test 6: Read the test file
 echo "Test 6: Read test file"
-curl -s -X POST http://localhost:3002/tools/call \
+curl -s -X POST http://localhost:$DEFAULT_PORT/tools/call \
   -H "Content-Type: application/json" \
   -d '{"name":"read_text_file","arguments":{"path":"/tmp/test.txt"}}' | jq .
 
 # Test 7: List directory
 echo "Test 7: List directory"
-curl -s -X POST http://localhost:3002/tools/call \
+curl -s -X POST http://localhost:$DEFAULT_PORT/tools/call \
   -H "Content-Type: application/json" \
   -d '{"name":"list_directory","arguments":{"path":"/tmp"}}' | jq .
 
@@ -641,7 +656,7 @@ HTTP_FILESYSTEM_MCP_PID=$!
 echo $HTTP_FILESYSTEM_MCP_PID > ../http-filesystem-mcp-server.pid
 cd ..
 
-echo "HTTP Filesystem MCP Server: http://localhost:3002"
+echo "HTTP Filesystem MCP Server: http://localhost:$DEFAULT_PORT"
 EOF
     print_success "Startup script updated"
 fi
@@ -713,4 +728,4 @@ print_info "  3. Restart: ./stop-http-filesystem-mcp.sh && ./start-http-filesyst
 print_info ""
 print_info "Postman Integration:"
 print_info "  The server now supports HTTP requests and can be used with Postman!"
-print_info "  Base URL: http://localhost:3002"
+print_info "  Base URL: http://localhost:$DEFAULT_PORT"

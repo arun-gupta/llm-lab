@@ -4,7 +4,7 @@ import { join } from 'path';
 import { getBaseURL } from '@/lib/port-config';
 
 // Import real API clients
-// import { graphRAGWebClient } from '@/lib/grpc-web-client';
+import { graphRAGWebClient } from '@/lib/grpc-web-client';
 
 interface ProtocolTestResult {
   protocol: 'REST' | 'GraphQL' | 'gRPC' | 'gRPC-Web' | 'WebSocket' | 'SSE';
