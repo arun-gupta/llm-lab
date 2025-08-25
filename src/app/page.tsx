@@ -6,6 +6,7 @@ import { HomeTab } from '@/components/tabs/HomeTab';
 import { TestTab } from '@/components/tabs/TestTab';
 import { GraphRAGTab } from '@/components/tabs/GraphRAGTab';
 import { MCPTab } from '@/components/tabs/MCPTab';
+import { GrpcWebTab } from '@/components/tabs/GrpcWebTab';
 
 import { SettingsTab } from '@/components/tabs/SettingsTab';
 import { PostmanSetupGuide } from '@/components/PostmanSetupGuide';
@@ -94,6 +95,10 @@ export default function Home() {
         )}
         {activeTab === 'test' && (
           <TestTab onTabChange={setActiveTab} />
+        )}
+
+        {activeTab === 'grpcweb' && (
+          <GrpcWebTab onTabChange={setActiveTab} />
         )}
 
         {activeTab === 'graphrag' && (

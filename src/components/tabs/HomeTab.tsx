@@ -1,6 +1,6 @@
 'use client';
 
-import { Zap, TestTube, BarChart3, Library, Settings, ArrowRight, Code, Network } from 'lucide-react';
+import { Zap, TestTube, BarChart3, Library, Settings, ArrowRight, Code, Network, Globe } from 'lucide-react';
 import { ApiKeyStatusIndicator } from '../ApiKeyStatusIndicator';
 
 import { TabType } from '../TabNavigation';
@@ -18,6 +18,13 @@ export function HomeTab({ onTabChange, apiKeyStatus }: HomeTabProps) {
       icon: TestTube,
       action: () => onTabChange('test'),
       color: 'bg-blue-500 hover:bg-blue-600'
+    },
+    {
+      title: 'gRPC-Web',
+      description: 'Browser-compatible gRPC with HTTP/1.1 transport and Protocol Buffer serialization',
+      icon: Globe,
+      action: () => onTabChange('grpcweb'),
+      color: 'bg-indigo-500 hover:bg-indigo-600'
     },
     {
       title: 'GraphRAG Lab',
@@ -99,7 +106,7 @@ export function HomeTab({ onTabChange, apiKeyStatus }: HomeTabProps) {
       {/* Quick Actions */}
       <div className="mb-8">
         <h2 className="text-xl font-semibold text-gray-900 mb-4">Quick Actions</h2>
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6">
           {quickActions.map((action, index) => {
             const Icon = action.icon;
             return (
