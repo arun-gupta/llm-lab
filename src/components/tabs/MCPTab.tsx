@@ -102,7 +102,7 @@ export function MCPTab() {
                   if (result.success) {
                     setDeploymentStatus({
                       type: 'success',
-                      message: '✅ Working MCP Collection created successfully in Postman Desktop!'
+                      message: 'Working MCP Collection created successfully in Postman Desktop!'
                     });
                   } else {
                     // Fallback to download if API key not configured
@@ -174,7 +174,7 @@ export function MCPTab() {
                   if (result.success) {
                     setDeploymentStatus({
                       type: 'success',
-                      message: '✅ Filesystem MCP Collection created successfully in Postman Desktop!'
+                      message: 'Filesystem MCP Collection created successfully in Postman Desktop!'
                     });
                   } else {
                     // Fallback to download if API key not configured
@@ -246,7 +246,7 @@ export function MCPTab() {
                   if (result.success) {
                     setDeploymentStatus({
                       type: 'success',
-                      message: '✅ SQLite MCP Collection created successfully in Postman Desktop!'
+                      message: 'SQLite MCP Collection created successfully in Postman Desktop!'
                     });
                   } else {
                     // Fallback to download if API key not configured
