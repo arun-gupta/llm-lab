@@ -436,7 +436,7 @@ export function GraphRAGTab() {
                 mode: "raw",
                 raw: JSON.stringify({
                   query: "AI healthcare relationships",
-                  graph_id: "graph_123",
+                  graph_id: "graph_1755797167093",
                   max_depth: 3,
                   node_types: ["person", "organization", "concept"]
                 }, null, 2)
@@ -462,7 +462,7 @@ export function GraphRAGTab() {
                 mode: "raw",
                 raw: JSON.stringify({
                   query: "AI healthcare relationships",
-                  graph_id: "graph_123",
+                  graph_id: "graph_1755797167093",
                   max_depth: 3
                 }, null, 2)
               }
@@ -487,7 +487,7 @@ export function GraphRAGTab() {
                 mode: "raw",
                 raw: JSON.stringify({
                   query: "What are AI benefits in healthcare?",
-                  graph_id: "graph_123",
+                  graph_id: "graph_1755797167093",
                   max_context_size: 10,
                   relevance_threshold: 0.7,
                   client_id: "browser_session_123"
@@ -514,7 +514,7 @@ export function GraphRAGTab() {
                 mode: "raw",
                 raw: JSON.stringify({
                   query: "AI healthcare",
-                  graph_id: "graph_123",
+                  graph_id: "graph_1755797167093",
                   session_id: "session_123"
                 }, null, 2)
               }
@@ -604,7 +604,7 @@ export function GraphRAGTab() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           query: query.trim(),
-          graphId: graphData.graphId || `graph_${Date.now()}`,
+          graphId: graphData.graphId || 'graph_1755797167093',
           model: selectedModel
         })
       });
