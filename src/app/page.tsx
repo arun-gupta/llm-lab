@@ -20,7 +20,7 @@ import { Download, Zap, Globe, Code, Github } from 'lucide-react';
 
 export default function Home() {
   // Tab navigation state
-  const [activeTab, setActiveTab] = useState<TabType>('home');
+  const [activeTab, setActiveTab] = useState<TabType>('graphrag');
   
 
   

@@ -12,30 +12,28 @@ interface TabNavigationProps {
 
 const tabs = [
   {
-    id: 'home' as TabType,
-    label: 'Home',
-    icon: Home,
-    description: 'Welcome and quick start'
-  },
-
-  {
-    id: 'collections' as TabType,
-    label: 'MCP',
-    icon: Library,
-    description: 'Model Context Protocol integrations and collections'
-  },
-
-  {
     id: 'graphrag' as TabType,
     label: 'GraphRAG',
     icon: Network,
     description: 'Graph-based Retrieval-Augmented Generation'
   },
   {
+    id: 'collections' as TabType,
+    label: 'MCP',
+    icon: Library,
+    description: 'Model Context Protocol integrations and collections'
+  },
+  {
     id: 'monitoring' as TabType,
     label: 'Model Monitoring',
     icon: Activity,
     description: 'A/B testing and performance monitoring for LLM models'
+  },
+  {
+    id: 'home' as TabType,
+    label: 'Home',
+    icon: Home,
+    description: 'Welcome and quick start'
   },
   {
     id: 'settings' as TabType,
