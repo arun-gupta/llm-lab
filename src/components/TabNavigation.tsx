@@ -12,6 +12,12 @@ interface TabNavigationProps {
 
 const tabs = [
   {
+    id: 'home' as TabType,
+    label: 'Home',
+    icon: Home,
+    description: 'Welcome and quick start'
+  },
+  {
     id: 'graphrag' as TabType,
     label: 'GraphRAG',
     icon: Network,
@@ -28,12 +34,6 @@ const tabs = [
     label: 'Model Monitoring',
     icon: Activity,
     description: 'A/B testing and performance monitoring for LLM models'
-  },
-  {
-    id: 'home' as TabType,
-    label: 'Home',
-    icon: Home,
-    description: 'Welcome and quick start'
   },
   {
     id: 'settings' as TabType,
