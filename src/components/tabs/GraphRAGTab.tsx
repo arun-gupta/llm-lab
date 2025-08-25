@@ -888,11 +888,6 @@ export function GraphRAGTab() {
         actualQuery = queryText.replace('InteractiveSession:', '').trim();
       }
         
-      // Mock WebSocket response for now
-      await new Promise(resolve => setTimeout(resolve, 300));
-      const endTime = performance.now();
-      const latency = Math.round(endTime - startTime);
-      
       // Fallback to API route if WebSocket server is not available
       const response = await fetch('/api/websocket/graphrag', {
         method: 'POST',
