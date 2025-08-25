@@ -1252,113 +1252,142 @@ export function GraphRAGTab() {
       const collection = {
         info: {
           name: 'GraphRAG WebSocket API',
-          description: 'WebSocket endpoints for real-time GraphRAG queries',
+          description: 'HTTP endpoints that proxy to WebSocket functionality for real-time GraphRAG queries',
           schema: 'https://schema.getpostman.com/json/collection/v2.1.0/collection.json'
         },
+        variable: [
+          {
+            key: "base_url",
+            value: "http://localhost:3000",
+            type: "string"
+          },
+          {
+            key: "graph_id",
+            value: graphData.graphId || "graph_123",
+            type: "string"
+          }
+        ],
         item: [
           {
-            name: 'WebSocket Connection',
+            name: 'WebSocket Health Check',
             request: {
               method: 'GET',
               header: [
                 {
-                  key: 'Upgrade',
-                  value: 'websocket'
+                  key: 'Accept',
+                  value: 'application/json'
+                }
+              ],
+              url: {
+                raw: '{{base_url}}/api/websocket/graphrag',
+                protocol: 'http',
+                host: ['{{base_url}}'],
+                path: ['api', 'websocket', 'graphrag']
+              },
+              description: 'Check if WebSocket server is available (returns HTTP response)'
+            }
+          },
+          {
+            name: 'Unary Query (HTTP Proxy)',
+            request: {
+              method: 'POST',
+              header: [
+                {
+                  key: 'Content-Type',
+                  value: 'application/json'
                 },
                 {
-                  key: 'Connection',
-                  value: 'Upgrade'
+                  key: 'Accept',
+                  value: 'application/json'
                 }
               ],
+              body: {
+                mode: 'raw',
+                raw: JSON.stringify({
+                  message: {
+                    type: 'unary',
+                    query: 'AI healthcare benefits',
+                    graphId: '{{graph_id}}',
+                    model: 'gpt-4'
+                  }
+                }, null, 2)
+              },
               url: {
-                raw: 'ws://localhost:3000/api/websocket/graphrag',
-                protocol: 'ws',
-                host: ['localhost'],
-                port: '3000',
+                raw: '{{base_url}}/api/websocket/graphrag',
+                protocol: 'http',
+                host: ['{{base_url}}'],
                 path: ['api', 'websocket', 'graphrag']
-              }
+              },
+              description: 'Send unary query via HTTP proxy to WebSocket server'
             }
           },
           {
-            name: 'Unary Query',
+            name: 'Streaming Query (HTTP Proxy)',
             request: {
               method: 'POST',
               header: [
                 {
                   key: 'Content-Type',
                   value: 'application/json'
-                }
-              ],
-              body: {
-                mode: 'raw',
-                raw: JSON.stringify({
-                  type: 'unary',
-                  query: 'AI healthcare benefits',
-                  graphId: 'your-graph-id'
-                }, null, 2)
-              },
-              url: {
-                raw: 'http://localhost:3000/api/websocket/query',
-                protocol: 'http',
-                host: ['localhost'],
-                port: '3000',
-                path: ['api', 'websocket', 'query']
-              }
-            }
-          },
-          {
-            name: 'Streaming Query',
-            request: {
-              method: 'POST',
-              header: [
+                },
                 {
-                  key: 'Content-Type',
+                  key: 'Accept',
                   value: 'application/json'
                 }
               ],
               body: {
                 mode: 'raw',
                 raw: JSON.stringify({
-                  type: 'streaming',
-                  query: 'Stanford researchers',
-                  graphId: 'your-graph-id'
+                  message: {
+                    type: 'streaming',
+                    query: 'Stanford researchers',
+                    graphId: '{{graph_id}}',
+                    model: 'gpt-4'
+                  }
                 }, null, 2)
               },
               url: {
-                raw: 'http://localhost:3000/api/websocket/stream',
+                raw: '{{base_url}}/api/websocket/graphrag',
                 protocol: 'http',
-                host: ['localhost'],
-                port: '3000',
-                path: ['api', 'websocket', 'stream']
-              }
+                host: ['{{base_url}}'],
+                path: ['api', 'websocket', 'graphrag']
+              },
+              description: 'Send streaming query via HTTP proxy to WebSocket server'
             }
           },
           {
-            name: 'Bidirectional Session',
+            name: 'Bidirectional Session (HTTP Proxy)',
             request: {
               method: 'POST',
               header: [
                 {
                   key: 'Content-Type',
                   value: 'application/json'
+                },
+                {
+                  key: 'Accept',
+                  value: 'application/json'
                 }
               ],
               body: {
                 mode: 'raw',
                 raw: JSON.stringify({
-                  type: 'bidirectional',
-                  sessionId: 'session-123',
-                  query: 'Machine learning diagnosis',
-                  graphId: 'your-graph-id'
+                  message: {
+                    type: 'bidirectional',
+                    sessionId: 'session-123',
+                    query: 'Machine learning diagnosis',
+                    graphId: '{{graph_id}}',
+                    model: 'gpt-4'
+                  }
                 }, null, 2)
               },
               url: {
-                raw: 'http://localhost:3000/api/websocket/session',
+                raw: '{{base_url}}/api/websocket/graphrag',
                 protocol: 'http',
-                host: ['localhost'],
-                port: '3000',
-                path: ['api', 'websocket', 'session']
-              }
+                host: ['{{base_url}}'],
+                path: ['api', 'websocket', 'graphrag']
+              },
+              description: 'Send bidirectional session query via HTTP proxy to WebSocket server'
             }
           }
         ]
