@@ -45,40 +45,40 @@ export async function POST(request: NextRequest) {
       } else if (lowerQuery === 'write test file') {
         return { operation: 'write_test_file', params: {} };
       } else if (lowerQuery === 'read test file') {
-        return { operation: 'read_file', params: { path: 'sample-docs/ai-healthcare.txt' } };
+        return { operation: 'read_file', params: { path: '/private/tmp/test-file.txt' } };
       } else if (lowerQuery === 'get file information') {
-        return { operation: 'get_file_info', params: { path: 'sample-docs/ai-healthcare.txt' } };
+        return { operation: 'get_file_info', params: { path: '/private/tmp/test-file.txt' } };
       } else if (lowerQuery === 'create test directory') {
         return { operation: 'create_test_directory', params: {} };
       } else if (lowerQuery === 'search for test files') {
-        return { operation: 'search_files', params: { query: 'AI', path: 'sample-docs' } };
+        return { operation: 'search_files', params: { query: 'test', path: '/private/tmp' } };
       } else if (lowerQuery === 'show test file metadata') {
-        return { operation: 'get_file_info', params: { path: 'sample-docs/ai-healthcare.txt' } };
+        return { operation: 'get_file_info', params: { path: '/private/tmp/test-file.txt' } };
       } else if (lowerQuery === 'show test directory contents') {
-        return { operation: 'list_directory', params: { path: 'sample-docs' } };
-      } else {
-        // Fallback to pattern matching for custom queries
-        if (lowerQuery.includes('list') && (lowerQuery.includes('file') || lowerQuery.includes('dir'))) {
-          const pathMatch = q.match(/['"`]([^'"`]+)['"`]/);
-          const path = pathMatch ? pathMatch[1] : 'sample-docs';
-          return { operation: 'list_directory', params: { path } };
-        } else if (lowerQuery.includes('read') && lowerQuery.includes('file')) {
-          const fileMatch = q.match(/['"`]([^'"`]+)['"`]/);
-          const file = fileMatch ? fileMatch[1] : 'sample-docs/ai-healthcare.txt';
-          return { operation: 'read_file', params: { path: file } };
-        } else if (lowerQuery.includes('search') && lowerQuery.includes('file')) {
-          const searchMatch = q.match(/['"`]([^'"`]+)['"`]/);
-          const searchTerm = searchMatch ? searchMatch[1] : 'AI';
-          return { operation: 'search_files', params: { query: searchTerm, path: 'sample-docs' } };
-        } else if (lowerQuery.includes('info') || lowerQuery.includes('stat')) {
-          const fileMatch = q.match(/['"`]([^'"`]+)['"`]/);
-          const file = fileMatch ? fileMatch[1] : 'sample-docs/ai-healthcare.txt';
-          return { operation: 'get_file_info', params: { path: file } };
-        } else {
-          // Default to listing sample docs
-          return { operation: 'list_sample_docs', params: {} };
+        return { operation: 'list_directory', params: { path: '/private/tmp/test-directory' } };
+              } else {
+          // Fallback to pattern matching for custom queries
+          if (lowerQuery.includes('list') && (lowerQuery.includes('file') || lowerQuery.includes('dir'))) {
+            const pathMatch = q.match(/['"`]([^'"`]+)['"`]/);
+            const path = pathMatch ? pathMatch[1] : '/private/tmp';
+            return { operation: 'list_directory', params: { path } };
+          } else if (lowerQuery.includes('read') && lowerQuery.includes('file')) {
+            const fileMatch = q.match(/['"`]([^'"`]+)['"`]/);
+            const file = fileMatch ? fileMatch[1] : '/private/tmp/test-file.txt';
+            return { operation: 'read_file', params: { path: file } };
+          } else if (lowerQuery.includes('search') && lowerQuery.includes('file')) {
+            const searchMatch = q.match(/['"`]([^'"`]+)['"`]/);
+            const searchTerm = searchMatch ? searchMatch[1] : 'test';
+            return { operation: 'search_files', params: { query: searchTerm, path: '/private/tmp' } };
+          } else if (lowerQuery.includes('info') || lowerQuery.includes('stat')) {
+            const fileMatch = q.match(/['"`]([^'"`]+)['"`]/);
+            const file = fileMatch ? fileMatch[1] : '/private/tmp/test-file.txt';
+            return { operation: 'get_file_info', params: { path: file } };
+          } else {
+            // Default to listing allowed directories
+            return { operation: 'list_allowed_directories', params: {} };
+          }
         }
-      }
     };
 
     const { operation, params } = parseQuery(query);
@@ -110,12 +110,15 @@ export async function POST(request: NextRequest) {
           break;
 
         case 'write_test_file':
-          mcpToolName = 'write_test_file';
-          mcpArguments = {};
+          mcpToolName = 'write_file';
+          mcpArguments = { 
+            path: '/private/tmp/test-file.txt',
+            content: `Test file created at ${new Date().toISOString()}\nThis is a test file for Filesystem MCP operations.`
+          };
           break;
         case 'create_test_directory':
-          mcpToolName = 'create_test_directory';
-          mcpArguments = {};
+          mcpToolName = 'create_directory';
+          mcpArguments = { path: '/private/tmp/test-directory' };
           break;
         case 'list_directory':
           mcpToolName = 'list_directory';
@@ -123,7 +126,7 @@ export async function POST(request: NextRequest) {
           break;
           
         case 'read_file':
-          mcpToolName = 'read_file';
+          mcpToolName = 'read_text_file';
           mcpArguments = { path: p.path };
           break;
         case 'search_files':
@@ -134,10 +137,7 @@ export async function POST(request: NextRequest) {
           mcpToolName = 'get_file_info';
           mcpArguments = { path: p.path };
           break;
-        case 'list_sample_docs':
-          mcpToolName = 'list_directory';
-          mcpArguments = { path: 'sample-docs' };
-          break;
+
         default:
           throw new Error(`Unknown operation: ${op}`);
       }
