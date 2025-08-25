@@ -58,13 +58,40 @@ export function ModelMonitoringTab({ onTabChange }: ModelMonitoringTabProps) {
   // A/B Testing State
   const [models, setModels] = useState<ModelConfig[]>([
     {
+      id: 'gpt-5',
+      name: 'GPT-5',
+      provider: 'OpenAI',
+      model: 'gpt-5',
+      description: 'Latest flagship model with advanced capabilities',
+      color: 'blue',
+      enabled: true
+    },
+    {
+      id: 'gpt-5-mini',
+      name: 'GPT-5 Mini',
+      provider: 'OpenAI',
+      model: 'gpt-5-mini',
+      description: 'Fast and efficient GPT-5 variant',
+      color: 'cyan',
+      enabled: true
+    },
+    {
+      id: 'gpt-5-nano',
+      name: 'GPT-5 Nano',
+      provider: 'OpenAI',
+      model: 'gpt-5-nano',
+      description: 'Lightweight and fast GPT-5 variant',
+      color: 'teal',
+      enabled: true
+    },
+    {
       id: 'gpt-4',
       name: 'GPT-4',
       provider: 'OpenAI',
       model: 'gpt-4',
-      description: 'Latest GPT-4 model with advanced reasoning',
-      color: 'blue',
-      enabled: true
+      description: 'Previous generation GPT-4 model',
+      color: 'indigo',
+      enabled: false
     },
     {
       id: 'gpt-3.5-turbo',
@@ -73,6 +100,24 @@ export function ModelMonitoringTab({ onTabChange }: ModelMonitoringTabProps) {
       model: 'gpt-3.5-turbo',
       description: 'Fast and cost-effective GPT-3.5 model',
       color: 'green',
+      enabled: false
+    },
+    {
+      id: 'claude-3-5-sonnet',
+      name: 'Claude 3.5 Sonnet',
+      provider: 'Anthropic',
+      model: 'claude-3-5-sonnet-20241022',
+      description: 'Latest Claude 3.5 model with advanced reasoning',
+      color: 'purple',
+      enabled: true
+    },
+    {
+      id: 'claude-3-5-haiku',
+      name: 'Claude 3.5 Haiku',
+      provider: 'Anthropic',
+      model: 'claude-3-5-haiku-20241022',
+      description: 'Fast and efficient Claude 3.5 variant',
+      color: 'pink',
       enabled: true
     },
     {
@@ -80,18 +125,18 @@ export function ModelMonitoringTab({ onTabChange }: ModelMonitoringTabProps) {
       name: 'Claude 3 Opus',
       provider: 'Anthropic',
       model: 'claude-3-opus-20240229',
-      description: 'Most capable Claude model for complex tasks',
-      color: 'purple',
-      enabled: true
+      description: 'Previous generation Claude model for complex tasks',
+      color: 'violet',
+      enabled: false
     },
     {
       id: 'claude-3-sonnet',
       name: 'Claude 3 Sonnet',
       provider: 'Anthropic',
       model: 'claude-3-sonnet-20240229',
-      description: 'Balanced performance and cost Claude model',
+      description: 'Previous generation balanced Claude model',
       color: 'orange',
-      enabled: true
+      enabled: false
     },
     {
       id: 'llama-3.1-8b',
@@ -107,6 +152,66 @@ export function ModelMonitoringTab({ onTabChange }: ModelMonitoringTabProps) {
   const [testPrompt, setTestPrompt] = useState('');
   const [isRunningTest, setIsRunningTest] = useState(false);
   const [testResults, setTestResults] = useState<TestResult[]>([]);
+
+  // Sample prompts for A/B testing
+  const samplePrompts = [
+    {
+      id: 'creative-writing',
+      title: 'Creative Writing',
+      prompt: 'Write a short story about a time traveler who accidentally changes a small event in history, but discovers that this change leads to a much better future than the original timeline.',
+      category: 'Creative',
+      difficulty: 'Medium'
+    },
+    {
+      id: 'code-review',
+      title: 'Code Review',
+      prompt: 'Review this Python function for potential issues, performance improvements, and best practices:\n\ndef process_data(data_list):\n    result = []\n    for item in data_list:\n        if item > 0:\n            result.append(item * 2)\n    return result',
+      category: 'Technical',
+      difficulty: 'Easy'
+    },
+    {
+      id: 'business-analysis',
+      title: 'Business Analysis',
+      prompt: 'Analyze the potential impact of implementing a 4-day workweek on employee productivity, company costs, and customer satisfaction. Provide specific recommendations for a tech company with 500 employees.',
+      category: 'Business',
+      difficulty: 'Hard'
+    },
+    {
+      id: 'scientific-explanation',
+      title: 'Scientific Explanation',
+      prompt: 'Explain quantum entanglement in simple terms that a high school student could understand. Include analogies and real-world examples.',
+      category: 'Educational',
+      difficulty: 'Medium'
+    },
+    {
+      id: 'problem-solving',
+      title: 'Problem Solving',
+      prompt: 'A company is experiencing high employee turnover. Design a comprehensive strategy to improve employee retention that considers compensation, work environment, career development, and company culture.',
+      category: 'Business',
+      difficulty: 'Hard'
+    },
+    {
+      id: 'creative-brainstorming',
+      title: 'Creative Brainstorming',
+      prompt: 'Generate 10 innovative product ideas that could help reduce food waste in households. Focus on practical, affordable solutions that could be easily adopted.',
+      category: 'Creative',
+      difficulty: 'Medium'
+    },
+    {
+      id: 'data-analysis',
+      title: 'Data Analysis',
+      prompt: 'Given a dataset of customer purchase history, what are the key metrics you would analyze to identify customer segments and develop targeted marketing strategies?',
+      category: 'Technical',
+      difficulty: 'Medium'
+    },
+    {
+      id: 'ethical-decision',
+      title: 'Ethical Decision Making',
+      prompt: 'A self-driving car must choose between hitting a pedestrian or swerving into a wall, potentially harming the passenger. Analyze the ethical considerations and decision-making frameworks for autonomous vehicles.',
+      category: 'Philosophical',
+      difficulty: 'Hard'
+    }
+  ];
 
   // Response Comparison State
   const [comparisonPrompt, setComparisonPrompt] = useState('');
@@ -634,6 +739,11 @@ export function ModelMonitoringTab({ onTabChange }: ModelMonitoringTabProps) {
     ));
   };
 
+  const selectSamplePrompt = (prompt: string) => {
+    setTestPrompt(prompt);
+    setComparisonPrompt(prompt);
+  };
+
   const runABTest = async () => {
     if (!testPrompt.trim() || !models.filter(m => m.enabled).length) return;
     
@@ -830,6 +940,47 @@ export function ModelMonitoringTab({ onTabChange }: ModelMonitoringTabProps) {
             </div>
           </div>
 
+          {/* Sample Prompts */}
+          <div className="bg-white rounded-lg border shadow-sm">
+            <div className="p-6 border-b">
+              <h3 className="text-lg font-semibold text-gray-900">Sample Prompts</h3>
+              <p className="text-gray-600 mt-1">Choose from predefined prompts for quick testing</p>
+            </div>
+            <div className="p-6">
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                {samplePrompts.map((sample) => (
+                  <div 
+                    key={sample.id} 
+                    className="border rounded-lg p-4 hover:shadow-md transition-shadow cursor-pointer"
+                    onClick={() => selectSamplePrompt(sample.prompt)}
+                  >
+                    <div className="flex items-center justify-between mb-2">
+                      <h4 className="font-medium text-gray-900">{sample.title}</h4>
+                      <span className={`text-xs px-2 py-1 rounded-full ${
+                        sample.difficulty === 'Easy' ? 'bg-green-100 text-green-800' :
+                        sample.difficulty === 'Medium' ? 'bg-yellow-100 text-yellow-800' :
+                        'bg-red-100 text-red-800'
+                      }`}>
+                        {sample.difficulty}
+                      </span>
+                    </div>
+                    <p className="text-xs text-gray-500 mb-2">{sample.category}</p>
+                    <p className="text-sm text-gray-600 line-clamp-3">{sample.prompt.substring(0, 100)}...</p>
+                    <button 
+                      className="mt-2 text-xs text-blue-600 hover:text-blue-800 font-medium"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        selectSamplePrompt(sample.prompt);
+                      }}
+                    >
+                      Use this prompt →
+                    </button>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+
           {/* Test Configuration */}
           <div className="bg-white rounded-lg border shadow-sm">
             <div className="p-6 border-b">
@@ -977,6 +1128,47 @@ export function ModelMonitoringTab({ onTabChange }: ModelMonitoringTabProps) {
                     <div className="text-xs text-gray-500">
                       Provider: {model.provider} | Model: {model.model}
                     </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+
+          {/* Sample Prompts */}
+          <div className="bg-white rounded-lg border shadow-sm">
+            <div className="p-6 border-b">
+              <h3 className="text-lg font-semibold text-gray-900">Sample Prompts</h3>
+              <p className="text-gray-600 mt-1">Choose from predefined prompts for quick comparison</p>
+            </div>
+            <div className="p-6">
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                {samplePrompts.map((sample) => (
+                  <div 
+                    key={sample.id} 
+                    className="border rounded-lg p-4 hover:shadow-md transition-shadow cursor-pointer"
+                    onClick={() => selectSamplePrompt(sample.prompt)}
+                  >
+                    <div className="flex items-center justify-between mb-2">
+                      <h4 className="font-medium text-gray-900">{sample.title}</h4>
+                      <span className={`text-xs px-2 py-1 rounded-full ${
+                        sample.difficulty === 'Easy' ? 'bg-green-100 text-green-800' :
+                        sample.difficulty === 'Medium' ? 'bg-yellow-100 text-yellow-800' :
+                        'bg-red-100 text-red-800'
+                      }`}>
+                        {sample.difficulty}
+                      </span>
+                    </div>
+                    <p className="text-xs text-gray-500 mb-2">{sample.category}</p>
+                    <p className="text-sm text-gray-600 line-clamp-3">{sample.prompt.substring(0, 100)}...</p>
+                    <button 
+                      className="mt-2 text-xs text-purple-600 hover:text-purple-800 font-medium"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        selectSamplePrompt(sample.prompt);
+                      }}
+                    >
+                      Use this prompt →
+                    </button>
                   </div>
                 ))}
               </div>

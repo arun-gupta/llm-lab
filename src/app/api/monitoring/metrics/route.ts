@@ -32,10 +32,13 @@ export async function GET(request: NextRequest) {
         total_cost: 12.45,
         average_cost_per_request: 0.00996,
         cost_by_model: {
+          'gpt-5': 12.50,
+          'gpt-5-mini': 6.20,
+          'gpt-5-nano': 3.80,
+          'claude-3-5-sonnet': 4.50,
+          'claude-3-5-haiku': 2.80,
           'gpt-4': 8.20,
-          'gpt-3.5-turbo': 2.15,
-          'claude-3-opus': 1.80,
-          'claude-3-sonnet': 0.30
+          'gpt-3.5-turbo': 2.15
         }
       },
       quality_metrics: {
@@ -59,9 +62,54 @@ export async function GET(request: NextRequest) {
       },
       model_performance: [
         {
+          model_id: 'gpt-5',
+          provider: 'OpenAI',
+          requests: 300,
+          success_rate: 99.2,
+          average_latency: 1200,
+          total_cost: 12.50,
+          average_quality: 0.96
+        },
+        {
+          model_id: 'gpt-5-mini',
+          provider: 'OpenAI',
+          requests: 400,
+          success_rate: 98.5,
+          average_latency: 800,
+          total_cost: 6.20,
+          average_quality: 0.89
+        },
+        {
+          model_id: 'gpt-5-nano',
+          provider: 'OpenAI',
+          requests: 350,
+          success_rate: 97.8,
+          average_latency: 600,
+          total_cost: 3.80,
+          average_quality: 0.82
+        },
+        {
+          model_id: 'claude-3-5-sonnet',
+          provider: 'Anthropic',
+          requests: 250,
+          success_rate: 95.5,
+          average_latency: 1800,
+          total_cost: 4.50,
+          average_quality: 0.94
+        },
+        {
+          model_id: 'claude-3-5-haiku',
+          provider: 'Anthropic',
+          requests: 300,
+          success_rate: 96.8,
+          average_latency: 1000,
+          total_cost: 2.80,
+          average_quality: 0.87
+        },
+        {
           model_id: 'gpt-4',
           provider: 'OpenAI',
-          requests: 450,
+          requests: 150,
           success_rate: 96.2,
           average_latency: 1800,
           total_cost: 8.20,
@@ -70,29 +118,11 @@ export async function GET(request: NextRequest) {
         {
           model_id: 'gpt-3.5-turbo',
           provider: 'OpenAI',
-          requests: 500,
+          requests: 200,
           success_rate: 98.0,
           average_latency: 850,
           total_cost: 2.15,
           average_quality: 0.78
-        },
-        {
-          model_id: 'claude-3-opus',
-          provider: 'Anthropic',
-          requests: 200,
-          success_rate: 89.5,
-          average_latency: 2200,
-          total_cost: 1.80,
-          average_quality: 0.95
-        },
-        {
-          model_id: 'claude-3-sonnet',
-          provider: 'Anthropic',
-          requests: 100,
-          success_rate: 92.0,
-          average_latency: 1600,
-          total_cost: 0.30,
-          average_quality: 0.85
         }
       ],
       timestamp: new Date().toISOString()
