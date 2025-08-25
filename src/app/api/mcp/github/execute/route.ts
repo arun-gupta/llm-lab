@@ -53,6 +53,11 @@ export async function POST(request: NextRequest) {
     };
 
     const { operation, params } = parseQuery(query);
+    
+    // Debug logging
+    console.log('GitHub MCP Query:', query);
+    console.log('Parsed Operation:', operation);
+    console.log('Parsed Params:', params);
 
     // Simulate GitHub MCP operations with realistic data
     const executeGitHubMCP = async (op: string, p: Record<string, any>): Promise<any> => {
@@ -86,6 +91,18 @@ export async function POST(request: NextRequest) {
                 language: 'Python',
                 updated_at: new Date(Date.now() - 86400000).toISOString(),
                 topics: ['mcp', 'examples', 'development']
+              },
+              {
+                id: 555666777,
+                name: 'protocol-comparison-demo',
+                full_name: 'arun-gupta/protocol-comparison-demo',
+                description: 'Demonstration of REST, GraphQL, gRPC, WebSocket, and SSE protocols',
+                private: false,
+                fork: false,
+                stargazers_count: 28,
+                language: 'JavaScript',
+                updated_at: new Date(Date.now() - 172800000).toISOString(),
+                topics: ['protocols', 'demo', 'comparison', 'api']
               }
             ]
           };
