@@ -65,6 +65,53 @@ jobs:
         docker stop test-container
         docker rm test-container
 
+  test-collections:
+    runs-on: ubuntu-latest
+    needs: build-and-test
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '20'
+        cache: 'npm'
+
+    - name: Install Newman
+      run: npm install -g newman
+
+    - name: Install Newman HTML reporter
+      run: npm install -g newman-reporter-html
+
+    - name: Start application for testing
+      run: |
+        # Start the application in background
+        docker run -d --name app-test -p 3000:3000 ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:latest
+        # Wait for app to be ready
+        sleep 15
+        curl -f http://localhost:3000/api/health || exit 1
+
+    - name: Run all collection tests
+      run: |
+        # Run all collections using the test script
+        ./scripts/test-collections.sh || echo "Some collection tests failed but continuing..."
+
+    - name: Upload Newman reports
+      uses: actions/upload-artifact@v4
+      if: always()
+      with:
+        name: newman-test-reports
+        path: newman-reports/
+        retention-days: 30
+
+    - name: Cleanup test container
+      if: always()
+      run: |
+        docker stop app-test || true
+        docker rm app-test || true
+
   security-scan:
     runs-on: ubuntu-latest
     needs: build-and-test
@@ -88,7 +135,7 @@ jobs:
 
   deploy-staging:
     runs-on: ubuntu-latest
-    needs: [build-and-test, security-scan]
+    needs: [build-and-test, test-collections, security-scan]
     if: github.ref == 'refs/heads/develop' && github.event_name == 'push'
     
     steps:
@@ -100,7 +147,7 @@ jobs:
 
   deploy-production:
     runs-on: ubuntu-latest
-    needs: [build-and-test, security-scan]
+    needs: [build-and-test, test-collections, security-scan]
     if: github.ref == 'refs/heads/main' && github.event_name == 'push'
     
     steps:

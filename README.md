@@ -51,6 +51,7 @@ A comprehensive **Postman-focused protocol testing and GraphRAG development plat
 - **GitHub Actions**: Automated testing and deployment ([docs](docs/github-actions.md))
 - **Docker**: Production-ready containerization
 - **Health Checks**: Container monitoring and status endpoints
+- **Newman Integration**: Automated Postman collection testing with HTML reports
 
 **✅ Recent Improvements:**
 - **SSE Streaming**: Meaningful context content instead of generic messages
@@ -59,6 +60,7 @@ A comprehensive **Postman-focused protocol testing and GraphRAG development plat
 - **Quickstart Script**: Enhanced with gRPC server startup and clean shutdown
 - **Docker Support**: Production-ready Dockerfile with multi-stage builds
 - **GitHub Actions**: Automated CI/CD pipelines for testing and deployment
+- **Newman Integration**: Automated testing of all Postman collections with detailed HTML reports
 
 ## 🚀 Quick Start
 
@@ -316,6 +318,40 @@ For comprehensive usage instructions, see our detailed guides:
 - **[📖 Usage Guide](docs/usage.md)** - Complete step-by-step instructions for all features
 - **[✨ Features Guide](docs/features.md)** - Detailed feature descriptions and capabilities
 - **[📈 Roadmap](docs/roadmap.md)** - Development phases and planned features
+
+## 🧪 Testing with Newman
+
+This project includes automated testing of all Postman collections using [Newman](https://github.com/postmanlabs/newman), the command-line collection runner for Postman.
+
+### **CI/CD Integration**
+- **Automated Testing**: All collections are tested automatically in GitHub Actions
+- **HTML Reports**: Detailed test reports are generated and uploaded as artifacts
+- **Parallel Execution**: Collections can be tested in parallel for faster feedback
+- **Failure Handling**: Tests continue even if some collections fail
+
+### **Local Testing**
+```bash
+# Test all collections sequentially
+./scripts/test-collections.sh
+
+# Test all collections in parallel
+PARALLEL=true ./scripts/test-collections.sh
+
+# Test a specific collection
+newman run public/postman-collections/github-mcp-unified.json --reporters cli,html
+```
+
+### **Available Collections**
+- **GitHub MCP**: Tests GitHub integration via Model Context Protocol
+- **GraphRAG gRPC**: Tests GraphRAG functionality via gRPC
+- **Filesystem MCP**: Tests filesystem operations via Model Context Protocol
+- **SQLite MCP**: Tests SQLite database operations via Model Context Protocol
+
+### **Test Reports**
+- Reports are saved to `newman-reports/` directory
+- HTML reports provide detailed test results and response data
+- Failed tests are clearly marked with error details
+- CI artifacts are retained for 30 days
 
 ## 📈 Development Status
 

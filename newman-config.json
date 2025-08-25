@@ -1,0 +1,29 @@
+{
+  "newman": {
+    "timeout": {
+      "request": 10000,
+      "script": 10000
+    },
+    "reporter": {
+      "cli": {
+        "silent": false,
+        "verbose": false
+      },
+      "html": {
+        "export": "./newman-reports/",
+        "template": "./newman-reports/template.hbs"
+      }
+    },
+    "ssl": {
+      "strict": false,
+      "verify": false
+    },
+    "bail": {
+      "folder": false,
+      "request": false
+    },
+    "delay": {
+      "request": 1000
+    }
+  }
+}
