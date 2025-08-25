@@ -28,19 +28,36 @@ export function MCPTab() {
       "Generate Repository Health Report"
     ],
     filesystem: [
-      "List files in sample-docs",
-      "Read file 'ai-healthcare.txt'",
-      "Search for files containing 'AI'",
-      "Get file info for 'ai-healthcare.txt'",
-      "List sample documents"
+      "Health Check",
+      "Show Configuration",
+      "List Available Tools",
+      "List Allowed Directories",
+      "List Directory Contents (Private TMP)",
+      "List Directory Contents (Desktop)",
+      "Write Test File",
+      "Read Test File",
+      "Get File Information",
+      "Create Test Directory",
+      "Search for Test Files",
+      "Show Test File Metadata",
+      "Show Test Directory Contents"
     ],
     sqlite: [
-      "List all tables",
-      "Show users table schema",
-      "Execute SELECT * FROM users LIMIT 5",
-      "Get database info",
-      "Backup database",
-      "Optimize database"
+      "Health Check",
+      "Server Info",
+      "List Tools",
+      "List Tables",
+      "Describe Table",
+      "Run Query",
+      "Insert Row",
+      "Update Row",
+      "Delete Row",
+      "Execute Tool - List Tables",
+      "Execute Tool - Describe Table",
+      "Execute Tool - Run Query",
+      "Execute Tool - Insert Row",
+      "Execute Tool - Update Row",
+      "Execute Tool - Delete Row"
     ]
   };
 
