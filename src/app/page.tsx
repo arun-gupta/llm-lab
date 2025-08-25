@@ -65,7 +65,7 @@ export default function Home() {
               </div>
               <div>
                 <h1 className="text-xl font-bold text-gray-900">Postman Protocol Playground</h1>
-                <p className="text-xs text-gray-600">Test and compare LLM providers with side-by-side performance analysis</p>
+                <p className="text-xs text-gray-600">Comprehensive LLM testing, protocol comparison, and model monitoring platform with GraphRAG capabilities</p>
               </div>
             </button>
             
@@ -120,8 +120,8 @@ export default function Home() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
           <div className="text-center text-gray-600">
             <p className="text-sm">
-              Use Postman to test and compare LLMs with MCP integration. 
-              Built for unified experimentation across OpenAI, Anthropic, and Ollama.
+              Comprehensive platform for LLM testing, protocol comparison, model monitoring, and GraphRAG development. 
+              Built for unified experimentation across multiple providers and protocols.
             </p>
           </div>
         </div>
