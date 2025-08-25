@@ -41,11 +41,22 @@ export async function POST(request: NextRequest) {
       } else if (lowerQuery === 'run query') {
         return { operation: 'run_query', params: { query: 'SELECT * FROM users LIMIT 5' } };
       } else if (lowerQuery === 'insert row') {
-        return { operation: 'insert_row', params: { table: 'users', data: { name: 'Test User', email: 'test@example.com' } } };
+        const timestamp = Date.now();
+        return { 
+          operation: 'insert_row', 
+          params: { 
+            table: 'users', 
+            data: { 
+              name: `Test User ${timestamp}`, 
+              email: `test${timestamp}@example.com` 
+            } 
+          } 
+        };
       } else if (lowerQuery === 'update row') {
-        return { operation: 'update_row', params: { table: 'users', id: 1, data: { name: 'Updated User' } } };
+        return { operation: 'update_row', params: { table: 'users', id: 1, data: { name: `Updated User ${Date.now()}` } } };
       } else if (lowerQuery === 'delete row') {
-        return { operation: 'delete_row', params: { table: 'users', id: 1 } };
+        // Try to delete a user that might not have foreign key dependencies
+        return { operation: 'delete_row', params: { table: 'users', id: 999 } };
       } else {
         // Fallback to pattern matching for custom queries
         if (lowerQuery.includes('list') && lowerQuery.includes('table')) {
