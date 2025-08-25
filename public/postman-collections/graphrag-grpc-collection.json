@@ -14,6 +14,11 @@
       "key": "proto_file_path",
       "value": "http://localhost:3000/graphrag.proto",
       "type": "string"
+    },
+    {
+      "key": "graph_id",
+      "value": "graph_1755797167093",
+      "type": "string"
     }
   ],
   "item": [
@@ -50,7 +55,7 @@
             },
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"query\": \"AI healthcare relationships\",\n  \"graph_id\": \"graph_123\",\n  \"max_depth\": 3,\n  \"node_types\": [\"person\", \"organization\", \"concept\"]\n}",
+              "raw": "{\n  \"query\": \"AI healthcare relationships\",\n  \"graph_id\": \"{{graph_id}}\",\n  \"max_depth\": 3,\n  \"node_types\": [\"person\", \"organization\", \"concept\"]\n}",
               "options": {
                 "raw": {
                   "language": "json"
@@ -73,7 +78,7 @@
             },
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"query\": \"What are AI benefits in healthcare?\",\n  \"graph_id\": \"graph_123\",\n  \"max_context_size\": 10,\n  \"relevance_threshold\": 0.7\n}",
+              "raw": "{\n  \"query\": \"What are AI benefits in healthcare?\",\n  \"graph_id\": \"{{graph_id}}\",\n  \"max_context_size\": 10,\n  \"relevance_threshold\": 0.7\n}",
               "options": {
                 "raw": {
                   "language": "json"
@@ -96,7 +101,7 @@
             },
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"entity_name\": \"Dr. Sarah Johnson\",\n  \"graph_id\": \"graph_123\",\n  \"entity_types\": [\"person\", \"researcher\"]\n}",
+              "raw": "{\n  \"entity_name\": \"Dr. Sarah Johnson\",\n  \"graph_id\": \"{{graph_id}}\",\n  \"entity_types\": [\"person\", \"researcher\"]\n}",
               "options": {
                 "raw": {
                   "language": "json"
@@ -142,7 +147,7 @@
             },
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"graph_id\": \"graph_123\",\n  \"node_types\": [\"person\", \"organization\"],\n  \"edge_types\": [\"employment\", \"collaboration\"]\n}",
+              "raw": "{\n  \"graph_id\": \"{{graph_id}}\",\n  \"node_types\": [\"person\", \"organization\"],\n  \"edge_types\": [\"employment\", \"collaboration\"]\n}",
               "options": {
                 "raw": {
                   "language": "json"
@@ -170,7 +175,7 @@
             },
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"query\": \"tech companies innovation\",\n  \"graph_id\": \"graph_123\",\n  \"max_depth\": 5,\n  \"node_types\": [\"organization\", \"concept\", \"technology\"]\n}",
+              "raw": "{\n  \"query\": \"tech companies innovation\",\n  \"graph_id\": \"{{graph_id}}\",\n  \"max_depth\": 5,\n  \"node_types\": [\"organization\", \"concept\", \"technology\"]\n}",
               "options": {
                 "raw": {
                   "language": "json"
@@ -193,7 +198,7 @@
             },
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"query\": \"How do AI and machine learning impact modern healthcare systems?\",\n  \"graph_id\": \"graph_123\",\n  \"max_context_size\": 50,\n  \"relevance_threshold\": 0.5\n}",
+              "raw": "{\n  \"query\": \"How do AI and machine learning impact modern healthcare systems?\",\n  \"graph_id\": \"{{graph_id}}\",\n  \"max_context_size\": 50,\n  \"relevance_threshold\": 0.5\n}",
               "options": {
                 "raw": {
                   "language": "json"
