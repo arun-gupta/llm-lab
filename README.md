@@ -166,12 +166,19 @@ Docker Compose reads environment files in this order (later files override earli
 - **Development** (`docker-compose.dev.yml`): Simplified setup with just the main app and SQLite MCP server
 - **Local Build** (`docker-compose.build.yml`): All services built locally from source (for development/testing)
 
-**Pre-built Images Available:**
+**Pre-built Images Available (All from GHCR):**
 - `ghcr.io/arun-gupta/postman-labs:latest` - Main Next.js application
 - `ghcr.io/arun-gupta/postman-labs-grpc:latest` - gRPC server for GraphRAG
 - `ghcr.io/arun-gupta/postman-labs-grpc-web:latest` - gRPC-Web proxy
 - `ghcr.io/arun-gupta/postman-labs-filesystem-mcp:latest` - Filesystem MCP server
-- `arungupta/sqlite-mcp-server:latest` - SQLite MCP server (Docker Hub)
+- `ghcr.io/arun-gupta/sqlite-mcp-server:latest` - SQLite MCP server
+
+**Benefits of Unified GHCR Registry:**
+- ✅ All images from the same trusted source
+- ✅ Consistent security scanning and vulnerability management
+- ✅ Unified access control and permissions
+- ✅ Better performance with single registry
+- ✅ Simplified dependency management
 
 **Example .env.local file:**
 ```bash

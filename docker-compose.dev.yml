@@ -20,7 +20,7 @@ services:
       - postman-labs-network
 
   sqlite-mcp-server:
-    image: arungupta/sqlite-mcp-server:latest
+    image: ghcr.io/arun-gupta/sqlite-mcp-server:latest
     ports:
       - "3001:3001"
     environment:
