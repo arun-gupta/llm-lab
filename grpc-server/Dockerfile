@@ -24,10 +24,7 @@ ENV NODE_ENV=production
 RUN addgroup --system --gid 1001 nodejs
 RUN adduser --system --uid 1001 grpcuser
 
-COPY --from=builder /app/public ./public
-
-# Automatically leverage output traces to reduce image size
-# https://nextjs.org/docs/advanced-features/output-file-tracing
+# Copy application files
 COPY --from=builder --chown=grpcuser:nodejs /app/node_modules ./node_modules
 COPY --from=builder --chown=grpcuser:nodejs /app/package.json ./package.json
 COPY --from=builder --chown=grpcuser:nodejs /app/server.js ./server.js
