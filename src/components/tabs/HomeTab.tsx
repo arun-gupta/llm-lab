@@ -132,26 +132,17 @@ export function HomeTab({ onTabChange, apiKeyStatus }: HomeTabProps) {
         <div className="bg-gray-50 rounded-lg p-6">
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
             <div className="text-center">
-              <div className="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                <span className="text-blue-600 font-bold text-lg">1</span>
-              </div>
-              <h3 className="font-semibold text-gray-900 mb-2">Configure API Keys</h3>
-              <p className="text-gray-600 text-sm">
-                Set up your OpenAI and Anthropic API keys, and ensure Ollama is running locally.
-              </p>
-            </div>
-            <div className="text-center">
               <div className="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                <span className="text-green-600 font-bold text-lg">2</span>
+                <span className="text-green-600 font-bold text-lg">1</span>
               </div>
-              <h3 className="font-semibold text-gray-900 mb-2">LLM Testing</h3>
+              <h3 className="font-semibold text-gray-900 mb-2">Try GraphRAG</h3>
               <p className="text-gray-600 text-sm">
-                Use the LLM Testing tab to experiment with prompts and compare providers side-by-side.
+                Upload documents, build knowledge graphs, and compare protocols (REST, GraphQL, gRPC, WebSocket, SSE).
               </p>
             </div>
             <div className="text-center">
               <div className="w-12 h-12 bg-purple-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                <span className="text-purple-600 font-bold text-lg">3</span>
+                <span className="text-purple-600 font-bold text-lg">2</span>
               </div>
               <h3 className="font-semibold text-gray-900 mb-2">Explore MCP</h3>
               <p className="text-gray-600 text-sm">
@@ -159,12 +150,21 @@ export function HomeTab({ onTabChange, apiKeyStatus }: HomeTabProps) {
               </p>
             </div>
             <div className="text-center">
-              <div className="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                <span className="text-green-600 font-bold text-lg">4</span>
+              <div className="w-12 h-12 bg-orange-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                <span className="text-orange-600 font-bold text-lg">3</span>
               </div>
-              <h3 className="font-semibold text-gray-900 mb-2">Try GraphRAG</h3>
+              <h3 className="font-semibold text-gray-900 mb-2">Model Monitoring</h3>
               <p className="text-gray-600 text-sm">
-                Upload documents, build knowledge graphs, and compare protocols (REST, GraphQL, gRPC, WebSocket, SSE).
+                A/B testing, response comparison, and performance monitoring for LLM models.
+              </p>
+            </div>
+            <div className="text-center">
+              <div className="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                <span className="text-blue-600 font-bold text-lg">4</span>
+              </div>
+              <h3 className="font-semibold text-gray-900 mb-2">Configure API Keys</h3>
+              <p className="text-gray-600 text-sm">
+                Set up your OpenAI and Anthropic API keys, and ensure Ollama is running locally.
               </p>
             </div>
           </div>
