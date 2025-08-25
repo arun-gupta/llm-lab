@@ -149,13 +149,8 @@ export async function POST(request: NextRequest) {
           'Content-Type': 'application/json'
         },
         body: JSON.stringify({
-          jsonrpc: '2.0',
-          method: 'tools/call',
-          params: {
-            name: mcpToolName,
-            arguments: mcpArguments
-          },
-          id: Date.now()
+          name: mcpToolName,
+          arguments: mcpArguments || {}
         })
       });
 
