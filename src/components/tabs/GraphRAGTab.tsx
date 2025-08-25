@@ -1618,8 +1618,8 @@ export function GraphRAGTab() {
           <div className="space-y-4">
                             <div className="bg-white rounded-lg border shadow-sm">
                   <div className="p-6 border-b bg-gray-50">
-                    <h3 className="flex items-center gap-2 text-lg font-semibold">
-                      <Upload className="w-5 h-5" />
+                    <h3 className="flex items-center gap-2 text-lg font-semibold text-gray-900">
+                      <Upload className="w-5 h-5 text-blue-600" />
                       Upload Documents
                       <span className="ml-auto text-xs bg-gray-200 text-gray-700 px-2 py-1 rounded-full">Setup</span>
                     </h3>
