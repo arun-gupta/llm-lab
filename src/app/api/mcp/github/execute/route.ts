@@ -27,9 +27,10 @@ export async function POST(request: NextRequest) {
     const parseQuery = (q: string): { operation: string; params: any } => {
       const lowerQuery = q.toLowerCase();
       
-      if (lowerQuery.includes('list') && lowerQuery.includes('repo')) {
+      // Check for specific patterns first
+      if (lowerQuery.includes('user repositories') || lowerQuery.includes('list repositories')) {
         return { operation: 'list_repositories', params: {} };
-      } else if (lowerQuery.includes('get') && lowerQuery.includes('repo')) {
+      } else if (lowerQuery.includes('repository information') || lowerQuery.includes('get repository')) {
         const repoMatch = q.match(/['"`]([^'"`]+)['"`]/);
         const repo = repoMatch ? repoMatch[1] : 'postman-labs';
         return { operation: 'get_repository', params: { repo } };
