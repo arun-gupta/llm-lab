@@ -134,10 +134,6 @@ export async function POST(request: NextRequest) {
 
       const data = await response.json();
       return data;
-
-        default:
-          throw new Error(`Unknown operation: ${op}`);
-      }
     };
 
     // Execute the MCP operation
