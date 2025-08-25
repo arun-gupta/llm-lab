@@ -1,11 +1,13 @@
 'use client';
 import { useState, useEffect } from 'react';
+import { SuccessCelebration } from './SuccessCelebration';
 
 export function GraphQLPlayground() {
   const [availableGraphs, setAvailableGraphs] = useState<string[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [importStatus, setImportStatus] = useState<'idle' | 'importing' | 'success' | 'manual' | 'error'>('idle');
   const [importMessage, setImportMessage] = useState('');
+  const [showSuccessCelebration, setShowSuccessCelebration] = useState(false);
   
   // Fetch available graphs on component mount
   useEffect(() => {
@@ -129,7 +131,7 @@ query GetAnalytics {
 
             if (result.success) {
               setImportStatus('success');
-              setImportMessage('✅ GraphQL Collection created successfully in Postman Desktop! Set base_url to http://localhost:3000 in your environment.');
+              setShowSuccessCelebration(true);
               
               // Don't open Postman Desktop automatically - just show success message
             } else {
@@ -397,6 +399,17 @@ query GetAnalytics {
           </button>
         </div>
       </div>
+      
+      {/* Success Celebration */}
+      <SuccessCelebration
+        isVisible={showSuccessCelebration}
+        type="collection-created"
+        onClose={() => setShowSuccessCelebration(false)}
+        data={{
+          collectionUrl: undefined,
+          hasEnvironment: false
+        }}
+      />
     </div>
   );
 }
