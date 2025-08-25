@@ -83,262 +83,105 @@ export async function POST(request: NextRequest) {
 
     const { operation, params } = parseQuery(query);
 
-    // Execute Filesystem MCP operations
+    // Execute Filesystem MCP operations using real MCP API
     const executeFilesystemMCP = async (op: string, p: Record<string, any>): Promise<any> => {
-      const basePath = process.cwd();
+      const filesystemMCPUrl = process.env.FILESYSTEM_MCP_URL || 'http://localhost:3002';
       
+      // Map operations to MCP tool names
+      let mcpToolName = '';
+      let mcpArguments = {};
+
       switch (op) {
         case 'health_check':
-          return {
-            status: 'healthy',
-            service: 'filesystem-mcp',
-            timestamp: new Date().toISOString(),
-            version: '1.0.0',
-            capabilities: ['list_directory', 'read_file', 'search_files', 'get_file_info']
-          };
-
+          mcpToolName = 'health_check';
+          mcpArguments = {};
+          break;
         case 'show_configuration':
-          return {
-            configuration: {
-              base_path: basePath,
-              allowed_directories: ['sample-docs', 'public', 'src'],
-              max_file_size: '10MB',
-              supported_operations: ['list_directory', 'read_file', 'search_files', 'get_file_info'],
-              security: {
-                path_validation: true,
-                directory_traversal_protection: true
-              }
-            }
-          };
-
+          mcpToolName = 'show_configuration';
+          mcpArguments = {};
+          break;
         case 'list_available_tools':
-          return {
-            tools: [
-              {
-                name: 'list_directory',
-                description: 'List contents of a directory',
-                parameters: ['path']
-              },
-              {
-                name: 'read_file',
-                description: 'Read contents of a file',
-                parameters: ['path']
-              },
-              {
-                name: 'search_files',
-                description: 'Search for files by name',
-                parameters: ['query', 'path']
-              },
-              {
-                name: 'get_file_info',
-                description: 'Get metadata about a file',
-                parameters: ['path']
-              }
-            ]
-          };
-
+          mcpToolName = 'list_available_tools';
+          mcpArguments = {};
+          break;
         case 'list_allowed_directories':
-          return {
-            allowed_directories: [
-              {
-                path: 'sample-docs',
-                description: 'Sample documentation files',
-                accessible: true
-              },
-              {
-                path: 'public',
-                description: 'Public assets and files',
-                accessible: true
-              },
-              {
-                path: 'src',
-                description: 'Source code files',
-                accessible: true
-              }
-            ]
-          };
+          mcpToolName = 'list_allowed_directories';
+          mcpArguments = {};
+          break;
 
         case 'write_test_file':
-          const testFilePath = join(basePath, 'sample-docs', 'test-file.txt');
-          const testContent = `Test file created at ${new Date().toISOString()}\nThis is a test file for Filesystem MCP operations.`;
-          
-          try {
-            await writeFile(testFilePath, testContent, 'utf-8');
-            return {
-              success: true,
-              file_path: 'sample-docs/test-file.txt',
-              content: testContent,
-              created_at: new Date().toISOString()
-            };
-          } catch (error) {
-            throw new Error(`Failed to write test file: ${error.message}`);
-          }
-
+          mcpToolName = 'write_test_file';
+          mcpArguments = {};
+          break;
         case 'create_test_directory':
-          const testDirPath = join(basePath, 'sample-docs', 'test-directory');
-          
-          try {
-            await mkdir(testDirPath, { recursive: true });
-            return {
-              success: true,
-              directory_path: 'sample-docs/test-directory',
-              created_at: new Date().toISOString()
-            };
-          } catch (error) {
-            throw new Error(`Failed to create test directory: ${error.message}`);
-          }
-
+          mcpToolName = 'create_test_directory';
+          mcpArguments = {};
+          break;
         case 'list_directory':
-          const dirPath = p.path || '.';
-          const fullPath = join(basePath, dirPath);
+          mcpToolName = 'list_directory';
+          mcpArguments = { path: p.path || '.' };
+          break;
           
-          try {
-            const items = await readdir(fullPath, { withFileTypes: true });
-            const files = await Promise.all(items.map(async item => {
-              const itemPath = join(fullPath, item.name);
-              const itemStats = item.isFile() ? await stat(itemPath) : null;
-              
-              return {
-                name: item.name,
-                type: item.isDirectory() ? 'directory' : 'file',
-                path: join(dirPath, item.name),
-                size: itemStats?.size || null,
-                modified: itemStats?.mtime.toISOString() || null
-              };
-            }));
-            
-            return {
-              path: dirPath,
-              items: files,
-              total_files: files.filter(f => f.type === 'file').length,
-              total_directories: files.filter(f => f.type === 'directory').length
-            };
-          } catch (error) {
-            throw new Error(`Failed to read directory: ${dirPath}`);
-          }
-
         case 'read_file':
-          const filePath = p.path;
-          if (!filePath) {
-            throw new Error('File path is required');
-          }
-          
-          const fullFilePath = join(basePath, filePath);
-          
-          try {
-            const content = await readFile(fullFilePath, 'utf-8');
-            const fileStats = await stat(fullFilePath);
-            
-            return {
-              path: filePath,
-              content: content,
-              size: fileStats.size,
-              modified: fileStats.mtime.toISOString(),
-              encoding: 'utf-8'
-            };
-          } catch (error) {
-            throw new Error(`Failed to read file: ${filePath}`);
-          }
-
+          mcpToolName = 'read_file';
+          mcpArguments = { path: p.path };
+          break;
         case 'search_files':
-          const searchPath = p.path || '.';
-          const searchTerm = p.query;
-          const searchFullPath = join(basePath, searchPath);
-          
-          try {
-            const items = await readdir(searchFullPath, { withFileTypes: true });
-            const matchingFiles = [];
-            
-            for (const item of items) {
-              if (item.isFile() && item.name.toLowerCase().includes(searchTerm.toLowerCase())) {
-                const filePath = join(searchPath, item.name);
-                const fileStats = await stat(join(searchFullPath, item.name));
-                matchingFiles.push({
-                  name: item.name,
-                  path: filePath,
-                  size: fileStats.size,
-                  modified: fileStats.mtime.toISOString()
-                });
-              }
-            }
-            
-            return {
-              search_term: searchTerm,
-              path: searchPath,
-              results: matchingFiles,
-              total_matches: matchingFiles.length
-            };
-          } catch (error) {
-            throw new Error(`Failed to search files: ${searchPath}`);
-          }
-
+          mcpToolName = 'search_files';
+          mcpArguments = { query: p.query, path: p.path || '.' };
+          break;
         case 'get_file_info':
-          const infoPath = p.path;
-          if (!infoPath) {
-            throw new Error('File path is required');
-          }
-          
-          const infoFullPath = join(basePath, infoPath);
-          
-          try {
-            const fileStats = await stat(infoFullPath);
-            
-            return {
-              path: infoPath,
-              exists: true,
-              size: fileStats.size,
-              created: fileStats.birthtime.toISOString(),
-              modified: fileStats.mtime.toISOString(),
-              accessed: fileStats.atime.toISOString(),
-              is_file: fileStats.isFile(),
-              is_directory: fileStats.isDirectory(),
-              permissions: fileStats.mode.toString(8)
-            };
-          } catch (error) {
-            return {
-              path: infoPath,
-              exists: false,
-              error: 'File not found'
-            };
-          }
-
+          mcpToolName = 'get_file_info';
+          mcpArguments = { path: p.path };
+          break;
         case 'list_sample_docs':
-          const samplePath = join(basePath, 'sample-docs');
-          
-          try {
-            const items = await readdir(samplePath, { withFileTypes: true });
-            const files = items
-              .filter(item => item.isFile())
-              .map(item => ({
-                name: item.name,
-                path: join('sample-docs', item.name),
-                size: 0, // Will be calculated below
-                modified: new Date().toISOString()
-              }));
-            
-            // Get file sizes
-            for (const file of files) {
-              try {
-                const fileStats = await stat(join(basePath, file.path));
-                file.size = fileStats.size;
-                file.modified = fileStats.mtime.toISOString();
-              } catch (error) {
-                // Ignore errors for individual files
-              }
-            }
-            
-            return {
-              path: 'sample-docs',
-              files: files,
-              total_files: files.length,
-              total_size: files.reduce((sum, file) => sum + file.size, 0)
-            };
-          } catch (error) {
-            throw new Error('Failed to read sample documents directory');
-          }
-
+          mcpToolName = 'list_directory';
+          mcpArguments = { path: 'sample-docs' };
+          break;
         default:
           throw new Error(`Unknown operation: ${op}`);
+      }
+
+      // Call MCP tool
+      const toolResponse = await fetch(`${filesystemMCPUrl}/tools/call`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          jsonrpc: '2.0',
+          method: 'tools/call',
+          params: {
+            name: mcpToolName,
+            arguments: mcpArguments
+          },
+          id: Date.now()
+        })
+      });
+
+      if (!toolResponse.ok) {
+        throw new Error(`MCP tool call failed: ${toolResponse.status} ${toolResponse.statusText}`);
+      }
+
+      const toolData = await toolResponse.json();
+      
+      if (toolData.error) {
+        throw new Error(`MCP tool error: ${toolData.error.message}`);
+      }
+
+      // Parse the MCP response
+      if (toolData.result?.content && toolData.result.content.length > 0) {
+        const contentText = toolData.result.content[0].text;
+        try {
+          // Try to parse as JSON first
+          const parsedData = JSON.parse(contentText);
+          return parsedData;
+        } catch (parseError) {
+          // If not JSON, return the text as is
+          return { content: contentText };
+        }
+      } else {
+        throw new Error('No content received from MCP server');
       }
     };
 
