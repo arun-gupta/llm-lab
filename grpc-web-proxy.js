@@ -8,7 +8,7 @@ const path = require('path');
 const app = express();
 
 // Load port configuration
-let PORT = 50052;
+let PORT = 50053;
 let GRPC_SERVER_PORT = 50051;
 let NEXTJS_PORT = 3000;
 
@@ -18,7 +18,7 @@ try {
   const configPath = path.join(__dirname, 'config', 'ports.json');
   if (fs.existsSync(configPath)) {
     const config = JSON.parse(fs.readFileSync(configPath, 'utf-8'));
-    PORT = config.development.grpc.http;
+    PORT = config.development.grpc.web_proxy;
     GRPC_SERVER_PORT = config.development.grpc.server;
     NEXTJS_PORT = config.development.nextjs;
   }

@@ -6,7 +6,7 @@ export class GraphRAGWebClient {
   private client: GraphRAGServiceClient;
   private serverUrl: string;
 
-  constructor(serverUrl: string = 'http://localhost:50052') {
+  constructor(serverUrl: string = 'http://localhost:50053') {
     this.serverUrl = serverUrl;
     this.client = new GraphRAGServiceClient(serverUrl);
   }

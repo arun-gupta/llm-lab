@@ -2,7 +2,7 @@
 // This is a simplified version that uses HTTP/JSON for now
 
 export class GraphRAGServiceClient {
-  constructor(serverUrl = 'http://localhost:50052') {
+  constructor(serverUrl = 'http://localhost:50053') {
     this.serverUrl = serverUrl;
   }
 
