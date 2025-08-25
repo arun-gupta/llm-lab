@@ -1,0 +1,33 @@
+{
+  "id": "github-mcp-environment",
+  "name": "GitHub MCP Environment",
+  "values": [
+    {
+      "key": "github_token",
+      "value": "{{github_token}}",
+      "type": "default",
+      "enabled": true
+    },
+    {
+      "key": "repo_owner",
+      "value": "arun-gupta",
+      "type": "default",
+      "enabled": true
+    },
+    {
+      "key": "repo_name",
+      "value": "postman-labs",
+      "type": "default",
+      "enabled": true
+    },
+    {
+      "key": "mcp_session_id",
+      "value": "",
+      "type": "default",
+      "enabled": true
+    }
+  ],
+  "_postman_variable_scope": "environment",
+  "_postman_exported_at": "2025-01-20T00:00:00.000Z",
+  "_postman_exported_using": "Postman/10.0.0"
+}
