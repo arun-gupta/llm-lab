@@ -27,192 +27,113 @@ export async function POST(request: NextRequest) {
     const parseQuery = (q: string): { operation: string; params: any } => {
       const lowerQuery = q.toLowerCase();
       
-      if (lowerQuery.includes('list') && lowerQuery.includes('table')) {
+      // Check for exact matches first
+      if (lowerQuery === 'health check') {
+        return { operation: 'health_check', params: {} };
+      } else if (lowerQuery === 'server info') {
+        return { operation: 'server_info', params: {} };
+      } else if (lowerQuery === 'list tools') {
+        return { operation: 'list_tools', params: {} };
+      } else if (lowerQuery === 'list tables') {
         return { operation: 'list_tables', params: {} };
-      } else if (lowerQuery.includes('schema') || lowerQuery.includes('describe')) {
-        const tableMatch = q.match(/['"`]([^'"`]+)['"`]/);
-        const table = tableMatch ? tableMatch[1] : 'users';
-        return { operation: 'describe_table', params: { table_name: table } };
-      } else if (lowerQuery.includes('select') || lowerQuery.includes('query')) {
-        const selectMatch = q.match(/select\s+(.+?)(?:\s+limit\s+\d+)?$/i);
-        if (selectMatch) {
-          return { operation: 'execute_query', params: { query: q } };
-        } else {
-          return { operation: 'execute_query', params: { query: 'SELECT * FROM users LIMIT 5' } };
-        }
-      } else if (lowerQuery.includes('info') || lowerQuery.includes('database')) {
-        return { operation: 'get_database_info', params: {} };
-      } else if (lowerQuery.includes('backup')) {
-        return { operation: 'backup_database', params: {} };
-      } else if (lowerQuery.includes('optimize') || lowerQuery.includes('vacuum')) {
-        return { operation: 'optimize_database', params: {} };
+      } else if (lowerQuery === 'describe table') {
+        return { operation: 'describe_table', params: { table_name: 'users' } };
+      } else if (lowerQuery === 'run query') {
+        return { operation: 'run_query', params: { query: 'SELECT * FROM users LIMIT 5' } };
+      } else if (lowerQuery === 'insert row') {
+        return { operation: 'insert_row', params: { table: 'users', data: { name: 'Test User', email: 'test@example.com' } } };
+      } else if (lowerQuery === 'update row') {
+        return { operation: 'update_row', params: { table: 'users', id: 1, data: { name: 'Updated User' } } };
+      } else if (lowerQuery === 'delete row') {
+        return { operation: 'delete_row', params: { table: 'users', id: 1 } };
       } else {
-        // Default to listing tables
-        return { operation: 'list_tables', params: {} };
+        // Fallback to pattern matching for custom queries
+        if (lowerQuery.includes('list') && lowerQuery.includes('table')) {
+          return { operation: 'list_tables', params: {} };
+        } else if (lowerQuery.includes('schema') || lowerQuery.includes('describe')) {
+          const tableMatch = q.match(/['"`]([^'"`]+)['"`]/);
+          const table = tableMatch ? tableMatch[1] : 'users';
+          return { operation: 'describe_table', params: { table_name: table } };
+        } else if (lowerQuery.includes('select') || lowerQuery.includes('query')) {
+          const selectMatch = q.match(/select\s+(.+?)(?:\s+limit\s+\d+)?$/i);
+          if (selectMatch) {
+            return { operation: 'run_query', params: { query: q } };
+          } else {
+            return { operation: 'run_query', params: { query: 'SELECT * FROM users LIMIT 5' } };
+          }
+        } else {
+          // Default to listing tools
+          return { operation: 'list_tools', params: {} };
+        }
       }
     };
 
     const { operation, params } = parseQuery(query);
 
-    // Simulate SQLite MCP operations with realistic data
+    // Execute SQLite MCP operations using real MCP API
     const executeSQLiteMCP = async (op: string, p: Record<string, any>): Promise<any> => {
-      // Simulate database delay
-      await new Promise(resolve => setTimeout(resolve, 50 + Math.random() * 100));
+      const sqliteMCPUrl = process.env.SQLITE_MCP_URL || 'http://localhost:4000';
+      
+      let endpoint = '';
+      let method = 'GET';
+      let body = null;
 
       switch (op) {
+        case 'health_check':
+          endpoint = '/health';
+          break;
+        case 'server_info':
+          endpoint = '/info';
+          break;
+        case 'list_tools':
+          endpoint = '/tools';
+          break;
         case 'list_tables':
-          return {
-            tables: [
-              {
-                name: 'users',
-                type: 'table',
-                sql: 'CREATE TABLE users (id INTEGER PRIMARY KEY, name TEXT, email TEXT, created_at DATETIME)'
-              },
-              {
-                name: 'posts',
-                type: 'table',
-                sql: 'CREATE TABLE posts (id INTEGER PRIMARY KEY, user_id INTEGER, title TEXT, content TEXT, created_at DATETIME)'
-              },
-              {
-                name: 'comments',
-                type: 'table',
-                sql: 'CREATE TABLE comments (id INTEGER PRIMARY KEY, post_id INTEGER, user_id INTEGER, content TEXT, created_at DATETIME)'
-              }
-            ],
-            total_tables: 3
-          };
+          endpoint = '/tables';
+          break;
 
         case 'describe_table':
-          const tableName = p.table_name || 'users';
-          
-          const schemas = {
-            users: {
-              columns: [
-                { name: 'id', type: 'INTEGER', notnull: 1, pk: 1, default: null },
-                { name: 'name', type: 'TEXT', notnull: 0, pk: 0, default: null },
-                { name: 'email', type: 'TEXT', notnull: 0, pk: 0, default: null },
-                { name: 'created_at', type: 'DATETIME', notnull: 0, pk: 0, default: 'CURRENT_TIMESTAMP' }
-              ],
-              indexes: [
-                { name: 'idx_users_email', columns: ['email'] }
-              ]
-            },
-            posts: {
-              columns: [
-                { name: 'id', type: 'INTEGER', notnull: 1, pk: 1, default: null },
-                { name: 'user_id', type: 'INTEGER', notnull: 1, pk: 0, default: null },
-                { name: 'title', type: 'TEXT', notnull: 0, pk: 0, default: null },
-                { name: 'content', type: 'TEXT', notnull: 0, pk: 0, default: null },
-                { name: 'created_at', type: 'DATETIME', notnull: 0, pk: 0, default: 'CURRENT_TIMESTAMP' }
-              ],
-              indexes: [
-                { name: 'idx_posts_user_id', columns: ['user_id'] },
-                { name: 'idx_posts_created_at', columns: ['created_at'] }
-              ]
-            },
-            comments: {
-              columns: [
-                { name: 'id', type: 'INTEGER', notnull: 1, pk: 1, default: null },
-                { name: 'post_id', type: 'INTEGER', notnull: 1, pk: 0, default: null },
-                { name: 'user_id', type: 'INTEGER', notnull: 1, pk: 0, default: null },
-                { name: 'content', type: 'TEXT', notnull: 0, pk: 0, default: null },
-                { name: 'created_at', type: 'DATETIME', notnull: 0, pk: 0, default: 'CURRENT_TIMESTAMP' }
-              ],
-              indexes: [
-                { name: 'idx_comments_post_id', columns: ['post_id'] },
-                { name: 'idx_comments_user_id', columns: ['user_id'] }
-              ]
-            }
-          };
+          endpoint = `/tables/${p.table_name || 'users'}`;
+          break;
+        case 'run_query':
+          endpoint = '/query';
+          method = 'POST';
+          body = { query: p.query };
+          break;
+        case 'insert_row':
+          endpoint = '/insert';
+          method = 'POST';
+          body = { table: p.table, data: p.data };
+          break;
+        case 'update_row':
+          endpoint = '/update';
+          method = 'POST';
+          body = { table: p.table, id: p.id, data: p.data };
+          break;
+        case 'delete_row':
+          endpoint = '/delete';
+          method = 'POST';
+          body = { table: p.table, id: p.id };
+          break;
+        default:
+          throw new Error(`Unknown operation: ${op}`);
+      }
 
-          return {
-            table_name: tableName,
-            schema: schemas[tableName as keyof typeof schemas] || schemas.users
-          };
+      // Call SQLite MCP API
+      const response = await fetch(`${sqliteMCPUrl}${endpoint}`, {
+        method,
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: body ? JSON.stringify(body) : undefined
+      });
 
-        case 'execute_query':
-          const query = p.query || 'SELECT * FROM users LIMIT 5';
-          
-          // Simulate different query results
-          if (query.toLowerCase().includes('users')) {
-            return {
-              query: query,
-              results: [
-                { id: 1, name: 'John Doe', email: 'john@example.com', created_at: '2024-01-15 10:30:00' },
-                { id: 2, name: 'Jane Smith', email: 'jane@example.com', created_at: '2024-01-16 14:20:00' },
-                { id: 3, name: 'Bob Johnson', email: 'bob@example.com', created_at: '2024-01-17 09:15:00' },
-                { id: 4, name: 'Alice Brown', email: 'alice@example.com', created_at: '2024-01-18 16:45:00' },
-                { id: 5, name: 'Charlie Wilson', email: 'charlie@example.com', created_at: '2024-01-19 11:30:00' }
-              ],
-              row_count: 5,
-              execution_time_ms: 12.5
-            };
-          } else if (query.toLowerCase().includes('posts')) {
-            return {
-              query: query,
-              results: [
-                { id: 1, user_id: 1, title: 'Getting Started with SQLite', content: 'SQLite is a lightweight database...', created_at: '2024-01-20 10:00:00' },
-                { id: 2, user_id: 2, title: 'Advanced SQLite Features', content: 'Learn about advanced features...', created_at: '2024-01-21 14:30:00' },
-                { id: 3, user_id: 1, title: 'SQLite Performance Tips', content: 'Optimize your SQLite database...', created_at: '2024-01-22 09:45:00' }
-              ],
-              row_count: 3,
-              execution_time_ms: 8.2
-            };
-          } else {
-            return {
-              query: query,
-              results: [],
-              row_count: 0,
-              execution_time_ms: 5.1
-            };
-          }
+      if (!response.ok) {
+        throw new Error(`SQLite MCP API call failed: ${response.status} ${response.statusText}`);
+      }
 
-        case 'get_database_info':
-          return {
-            database_name: 'postman_labs.db',
-            version: '3.42.0',
-            page_size: 4096,
-            page_count: 1024,
-            file_size_bytes: 4194304,
-            encoding: 'UTF-8',
-            user_version: 1,
-            application_id: 0,
-            journal_mode: 'WAL',
-            synchronous: 'NORMAL',
-            cache_size: -2000,
-            temp_store: 'DEFAULT',
-            mmap_size: 268435456,
-            auto_vacuum: 'NONE',
-            incremental_vacuum: 0,
-            busy_timeout: 30000,
-            foreign_keys: 'ON',
-            recursive_triggers: 'OFF'
-          };
-
-        case 'backup_database':
-          return {
-            backup_path: '/backups/postman_labs_backup_2024_01_25.db',
-            original_size_bytes: 4194304,
-            backup_size_bytes: 4194304,
-            compression_ratio: 1.0,
-            backup_time_ms: 1250,
-            status: 'completed'
-          };
-
-        case 'optimize_database':
-          return {
-            optimization_type: 'VACUUM',
-            original_size_bytes: 4194304,
-            optimized_size_bytes: 3145728,
-            space_saved_bytes: 1048576,
-            optimization_time_ms: 850,
-            status: 'completed',
-            recommendations: [
-              'Consider adding indexes for frequently queried columns',
-              'Remove unused indexes to improve write performance',
-              'Monitor query performance with EXPLAIN QUERY PLAN'
-            ]
-          };
+      const data = await response.json();
+      return data;
 
         default:
           throw new Error(`Unknown operation: ${op}`);
