@@ -1420,48 +1420,50 @@ export function ModelMonitoringTab({ onTabChange }: ModelMonitoringTabProps) {
 
         {/* Comparison Results */}
         {comparisonResponses.length > 0 && (
-          <div className="bg-white rounded-lg border shadow-sm">
-            <div className="p-6 border-b">
-              <h3 className="text-lg font-semibold text-gray-900">Response Comparison Results</h3>
-              <p className="text-gray-600 mt-1">Side-by-side comparison of model responses</p>
-            </div>
-            <div className="p-6">
-              <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                {comparisonResponses.map((response) => (
-                  <div key={response.id} className="border rounded-lg p-4">
-                    <div className="flex items-center justify-between mb-3">
-                      <div className="flex items-center space-x-2">
-                        <div className={`w-3 h-3 rounded-full bg-${models.find(m => m.id === response.model)?.color || 'gray'}-500`}></div>
-                        <h4 className="font-medium text-gray-900">{response.modelName}</h4>
-                      </div>
-                      <div className="text-xs text-gray-500">
-                        {response.provider}
-                      </div>
-                    </div>
-                    
-                    <div className="space-y-3">
-                      <div className="text-sm bg-gray-50 p-3 rounded border">
-                        <div className="text-xs text-gray-500 mb-1">Response:</div>
-                        <div className="text-gray-700">{response.content}</div>
+          <div className="lg:col-span-3">
+            <div className="bg-white rounded-lg border shadow-sm">
+              <div className="p-6 border-b">
+                <h3 className="text-lg font-semibold text-gray-900">Response Comparison Results</h3>
+                <p className="text-gray-600 mt-1">Side-by-side comparison of model responses</p>
+              </div>
+              <div className="p-6">
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                  {comparisonResponses.map((response) => (
+                    <div key={response.id} className="border rounded-lg p-4">
+                      <div className="flex items-center justify-between mb-3">
+                        <div className="flex items-center space-x-2">
+                          <div className={`w-3 h-3 rounded-full bg-${models.find(m => m.id === response.model)?.color || 'gray'}-500`}></div>
+                          <h4 className="font-medium text-gray-900">{response.modelName}</h4>
+                        </div>
+                        <div className="text-xs text-gray-500">
+                          {response.provider}
+                        </div>
                       </div>
                       
-                      <div className="grid grid-cols-3 gap-2 text-xs">
-                        <div className="text-center p-2 bg-blue-50 rounded">
-                          <div className="font-medium text-blue-900">{response.latency}ms</div>
-                          <div className="text-blue-600">Latency</div>
+                      <div className="space-y-3">
+                        <div className="text-sm bg-gray-50 p-3 rounded border">
+                          <div className="text-xs text-gray-500 mb-1">Response:</div>
+                          <div className="text-gray-700">{response.content}</div>
                         </div>
-                        <div className="text-center p-2 bg-green-50 rounded">
-                          <div className="font-medium text-green-900">{response.tokens}</div>
-                          <div className="text-green-600">Tokens</div>
-                        </div>
-                        <div className="text-center p-2 bg-yellow-50 rounded">
-                          <div className="font-medium text-yellow-900">${response.cost}</div>
-                          <div className="text-yellow-600">Cost</div>
+                        
+                        <div className="grid grid-cols-3 gap-2 text-xs">
+                          <div className="text-center p-2 bg-blue-50 rounded">
+                            <div className="font-medium text-blue-900">{response.latency}ms</div>
+                            <div className="text-blue-600">Latency</div>
+                          </div>
+                          <div className="text-center p-2 bg-green-50 rounded">
+                            <div className="font-medium text-green-900">{response.tokens}</div>
+                            <div className="text-green-600">Tokens</div>
+                          </div>
+                          <div className="text-center p-2 bg-yellow-50 rounded">
+                            <div className="font-medium text-yellow-900">${response.cost}</div>
+                            <div className="text-yellow-600">Cost</div>
+                          </div>
                         </div>
                       </div>
                     </div>
-                  </div>
-                ))}
+                  ))}
+                </div>
               </div>
             </div>
           </div>
