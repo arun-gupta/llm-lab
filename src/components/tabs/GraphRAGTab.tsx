@@ -1626,6 +1626,17 @@ export function GraphRAGTab() {
                 <p className="text-gray-600 mt-1">
                   Upload text files to build a knowledge graph. The system will extract entities and relationships.
                 </p>
+                <div className="mt-2 p-3 bg-blue-50 border border-blue-200 rounded-lg">
+                  <div className="flex items-center gap-2">
+                    <svg className="w-4 h-4 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                    <span className="text-sm font-medium text-blue-800">In-Memory Database</span>
+                  </div>
+                  <p className="text-sm text-blue-700 mt-1">
+                    Knowledge graphs are stored in <code className="bg-blue-100 px-1 rounded">data/graphs/</code> as JSON files for fast access and persistence across sessions.
+                  </p>
+                </div>
               </div>
               <div className="p-6 space-y-4">
                 <div className="space-y-4">
