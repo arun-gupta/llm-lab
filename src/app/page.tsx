@@ -71,7 +71,7 @@ export default function Home() {
             
             <div className="flex items-center space-x-3">
               <a
-                href="https://github.com/arun-gupta/llm-prompt-lab"
+                href="https://github.com/arun-gupta/postman-protocol-playground"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="flex items-center justify-center w-9 h-9 text-gray-600 hover:text-gray-900 hover:bg-gray-100 rounded-lg transition-colors"
