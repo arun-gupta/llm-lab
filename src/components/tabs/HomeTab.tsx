@@ -1,6 +1,6 @@
 'use client';
 
-import { Zap, TestTube, BarChart3, Library, Settings, ArrowRight, Code, Network } from 'lucide-react';
+import { Zap, TestTube, BarChart3, Library, Settings, ArrowRight, Code, Network, Activity } from 'lucide-react';
 import { ApiKeyStatusIndicator } from '../ApiKeyStatusIndicator';
 
 import { TabType } from '../TabNavigation';
@@ -33,6 +33,13 @@ export function HomeTab({ onTabChange, apiKeyStatus }: HomeTabProps) {
       icon: Library,
       action: () => onTabChange('collections'),
       color: 'bg-purple-500 hover:bg-purple-600'
+    },
+    {
+      title: 'Model Monitoring',
+      description: 'A/B testing and performance monitoring for LLM models with analytics',
+      icon: Activity,
+      action: () => onTabChange('monitoring'),
+      color: 'bg-orange-500 hover:bg-orange-600'
     },
     {
       title: 'Settings',

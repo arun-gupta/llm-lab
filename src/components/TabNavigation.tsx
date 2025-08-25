@@ -1,9 +1,9 @@
 'use client';
 
 import { useState } from 'react';
-import { Home, TestTube, BarChart3, Library, TrendingUp, Settings, Network } from 'lucide-react';
+import { Home, TestTube, BarChart3, Library, TrendingUp, Settings, Network, Activity } from 'lucide-react';
 
-export type TabType = 'home' | 'test' | 'collections' | 'graphrag' | 'settings';
+export type TabType = 'home' | 'test' | 'collections' | 'graphrag' | 'monitoring' | 'settings';
 
 interface TabNavigationProps {
   activeTab: TabType;
@@ -35,6 +35,12 @@ const tabs = [
     label: 'GraphRAG',
     icon: Network,
     description: 'Graph-based Retrieval-Augmented Generation'
+  },
+  {
+    id: 'monitoring' as TabType,
+    label: 'Model Monitoring',
+    icon: Activity,
+    description: 'A/B testing and performance monitoring for LLM models'
   },
   {
     id: 'settings' as TabType,

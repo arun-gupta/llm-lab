@@ -1,0 +1,920 @@
+'use client';
+
+import { useState } from 'react';
+import { 
+  BarChart3, 
+  TrendingUp, 
+  Clock, 
+  DollarSign, 
+  Target, 
+  Zap, 
+  Activity,
+  GitCompare,
+  Database,
+  Settings,
+  Download,
+  Play,
+  Pause,
+  RefreshCw
+} from 'lucide-react';
+import { SuccessCelebration } from '../SuccessCelebration';
+
+interface ModelMonitoringTabProps {
+  onTabChange?: (tab: string) => void;
+}
+
+interface ModelConfig {
+  id: string;
+  name: string;
+  provider: string;
+  model: string;
+  description: string;
+  color: string;
+  enabled: boolean;
+}
+
+interface TestResult {
+  id: string;
+  timestamp: string;
+  modelId: string;
+  prompt: string;
+  response: string;
+  latency: number;
+  tokens: number;
+  cost: number;
+  quality: number;
+  status: 'success' | 'error' | 'timeout';
+}
+
+export function ModelMonitoringTab({ onTabChange }: ModelMonitoringTabProps) {
+  const [activeTab, setActiveTab] = useState<'ab-testing' | 'monitoring' | 'analytics'>('ab-testing');
+  const [importStatus, setImportStatus] = useState<'idle' | 'importing' | 'success' | 'error'>('idle');
+  const [showSuccessCelebration, setShowSuccessCelebration] = useState(false);
+  const [celebrationType, setCelebrationType] = useState<'collection-created' | 'api-key-setup' | 'first-response' | 'postman-connected'>('collection-created');
+  const [celebrationData, setCelebrationData] = useState<any>({});
+  
+  // A/B Testing State
+  const [models, setModels] = useState<ModelConfig[]>([
+    {
+      id: 'gpt-4',
+      name: 'GPT-4',
+      provider: 'OpenAI',
+      model: 'gpt-4',
+      description: 'Latest GPT-4 model with advanced reasoning',
+      color: 'blue',
+      enabled: true
+    },
+    {
+      id: 'gpt-3.5-turbo',
+      name: 'GPT-3.5 Turbo',
+      provider: 'OpenAI',
+      model: 'gpt-3.5-turbo',
+      description: 'Fast and cost-effective GPT-3.5 model',
+      color: 'green',
+      enabled: true
+    },
+    {
+      id: 'claude-3-opus',
+      name: 'Claude 3 Opus',
+      provider: 'Anthropic',
+      model: 'claude-3-opus-20240229',
+      description: 'Most capable Claude model for complex tasks',
+      color: 'purple',
+      enabled: true
+    },
+    {
+      id: 'claude-3-sonnet',
+      name: 'Claude 3 Sonnet',
+      provider: 'Anthropic',
+      model: 'claude-3-sonnet-20240229',
+      description: 'Balanced performance and cost Claude model',
+      color: 'orange',
+      enabled: true
+    },
+    {
+      id: 'llama-3.1-8b',
+      name: 'Llama 3.1 8B',
+      provider: 'Ollama',
+      model: 'llama3.1:8b',
+      description: 'Local Llama model for privacy-focused testing',
+      color: 'red',
+      enabled: false
+    }
+  ]);
+
+  const [testPrompt, setTestPrompt] = useState('');
+  const [isRunningTest, setIsRunningTest] = useState(false);
+  const [testResults, setTestResults] = useState<TestResult[]>([]);
+
+  // Performance Monitoring State
+  const [monitoringEnabled, setMonitoringEnabled] = useState(false);
+  const [metrics, setMetrics] = useState({
+    totalRequests: 0,
+    averageLatency: 0,
+    totalCost: 0,
+    successRate: 0
+  });
+
+  const generateABTestingCollection = async () => {
+    if (!models.filter(m => m.enabled).length) return;
+
+    setImportStatus('importing');
+    
+    try {
+      const enabledModels = models.filter(m => m.enabled);
+      
+      const collection = {
+        info: {
+          name: `A/B Testing Collection - ${new Date().toLocaleDateString()}`,
+          description: `A/B testing collection for comparing ${enabledModels.length} models`,
+          schema: "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+        },
+        variable: [
+          {
+            key: "base_url",
+            value: "http://localhost:3000",
+            type: "string"
+          },
+          {
+            key: "test_prompt",
+            value: testPrompt || "Compare the performance of different AI models",
+            type: "string"
+          }
+        ],
+        item: [
+          // A/B Testing Setup Request
+          {
+            name: "Setup A/B Testing Environment",
+            request: {
+              method: "POST",
+              header: [
+                {
+                  key: "Content-Type",
+                  value: "application/json"
+                }
+              ],
+              body: {
+                mode: "raw",
+                raw: JSON.stringify({
+                  models: enabledModels.map(m => ({
+                    id: m.id,
+                    provider: m.provider,
+                    model: m.model
+                  })),
+                  test_prompt: "{{test_prompt}}"
+                }, null, 2)
+              },
+              url: {
+                raw: "{{base_url}}/api/monitoring/setup-ab-test",
+                host: ["{{base_url}}"],
+                path: ["api", "monitoring", "setup-ab-test"]
+              }
+            }
+          },
+          // Individual model test requests
+          ...enabledModels.map(model => ({
+            name: `Test ${model.name} (${model.provider})`,
+            request: {
+              method: "POST",
+              header: [
+                {
+                  key: "Content-Type",
+                  value: "application/json"
+                }
+              ],
+              body: {
+                mode: "raw",
+                raw: JSON.stringify({
+                  prompt: "{{test_prompt}}",
+                  provider: model.provider,
+                  model: model.model,
+                  track_performance: true
+                }, null, 2)
+              },
+              url: {
+                raw: "{{base_url}}/api/llm",
+                host: ["{{base_url}}"],
+                path: ["api", "llm"]
+              }
+            },
+            response: [
+              {
+                name: "Sample Response",
+                originalRequest: {
+                  method: "POST",
+                  header: [
+                    {
+                      key: "Content-Type",
+                      value: "application/json"
+                    }
+                  ],
+                  body: {
+                    mode: "raw",
+                    raw: JSON.stringify({
+                      prompt: "{{test_prompt}}",
+                      provider: model.provider,
+                      model: model.model,
+                      track_performance: true
+                    }, null, 2)
+                  },
+                  url: {
+                    raw: "{{base_url}}/api/llm",
+                    host: ["{{base_url}}"],
+                    path: ["api", "llm"]
+                  }
+                },
+                status: "OK",
+                code: 200,
+                _postman_previewlanguage: "json",
+                header: [
+                  {
+                    key: "Content-Type",
+                    value: "application/json"
+                  }
+                ],
+                cookie: [],
+                body: JSON.stringify({
+                  provider: model.provider,
+                  model: model.model,
+                  content: `Sample response from ${model.name}`,
+                  latency: Math.floor(Math.random() * 2000) + 500,
+                  tokens: Math.floor(Math.random() * 1000) + 100,
+                  cost: (Math.random() * 0.1).toFixed(4),
+                  quality: (Math.random() * 0.3 + 0.7).toFixed(2)
+                }, null, 2)
+              }
+            ]
+          })),
+          // Performance Analysis Request
+          {
+            name: "Analyze A/B Test Results",
+            request: {
+              method: "GET",
+              header: [],
+              url: {
+                raw: "{{base_url}}/api/monitoring/ab-test-results",
+                host: ["{{base_url}}"],
+                path: ["api", "monitoring", "ab-test-results"]
+              }
+            }
+          }
+        ]
+      };
+
+      // Create collection via Postman API
+      const apiResponse = await fetch('/api/postman/create-collection', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          collection: collection,
+          createInWeb: false,
+        }),
+      });
+
+      const result = await apiResponse.json();
+
+      if (result.success) {
+        setImportStatus('success');
+        setShowSuccessCelebration(true);
+        setCelebrationType('collection-created');
+        setCelebrationData({
+          collectionUrl: result.data?.collectionUrl
+        });
+      } else {
+        if (result.fallback) {
+          const blob = new Blob([JSON.stringify(collection, null, 2)], {
+            type: 'application/json',
+          });
+          const url = URL.createObjectURL(blob);
+          const a = document.createElement('a');
+          a.href = url;
+          a.download = `ab-testing-collection-${new Date().toISOString().split('T')[0]}.json`;
+          document.body.appendChild(a);
+          a.click();
+          document.body.removeChild(a);
+          URL.revokeObjectURL(url);
+          setImportStatus('success');
+          setShowSuccessCelebration(true);
+          setCelebrationType('collection-created');
+          setCelebrationData({});
+        } else {
+          throw new Error(result.message || 'Failed to create collection');
+        }
+      }
+    } catch (error) {
+      console.error('Error creating collection:', error);
+      setImportStatus('error');
+      setShowSuccessCelebration(true);
+      setCelebrationData({
+        title: 'Collection Creation Failed',
+        message: 'Failed to create collection. Try again or check your Postman API key.'
+      });
+    }
+  };
+
+  const generateMonitoringCollection = async () => {
+    setImportStatus('importing');
+    
+    try {
+      const collection = {
+        info: {
+          name: `Model Performance Monitoring - ${new Date().toLocaleDateString()}`,
+          description: "Performance monitoring collection for tracking model metrics",
+          schema: "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+        },
+        variable: [
+          {
+            key: "base_url",
+            value: "http://localhost:3000",
+            type: "string"
+          }
+        ],
+        item: [
+          {
+            name: "Start Performance Monitoring",
+            request: {
+              method: "POST",
+              header: [
+                {
+                  key: "Content-Type",
+                  value: "application/json"
+                }
+              ],
+              body: {
+                mode: "raw",
+                raw: JSON.stringify({
+                  enabled: true,
+                  track_metrics: ["latency", "throughput", "cost", "quality"]
+                }, null, 2)
+              },
+              url: {
+                raw: "{{base_url}}/api/monitoring/start",
+                host: ["{{base_url}}"],
+                path: ["api", "monitoring", "start"]
+              }
+            }
+          },
+          {
+            name: "Get Performance Metrics",
+            request: {
+              method: "GET",
+              header: [],
+              url: {
+                raw: "{{base_url}}/api/monitoring/metrics",
+                host: ["{{base_url}}"],
+                path: ["api", "monitoring", "metrics"]
+              }
+            }
+          },
+          {
+            name: "Get Model Performance Comparison",
+            request: {
+              method: "GET",
+              header: [],
+              url: {
+                raw: "{{base_url}}/api/monitoring/model-comparison",
+                host: ["{{base_url}}"],
+                path: ["api", "monitoring", "model-comparison"]
+              }
+            }
+          },
+          {
+            name: "Export Performance Report",
+            request: {
+              method: "GET",
+              header: [],
+              url: {
+                raw: "{{base_url}}/api/monitoring/export-report?format=json",
+                host: ["{{base_url}}"],
+                path: ["api", "monitoring", "export-report"],
+                query: [
+                  {
+                    key: "format",
+                    value: "json"
+                  }
+                ]
+              }
+            }
+          },
+          {
+            name: "Stop Performance Monitoring",
+            request: {
+              method: "POST",
+              header: [
+                {
+                  key: "Content-Type",
+                  value: "application/json"
+                }
+              ],
+              body: {
+                mode: "raw",
+                raw: JSON.stringify({
+                  enabled: false
+                }, null, 2)
+              },
+              url: {
+                raw: "{{base_url}}/api/monitoring/stop",
+                host: ["{{base_url}}"],
+                path: ["api", "monitoring", "stop"]
+              }
+            }
+          }
+        ]
+      };
+
+      const apiResponse = await fetch('/api/postman/create-collection', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          collection: collection,
+          createInWeb: false,
+        }),
+      });
+
+      const result = await apiResponse.json();
+
+      if (result.success) {
+        setImportStatus('success');
+        setShowSuccessCelebration(true);
+        setCelebrationType('collection-created');
+        setCelebrationData({
+          collectionUrl: result.data?.collectionUrl
+        });
+      } else {
+        if (result.fallback) {
+          const blob = new Blob([JSON.stringify(collection, null, 2)], {
+            type: 'application/json',
+          });
+          const url = URL.createObjectURL(blob);
+          const a = document.createElement('a');
+          a.href = url;
+          a.download = `monitoring-collection-${new Date().toISOString().split('T')[0]}.json`;
+          document.body.appendChild(a);
+          a.click();
+          document.body.removeChild(a);
+          URL.revokeObjectURL(url);
+          setImportStatus('success');
+          setShowSuccessCelebration(true);
+          setCelebrationType('collection-created');
+          setCelebrationData({});
+        } else {
+          throw new Error(result.message || 'Failed to create collection');
+        }
+      }
+    } catch (error) {
+      console.error('Error creating collection:', error);
+      setImportStatus('error');
+      setShowSuccessCelebration(true);
+      setCelebrationData({
+        title: 'Collection Creation Failed',
+        message: 'Failed to create collection. Try again or check your Postman API key.'
+      });
+    }
+  };
+
+  const toggleModel = (modelId: string) => {
+    setModels(prev => prev.map(m => 
+      m.id === modelId ? { ...m, enabled: !m.enabled } : m
+    ));
+  };
+
+  const runABTest = async () => {
+    if (!testPrompt.trim() || !models.filter(m => m.enabled).length) return;
+    
+    setIsRunningTest(true);
+    setTestResults([]);
+    
+    // Simulate A/B testing
+    const enabledModels = models.filter(m => m.enabled);
+    const results: TestResult[] = [];
+    
+    for (const model of enabledModels) {
+      // Simulate API call delay
+      await new Promise(resolve => setTimeout(resolve, 1000 + Math.random() * 2000));
+      
+      const result: TestResult = {
+        id: `${model.id}-${Date.now()}`,
+        timestamp: new Date().toISOString(),
+        modelId: model.id,
+        prompt: testPrompt,
+        response: `Sample response from ${model.name} for: "${testPrompt}"`,
+        latency: Math.floor(Math.random() * 2000) + 500,
+        tokens: Math.floor(Math.random() * 1000) + 100,
+        cost: parseFloat((Math.random() * 0.1).toFixed(4)),
+        quality: parseFloat((Math.random() * 0.3 + 0.7).toFixed(2)),
+        status: 'success'
+      };
+      
+      results.push(result);
+      setTestResults(prev => [...prev, result]);
+    }
+    
+    setIsRunningTest(false);
+  };
+
+  return (
+    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      {/* Header */}
+      <div className="mb-8">
+        <div className="flex items-center justify-between">
+          <div>
+            <h1 className="text-3xl font-bold text-gray-900 mb-2">Model Monitoring</h1>
+            <p className="text-gray-600">
+              A/B testing and performance monitoring for LLM models with comprehensive analytics
+            </p>
+          </div>
+          <div className="flex items-center space-x-3">
+            <button
+              onClick={generateABTestingCollection}
+              disabled={!models.filter(m => m.enabled).length || importStatus === 'importing'}
+              className="flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              <img src="/postman-logo.svg" alt="Postman" className="w-4 h-4 mr-2" />
+              {importStatus === 'importing' ? 'Importing...' : 'Add A/B Testing Collection'}
+            </button>
+            <button
+              onClick={generateMonitoringCollection}
+              disabled={importStatus === 'importing'}
+              className="flex items-center px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              <img src="/postman-logo.svg" alt="Postman" className="w-4 h-4 mr-2" />
+              {importStatus === 'importing' ? 'Importing...' : 'Add Monitoring Collection'}
+            </button>
+          </div>
+        </div>
+      </div>
+
+      {/* Tab Navigation */}
+      <div className="mb-6">
+        <nav className="flex space-x-8 border-b border-gray-200">
+          <button
+            onClick={() => setActiveTab('ab-testing')}
+            className={`flex items-center space-x-2 py-2 px-1 border-b-2 font-medium text-sm transition-colors ${
+              activeTab === 'ab-testing'
+                ? 'border-blue-500 text-blue-600'
+                : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+            }`}
+          >
+            <GitCompare className="w-4 h-4" />
+            <span>A/B Testing</span>
+          </button>
+          <button
+            onClick={() => setActiveTab('monitoring')}
+            className={`flex items-center space-x-2 py-2 px-1 border-b-2 font-medium text-sm transition-colors ${
+              activeTab === 'monitoring'
+                ? 'border-blue-500 text-blue-600'
+                : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+            }`}
+          >
+            <Activity className="w-4 h-4" />
+            <span>Performance Monitoring</span>
+          </button>
+          <button
+            onClick={() => setActiveTab('analytics')}
+            className={`flex items-center space-x-2 py-2 px-1 border-b-2 font-medium text-sm transition-colors ${
+              activeTab === 'analytics'
+                ? 'border-blue-500 text-blue-600'
+                : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+            }`}
+          >
+            <BarChart3 className="w-4 h-4" />
+            <span>Analytics Dashboard</span>
+          </button>
+        </nav>
+      </div>
+
+      {/* A/B Testing Tab */}
+      {activeTab === 'ab-testing' && (
+        <div className="space-y-6">
+          {/* Model Configuration */}
+          <div className="bg-white rounded-lg border shadow-sm">
+            <div className="p-6 border-b">
+              <h3 className="text-lg font-semibold text-gray-900">Model Configuration</h3>
+              <p className="text-gray-600 mt-1">Select models to include in A/B testing</p>
+            </div>
+            <div className="p-6">
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                {models.map((model) => (
+                  <div key={model.id} className="border rounded-lg p-4 hover:shadow-md transition-shadow">
+                    <div className="flex items-center justify-between mb-3">
+                      <div className="flex items-center space-x-2">
+                        <div className={`w-3 h-3 rounded-full bg-${model.color}-500`}></div>
+                        <h4 className="font-medium text-gray-900">{model.name}</h4>
+                      </div>
+                      <label className="relative inline-flex items-center cursor-pointer">
+                        <input
+                          type="checkbox"
+                          checked={model.enabled}
+                          onChange={() => toggleModel(model.id)}
+                          className="sr-only peer"
+                        />
+                        <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
+                      </label>
+                    </div>
+                    <p className="text-sm text-gray-600 mb-2">{model.description}</p>
+                    <div className="text-xs text-gray-500">
+                      Provider: {model.provider} | Model: {model.model}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+
+          {/* Test Configuration */}
+          <div className="bg-white rounded-lg border shadow-sm">
+            <div className="p-6 border-b">
+              <h3 className="text-lg font-semibold text-gray-900">Test Configuration</h3>
+              <p className="text-gray-600 mt-1">Configure your A/B test parameters</p>
+            </div>
+            <div className="p-6 space-y-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Test Prompt
+                </label>
+                <textarea
+                  value={testPrompt}
+                  onChange={(e) => setTestPrompt(e.target.value)}
+                  placeholder="Enter a prompt to test across all selected models..."
+                  rows={3}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                />
+              </div>
+              
+              <div className="flex items-center space-x-4">
+                <button
+                  onClick={runABTest}
+                  disabled={!testPrompt.trim() || !models.filter(m => m.enabled).length || isRunningTest}
+                  className="flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  {isRunningTest ? (
+                    <>
+                      <RefreshCw className="w-4 h-4 mr-2 animate-spin" />
+                      Running Test...
+                    </>
+                  ) : (
+                    <>
+                      <Play className="w-4 h-4 mr-2" />
+                      Run A/B Test
+                    </>
+                  )}
+                </button>
+                
+                <div className="text-sm text-gray-600">
+                  {models.filter(m => m.enabled).length} model(s) selected
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Test Results */}
+          {testResults.length > 0 && (
+            <div className="bg-white rounded-lg border shadow-sm">
+              <div className="p-6 border-b">
+                <h3 className="text-lg font-semibold text-gray-900">Test Results</h3>
+                <p className="text-gray-600 mt-1">Performance comparison across models</p>
+              </div>
+              <div className="p-6">
+                <div className="overflow-x-auto">
+                  <table className="min-w-full divide-y divide-gray-200">
+                    <thead className="bg-gray-50">
+                      <tr>
+                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Model</th>
+                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Latency</th>
+                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Tokens</th>
+                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Cost</th>
+                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Quality</th>
+                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+                      </tr>
+                    </thead>
+                    <tbody className="bg-white divide-y divide-gray-200">
+                      {testResults.map((result) => {
+                        const model = models.find(m => m.id === result.modelId);
+                        return (
+                          <tr key={result.id}>
+                            <td className="px-6 py-4 whitespace-nowrap">
+                              <div className="flex items-center">
+                                <div className={`w-3 h-3 rounded-full bg-${model?.color || 'gray'}-500 mr-3`}></div>
+                                <div>
+                                  <div className="text-sm font-medium text-gray-900">{model?.name}</div>
+                                  <div className="text-sm text-gray-500">{model?.provider}</div>
+                                </div>
+                              </div>
+                            </td>
+                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                              {result.latency}ms
+                            </td>
+                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                              {result.tokens}
+                            </td>
+                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                              ${result.cost}
+                            </td>
+                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                              {result.quality}
+                            </td>
+                            <td className="px-6 py-4 whitespace-nowrap">
+                              <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
+                                result.status === 'success' 
+                                  ? 'bg-green-100 text-green-800' 
+                                  : result.status === 'error'
+                                  ? 'bg-red-100 text-red-800'
+                                  : 'bg-yellow-100 text-yellow-800'
+                              }`}>
+                                {result.status}
+                              </span>
+                            </td>
+                          </tr>
+                        );
+                      })}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
+          )}
+        </div>
+      )}
+
+      {/* Performance Monitoring Tab */}
+      {activeTab === 'monitoring' && (
+        <div className="space-y-6">
+          {/* Monitoring Controls */}
+          <div className="bg-white rounded-lg border shadow-sm">
+            <div className="p-6 border-b">
+              <h3 className="text-lg font-semibold text-gray-900">Performance Monitoring</h3>
+              <p className="text-gray-600 mt-1">Track and monitor model performance metrics</p>
+            </div>
+            <div className="p-6">
+              <div className="flex items-center justify-between">
+                <div>
+                  <h4 className="font-medium text-gray-900">Real-time Monitoring</h4>
+                  <p className="text-sm text-gray-600">Track latency, throughput, costs, and quality metrics</p>
+                </div>
+                <label className="relative inline-flex items-center cursor-pointer">
+                  <input
+                    type="checkbox"
+                    checked={monitoringEnabled}
+                    onChange={(e) => setMonitoringEnabled(e.target.checked)}
+                    className="sr-only peer"
+                  />
+                  <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
+                </label>
+              </div>
+            </div>
+          </div>
+
+          {/* Metrics Dashboard */}
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+            <div className="bg-white rounded-lg border shadow-sm p-6">
+              <div className="flex items-center">
+                <div className="flex-shrink-0">
+                  <Activity className="w-8 h-8 text-blue-600" />
+                </div>
+                <div className="ml-4">
+                  <p className="text-sm font-medium text-gray-500">Total Requests</p>
+                  <p className="text-2xl font-semibold text-gray-900">{metrics.totalRequests}</p>
+                </div>
+              </div>
+            </div>
+
+            <div className="bg-white rounded-lg border shadow-sm p-6">
+              <div className="flex items-center">
+                <div className="flex-shrink-0">
+                  <Clock className="w-8 h-8 text-green-600" />
+                </div>
+                <div className="ml-4">
+                  <p className="text-sm font-medium text-gray-500">Avg Latency</p>
+                  <p className="text-2xl font-semibold text-gray-900">{metrics.averageLatency}ms</p>
+                </div>
+              </div>
+            </div>
+
+            <div className="bg-white rounded-lg border shadow-sm p-6">
+              <div className="flex items-center">
+                <div className="flex-shrink-0">
+                  <DollarSign className="w-8 h-8 text-yellow-600" />
+                </div>
+                <div className="ml-4">
+                  <p className="text-sm font-medium text-gray-500">Total Cost</p>
+                  <p className="text-2xl font-semibold text-gray-900">${metrics.totalCost}</p>
+                </div>
+              </div>
+            </div>
+
+            <div className="bg-white rounded-lg border shadow-sm p-6">
+              <div className="flex items-center">
+                <div className="flex-shrink-0">
+                  <Target className="w-8 h-8 text-purple-600" />
+                </div>
+                <div className="ml-4">
+                  <p className="text-sm font-medium text-gray-500">Success Rate</p>
+                  <p className="text-2xl font-semibold text-gray-900">{metrics.successRate}%</p>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Monitoring Features */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div className="bg-white rounded-lg border shadow-sm p-6">
+              <h4 className="font-medium text-gray-900 mb-4">Tracked Metrics</h4>
+              <ul className="space-y-2">
+                <li className="flex items-center text-sm text-gray-600">
+                  <Zap className="w-4 h-4 mr-2 text-blue-600" />
+                  Response latency and throughput
+                </li>
+                <li className="flex items-center text-sm text-gray-600">
+                  <DollarSign className="w-4 h-4 mr-2 text-green-600" />
+                  Cost per request and total spending
+                </li>
+                <li className="flex items-center text-sm text-gray-600">
+                  <Target className="w-4 h-4 mr-2 text-purple-600" />
+                  Quality scores and error rates
+                </li>
+                <li className="flex items-center text-sm text-gray-600">
+                  <Database className="w-4 h-4 mr-2 text-orange-600" />
+                  Token usage and efficiency
+                </li>
+              </ul>
+            </div>
+
+            <div className="bg-white rounded-lg border shadow-sm p-6">
+              <h4 className="font-medium text-gray-900 mb-4">API Endpoints</h4>
+              <ul className="space-y-2">
+                <li className="text-sm text-gray-600">
+                  <code className="bg-gray-100 px-2 py-1 rounded">POST /api/monitoring/start</code>
+                </li>
+                <li className="text-sm text-gray-600">
+                  <code className="bg-gray-100 px-2 py-1 rounded">GET /api/monitoring/metrics</code>
+                </li>
+                <li className="text-sm text-gray-600">
+                  <code className="bg-gray-100 px-2 py-1 rounded">GET /api/monitoring/model-comparison</code>
+                </li>
+                <li className="text-sm text-gray-600">
+                  <code className="bg-gray-100 px-2 py-1 rounded">POST /api/monitoring/stop</code>
+                </li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Analytics Dashboard Tab */}
+      {activeTab === 'analytics' && (
+        <div className="space-y-6">
+          <div className="bg-white rounded-lg border shadow-sm p-6">
+            <h3 className="text-lg font-semibold text-gray-900 mb-4">Analytics Dashboard</h3>
+            <p className="text-gray-600 mb-6">
+              Comprehensive analytics and insights for model performance comparison
+            </p>
+            
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div className="bg-gray-50 rounded-lg p-4">
+                <h4 className="font-medium text-gray-900 mb-2">Performance Trends</h4>
+                <p className="text-sm text-gray-600">Track performance over time with detailed charts and metrics</p>
+                <div className="text-xs text-gray-500 mt-2">🚧 Coming Soon</div>
+              </div>
+              
+              <div className="bg-gray-50 rounded-lg p-4">
+                <h4 className="font-medium text-gray-900 mb-2">Cost Analysis</h4>
+                <p className="text-sm text-gray-600">Compare costs across different models and providers</p>
+                <div className="text-xs text-gray-500 mt-2">🚧 Coming Soon</div>
+              </div>
+              
+              <div className="bg-gray-50 rounded-lg p-4">
+                <h4 className="font-medium text-gray-900 mb-2">Quality Assessment</h4>
+                <p className="text-sm text-gray-600">Automated quality scoring and consistency checks</p>
+                <div className="text-xs text-gray-500 mt-2">🚧 Coming Soon</div>
+              </div>
+              
+              <div className="bg-gray-50 rounded-lg p-4">
+                <h4 className="font-medium text-gray-900 mb-2">Recommendations</h4>
+                <p className="text-sm text-gray-600">AI-powered recommendations for model selection</p>
+                <div className="text-xs text-gray-500 mt-2">🚧 Coming Soon</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Success Celebration */}
+      {showSuccessCelebration && (
+        <SuccessCelebration
+          isVisible={showSuccessCelebration}
+          type={celebrationType}
+          onClose={() => {
+            setShowSuccessCelebration(false);
+            setCelebrationData({});
+            setImportStatus('idle');
+          }}
+          data={celebrationData}
+        />
+      )}
+    </div>
+  );
+}

@@ -6,6 +6,7 @@ import { HomeTab } from '@/components/tabs/HomeTab';
 import { TestTab } from '@/components/tabs/TestTab';
 import { GraphRAGTab } from '@/components/tabs/GraphRAGTab';
 import { MCPTab } from '@/components/tabs/MCPTab';
+import { ModelMonitoringTab } from '@/components/tabs/ModelMonitoringTab';
 
 
 import { SettingsTab } from '@/components/tabs/SettingsTab';
@@ -91,7 +92,7 @@ export default function Home() {
       {/* Tab Content */}
       <main className="pt-8">
         {activeTab === 'home' && (
-          <HomeTab onTabChange={setActiveTab} />
+          <HomeTab onTabChange={setActiveTab} apiKeyStatus={{}} />
         )}
         {activeTab === 'test' && (
           <TestTab onTabChange={setActiveTab} />
@@ -105,6 +106,10 @@ export default function Home() {
 
         {activeTab === 'collections' && (
           <MCPTab />
+        )}
+
+        {activeTab === 'monitoring' && (
+          <ModelMonitoringTab />
         )}
 
         {activeTab === 'settings' && (
