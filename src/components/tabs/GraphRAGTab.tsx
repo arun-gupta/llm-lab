@@ -1853,16 +1853,10 @@ export function GraphRAGTab() {
                 <button 
                   onClick={generatePostmanCollection} 
                   disabled={!responses || importStatus === 'importing'}
-                  className="flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="w-8 h-8 bg-orange-500 rounded-full flex items-center justify-center relative group hover:bg-orange-600 disabled:opacity-50 disabled:cursor-not-allowed"
+                  title="Add GraphRAG REST to Postman"
                 >
-                  <div className="w-4 h-4 mr-2 bg-orange-500 rounded-full flex items-center justify-center relative group">
-                    <span className="text-white text-xs font-bold">P</span>
-                    <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 px-2 py-1 bg-gray-800 text-white text-xs rounded opacity-0 group-hover:opacity-100 transition-opacity duration-200 whitespace-nowrap z-10">
-                      Postman
-                      <div className="absolute top-full left-1/2 transform -translate-x-1/2 w-0 h-0 border-l-4 border-r-4 border-t-4 border-transparent border-t-gray-800"></div>
-                    </div>
-                  </div>
-                  {importStatus === 'importing' ? 'Importing...' : 'Add GraphRAG REST to Postman'}
+                  <img src="/postman-logo.svg" alt="Postman" className="w-5 h-5" />
                 </button>
               </div>
               <div className="p-6">
@@ -2335,20 +2329,14 @@ export function GraphRAGTab() {
                         Compare REST, GraphQL, gRPC, gRPC-Web, WebSocket, and SSE performance using the same GraphRAG query
                       </p>
                     </div>
-                    <button
-                      onClick={generateComparisonCollection}
-                      disabled={!graphData || importStatus === 'importing'}
-                      className="flex items-center px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 disabled:opacity-50 disabled:cursor-not-allowed"
-                    >
-                      <div className="w-4 h-4 mr-2 bg-orange-500 rounded-full flex items-center justify-center relative group">
-                        <span className="text-white text-xs font-bold">P</span>
-                        <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 px-2 py-1 bg-gray-800 text-white text-xs rounded opacity-0 group-hover:opacity-100 transition-opacity duration-200 whitespace-nowrap z-10">
-                          Postman
-                          <div className="absolute top-full left-1/2 transform -translate-x-1/2 w-0 h-0 border-l-4 border-r-4 border-t-4 border-transparent border-t-gray-800"></div>
-                        </div>
-                      </div>
-                      {importStatus === 'importing' ? 'Importing...' : 'Add Comparison Collection to Postman'}
-                    </button>
+                                          <button
+                        onClick={generateComparisonCollection}
+                        disabled={!graphData || importStatus === 'importing'}
+                        className="w-8 h-8 bg-orange-500 rounded-full flex items-center justify-center relative group hover:bg-orange-600 disabled:opacity-50 disabled:cursor-not-allowed"
+                        title="Add Comparison Collection to Postman"
+                      >
+                        <img src="/postman-logo.svg" alt="Postman" className="w-5 h-5" />
+                      </button>
                   </div>
                   <div className="p-6">
                     <div className="space-y-4">
@@ -2721,16 +2709,10 @@ export function GraphRAGTab() {
                       <button 
                         onClick={generateGrpcPostmanCollection}
                         disabled={!graphData || importStatus === 'importing'}
-                        className="flex items-center px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 disabled:opacity-50 disabled:cursor-not-allowed"
+                        className="w-8 h-8 bg-orange-500 rounded-full flex items-center justify-center relative group hover:bg-orange-600 disabled:opacity-50 disabled:cursor-not-allowed"
+                        title="Add gRPC to Postman"
                       >
-                        <div className="w-4 h-4 mr-2 bg-orange-500 rounded-full flex items-center justify-center relative group">
-                          <span className="text-white text-xs font-bold">P</span>
-                          <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 px-2 py-1 bg-gray-800 text-white text-xs rounded opacity-0 group-hover:opacity-100 transition-opacity duration-200 whitespace-nowrap z-10">
-                            Postman
-                            <div className="absolute top-full left-1/2 transform -translate-x-1/2 w-0 h-0 border-l-4 border-r-4 border-t-4 border-transparent border-t-gray-800"></div>
-                          </div>
-                        </div>
-                        {importStatus === 'importing' ? 'Importing...' : 'Add gRPC to Postman'}
+                        <img src="/postman-logo.svg" alt="Postman" className="w-5 h-5" />
                       </button>
                     </div>
 
@@ -2867,16 +2849,10 @@ export function GraphRAGTab() {
                         <button 
                           onClick={generateGrpcWebPostmanCollection}
                           disabled={!graphData || importStatus === 'importing'}
-                          className="flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed"
+                          className="w-8 h-8 bg-orange-500 rounded-full flex items-center justify-center relative group hover:bg-orange-600 disabled:opacity-50 disabled:cursor-not-allowed"
+                          title="Add gRPC-Web to Postman"
                         >
-                          <div className="w-4 h-4 mr-2 bg-orange-500 rounded-full flex items-center justify-center relative group">
-                            <span className="text-white text-xs font-bold">P</span>
-                            <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 px-2 py-1 bg-gray-800 text-white text-xs rounded opacity-0 group-hover:opacity-100 transition-opacity duration-200 whitespace-nowrap z-10">
-                              Postman
-                              <div className="absolute top-full left-1/2 transform -translate-x-1/2 w-0 h-0 border-l-4 border-r-4 border-t-4 border-transparent border-t-gray-800"></div>
-                            </div>
-                          </div>
-                          {importStatus === 'importing' ? 'Importing...' : 'Add gRPC-Web to Postman'}
+                          <img src="/postman-logo.svg" alt="Postman" className="w-5 h-5" />
                         </button>
                       </div>
                       
@@ -3114,16 +3090,10 @@ export function GraphRAGTab() {
                   <button 
                     onClick={generateSsePostmanCollection}
                     disabled={!graphData || importStatus === 'importing'}
-                    className="flex items-center px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 disabled:opacity-50 disabled:cursor-not-allowed"
+                    className="w-8 h-8 bg-orange-500 rounded-full flex items-center justify-center relative group hover:bg-orange-600 disabled:opacity-50 disabled:cursor-not-allowed"
+                    title="Add SSE to Postman"
                   >
-                    <div className="w-4 h-4 mr-2 bg-orange-500 rounded-full flex items-center justify-center relative group">
-                      <span className="text-white text-xs font-bold">P</span>
-                      <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 px-2 py-1 bg-gray-800 text-white text-xs rounded opacity-0 group-hover:opacity-100 transition-opacity duration-200 whitespace-nowrap z-10">
-                        Postman
-                        <div className="absolute top-full left-1/2 transform -translate-x-1/2 w-0 h-0 border-l-4 border-r-4 border-t-4 border-transparent border-t-gray-800"></div>
-                      </div>
-                    </div>
-                    {importStatus === 'importing' ? 'Importing...' : 'Add SSE to Postman'}
+                    <img src="/postman-logo.svg" alt="Postman" className="w-5 h-5" />
                   </button>
                 </div>
 
@@ -3310,15 +3280,10 @@ export function GraphRAGTab() {
                   <button 
                     onClick={generateWebSocketPostmanCollection}
                     disabled={!graphData || importStatus === 'importing'}
-                    className="flex items-center px-4 py-2 bg-orange-600 text-white rounded-lg hover:bg-orange-700 disabled:opacity-50 disabled:cursor-not-allowed"
+                    className="w-8 h-8 bg-orange-500 rounded-full flex items-center justify-center relative group hover:bg-orange-600 disabled:opacity-50 disabled:cursor-not-allowed"
+                    title="Add WebSocket to Postman"
                   >
-                    <svg className="w-4 h-4 mr-2" viewBox="0 0 24 24" fill="currentColor">
-                      <circle cx="12" cy="12" r="10" fill="#FF6C37"/>
-                      <path d="M10 8c0-1.1.9-2 2-2s2 .9 2 2-.9 2-2 2-2-.9-2-2z" fill="white"/>
-                      <path d="M8 12h8v2H8z" fill="white"/>
-                      <path d="M10 16h4v2H10z" fill="white"/>
-                    </svg>
-                    {importStatus === 'importing' ? 'Importing...' : 'Add WebSocket to Postman'}
+                    <img src="/postman-logo.svg" alt="Postman" className="w-5 h-5" />
                   </button>
                 </div>
 
