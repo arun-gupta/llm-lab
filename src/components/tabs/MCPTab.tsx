@@ -768,60 +768,89 @@ Collection URL: ${result.collectionUrl}${githubToken ? '\n\n🔑 GitHub token ha
             </nav>
           </div>
 
-          {activeTab === 'execute' && (
-            <div className="space-y-6">
-              {/* Query Input */}
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  MCP Query
-                </label>
-                <textarea
-                  value={mcpQuery}
-                  onChange={(e) => setMcpQuery(e.target.value)}
-                  placeholder={
-                    activeMCP === 'github' 
-                      ? "e.g., 'List my repositories', 'Get issues for postman-labs', 'Show repository health'" :
-                    activeMCP === 'filesystem'
-                      ? "e.g., 'List files in sample-docs', 'Read ai-healthcare.txt', 'Search for files containing AI'" :
-                    activeMCP === 'sqlite'
-                      ? "e.g., 'List all tables', 'Show users table schema', 'Execute SELECT * FROM users LIMIT 5'" :
-                      "Enter your MCP query..."
-                  }
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 h-24"
-                />
-              </div>
-
-              {/* Action Buttons */}
-              <div className="flex space-x-3">
-                <button
-                  onClick={() => executeMCPQuery(activeMCP, mcpQuery, false)}
-                  disabled={!mcpQuery.trim() || isExecuting}
-                  className="flex-1 px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed"
-                >
-                  {isExecuting ? 'Executing...' : 'Execute Query'}
-                </button>
-                <button
-                  onClick={() => executeMCPQuery(activeMCP, mcpQuery, true)}
-                  disabled={!mcpQuery.trim() || isExecuting}
-                  className="flex-1 px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 disabled:opacity-50 disabled:cursor-not-allowed"
-                >
-                  {isExecuting ? 'Creating...' : 'Execute & Create Collection'}
-                </button>
-              </div>
-
-              {/* Results Display */}
-              {mcpResult && (
+                    {activeTab === 'execute' && (
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+              {/* Left Side - Query Input */}
+              <div className="space-y-4">
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Results
+                    MCP Query
                   </label>
-                  <div className="bg-gray-50 border border-gray-200 rounded-md p-4 max-h-96 overflow-auto">
+                  <textarea
+                    value={mcpQuery}
+                    onChange={(e) => setMcpQuery(e.target.value)}
+                    placeholder={
+                      activeMCP === 'github'
+                        ? "e.g., 'List my repositories', 'Get issues for postman-labs', 'Show repository health'" :
+                      activeMCP === 'filesystem'
+                        ? "e.g., 'List files in sample-docs', 'Read ai-healthcare.txt', 'Search for files containing AI'" :
+                      activeMCP === 'sqlite'
+                        ? "e.g., 'List all tables', 'Show users table schema', 'Execute SELECT * FROM users LIMIT 5'" :
+                        "Enter your MCP query..."
+                    }
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 h-32"
+                  />
+                </div>
+
+                {/* Action Buttons */}
+                <div className="flex space-x-3">
+                  <button
+                    onClick={() => executeMCPQuery(activeMCP, mcpQuery, false)}
+                    disabled={!mcpQuery.trim() || isExecuting}
+                    className="flex-1 px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed"
+                  >
+                    {isExecuting ? 'Executing...' : 'Execute Query'}
+                  </button>
+                  <button
+                    onClick={() => executeMCPQuery(activeMCP, mcpQuery, true)}
+                    disabled={!mcpQuery.trim() || isExecuting}
+                    className="flex-1 px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 disabled:opacity-50 disabled:cursor-not-allowed"
+                  >
+                    {isExecuting ? 'Creating...' : 'Execute & Create Collection'}
+                  </button>
+                </div>
+
+                {/* Sample Queries */}
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Sample Queries
+                  </label>
+                  <div className="space-y-2">
+                    {sampleQueries[activeMCP || 'github'].map((query, index) => (
+                      <button
+                        key={index}
+                        onClick={() => setMcpQuery(query)}
+                        className="w-full text-left p-3 border border-gray-200 rounded-md hover:bg-gray-50 transition-colors text-sm text-gray-700"
+                      >
+                        {query}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              </div>
+
+              {/* Right Side - Results Display */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Results
+                </label>
+                <div className="bg-gray-50 border border-gray-200 rounded-md p-4 h-96 overflow-auto">
+                  {mcpResult ? (
                     <pre className="text-sm text-gray-800 whitespace-pre-wrap">
                       {JSON.stringify(mcpResult, null, 2)}
                     </pre>
-                  </div>
+                  ) : (
+                    <div className="flex items-center justify-center h-full text-gray-500">
+                      <div className="text-center">
+                        <div className="w-12 h-12 bg-gray-100 rounded-lg flex items-center justify-center mx-auto mb-3">
+                          <Code className="w-6 h-6 text-gray-400" />
+                        </div>
+                        <p className="text-sm">Execute a query to see results here</p>
+                      </div>
+                    </div>
+                  )}
                 </div>
-              )}
+              </div>
             </div>
           )}
 
