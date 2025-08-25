@@ -13,11 +13,25 @@ interface HomeTabProps {
 export function HomeTab({ onTabChange, apiKeyStatus }: HomeTabProps) {
   const quickActions = [
     {
+      title: 'LLM Testing',
+      description: 'Test prompts across OpenAI, Anthropic, and Ollama with side-by-side comparison',
+      icon: TestTube,
+      action: () => onTabChange('test'),
+      color: 'bg-blue-500 hover:bg-blue-600'
+    },
+    {
       title: 'GraphRAG Lab',
       description: 'Build knowledge graphs, compare protocols, and test GraphRAG vs traditional RAG',
       icon: Network,
       action: () => onTabChange('graphrag'),
       color: 'bg-green-500 hover:bg-green-600'
+    },
+    {
+      title: 'MCP Integration',
+      description: 'Explore Model Context Protocol integrations for GitHub, Filesystem, and SQLite',
+      icon: Library,
+      action: () => onTabChange('collections'),
+      color: 'bg-purple-500 hover:bg-purple-600'
     },
   ];
 
@@ -78,7 +92,7 @@ export function HomeTab({ onTabChange, apiKeyStatus }: HomeTabProps) {
       {/* Quick Actions */}
       <div className="mb-8">
         <h2 className="text-xl font-semibold text-gray-900 mb-4">Quick Actions</h2>
-        <div className="grid grid-cols-1 md:grid-cols-1 gap-6 max-w-md mx-auto">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           {quickActions.map((action, index) => {
             const Icon = action.icon;
             return (
