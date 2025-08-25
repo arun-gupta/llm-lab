@@ -64,7 +64,9 @@ export async function POST(request: NextRequest) {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          message: { query, graph_id: graphId, model }
+          query,
+          graphData: { id: graphId, nodes: [], edges: [] }, // Provide minimal graph data
+          model
         })
       });
       
@@ -110,22 +112,24 @@ export async function POST(request: NextRequest) {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           query: `
-            query GraphRAGQuery($query: String!, $graphId: String!, $model: String) {
-              graphRAGQuery(query: $query, graphId: $graphId, model: $model) {
+            query GraphRAGQuery($input: GraphRAGQueryInput!) {
+              graphRAGQuery(input: $input) {
                 graphRAGResponse
-                contextNodes {
-                  id
-                  label
-                  relevance
-                }
-                performanceMetrics {
-                  processingTimeMs
-                  totalNodesAccessed
+                traditionalRAGResponse
+                performance {
+                  graphRAGLatency
+                  traditionalRAGLatency
                 }
               }
             }
           `,
-          variables: { query, graphId, model }
+          variables: { 
+            input: { 
+              query, 
+              graphId, 
+              model 
+            } 
+          }
         })
       });
       
