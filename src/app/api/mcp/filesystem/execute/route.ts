@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { readdir, readFile, stat } from 'fs/promises';
+import { readdir, readFile, stat, writeFile, mkdir } from 'fs/promises';
 import { join } from 'path';
 
 interface FilesystemMCPOperation {
@@ -29,27 +29,55 @@ export async function POST(request: NextRequest) {
     const parseQuery = (q: string): { operation: string; params: any } => {
       const lowerQuery = q.toLowerCase();
       
-      if (lowerQuery.includes('list') && (lowerQuery.includes('file') || lowerQuery.includes('dir'))) {
-        const pathMatch = q.match(/['"`]([^'"`]+)['"`]/);
+      // Check for exact matches first
+      if (lowerQuery === 'health check') {
+        return { operation: 'health_check', params: {} };
+      } else if (lowerQuery === 'show configuration') {
+        return { operation: 'show_configuration', params: {} };
+      } else if (lowerQuery === 'list available tools') {
+        return { operation: 'list_available_tools', params: {} };
+      } else if (lowerQuery === 'list allowed directories') {
+        return { operation: 'list_allowed_directories', params: {} };
+      } else if (lowerQuery === 'list directory contents (private tmp)' || lowerQuery === 'list directory contents (desktop)') {
+        const pathMatch = q.match(/\(([^)]+)\)/);
         const path = pathMatch ? pathMatch[1] : 'sample-docs';
         return { operation: 'list_directory', params: { path } };
-      } else if (lowerQuery.includes('read') && lowerQuery.includes('file')) {
-        const fileMatch = q.match(/['"`]([^'"`]+)['"`]/);
-        const file = fileMatch ? fileMatch[1] : 'sample-docs/ai-healthcare.txt';
-        return { operation: 'read_file', params: { path: file } };
-      } else if (lowerQuery.includes('search') && lowerQuery.includes('file')) {
-        const searchMatch = q.match(/['"`]([^'"`]+)['"`]/);
-        const searchTerm = searchMatch ? searchMatch[1] : 'AI';
-        return { operation: 'search_files', params: { query: searchTerm, path: 'sample-docs' } };
-      } else if (lowerQuery.includes('info') || lowerQuery.includes('stat')) {
-        const fileMatch = q.match(/['"`]([^'"`]+)['"`]/);
-        const file = fileMatch ? fileMatch[1] : 'sample-docs/ai-healthcare.txt';
-        return { operation: 'get_file_info', params: { path: file } };
-      } else if (lowerQuery.includes('sample') || lowerQuery.includes('doc')) {
-        return { operation: 'list_sample_docs', params: {} };
+      } else if (lowerQuery === 'write test file') {
+        return { operation: 'write_test_file', params: {} };
+      } else if (lowerQuery === 'read test file') {
+        return { operation: 'read_file', params: { path: 'sample-docs/ai-healthcare.txt' } };
+      } else if (lowerQuery === 'get file information') {
+        return { operation: 'get_file_info', params: { path: 'sample-docs/ai-healthcare.txt' } };
+      } else if (lowerQuery === 'create test directory') {
+        return { operation: 'create_test_directory', params: {} };
+      } else if (lowerQuery === 'search for test files') {
+        return { operation: 'search_files', params: { query: 'AI', path: 'sample-docs' } };
+      } else if (lowerQuery === 'show test file metadata') {
+        return { operation: 'get_file_info', params: { path: 'sample-docs/ai-healthcare.txt' } };
+      } else if (lowerQuery === 'show test directory contents') {
+        return { operation: 'list_directory', params: { path: 'sample-docs' } };
       } else {
-        // Default to listing sample docs
-        return { operation: 'list_sample_docs', params: {} };
+        // Fallback to pattern matching for custom queries
+        if (lowerQuery.includes('list') && (lowerQuery.includes('file') || lowerQuery.includes('dir'))) {
+          const pathMatch = q.match(/['"`]([^'"`]+)['"`]/);
+          const path = pathMatch ? pathMatch[1] : 'sample-docs';
+          return { operation: 'list_directory', params: { path } };
+        } else if (lowerQuery.includes('read') && lowerQuery.includes('file')) {
+          const fileMatch = q.match(/['"`]([^'"`]+)['"`]/);
+          const file = fileMatch ? fileMatch[1] : 'sample-docs/ai-healthcare.txt';
+          return { operation: 'read_file', params: { path: file } };
+        } else if (lowerQuery.includes('search') && lowerQuery.includes('file')) {
+          const searchMatch = q.match(/['"`]([^'"`]+)['"`]/);
+          const searchTerm = searchMatch ? searchMatch[1] : 'AI';
+          return { operation: 'search_files', params: { query: searchTerm, path: 'sample-docs' } };
+        } else if (lowerQuery.includes('info') || lowerQuery.includes('stat')) {
+          const fileMatch = q.match(/['"`]([^'"`]+)['"`]/);
+          const file = fileMatch ? fileMatch[1] : 'sample-docs/ai-healthcare.txt';
+          return { operation: 'get_file_info', params: { path: file } };
+        } else {
+          // Default to listing sample docs
+          return { operation: 'list_sample_docs', params: {} };
+        }
       }
     };
 
@@ -60,6 +88,106 @@ export async function POST(request: NextRequest) {
       const basePath = process.cwd();
       
       switch (op) {
+        case 'health_check':
+          return {
+            status: 'healthy',
+            service: 'filesystem-mcp',
+            timestamp: new Date().toISOString(),
+            version: '1.0.0',
+            capabilities: ['list_directory', 'read_file', 'search_files', 'get_file_info']
+          };
+
+        case 'show_configuration':
+          return {
+            configuration: {
+              base_path: basePath,
+              allowed_directories: ['sample-docs', 'public', 'src'],
+              max_file_size: '10MB',
+              supported_operations: ['list_directory', 'read_file', 'search_files', 'get_file_info'],
+              security: {
+                path_validation: true,
+                directory_traversal_protection: true
+              }
+            }
+          };
+
+        case 'list_available_tools':
+          return {
+            tools: [
+              {
+                name: 'list_directory',
+                description: 'List contents of a directory',
+                parameters: ['path']
+              },
+              {
+                name: 'read_file',
+                description: 'Read contents of a file',
+                parameters: ['path']
+              },
+              {
+                name: 'search_files',
+                description: 'Search for files by name',
+                parameters: ['query', 'path']
+              },
+              {
+                name: 'get_file_info',
+                description: 'Get metadata about a file',
+                parameters: ['path']
+              }
+            ]
+          };
+
+        case 'list_allowed_directories':
+          return {
+            allowed_directories: [
+              {
+                path: 'sample-docs',
+                description: 'Sample documentation files',
+                accessible: true
+              },
+              {
+                path: 'public',
+                description: 'Public assets and files',
+                accessible: true
+              },
+              {
+                path: 'src',
+                description: 'Source code files',
+                accessible: true
+              }
+            ]
+          };
+
+        case 'write_test_file':
+          const testFilePath = join(basePath, 'sample-docs', 'test-file.txt');
+          const testContent = `Test file created at ${new Date().toISOString()}\nThis is a test file for Filesystem MCP operations.`;
+          
+          try {
+            await writeFile(testFilePath, testContent, 'utf-8');
+            return {
+              success: true,
+              file_path: 'sample-docs/test-file.txt',
+              content: testContent,
+              created_at: new Date().toISOString()
+            };
+          } catch (error) {
+            throw new Error(`Failed to write test file: ${error.message}`);
+          }
+
+        case 'create_test_directory':
+          const testDirPath = join(basePath, 'sample-docs', 'test-directory');
+          
+          try {
+            await mkdir(testDirPath, { recursive: true });
+            return {
+              success: true,
+              directory_path: 'sample-docs/test-directory',
+              created_at: new Date().toISOString()
+            };
+          } catch (error) {
+            throw new Error(`Failed to create test directory: ${error.message}`);
+          }
+
         case 'list_directory':
           const dirPath = p.path || '.';
           const fullPath = join(basePath, dirPath);
