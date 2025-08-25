@@ -591,6 +591,8 @@ export function GraphRAGTab() {
   const handleProtocolComparison = async () => {
     if (!query.trim() || !graphData) return;
 
+    // Clear previous comparison results
+    setResponses(null);
     setIsQuerying(true);
 
     try {
