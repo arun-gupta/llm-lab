@@ -14,14 +14,44 @@ interface GitHubMCPResponse {
 
 export async function POST(request: NextRequest) {
   try {
-    const { operation, params, generateCollection = false } = await request.json();
+    const { query, generateCollection = false } = await request.json();
 
-    if (!operation) {
+    if (!query) {
       return NextResponse.json(
-        { error: 'Operation is required' },
+        { error: 'Query is required' },
         { status: 400 }
       );
     }
+
+    // Parse natural language query to determine operation and params
+    const parseQuery = (q: string): { operation: string; params: any } => {
+      const lowerQuery = q.toLowerCase();
+      
+      if (lowerQuery.includes('list') && lowerQuery.includes('repo')) {
+        return { operation: 'list_repositories', params: {} };
+      } else if (lowerQuery.includes('get') && lowerQuery.includes('repo')) {
+        const repoMatch = q.match(/['"`]([^'"`]+)['"`]/);
+        const repo = repoMatch ? repoMatch[1] : 'postman-labs';
+        return { operation: 'get_repository', params: { repo } };
+      } else if (lowerQuery.includes('issue')) {
+        const repoMatch = q.match(/['"`]([^'"`]+)['"`]/);
+        const repo = repoMatch ? repoMatch[1] : 'postman-labs';
+        return { operation: 'list_issues', params: { repo } };
+      } else if (lowerQuery.includes('pull request') || lowerQuery.includes('pr')) {
+        const repoMatch = q.match(/['"`]([^'"`]+)['"`]/);
+        const repo = repoMatch ? repoMatch[1] : 'postman-labs';
+        return { operation: 'get_pull_requests', params: { repo } };
+      } else if (lowerQuery.includes('health')) {
+        const repoMatch = q.match(/['"`]([^'"`]+)['"`]/);
+        const repo = repoMatch ? repoMatch[1] : 'postman-labs';
+        return { operation: 'get_repository_health', params: { repo } };
+      } else {
+        // Default to listing repositories
+        return { operation: 'list_repositories', params: {} };
+      }
+    };
+
+    const { operation, params } = parseQuery(query);
 
     // Simulate GitHub MCP operations with realistic data
     const executeGitHubMCP = async (op: string, p: Record<string, any>): Promise<any> => {

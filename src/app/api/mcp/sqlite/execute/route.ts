@@ -14,14 +14,45 @@ interface SQLiteMCPResponse {
 
 export async function POST(request: NextRequest) {
   try {
-    const { operation, params, generateCollection = false } = await request.json();
+    const { query, generateCollection = false } = await request.json();
 
-    if (!operation) {
+    if (!query) {
       return NextResponse.json(
-        { error: 'Operation is required' },
+        { error: 'Query is required' },
         { status: 400 }
       );
     }
+
+    // Parse natural language query to determine operation and params
+    const parseQuery = (q: string): { operation: string; params: any } => {
+      const lowerQuery = q.toLowerCase();
+      
+      if (lowerQuery.includes('list') && lowerQuery.includes('table')) {
+        return { operation: 'list_tables', params: {} };
+      } else if (lowerQuery.includes('schema') || lowerQuery.includes('describe')) {
+        const tableMatch = q.match(/['"`]([^'"`]+)['"`]/);
+        const table = tableMatch ? tableMatch[1] : 'users';
+        return { operation: 'describe_table', params: { table_name: table } };
+      } else if (lowerQuery.includes('select') || lowerQuery.includes('query')) {
+        const selectMatch = q.match(/select\s+(.+?)(?:\s+limit\s+\d+)?$/i);
+        if (selectMatch) {
+          return { operation: 'execute_query', params: { query: q } };
+        } else {
+          return { operation: 'execute_query', params: { query: 'SELECT * FROM users LIMIT 5' } };
+        }
+      } else if (lowerQuery.includes('info') || lowerQuery.includes('database')) {
+        return { operation: 'get_database_info', params: {} };
+      } else if (lowerQuery.includes('backup')) {
+        return { operation: 'backup_database', params: {} };
+      } else if (lowerQuery.includes('optimize') || lowerQuery.includes('vacuum')) {
+        return { operation: 'optimize_database', params: {} };
+      } else {
+        // Default to listing tables
+        return { operation: 'list_tables', params: {} };
+      }
+    };
+
+    const { operation, params } = parseQuery(query);
 
     // Simulate SQLite MCP operations with realistic data
     const executeSQLiteMCP = async (op: string, p: Record<string, any>): Promise<any> => {

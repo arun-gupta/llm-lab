@@ -12,8 +12,8 @@ export function MCPTab() {
   
   // MCP Execution States
   const [activeMCP, setActiveMCP] = useState<'github' | 'filesystem' | 'sqlite' | null>(null);
-  const [mcpOperation, setMcpOperation] = useState('');
-  const [mcpParams, setMcpParams] = useState('');
+  const [activeTab, setActiveTab] = useState<'execute' | 'collections'>('execute');
+  const [mcpQuery, setMcpQuery] = useState('');
   const [mcpResult, setMcpResult] = useState<any>(null);
   const [isExecuting, setIsExecuting] = useState(false);
 
@@ -27,8 +27,8 @@ export function MCPTab() {
     }
   }, [deploymentStatus]);
 
-  // Execute MCP operation and generate collection
-  const executeMCPOperation = async (mcpType: string, operation: string, params: any, generateCollection: boolean = false) => {
+  // Execute MCP query and generate collection
+  const executeMCPQuery = async (mcpType: string, query: string, generateCollection: boolean = false) => {
     setIsExecuting(true);
     setMcpResult(null);
 
@@ -39,8 +39,7 @@ export function MCPTab() {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          operation,
-          params,
+          query,
           generateCollection
         }),
       });
@@ -80,14 +79,14 @@ export function MCPTab() {
       } else {
         setDeploymentStatus({
           type: 'error',
-          message: result.error || 'MCP operation failed'
+          message: result.error || 'MCP query failed'
         });
       }
     } catch (error) {
       console.error('MCP execution error:', error);
       setDeploymentStatus({
         type: 'error',
-        message: 'Failed to execute MCP operation'
+        message: 'Failed to execute MCP query'
       });
     } finally {
       setIsExecuting(false);
@@ -643,9 +642,9 @@ Collection URL: ${result.collectionUrl}${githubToken ? '\n\n🔑 GitHub token ha
       {/* MCP Execution Interface */}
       {activeMCP && (
         <div className="bg-white rounded-lg border border-gray-200 p-6 mt-6">
-          <div className="flex items-center justify-between mb-4">
+          <div className="flex items-center justify-between mb-6">
             <h3 className="text-lg font-semibold text-gray-900">
-              Execute {activeMCP.charAt(0).toUpperCase() + activeMCP.slice(1)} MCP Operations
+              {activeMCP.charAt(0).toUpperCase() + activeMCP.slice(1)} MCP Operations
             </h3>
             <button
               onClick={() => setActiveMCP(null)}
@@ -655,118 +654,163 @@ Collection URL: ${result.collectionUrl}${githubToken ? '\n\n🔑 GitHub token ha
             </button>
           </div>
 
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-            {/* Operation Selection */}
-            <div className="space-y-4">
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Operation
-                </label>
-                <select
-                  value={mcpOperation}
-                  onChange={(e) => setMcpOperation(e.target.value)}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                >
-                  <option value="">Select an operation...</option>
-                  {activeMCP === 'github' && (
-                    <>
-                      <option value="list_repositories">List Repositories</option>
-                      <option value="get_repository">Get Repository</option>
-                      <option value="list_issues">List Issues</option>
-                      <option value="get_pull_requests">Get Pull Requests</option>
-                      <option value="get_repository_health">Get Repository Health</option>
-                    </>
-                  )}
-                  {activeMCP === 'filesystem' && (
-                    <>
-                      <option value="list_directory">List Directory</option>
-                      <option value="read_file">Read File</option>
-                      <option value="search_files">Search Files</option>
-                      <option value="get_file_info">Get File Info</option>
-                      <option value="list_sample_docs">List Sample Documents</option>
-                    </>
-                  )}
-                  {activeMCP === 'sqlite' && (
-                    <>
-                      <option value="list_tables">List Tables</option>
-                      <option value="describe_table">Describe Table</option>
-                      <option value="execute_query">Execute Query</option>
-                      <option value="get_database_info">Get Database Info</option>
-                      <option value="backup_database">Backup Database</option>
-                      <option value="optimize_database">Optimize Database</option>
-                    </>
-                  )}
-                </select>
-              </div>
+          {/* Tab Navigation */}
+          <div className="border-b border-gray-200 mb-6">
+            <nav className="-mb-px flex space-x-8">
+              <button
+                onClick={() => setActiveTab('execute')}
+                className={`py-2 px-1 border-b-2 font-medium text-sm ${
+                  activeTab === 'execute'
+                    ? 'border-blue-500 text-blue-600'
+                    : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                }`}
+              >
+                Execute Queries
+              </button>
+              <button
+                onClick={() => setActiveTab('collections')}
+                className={`py-2 px-1 border-b-2 font-medium text-sm ${
+                  activeTab === 'collections'
+                    ? 'border-blue-500 text-blue-600'
+                    : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                }`}
+              >
+                Collections
+              </button>
+            </nav>
+          </div>
 
+          {activeTab === 'execute' && (
+            <div className="space-y-6">
+              {/* Query Input */}
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Parameters (JSON)
+                  MCP Query
                 </label>
                 <textarea
-                  value={mcpParams}
-                  onChange={(e) => setMcpParams(e.target.value)}
-                  placeholder="Enter parameters as JSON..."
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 h-32"
+                  value={mcpQuery}
+                  onChange={(e) => setMcpQuery(e.target.value)}
+                  placeholder={
+                    activeMCP === 'github' 
+                      ? "e.g., 'List my repositories', 'Get issues for postman-labs', 'Show repository health'" :
+                    activeMCP === 'filesystem'
+                      ? "e.g., 'List files in sample-docs', 'Read ai-healthcare.txt', 'Search for files containing AI'" :
+                    activeMCP === 'sqlite'
+                      ? "e.g., 'List all tables', 'Show users table schema', 'Execute SELECT * FROM users LIMIT 5'" :
+                      "Enter your MCP query..."
+                  }
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 h-24"
                 />
               </div>
 
+              {/* Action Buttons */}
               <div className="flex space-x-3">
                 <button
-                  onClick={() => {
-                    try {
-                      const params = mcpParams ? JSON.parse(mcpParams) : {};
-                      executeMCPOperation(activeMCP, mcpOperation, params, false);
-                    } catch (error) {
-                      setDeploymentStatus({
-                        type: 'error',
-                        message: 'Invalid JSON parameters'
-                      });
-                    }
-                  }}
-                  disabled={!mcpOperation || isExecuting}
+                  onClick={() => executeMCPQuery(activeMCP, mcpQuery, false)}
+                  disabled={!mcpQuery.trim() || isExecuting}
                   className="flex-1 px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed"
                 >
-                  {isExecuting ? 'Executing...' : 'Execute Operation'}
+                  {isExecuting ? 'Executing...' : 'Execute Query'}
                 </button>
                 <button
-                  onClick={() => {
-                    try {
-                      const params = mcpParams ? JSON.parse(mcpParams) : {};
-                      executeMCPOperation(activeMCP, mcpOperation, params, true);
-                    } catch (error) {
-                      setDeploymentStatus({
-                        type: 'error',
-                        message: 'Invalid JSON parameters'
-                      });
-                    }
-                  }}
-                  disabled={!mcpOperation || isExecuting}
+                  onClick={() => executeMCPQuery(activeMCP, mcpQuery, true)}
+                  disabled={!mcpQuery.trim() || isExecuting}
                   className="flex-1 px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   {isExecuting ? 'Creating...' : 'Execute & Create Collection'}
                 </button>
               </div>
-            </div>
 
-            {/* Results Display */}
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Results
-              </label>
-              <div className="bg-gray-50 border border-gray-200 rounded-md p-4 h-64 overflow-auto">
-                {mcpResult ? (
-                  <pre className="text-sm text-gray-800 whitespace-pre-wrap">
-                    {JSON.stringify(mcpResult, null, 2)}
-                  </pre>
-                ) : (
-                  <p className="text-gray-500 text-sm">
-                    Execute an operation to see results here...
-                  </p>
-                )}
+              {/* Results Display */}
+              {mcpResult && (
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Results
+                  </label>
+                  <div className="bg-gray-50 border border-gray-200 rounded-md p-4 max-h-96 overflow-auto">
+                    <pre className="text-sm text-gray-800 whitespace-pre-wrap">
+                      {JSON.stringify(mcpResult, null, 2)}
+                    </pre>
+                  </div>
+                </div>
+              )}
+            </div>
+          )}
+
+          {activeTab === 'collections' && (
+            <div className="space-y-4">
+              <p className="text-gray-600">
+                Generate Postman collections for {activeMCP} MCP operations. Use the Execute tab to test queries first, then create collections with real data.
+              </p>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <button
+                  onClick={async () => {
+                    try {
+                      const response = await fetch(`/postman-collections/${activeMCP}-mcp-${activeMCP === 'github' ? 'unified' : activeMCP === 'filesystem' ? 'official-fixed' : 'server'}.json`);
+                      const collection = await response.json();
+                      
+                      const apiResponse = await fetch('/api/postman/create-collection', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ collection, createInWeb: false }),
+                      });
+                      
+                      const result = await apiResponse.json();
+                      
+                      if (result.success) {
+                        setDeploymentStatus({
+                          type: 'success',
+                          message: `${activeMCP.charAt(0).toUpperCase() + activeMCP.slice(1)} MCP Collection created successfully in Postman Desktop!`
+                        });
+                      } else {
+                        setDeploymentStatus({
+                          type: 'error',
+                          message: 'Failed to create collection'
+                        });
+                      }
+                    } catch (error) {
+                      setDeploymentStatus({
+                        type: 'error',
+                        message: 'Failed to create collection'
+                      });
+                    }
+                  }}
+                  className="p-4 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors"
+                >
+                  <div className="flex items-center space-x-3">
+                    <img src="/postman-logo.svg" alt="Postman" className="w-6 h-6" />
+                    <div>
+                      <h4 className="font-medium text-gray-900">Static Collection</h4>
+                      <p className="text-sm text-gray-600">Pre-built collection with sample data</p>
+                    </div>
+                  </div>
+                </button>
+                
+                <button
+                  onClick={() => {
+                    if (mcpResult) {
+                      executeMCPQuery(activeMCP, mcpQuery, true);
+                    } else {
+                      setDeploymentStatus({
+                        type: 'error',
+                        message: 'Execute a query first to create a dynamic collection'
+                      });
+                    }
+                  }}
+                  disabled={!mcpResult}
+                  className="p-4 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors disabled:opacity-50"
+                >
+                  <div className="flex items-center space-x-3">
+                    <Zap className="w-6 h-6 text-green-600" />
+                    <div>
+                      <h4 className="font-medium text-gray-900">Dynamic Collection</h4>
+                      <p className="text-sm text-gray-600">Collection based on executed query results</p>
+                    </div>
+                  </div>
+                </button>
               </div>
             </div>
-          </div>
+          )}
         </div>
       )}
     </div>

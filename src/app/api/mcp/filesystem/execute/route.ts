@@ -16,14 +16,44 @@ interface FilesystemMCPResponse {
 
 export async function POST(request: NextRequest) {
   try {
-    const { operation, params, generateCollection = false } = await request.json();
+    const { query, generateCollection = false } = await request.json();
 
-    if (!operation) {
+    if (!query) {
       return NextResponse.json(
-        { error: 'Operation is required' },
+        { error: 'Query is required' },
         { status: 400 }
       );
     }
+
+    // Parse natural language query to determine operation and params
+    const parseQuery = (q: string): { operation: string; params: any } => {
+      const lowerQuery = q.toLowerCase();
+      
+      if (lowerQuery.includes('list') && (lowerQuery.includes('file') || lowerQuery.includes('dir'))) {
+        const pathMatch = q.match(/['"`]([^'"`]+)['"`]/);
+        const path = pathMatch ? pathMatch[1] : 'sample-docs';
+        return { operation: 'list_directory', params: { path } };
+      } else if (lowerQuery.includes('read') && lowerQuery.includes('file')) {
+        const fileMatch = q.match(/['"`]([^'"`]+)['"`]/);
+        const file = fileMatch ? fileMatch[1] : 'sample-docs/ai-healthcare.txt';
+        return { operation: 'read_file', params: { path: file } };
+      } else if (lowerQuery.includes('search') && lowerQuery.includes('file')) {
+        const searchMatch = q.match(/['"`]([^'"`]+)['"`]/);
+        const searchTerm = searchMatch ? searchMatch[1] : 'AI';
+        return { operation: 'search_files', params: { query: searchTerm, path: 'sample-docs' } };
+      } else if (lowerQuery.includes('info') || lowerQuery.includes('stat')) {
+        const fileMatch = q.match(/['"`]([^'"`]+)['"`]/);
+        const file = fileMatch ? fileMatch[1] : 'sample-docs/ai-healthcare.txt';
+        return { operation: 'get_file_info', params: { path: file } };
+      } else if (lowerQuery.includes('sample') || lowerQuery.includes('doc')) {
+        return { operation: 'list_sample_docs', params: {} };
+      } else {
+        // Default to listing sample docs
+        return { operation: 'list_sample_docs', params: {} };
+      }
+    };
+
+    const { operation, params } = parseQuery(query);
 
     // Execute Filesystem MCP operations
     const executeFilesystemMCP = async (op: string, p: Record<string, any>): Promise<any> => {
