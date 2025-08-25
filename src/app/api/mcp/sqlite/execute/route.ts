@@ -55,8 +55,8 @@ export async function POST(request: NextRequest) {
       } else if (lowerQuery === 'update row') {
         return { operation: 'update_row', params: { table: 'users', id: 1, data: { name: `Updated User ${Date.now()}` } } };
       } else if (lowerQuery === 'delete row') {
-        // Try to delete a user that might not have foreign key dependencies
-        return { operation: 'delete_row', params: { table: 'users', id: 999 } };
+        // Delete by email pattern to match Postman Collection behavior
+        return { operation: 'delete_row', params: { table: 'users', email: 'test-delete@example.com' } };
       } else {
         // Fallback to pattern matching for custom queries
         if (lowerQuery.includes('list') && lowerQuery.includes('table')) {
@@ -124,7 +124,7 @@ export async function POST(request: NextRequest) {
         case 'delete_row':
           endpoint = '/tables/users/delete';
           method = 'DELETE';
-          body = { where: { id: p.id } };
+          body = { where: p.email ? { email: p.email } : { id: p.id } };
           break;
         default:
           throw new Error(`Unknown operation: ${op}`);
