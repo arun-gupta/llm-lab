@@ -1,9 +1,9 @@
 'use client';
 
 import { useState } from 'react';
-import { Home, TestTube, BarChart3, Library, TrendingUp, Settings, Network, Globe } from 'lucide-react';
+import { Home, TestTube, BarChart3, Library, TrendingUp, Settings, Network } from 'lucide-react';
 
-export type TabType = 'home' | 'test' | 'collections' | 'grpcweb' | 'graphrag' | 'settings';
+export type TabType = 'home' | 'test' | 'collections' | 'graphrag' | 'settings';
 
 interface TabNavigationProps {
   activeTab: TabType;
@@ -29,12 +29,7 @@ const tabs = [
     icon: Library,
     description: 'Model Context Protocol integrations and collections'
   },
-  {
-    id: 'grpcweb' as TabType,
-    label: 'gRPC-Web',
-    icon: Globe,
-    description: 'Browser-compatible gRPC with HTTP/1.1 and Protocol Buffers'
-  },
+
   {
     id: 'graphrag' as TabType,
     label: 'GraphRAG',
