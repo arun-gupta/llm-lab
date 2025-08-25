@@ -2407,204 +2407,101 @@ export function GraphRAGTab() {
                 </div>
 
                 {/* Results Comparison */}
-                {responses && (
+                {responses && responses.comparisonData && (
                   <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-6 gap-6">
-                    {/* REST Results */}
-                    <div className="bg-white rounded-lg border shadow-sm">
-                      <div className="p-4 border-b bg-blue-50">
-                        <h4 className="font-semibold text-blue-800 flex items-center gap-2">
-                          🌐 REST API
-                          <span className="text-xs bg-blue-200 text-blue-800 px-2 py-1 rounded">HTTP/1.1</span>
-                        </h4>
-                      </div>
-                      <div className="p-4 space-y-3">
-                        <div className="space-y-2">
-                          <div className="text-sm">
-                            <span className="font-medium text-gray-900">Latency:</span>
-                            <span className="ml-2 text-green-600">{responses.performance.traditionalRAGLatency}ms</span>
-                          </div>
-                          <div className="text-sm">
-                            <span className="font-medium text-gray-900">Protocol:</span>
-                            <span className="ml-2 text-gray-700">HTTP/1.1 + JSON</span>
-                          </div>
-                          <div className="text-sm">
-                            <span className="font-medium text-gray-900">Payload Size:</span>
-                            <span className="ml-2 text-gray-700">~2.5KB</span>
-                          </div>
+                    {responses.comparisonData.results.map((result: any, index: number) => (
+                      <div key={index} className="bg-white rounded-lg border shadow-sm">
+                        <div className={`p-4 border-b ${
+                          result.protocol === 'REST' ? 'bg-blue-50' :
+                          result.protocol === 'GraphQL' ? 'bg-purple-50' :
+                          result.protocol === 'gRPC' ? 'bg-green-50' :
+                          result.protocol === 'gRPC-Web' ? 'bg-indigo-50' :
+                          result.protocol === 'WebSocket' ? 'bg-orange-50' :
+                          'bg-red-50'
+                        }`}>
+                          <h4 className={`font-semibold flex items-center gap-2 ${
+                            result.protocol === 'REST' ? 'text-blue-800' :
+                            result.protocol === 'GraphQL' ? 'text-purple-800' :
+                            result.protocol === 'gRPC' ? 'text-green-800' :
+                            result.protocol === 'gRPC-Web' ? 'text-indigo-800' :
+                            result.protocol === 'WebSocket' ? 'text-orange-800' :
+                            'text-red-800'
+                          }`}>
+                            {result.protocol === 'REST' ? '🌐' :
+                             result.protocol === 'GraphQL' ? '🔧' :
+                             result.protocol === 'gRPC' ? '⚡' :
+                             result.protocol === 'gRPC-Web' ? '🌐' :
+                             result.protocol === 'WebSocket' ? '🔌' :
+                             '📡'} {result.protocol}
+                            <span className={`text-xs px-2 py-1 rounded ${
+                              result.protocol === 'REST' ? 'bg-blue-200 text-blue-800' :
+                              result.protocol === 'GraphQL' ? 'bg-purple-200 text-purple-800' :
+                              result.protocol === 'gRPC' ? 'bg-green-200 text-green-800' :
+                              result.protocol === 'gRPC-Web' ? 'bg-indigo-200 text-indigo-800' :
+                              result.protocol === 'WebSocket' ? 'bg-orange-200 text-orange-800' :
+                              'bg-red-200 text-red-800'
+                            }`}>
+                              {result.protocol === 'REST' ? 'HTTP/1.1' :
+                               result.protocol === 'GraphQL' ? 'HTTP/1.1' :
+                               result.protocol === 'gRPC' ? 'HTTP/2' :
+                               result.protocol === 'gRPC-Web' ? 'HTTP/1.1' :
+                               result.protocol === 'WebSocket' ? 'Real-time' :
+                               'Streaming'}
+                            </span>
+                            {/* Mock/Real Indicator */}
+                            <span className={`text-xs px-2 py-1 rounded ${
+                              result.status === 'success' ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'
+                            }`}>
+                              {result.status === 'success' ? '✅ Real' : '⚠️ Mock'}
+                            </span>
+                          </h4>
                         </div>
-                        <div className="border-t pt-3">
-                          <div className="text-xs text-gray-600 mb-2">Response Preview:</div>
-                          <div className="text-sm bg-gray-50 p-2 rounded text-gray-700 max-h-20 overflow-y-auto">
-                            {responses.traditionalRAGResponse.substring(0, 150)}...
+                        <div className="p-4 space-y-3">
+                          <div className="space-y-2">
+                            <div className="text-sm">
+                              <span className="font-medium text-gray-900">Latency:</span>
+                              <span className={`ml-2 ${result.status === 'success' ? 'text-green-600' : 'text-gray-400'}`}>
+                                {result.latency}ms
+                              </span>
+                            </div>
+                            <div className="text-sm">
+                              <span className="font-medium text-gray-900">Protocol:</span>
+                              <span className="ml-2 text-gray-700">
+                                {result.protocol === 'REST' ? 'HTTP/1.1 + JSON' :
+                                 result.protocol === 'GraphQL' ? 'HTTP/1.1 + JSON' :
+                                 result.protocol === 'gRPC' ? 'HTTP/2 + Protobuf' :
+                                 result.protocol === 'gRPC-Web' ? 'HTTP/1.1 + Protobuf' :
+                                 result.protocol === 'WebSocket' ? 'WebSocket + JSON' :
+                                 'HTTP/1.1 + EventSource'}
+                              </span>
+                            </div>
+                            <div className="text-sm">
+                              <span className="font-medium text-gray-900">Payload Size:</span>
+                              <span className="ml-2 text-gray-700">~{Math.round(result.payloadSize / 1024 * 10) / 10}KB</span>
+                            </div>
+                            {result.status === 'error' && (
+                              <div className="text-sm">
+                                <span className="font-medium text-red-600">Error:</span>
+                                <span className="ml-2 text-red-500 text-xs">{result.error}</span>
+                              </div>
+                            )}
                           </div>
-                        </div>
-                      </div>
-                    </div>
-
-                    {/* GraphQL Results */}
-                    <div className="bg-white rounded-lg border shadow-sm">
-                      <div className="p-4 border-b bg-purple-50">
-                        <h4 className="font-semibold text-purple-800 flex items-center gap-2">
-                          🔧 GraphQL
-                          <span className="text-xs bg-purple-200 text-purple-800 px-2 py-1 rounded">HTTP/1.1</span>
-                        </h4>
-                      </div>
-                      <div className="p-4 space-y-3">
-                        <div className="space-y-2">
-                          <div className="text-sm">
-                            <span className="font-medium text-gray-900">Latency:</span>
-                            <span className="ml-2 text-green-600">{Math.round(responses.performance.graphRAGLatency * 0.85)}ms</span>
-                          </div>
-                          <div className="text-sm">
-                            <span className="font-medium text-gray-900">Protocol:</span>
-                            <span className="ml-2 text-gray-700">HTTP/1.1 + JSON</span>
-                          </div>
-                          <div className="text-sm">
-                            <span className="font-medium text-gray-900">Payload Size:</span>
-                            <span className="ml-2 text-gray-700">~1.8KB</span>
-                          </div>
-                        </div>
-                        <div className="border-t pt-3">
-                          <div className="text-xs text-gray-600 mb-2">Response Preview:</div>
-                          <div className="text-sm bg-gray-50 p-2 rounded text-gray-700 max-h-20 overflow-y-auto">
-                            {responses.graphRAGResponse.substring(0, 150)}...
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-
-                    {/* gRPC Results */}
-                    <div className="bg-white rounded-lg border shadow-sm">
-                      <div className="p-4 border-b bg-green-50">
-                        <h4 className="font-semibold text-green-800 flex items-center gap-2">
-                          ⚡ gRPC
-                          <span className="text-xs bg-green-200 text-green-800 px-2 py-1 rounded">HTTP/2</span>
-                        </h4>
-                      </div>
-                      <div className="p-4 space-y-3">
-                        <div className="space-y-2">
-                          <div className="text-sm">
-                            <span className="font-medium text-gray-900">Latency:</span>
-                            <span className="ml-2 text-green-600">{Math.round(responses.performance.graphRAGLatency * 0.4)}ms</span>
-                          </div>
-                          <div className="text-sm">
-                            <span className="font-medium text-gray-900">Protocol:</span>
-                            <span className="ml-2 text-gray-700">HTTP/2 + Protobuf</span>
-                          </div>
-                          <div className="text-sm">
-                            <span className="font-medium text-gray-900">Payload Size:</span>
-                            <span className="ml-2 text-gray-700">~800B</span>
-                          </div>
-                        </div>
-                        <div className="border-t pt-3">
-                          <div className="text-xs text-gray-600 mb-2">Response Preview:</div>
-                          <div className="text-sm bg-gray-50 p-2 rounded text-gray-700 max-h-20 overflow-y-auto">
-                            {responses.graphRAGResponse.substring(0, 150)}...
+                          <div className="border-t pt-3">
+                            <div className="text-xs text-gray-600 mb-2">Response Preview:</div>
+                            <div className="text-sm bg-gray-50 p-2 rounded text-gray-700 max-h-20 overflow-y-auto">
+                              {result.response ? result.response.substring(0, 150) + '...' : 'No response data'}
+                            </div>
                           </div>
                         </div>
                       </div>
-                    </div>
-
-                    {/* gRPC-Web Results */}
-                    <div className="bg-white rounded-lg border shadow-sm">
-                      <div className="p-4 border-b bg-blue-50">
-                        <h4 className="font-semibold text-blue-800 flex items-center gap-2">
-                          🌐 gRPC-Web
-                          <span className="text-xs bg-blue-200 text-blue-800 px-2 py-1 rounded">HTTP/1.1</span>
-                        </h4>
-                      </div>
-                      <div className="p-4 space-y-3">
-                        <div className="space-y-2">
-                          <div className="text-sm">
-                            <span className="font-medium text-gray-900">Latency:</span>
-                            <span className="ml-2 text-green-600">{Math.round(responses.performance.graphRAGLatency * 0.5)}ms</span>
-                          </div>
-                          <div className="text-sm">
-                            <span className="font-medium text-gray-900">Protocol:</span>
-                            <span className="ml-2 text-gray-700">HTTP/1.1 + Protobuf</span>
-                          </div>
-                          <div className="text-sm">
-                            <span className="font-medium text-gray-900">Payload Size:</span>
-                            <span className="ml-2 text-gray-700">~900B</span>
-                          </div>
-                        </div>
-                        <div className="border-t pt-3">
-                          <div className="text-xs text-gray-600 mb-2">Response Preview:</div>
-                          <div className="text-sm bg-gray-50 p-2 rounded text-gray-700 max-h-20 overflow-y-auto">
-                            {responses.graphRAGResponse.substring(0, 150)}...
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-
-                    {/* SSE Results */}
-                    <div className="bg-white rounded-lg border shadow-sm">
-                      <div className="p-4 border-b bg-red-50">
-                        <h4 className="font-semibold text-red-800 flex items-center gap-2">
-                          📡 SSE
-                          <span className="text-xs bg-red-200 text-red-800 px-2 py-1 rounded">Streaming</span>
-                        </h4>
-                      </div>
-                      <div className="p-4 space-y-3">
-                        <div className="space-y-2">
-                          <div className="text-sm">
-                            <span className="font-medium text-gray-900">Latency:</span>
-                            <span className="ml-2 text-green-600">{Math.round(responses.performance.graphRAGLatency * 0.2)}ms</span>
-                          </div>
-                          <div className="text-sm">
-                            <span className="font-medium text-gray-900">Protocol:</span>
-                            <span className="ml-2 text-gray-700">HTTP/1.1 + EventSource</span>
-                          </div>
-                          <div className="text-sm">
-                            <span className="font-medium text-gray-900">Payload Size:</span>
-                            <span className="ml-2 text-gray-700">~1.7KB</span>
-                          </div>
-                        </div>
-                        <div className="border-t pt-3">
-                          <div className="text-xs text-gray-600 mb-2">Response Preview:</div>
-                          <div className="text-sm bg-gray-50 p-2 rounded text-gray-700 max-h-20 overflow-y-auto">
-                            {responses.graphRAGResponse.substring(0, 150)}...
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-
-                    {/* WebSocket Results */}
-                    <div className="bg-white rounded-lg border shadow-sm">
-                      <div className="p-4 border-b bg-orange-50">
-                        <h4 className="font-semibold text-orange-800 flex items-center gap-2">
-                          🔌 WebSocket
-                          <span className="text-xs bg-orange-200 text-orange-800 px-2 py-1 rounded">Real-time</span>
-                        </h4>
-                      </div>
-                      <div className="p-4 space-y-3">
-                        <div className="space-y-2">
-                          <div className="text-sm">
-                            <span className="font-medium text-gray-900">Latency:</span>
-                            <span className="ml-2 text-green-600">{Math.round(responses.performance.graphRAGLatency * 0.25)}ms</span>
-                          </div>
-                          <div className="text-sm">
-                            <span className="font-medium text-gray-900">Protocol:</span>
-                            <span className="ml-2 text-gray-700">WebSocket + JSON</span>
-                          </div>
-                          <div className="text-sm">
-                            <span className="font-medium text-gray-900">Payload Size:</span>
-                            <span className="ml-2 text-gray-700">~2.2KB</span>
-                          </div>
-                        </div>
-                        <div className="border-t pt-3">
-                          <div className="text-xs text-gray-600 mb-2">Response Preview:</div>
-                          <div className="text-sm bg-gray-50 p-2 rounded text-gray-700 max-h-20 overflow-y-auto">
-                            {responses.graphRAGResponse.substring(0, 150)}...
-                          </div>
-                        </div>
-                      </div>
-                    </div>
+                    ))}
                   </div>
                 )}
 
+
+
                 {/* Performance Analytics */}
-                {responses && (
+                {responses && responses.comparisonData && (
                   <div className="bg-white rounded-lg border shadow-sm">
                     <div className="p-6 border-b">
                       <h3 className="flex items-center gap-2 text-lg font-semibold text-gray-900">
@@ -2618,33 +2515,39 @@ export function GraphRAGTab() {
                         <div className="space-y-3">
                           <h4 className="font-medium text-gray-800">Latency Comparison</h4>
                           <div className="space-y-2">
-                            <div className="flex justify-between items-center">
-                              <span className="text-sm text-gray-900">REST</span>
-                              <div className="flex items-center space-x-2">
-                                <div className="w-20 bg-gray-200 rounded-full h-2">
-                                  <div className="bg-blue-500 h-2 rounded-full" style={{width: '100%'}}></div>
-                                </div>
-                                <span className="text-xs text-gray-600">{responses.performance.traditionalRAGLatency}ms</span>
-                              </div>
-                            </div>
-                            <div className="flex justify-between items-center">
-                              <span className="text-sm text-gray-900">GraphQL</span>
-                              <div className="flex items-center space-x-2">
-                                <div className="w-20 bg-gray-200 rounded-full h-2">
-                                  <div className="bg-purple-500 h-2 rounded-full" style={{width: '85%'}}></div>
-                                </div>
-                                <span className="text-xs text-gray-600">{Math.round(responses.performance.graphRAGLatency * 0.85)}ms</span>
-                              </div>
-                            </div>
-                            <div className="flex justify-between items-center">
-                              <span className="text-sm text-gray-900">gRPC</span>
-                              <div className="flex items-center space-x-2">
-                                <div className="w-20 bg-gray-200 rounded-full h-2">
-                                  <div className="bg-green-500 h-2 rounded-full" style={{width: '40%'}}></div>
-                                </div>
-                                <span className="text-xs text-gray-600">{Math.round(responses.performance.graphRAGLatency * 0.4)}ms</span>
-                              </div>
-                            </div>
+                            {responses.comparisonData.results
+                              .filter((r: any) => r.status === 'success')
+                              .sort((a: any, b: any) => a.latency - b.latency)
+                              .map((result: any, index: number) => {
+                                const maxLatency = Math.max(...responses.comparisonData.results
+                                  .filter((r: any) => r.status === 'success')
+                                  .map((r: any) => r.latency));
+                                const percentage = (result.latency / maxLatency) * 100;
+                                
+                                return (
+                                  <div key={index} className="flex justify-between items-center">
+                                    <span className="text-sm text-gray-900">{result.protocol}</span>
+                                    <div className="flex items-center space-x-2">
+                                      <div className="w-20 bg-gray-200 rounded-full h-2">
+                                        <div 
+                                          className={`h-2 rounded-full ${
+                                            result.protocol === 'REST' ? 'bg-blue-500' :
+                                            result.protocol === 'GraphQL' ? 'bg-purple-500' :
+                                            result.protocol === 'gRPC' ? 'bg-green-500' :
+                                            result.protocol === 'gRPC-Web' ? 'bg-indigo-500' :
+                                            result.protocol === 'WebSocket' ? 'bg-orange-500' :
+                                            'bg-red-500'
+                                          }`} 
+                                          style={{width: `${percentage}%`}}
+                                        ></div>
+                                      </div>
+                                      <span className="text-xs text-gray-600">{result.latency}ms</span>
+                                    </div>
+                                  </div>
+                                );
+                              })}
+                          </div>
+                        </div>
                             <div className="flex justify-between items-center">
                               <span className="text-sm text-gray-900">gRPC-Web</span>
                               <div className="flex items-center space-x-2">
