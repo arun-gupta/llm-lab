@@ -20,9 +20,9 @@ export function MCPTab() {
   // Sample queries for each MCP type
   const sampleQueries = {
     github: [
-      "Initialize MCP Session",
-      "List User Repositories (First 5)",
-      "Get Specific Repository Details",
+      "Initialize MCP Session (Optional)",
+      "Get User Repositories",
+      "Get Repository Information",
       "Get Repository Issues", 
       "Get Pull Requests",
       "Generate Repository Health Report"
