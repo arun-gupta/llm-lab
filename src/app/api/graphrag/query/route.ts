@@ -443,7 +443,7 @@ function calculateSpecificity(response: string): number {
 }
 
 function calculateReadability(text: string): number {
-  // Simplified Flesch reading ease calculation
+  // Enhanced readability calculation with better handling of technical content
   const sentences = text.split(/[.!?]+/).filter(s => s.trim().length > 0);
   const words = text.split(/\s+/).filter(w => w.length > 0);
   const syllables = estimateSyllables(text);
@@ -454,26 +454,45 @@ function calculateReadability(text: string): number {
   const avgSyllablesPerWord = syllables / words.length;
   
   // Flesch Reading Ease formula: 206.835 - (1.015 × avg sentence length) - (84.6 × avg syllables per word)
-  const fleschScore = 206.835 - (1.015 * avgSentenceLength) - (84.6 * avgSyllablesPerWord);
+  let fleschScore = 206.835 - (1.015 * avgSentenceLength) - (84.6 * avgSyllablesPerWord);
   
-  return Math.max(0, Math.min(100, fleschScore));
+  // Handle negative scores for technical content by using a more lenient scale
+  if (fleschScore < 0) {
+    // For very technical content, map negative scores to a reasonable range
+    // -50 to 0 becomes 20 to 40 (indicating technical but readable)
+    fleschScore = Math.max(20, 40 + (fleschScore * 0.4));
+  }
+  
+  // Ensure the score is within 0-100 range
+  return Math.max(0, Math.min(100, Math.round(fleschScore)));
 }
 
 function estimateSyllables(text: string): number {
-  // Simple syllable estimation
+  // Enhanced syllable estimation for technical content
   const words = text.toLowerCase().split(/\s+/);
   let syllableCount = 0;
   
   words.forEach(word => {
-    // Remove common suffixes
-    word = word.replace(/(?:ed|es|ing|ly|ment|ness|tion|sion)$/, '');
+    // Clean the word
+    word = word.replace(/[^\w]/g, ''); // Remove non-word characters
     
-    // Count vowel groups
-    const vowelGroups = word.match(/[aeiouy]+/g);
-    if (vowelGroups) {
-      syllableCount += vowelGroups.length;
+    if (word.length === 0) return;
+    
+    // Handle technical terms and acronyms
+    if (word.match(/^[a-z]+$/)) {
+      // Regular word - remove common suffixes that don't add syllables
+      word = word.replace(/(?:ed|es|ing|ly|ment|ness|tion|sion|al|ive|able|ible)$/, '');
+      
+      // Count vowel groups more accurately
+      const vowelGroups = word.match(/[aeiouy]+/g);
+      if (vowelGroups) {
+        syllableCount += vowelGroups.length;
+      } else {
+        syllableCount += 1; // At least one syllable
+      }
     } else {
-      syllableCount += 1; // At least one syllable
+      // Technical terms, numbers, or mixed content - estimate more conservatively
+      syllableCount += Math.max(1, Math.ceil(word.length / 3));
     }
   });
   
