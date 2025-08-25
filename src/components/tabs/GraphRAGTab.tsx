@@ -247,7 +247,7 @@ export function GraphRAGTab() {
 
   const generatePostmanCollection = async () => {
     setImportStatus('importing');
-    setImportMessage('Generating collection...');
+
     
     try {
       const response = await fetch('/api/graphrag/postman-collection', {
@@ -334,7 +334,7 @@ export function GraphRAGTab() {
 
   const generateGrpcPostmanCollection = async () => {
     setImportStatus('importing');
-    setImportMessage('Generating gRPC collection...');
+
     
     try {
       // Fetch the gRPC collection from the public folder
@@ -415,7 +415,7 @@ export function GraphRAGTab() {
 
   const generateGrpcWebPostmanCollection = async () => {
     setImportStatus('importing');
-    setImportMessage('Generating gRPC-Web collection...');
+
     
     try {
       // Create gRPC-Web collection data
@@ -1066,7 +1066,7 @@ export function GraphRAGTab() {
     if (!graphData) return;
 
     setImportStatus('importing');
-    setImportMessage('Generating SSE collection...');
+
     
     try {
       const collection = {
@@ -1246,7 +1246,7 @@ export function GraphRAGTab() {
     if (!graphData) return;
 
     setImportStatus('importing');
-    setImportMessage('Generating WebSocket collection...');
+
     
     try {
       const collection = {
@@ -1432,7 +1432,7 @@ export function GraphRAGTab() {
     if (!graphData) return;
 
     setImportStatus('importing');
-    setImportMessage('Generating protocol comparison collection...');
+
     
     try {
       const response = await fetch('/api/protocol-comparison/postman-collection', {
