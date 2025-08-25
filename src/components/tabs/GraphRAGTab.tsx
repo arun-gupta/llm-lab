@@ -2548,94 +2548,42 @@ export function GraphRAGTab() {
                               })}
                           </div>
                         </div>
-                            <div className="flex justify-between items-center">
-                              <span className="text-sm text-gray-900">gRPC-Web</span>
-                              <div className="flex items-center space-x-2">
-                                <div className="w-20 bg-gray-200 rounded-full h-2">
-                                  <div className="bg-blue-500 h-2 rounded-full" style={{width: '50%'}}></div>
-                                </div>
-                                <span className="text-xs text-gray-600">{Math.round(responses.performance.graphRAGLatency * 0.5)}ms</span>
-                              </div>
-                            </div>
-                            <div className="flex justify-between items-center">
-                              <span className="text-sm text-gray-900">SSE</span>
-                              <div className="flex items-center space-x-2">
-                                <div className="w-20 bg-gray-200 rounded-full h-2">
-                                  <div className="bg-red-500 h-2 rounded-full" style={{width: '20%'}}></div>
-                                </div>
-                                <span className="text-xs text-gray-600">{Math.round(responses.performance.graphRAGLatency * 0.2)}ms</span>
-                              </div>
-                            </div>
-                            <div className="flex justify-between items-center">
-                              <span className="text-sm text-gray-900">WebSocket</span>
-                              <div className="flex items-center space-x-2">
-                                <div className="w-20 bg-gray-200 rounded-full h-2">
-                                  <div className="bg-orange-500 h-2 rounded-full" style={{width: '25%'}}></div>
-                                </div>
-                                <span className="text-xs text-gray-600">{Math.round(responses.performance.graphRAGLatency * 0.25)}ms</span>
-                              </div>
-                            </div>
-                          </div>
-                        </div>
 
                         {/* Payload Size Comparison */}
                         <div className="space-y-3">
                           <h4 className="font-medium text-gray-800">Payload Efficiency</h4>
                           <div className="space-y-2">
-                            <div className="flex justify-between items-center">
-                              <span className="text-sm text-gray-900">REST (JSON)</span>
-                              <div className="flex items-center space-x-2">
-                                <div className="w-20 bg-gray-200 rounded-full h-2">
-                                  <div className="bg-blue-500 h-2 rounded-full" style={{width: '100%'}}></div>
-                                </div>
-                                <span className="text-xs text-gray-600">2.5KB</span>
-                              </div>
-                            </div>
-                            <div className="flex justify-between items-center">
-                              <span className="text-sm text-gray-900">GraphQL (JSON)</span>
-                              <div className="flex items-center space-x-2">
-                                <div className="w-20 bg-gray-200 rounded-full h-2">
-                                  <div className="bg-purple-500 h-2 rounded-full" style={{width: '72%'}}></div>
-                                </div>
-                                <span className="text-xs text-gray-600">1.8KB</span>
-                              </div>
-                            </div>
-                            <div className="flex justify-between items-center">
-                              <span className="text-sm text-gray-900">gRPC (Protobuf)</span>
-                              <div className="flex items-center space-x-2">
-                                <div className="w-20 bg-gray-200 rounded-full h-2">
-                                  <div className="bg-green-500 h-2 rounded-full" style={{width: '32%'}}></div>
-                                </div>
-                                <span className="text-xs text-gray-600">800B</span>
-                              </div>
-                            </div>
-                            <div className="flex justify-between items-center">
-                              <span className="text-sm text-gray-900">gRPC-Web (Protobuf)</span>
-                              <div className="flex items-center space-x-2">
-                                <div className="w-20 bg-gray-200 rounded-full h-2">
-                                  <div className="bg-blue-500 h-2 rounded-full" style={{width: '36%'}}></div>
-                                </div>
-                                <span className="text-xs text-gray-600">900B</span>
-                              </div>
-                            </div>
-                            <div className="flex justify-between items-center">
-                              <span className="text-sm text-gray-900">SSE (EventSource)</span>
-                              <div className="flex items-center space-x-2">
-                                <div className="w-20 bg-gray-200 rounded-full h-2">
-                                  <div className="bg-red-500 h-2 rounded-full" style={{width: '68%'}}></div>
-                                </div>
-                                <span className="text-xs text-gray-600">1.7KB</span>
-                              </div>
-                            </div>
-                            <div className="flex justify-between items-center">
-                              <span className="text-sm text-gray-900">WebSocket (JSON)</span>
-                              <div className="flex items-center space-x-2">
-                                <div className="w-20 bg-gray-200 rounded-full h-2">
-                                  <div className="bg-orange-500 h-2 rounded-full" style={{width: '88%'}}></div>
-                                </div>
-                                <span className="text-xs text-gray-600">2.2KB</span>
-                              </div>
-                            </div>
+                            {responses.comparisonData.results
+                              .filter((r: any) => r.status === 'success')
+                              .sort((a: any, b: any) => b.payloadSize - a.payloadSize)
+                              .map((result: any, index: number) => {
+                                const maxPayload = Math.max(...responses.comparisonData.results
+                                  .filter((r: any) => r.status === 'success')
+                                  .map((r: any) => r.payloadSize));
+                                const percentage = (result.payloadSize / maxPayload) * 100;
+                                
+                                return (
+                                  <div key={index} className="flex justify-between items-center">
+                                    <span className="text-sm text-gray-900">{result.protocol}</span>
+                                    <div className="flex items-center space-x-2">
+                                      <div className="w-20 bg-gray-200 rounded-full h-2">
+                                        <div 
+                                          className={`h-2 rounded-full ${
+                                            result.protocol === 'REST' ? 'bg-blue-500' :
+                                            result.protocol === 'GraphQL' ? 'bg-purple-500' :
+                                            result.protocol === 'gRPC' ? 'bg-green-500' :
+                                            result.protocol === 'gRPC-Web' ? 'bg-indigo-500' :
+                                            result.protocol === 'WebSocket' ? 'bg-orange-500' :
+                                            'bg-red-500'
+                                          }`} 
+                                          style={{width: `${percentage}%`}}
+                                        ></div>
+                                      </div>
+                                      <span className="text-xs text-gray-600">~{Math.round(result.payloadSize / 1024 * 10) / 10}KB</span>
+                                    </div>
+                                  </div>
+                                );
+                              })}
                           </div>
                         </div>
 
@@ -2706,9 +2654,8 @@ export function GraphRAGTab() {
                 {/* gRPC Sub-tab Navigation */}
                 <div className="bg-white rounded-lg border shadow-sm">
                   <div className="p-6 border-b">
-            
-
-        <div className="flex space-x-1">
+                    <h3 className="text-lg font-semibold text-gray-900 mb-4">gRPC Protocol Selection</h3>
+                    <div className="flex space-x-1">
                       <button
                         onClick={() => setGrpcSubTab('grpc')}
                         className={`px-4 py-2 text-sm font-medium rounded-lg transition-colors ${
