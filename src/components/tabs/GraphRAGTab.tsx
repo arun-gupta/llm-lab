@@ -1855,12 +1855,7 @@ export function GraphRAGTab() {
                   disabled={!responses || importStatus === 'importing'}
                   className="flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed"
                 >
-                  <svg className="w-4 h-4 mr-2" viewBox="0 0 24 24" fill="currentColor">
-                    <circle cx="12" cy="12" r="10" fill="#FF6C37"/>
-                    <path d="M10 8c0-1.1.9-2 2-2s2 .9 2 2-.9 2-2 2-2-.9-2-2z" fill="white"/>
-                    <path d="M8 12h8v2H8z" fill="white"/>
-                    <path d="M10 16h4v2H10z" fill="white"/>
-                  </svg>
+                  <img src="https://www.postman.com/company/logo-and-branding-assets/img/logo/postman-logo-orange.svg" alt="Postman" className="w-4 h-4 mr-2" />
                   {importStatus === 'importing' ? 'Importing...' : 'Add GraphRAG REST to Postman'}
                 </button>
               </div>
@@ -2339,12 +2334,7 @@ export function GraphRAGTab() {
                       disabled={!graphData || importStatus === 'importing'}
                       className="flex items-center px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 disabled:opacity-50 disabled:cursor-not-allowed"
                     >
-                      <svg className="w-4 h-4 mr-2" viewBox="0 0 24 24" fill="currentColor">
-                        <circle cx="12" cy="12" r="10" fill="#FF6C37"/>
-                        <path d="M10 8c0-1.1.9-2 2-2s2 .9 2 2-.9 2-2 2-2-.9-2-2z" fill="white"/>
-                        <path d="M8 12h8v2H8z" fill="white"/>
-                        <path d="M10 16h4v2H10z" fill="white"/>
-                      </svg>
+                      <img src="https://www.postman.com/company/logo-and-branding-assets/img/logo/postman-logo-orange.svg" alt="Postman" className="w-4 h-4 mr-2" />
                       {importStatus === 'importing' ? 'Importing...' : 'Add Comparison Collection to Postman'}
                     </button>
                   </div>
@@ -2721,12 +2711,7 @@ export function GraphRAGTab() {
                         disabled={!graphData || importStatus === 'importing'}
                         className="flex items-center px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 disabled:opacity-50 disabled:cursor-not-allowed"
                       >
-                        <svg className="w-4 h-4 mr-2" viewBox="0 0 24 24" fill="currentColor">
-                          <circle cx="12" cy="12" r="10" fill="#FF6C37"/>
-                          <path d="M10 8c0-1.1.9-2 2-2s2 .9 2 2-.9 2-2 2-2-.9-2-2z" fill="white"/>
-                          <path d="M8 12h8v2H8z" fill="white"/>
-                          <path d="M10 16h4v2H10z" fill="white"/>
-                        </svg>
+                        <img src="https://www.postman.com/company/logo-and-branding-assets/img/logo/postman-logo-orange.svg" alt="Postman" className="w-4 h-4 mr-2" />
                         {importStatus === 'importing' ? 'Importing...' : 'Add gRPC to Postman'}
                       </button>
                     </div>
@@ -2866,12 +2851,7 @@ export function GraphRAGTab() {
                           disabled={!graphData || importStatus === 'importing'}
                           className="flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed"
                         >
-                          <svg className="w-4 h-4 mr-2" viewBox="0 0 24 24" fill="currentColor">
-                            <circle cx="12" cy="12" r="10" fill="#FF6C37"/>
-                            <path d="M10 8c0-1.1.9-2 2-2s2 .9 2 2-.9 2-2 2-2-.9-2-2z" fill="white"/>
-                            <path d="M8 12h8v2H8z" fill="white"/>
-                            <path d="M10 16h4v2H10z" fill="white"/>
-                          </svg>
+                          <img src="https://www.postman.com/company/logo-and-branding-assets/img/logo/postman-logo-orange.svg" alt="Postman" className="w-4 h-4 mr-2" />
                           {importStatus === 'importing' ? 'Importing...' : 'Add gRPC-Web to Postman'}
                         </button>
                       </div>
@@ -3112,12 +3092,7 @@ export function GraphRAGTab() {
                     disabled={!graphData || importStatus === 'importing'}
                     className="flex items-center px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 disabled:opacity-50 disabled:cursor-not-allowed"
                   >
-                    <svg className="w-4 h-4 mr-2" viewBox="0 0 24 24" fill="currentColor">
-                      <circle cx="12" cy="12" r="10" fill="#FF6C37"/>
-                      <path d="M10 8c0-1.1.9-2 2-2s2 .9 2 2-.9 2-2 2-2-.9-2-2z" fill="white"/>
-                      <path d="M8 12h8v2H8z" fill="white"/>
-                      <path d="M10 16h4v2H10z" fill="white"/>
-                    </svg>
+                    <img src="https://www.postman.com/company/logo-and-branding-assets/img/logo/postman-logo-orange.svg" alt="Postman" className="w-4 h-4 mr-2" />
                     {importStatus === 'importing' ? 'Importing...' : 'Add SSE to Postman'}
                   </button>
                 </div>
