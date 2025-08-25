@@ -320,6 +320,7 @@ export async function POST(request: NextRequest) {
       const reader = sseResponse.body?.getReader();
       let sseData = '';
       let eventCount = 0;
+      let contextChunks = [];
       
       if (reader) {
         while (true) {
@@ -329,12 +330,26 @@ export async function POST(request: NextRequest) {
           const chunk = new TextDecoder().decode(value);
           sseData += chunk;
           
-          // Count events
-          const events = chunk.split('\n\n').filter(event => event.trim().startsWith('data: '));
-          eventCount += events.length;
+          // Parse SSE events
+          const lines = chunk.split('\n');
+          for (const line of lines) {
+            if (line.startsWith('data: ')) {
+              try {
+                const eventData = JSON.parse(line.slice(6));
+                eventCount++;
+                
+                // Collect context chunks
+                if (eventData.event === 'context_chunk' && eventData.data) {
+                  contextChunks.push(eventData.data);
+                }
+              } catch (e) {
+                // Ignore parsing errors for non-JSON lines
+              }
+            }
+          }
           
           // Stop after receiving a few events for comparison
-          if (eventCount >= 3) break;
+          if (eventCount >= 5) break;
         }
         reader.releaseLock();
       }
@@ -343,11 +358,20 @@ export async function POST(request: NextRequest) {
       const measuredLatency = Math.round(sseEndTime - sseStartTime);
       const minLatency = Math.max(measuredLatency, 7); // SSE has streaming overhead
 
+      // Create a meaningful response preview
+      let responsePreview = `SSE streaming completed with ${eventCount} events`;
+      if (contextChunks.length > 0) {
+        const firstChunk = contextChunks[0];
+        const description = firstChunk.description || firstChunk.entity_id || 'Context data';
+        responsePreview += `, first context: "${description.substring(0, 50)}"`;
+      }
+      responsePreview += '...';
+
       results.push({
         protocol: 'SSE',
         latency: minLatency,
         payloadSize: sseData.length,
-        response: `SSE streaming completed with ${eventCount} events`,
+        response: responsePreview,
         timestamp: new Date().toISOString(),
         status: 'success',
         error: undefined
