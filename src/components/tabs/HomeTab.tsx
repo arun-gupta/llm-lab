@@ -1,6 +1,6 @@
 'use client';
 
-import { Zap, TestTube, BarChart3, Library, Settings, ArrowRight, Play, Code, Network } from 'lucide-react';
+import { Zap, TestTube, BarChart3, Library, Settings, ArrowRight, Code, Network } from 'lucide-react';
 import { ApiKeyStatusIndicator } from '../ApiKeyStatusIndicator';
 
 import { TabType } from '../TabNavigation';
@@ -181,20 +181,7 @@ export function HomeTab({ onTabChange, apiKeyStatus }: HomeTabProps) {
         </div>
       </div>
 
-      {/* Recent Activity Placeholder */}
-      <div className="mb-8">
-        <h2 className="text-xl font-semibold text-gray-900 mb-4">Recent Activity</h2>
-        <div className="bg-gray-50 rounded-lg p-6 text-center">
-                      <p className="text-gray-500">No recent activity yet. Start by experimenting with prompts!</p>
-                      <button
-              onClick={() => onTabChange('test')}
-              className="mt-4 inline-flex items-center space-x-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
-            >
-              <Play className="w-4 h-4" />
-              <span>Start Experimenting</span>
-            </button>
-        </div>
-      </div>
+
 
 
     </div>
