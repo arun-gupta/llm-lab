@@ -66,12 +66,17 @@ export async function POST(request: NextRequest) {
           
           try {
             const items = await readdir(fullPath, { withFileTypes: true });
-            const files = items.map(item => ({
-              name: item.name,
-              type: item.isDirectory() ? 'directory' : 'file',
-              path: join(dirPath, item.name),
-              size: item.isFile() ? (await stat(join(fullPath, item.name))).size : null,
-              modified: item.isFile() ? (await stat(join(fullPath, item.name))).mtime.toISOString() : null
+            const files = await Promise.all(items.map(async item => {
+              const itemPath = join(fullPath, item.name);
+              const itemStats = item.isFile() ? await stat(itemPath) : null;
+              
+              return {
+                name: item.name,
+                type: item.isDirectory() ? 'directory' : 'file',
+                path: join(dirPath, item.name),
+                size: itemStats?.size || null,
+                modified: itemStats?.mtime.toISOString() || null
+              };
             }));
             
             return {
