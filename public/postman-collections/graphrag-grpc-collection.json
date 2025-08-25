@@ -7,12 +7,12 @@
   "variable": [
     {
       "key": "grpc_server_url",
-      "value": "localhost:8080",
+      "value": "localhost:50051",
       "type": "string"
     },
     {
       "key": "proto_file_path",
-      "value": "./graphrag.proto",
+      "value": "http://localhost:3000/graphrag.proto",
       "type": "string"
     }
   ],
