@@ -120,11 +120,9 @@ temp/
 
 # Project specific
 data/
-config/
 scripts/
 docs/
 sample-docs/
 postman-collections/
-grpc-server/
 websocket-server.js
 *.sh 
