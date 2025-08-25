@@ -132,7 +132,7 @@ message GraphStats {
 import { GraphRAGWebServiceClient } from './generated/graphrag_web_grpc_web_pb';
 import { GraphQuery, ContextRequest } from './generated/graphrag_web_pb';
 
-const client = new GraphRAGWebServiceClient('http://localhost:8080');
+const client = new GraphRAGWebServiceClient('http://localhost:50052');
 
 // Unary call
 const query = new GraphQuery();
@@ -188,7 +188,7 @@ contextStream.on('data', (chunk) => {
     <div id="results"></div>
     
     <script>
-        const client = new GraphRAGWebServiceClient('http://localhost:8080');
+        const client = new GraphRAGWebServiceClient('http://localhost:50052');
         
         // Simple query
         const query = new GraphQuery();

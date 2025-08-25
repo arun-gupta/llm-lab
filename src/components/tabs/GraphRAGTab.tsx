@@ -1281,7 +1281,8 @@ export function GraphRAGTab() {
               url: {
                 raw: '{{base_url}}/api/websocket/graphrag',
                 protocol: 'http',
-                host: ['{{base_url}}'],
+                host: ['localhost'],
+                port: '3000',
                 path: ['api', 'websocket', 'graphrag']
               },
               description: 'Check if WebSocket server is available (returns HTTP response)'
@@ -1315,7 +1316,8 @@ export function GraphRAGTab() {
               url: {
                 raw: '{{base_url}}/api/websocket/graphrag',
                 protocol: 'http',
-                host: ['{{base_url}}'],
+                host: ['localhost'],
+                port: '3000',
                 path: ['api', 'websocket', 'graphrag']
               },
               description: 'Send unary query via HTTP proxy to WebSocket server'
@@ -1349,7 +1351,8 @@ export function GraphRAGTab() {
               url: {
                 raw: '{{base_url}}/api/websocket/graphrag',
                 protocol: 'http',
-                host: ['{{base_url}}'],
+                host: ['localhost'],
+                port: '3000',
                 path: ['api', 'websocket', 'graphrag']
               },
               description: 'Send streaming query via HTTP proxy to WebSocket server'
@@ -1383,7 +1386,8 @@ export function GraphRAGTab() {
               url: {
                 raw: '{{base_url}}/api/websocket/graphrag',
                 protocol: 'http',
-                host: ['{{base_url}}'],
+                host: ['localhost'],
+                port: '3000',
                 path: ['api', 'websocket', 'graphrag']
               },
               description: 'Send bidirectional session query via HTTP proxy to WebSocket server'
