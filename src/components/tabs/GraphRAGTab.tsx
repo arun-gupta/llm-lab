@@ -1305,10 +1305,10 @@ export function GraphRAGTab() {
                 mode: 'raw',
                 raw: JSON.stringify({
                   message: {
-                    type: 'unary',
                     query: 'AI healthcare benefits',
-                    graphId: '{{graph_id}}',
-                    model: 'gpt-4'
+                    graph_id: '{{graph_id}}',
+                    model: 'gpt-4',
+                    session_type: 'unary'
                   }
                 }, null, 2)
               },
@@ -1339,10 +1339,10 @@ export function GraphRAGTab() {
                 mode: 'raw',
                 raw: JSON.stringify({
                   message: {
-                    type: 'streaming',
                     query: 'Stanford researchers',
-                    graphId: '{{graph_id}}',
-                    model: 'gpt-4'
+                    graph_id: '{{graph_id}}',
+                    model: 'gpt-4',
+                    session_type: 'streaming'
                   }
                 }, null, 2)
               },
@@ -1373,11 +1373,10 @@ export function GraphRAGTab() {
                 mode: 'raw',
                 raw: JSON.stringify({
                   message: {
-                    type: 'bidirectional',
-                    sessionId: 'session-123',
                     query: 'Machine learning diagnosis',
-                    graphId: '{{graph_id}}',
-                    model: 'gpt-4'
+                    graph_id: '{{graph_id}}',
+                    model: 'gpt-4',
+                    session_type: 'bidirectional'
                   }
                 }, null, 2)
               },
