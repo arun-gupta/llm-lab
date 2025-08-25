@@ -265,7 +265,6 @@ export function GraphRAGTab() {
         // Try to create collection directly in Postman Desktop using API
         const createInPostman = async () => {
           try {
-            setImportMessage('Creating collection in Postman Desktop...');
             
             // Use the same API as MCP tab for direct Postman integration
             const postmanResponse = await fetch('/api/postman/create-collection', {
@@ -347,7 +346,7 @@ export function GraphRAGTab() {
         // Try to create collection directly in Postman Desktop using API
         const createInPostman = async () => {
           try {
-            setImportMessage('Creating gRPC collection in Postman Desktop...');
+
             
             const postmanResponse = await fetch('/api/postman/create-collection', {
               method: 'POST',
@@ -543,7 +542,7 @@ export function GraphRAGTab() {
       // Try to create collection directly in Postman Desktop using API
       const createInPostman = async () => {
         try {
-          setImportMessage('Creating gRPC-Web collection in Postman Desktop...');
+          
           
           const postmanResponse = await fetch('/api/postman/create-collection', {
             method: 'POST',
@@ -1182,7 +1181,7 @@ export function GraphRAGTab() {
       // Try to create collection directly in Postman Desktop using API
       const createInPostman = async () => {
         try {
-          setImportMessage('Creating SSE collection in Postman Desktop...');
+          
           
           const postmanResponse = await fetch('/api/postman/create-collection', {
             method: 'POST',
@@ -1368,7 +1367,7 @@ export function GraphRAGTab() {
       // Try to create collection directly in Postman Desktop using API
       const createInPostman = async () => {
         try {
-          setImportMessage('Creating WebSocket collection in Postman Desktop...');
+          
           
           const postmanResponse = await fetch('/api/postman/create-collection', {
             method: 'POST',
@@ -1450,7 +1449,6 @@ export function GraphRAGTab() {
         // Try to create collection directly in Postman Desktop using API
         const createInPostman = async () => {
           try {
-            setImportMessage('Creating collection in Postman Desktop...');
             
             // Use the same API as other collection buttons for direct Postman integration
             const postmanResponse = await fetch('/api/postman/create-collection', {
