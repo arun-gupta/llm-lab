@@ -1,6 +1,6 @@
 import { grpc } from 'grpc-web';
-// import { GraphRAGServiceClient } from './generated/graphrag_grpc_web_pb';
-// import { GraphQuery, GraphRAGResponse } from './generated/graphrag_pb';
+import { GraphRAGServiceClient } from './generated/graphrag_grpc_web_pb';
+import { GraphQuery, GraphRAGResponse } from './generated/graphrag_pb';
 
 // gRPC-Web client for GraphRAG service
 export class GraphRAGWebClient {

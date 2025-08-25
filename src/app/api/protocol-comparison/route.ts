@@ -85,7 +85,7 @@ export async function POST(request: NextRequest) {
         protocol: 'REST',
         latency: minLatency,
         payloadSize: JSON.stringify(restData).length,
-        response: restData.data?.response || 'REST response received',
+        response: restData.graphRAGResponse || restData.traditionalRAGResponse || 'REST response received',
         timestamp: new Date().toISOString(),
         status: 'success',
         error: undefined
@@ -193,7 +193,7 @@ export async function POST(request: NextRequest) {
         protocol: 'gRPC',
         latency: minLatency,
         payloadSize: JSON.stringify(grpcData).length,
-        response: grpcData.data?.response || 'gRPC response received',
+        response: grpcData.response || grpcData.data?.response || 'gRPC response received',
         timestamp: new Date().toISOString(),
         status: 'success',
         error: undefined
@@ -219,7 +219,7 @@ export async function POST(request: NextRequest) {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          message: { query, graph_id: graphId, model }
+          message: { query, graph_id: graphId, model, streaming: false }
         })
       });
       
