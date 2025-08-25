@@ -83,7 +83,75 @@ npm run dev
 ./scripts/setup-http-filesystem-mcp.sh
 ```
 
-### **Option 2: GitHub Codespaces (Outdated - Use Local Setup Instead)**
+### **Option 2: Docker Deployment**
+
+**Using Docker Compose (Recommended for Production):**
+```bash
+# Clone the repository
+git clone https://github.com/arun-gupta/postman-labs.git
+cd postman-labs
+
+# Option 1: Use .env.local (recommended for local development)
+# Create .env.local with your API keys (this file is gitignored)
+cat > .env.local << EOF
+OPENAI_API_KEY=your_openai_api_key_here
+ANTHROPIC_API_KEY=your_anthropic_api_key_here
+POSTMAN_API_KEY=your_postman_api_key_here
+OLLAMA_BASE_URL=http://host.docker.internal:11434
+EOF
+
+# Option 2: Use .env file
+# Create environment file with your API keys
+cp .env.example .env
+# Edit .env and add your API keys
+
+# Build and run with Docker Compose
+docker-compose up --build
+
+# To run in background
+docker-compose up -d --build
+
+# To stop
+docker-compose down
+```
+
+**Using Docker directly:**
+```bash
+# Build the image
+docker build -t postman-labs .
+
+# Run the container
+docker run -p 3000:3000 \
+  -e OPENAI_API_KEY=your_key \
+  -e ANTHROPIC_API_KEY=your_key \
+  -e POSTMAN_API_KEY=your_key \
+  postman-labs
+
+# Or with environment file
+docker run -p 3000:3000 --env-file .env postman-labs
+```
+
+**Environment Variables Required:**
+- `OPENAI_API_KEY`: Your OpenAI API key
+- `ANTHROPIC_API_KEY`: Your Anthropic API key  
+- `POSTMAN_API_KEY`: Your Postman API key (optional)
+- `OLLAMA_BASE_URL`: URL for Ollama server (optional, defaults to localhost:11434)
+
+**Environment File Precedence:**
+Docker Compose reads environment files in this order (later files override earlier ones):
+1. `.env.local` (gitignored, recommended for local development)
+2. `.env` (can be committed to git for default values)
+
+**Example .env.local file:**
+```bash
+# Create .env.local with your actual API keys
+OPENAI_API_KEY=sk-your-actual-openai-key
+ANTHROPIC_API_KEY=sk-ant-your-actual-anthropic-key
+POSTMAN_API_KEY=your-actual-postman-key
+OLLAMA_BASE_URL=http://host.docker.internal:11434
+```
+
+### **Option 3: GitHub Codespaces (Outdated - Use Local Setup Instead)**
 
 ⚠️ **Note**: GitHub Codespaces setup is currently outdated and may not work properly. We recommend using the local development setup above for the best experience.
 
