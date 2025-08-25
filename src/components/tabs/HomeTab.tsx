@@ -13,7 +13,7 @@ interface HomeTabProps {
 export function HomeTab({ onTabChange, apiKeyStatus }: HomeTabProps) {
   const quickActions = [
     {
-      title: 'Test & Compare',
+              title: 'LLM Testing',
       description: 'Test prompts across all providers with side-by-side comparison',
       icon: TestTube,
       action: () => onTabChange('test'),
@@ -48,7 +48,7 @@ export function HomeTab({ onTabChange, apiKeyStatus }: HomeTabProps) {
           Welcome to Postman Protocol Playground
         </h1>
         <p className="text-lg text-gray-600 mb-4">
-          Test & compare REST, GraphQL, gRPC, WebSocket, and MCP integrations
+          Test and compare LLM providers with side-by-side performance analysis
         </p>
       </div>
 
@@ -133,9 +133,9 @@ export function HomeTab({ onTabChange, apiKeyStatus }: HomeTabProps) {
               <div className="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
                 <span className="text-green-600 font-bold text-lg">2</span>
               </div>
-              <h3 className="font-semibold text-gray-900 mb-2">Test & Compare</h3>
+              <h3 className="font-semibold text-gray-900 mb-2">LLM Testing</h3>
               <p className="text-gray-600 text-sm">
-                Use the Test & Compare tab to experiment with prompts and compare providers side-by-side.
+                Use the LLM Testing tab to experiment with prompts and compare providers side-by-side.
               </p>
             </div>
             <div className="text-center">

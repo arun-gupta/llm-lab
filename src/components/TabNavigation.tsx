@@ -19,9 +19,9 @@ const tabs = [
   },
   {
     id: 'test' as TabType,
-    label: 'Test & Compare',
+    label: 'LLM Testing',
     icon: TestTube,
-    description: 'Test prompts, A/B testing, and comparison'
+    description: 'Test and compare LLM providers, prompts, and responses'
   },
   {
     id: 'collections' as TabType,

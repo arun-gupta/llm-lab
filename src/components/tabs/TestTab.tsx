@@ -74,7 +74,7 @@ export function TestTab({ onTabChange }: TestTabProps) {
       <div className="mb-8">
         <div className="flex items-center justify-between">
           <div>
-            <h1 className="text-3xl font-bold text-gray-900 mb-2">Test & Compare</h1>
+            <h1 className="text-3xl font-bold text-gray-900 mb-2">LLM Testing</h1>
             <p className="text-gray-600">
               Test prompts across different providers and models with A/B testing, side-by-side comparison, and performance benchmarking.
             </p>
