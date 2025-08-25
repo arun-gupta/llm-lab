@@ -56,6 +56,14 @@
           "listen": "test",
           "script": {
             "exec": [
+              "// Debug environment variables",
+              "console.log('🔍 Environment Variables Debug:');",
+              "console.log('repo_owner:', pm.environment.get('repo_owner'));",
+              "console.log('repo_name:', pm.environment.get('repo_name'));",
+              "console.log('github_token:', pm.environment.get('github_token') ? 'SET' : 'NOT SET');",
+              "console.log('mcp_session_id:', pm.environment.get('mcp_session_id'));",
+              "console.log('========================');",
+              "",
               "pm.test(\"Status code is 200\", function () {",
               "    pm.response.to.have.status(200);",
               "});",
