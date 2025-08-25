@@ -482,55 +482,7 @@ export function MCPTab() {
           </div>
         </div>
 
-        {/* MCP Features */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
-          <div className="bg-white rounded-lg p-6 border border-gray-200">
-            <h3 className="font-semibold text-gray-900 mb-4">Key Features</h3>
-            <ul className="space-y-2 text-sm text-gray-600">
-              <li className="flex items-center space-x-2">
-                <Zap className="w-4 h-4 text-blue-600" />
-                <span>Dynamic test data generation</span>
-              </li>
-              <li className="flex items-center space-x-2">
-                <Zap className="w-4 h-4 text-blue-600" />
-                <span>Multi-MCP orchestration</span>
-              </li>
-              <li className="flex items-center space-x-2">
-                <Zap className="w-4 h-4 text-blue-600" />
-                <span>Real-time data validation</span>
-              </li>
-              <li className="flex items-center space-x-2">
-                <Zap className="w-4 h-4 text-blue-600" />
-                <span>Conditional test execution</span>
-              </li>
-            </ul>
-          </div>
-          <div className="bg-white rounded-lg p-6 border border-gray-200">
-            <h3 className="font-semibold text-gray-900 mb-4">Quick Start</h3>
-            <div className="space-y-3 text-sm text-gray-600">
-              <div className="flex items-center space-x-2">
-                <span className="w-6 h-6 bg-blue-100 text-blue-600 rounded-full flex items-center justify-center text-xs font-bold">1</span>
-                <span>Install any MCP collection (GitHub, Filesystem, or SQLite)</span>
-              </div>
-              <div className="flex items-center space-x-2">
-                <span className="w-6 h-6 bg-blue-100 text-blue-600 rounded-full flex items-center justify-center text-xs font-bold">2</span>
-                <span>Set up the corresponding MCP server (see collection descriptions)</span>
-              </div>
-              <div className="flex items-center space-x-2">
-                <span className="w-6 h-6 bg-blue-100 text-blue-600 rounded-full flex items-center justify-center text-xs font-bold">3</span>
-                <span>Run "Health Check" to verify server connectivity</span>
-              </div>
-              <div className="flex items-center space-x-2">
-                <span className="w-6 h-6 bg-blue-100 text-blue-600 rounded-full flex items-center justify-center text-xs font-bold">4</span>
-                <span>Execute the available tools for your use case</span>
-              </div>
-              <div className="flex items-center space-x-2">
-                <span className="w-6 h-6 bg-blue-100 text-blue-600 rounded-full flex items-center justify-center text-xs font-bold">5</span>
-                <span>Combine multiple MCP servers for advanced workflows</span>
-              </div>
-            </div>
-          </div>
-        </div>
+
 
         {/* Download Section */}
         <div className="text-center">
