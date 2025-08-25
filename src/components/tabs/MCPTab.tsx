@@ -17,6 +17,32 @@ export function MCPTab() {
   const [mcpResult, setMcpResult] = useState<any>(null);
   const [isExecuting, setIsExecuting] = useState(false);
 
+  // Sample queries for each MCP type
+  const sampleQueries = {
+    github: [
+      "List my repositories",
+      "Get repository 'postman-labs'",
+      "Show issues for 'postman-labs'",
+      "Get pull requests for 'postman-labs'",
+      "Show repository health for 'postman-labs'"
+    ],
+    filesystem: [
+      "List files in sample-docs",
+      "Read file 'ai-healthcare.txt'",
+      "Search for files containing 'AI'",
+      "Get file info for 'ai-healthcare.txt'",
+      "List sample documents"
+    ],
+    sqlite: [
+      "List all tables",
+      "Show users table schema",
+      "Execute SELECT * FROM users LIMIT 5",
+      "Get database info",
+      "Backup database",
+      "Optimize database"
+    ]
+  };
+
   // Auto-dismiss notification after 5 seconds
   useEffect(() => {
     if (deploymentStatus) {
@@ -137,252 +163,324 @@ export function MCPTab() {
           </p>
         </div>
 
-        {/* MCP Servers Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
-          <div className="bg-white rounded-lg p-6 border border-gray-200 hover:shadow-lg transition-shadow flex flex-col">
-            <div className="flex items-center space-x-3 mb-4">
-              <div className="w-10 h-10 bg-gray-800 rounded-lg flex items-center justify-center">
-                <Code className="w-5 h-5 text-white" />
-              </div>
-              <h3 className="font-semibold text-gray-900">GitHub MCP</h3>
-            </div>
-            <p className="text-sm text-gray-600 mb-4">Fast repository analysis with user repos, issues, PRs, and health reports</p>
-            <div className="text-xs text-gray-500 mb-4">✅ 6 optimized MCP requests</div>
-            <div className="text-xs text-blue-600 mb-4">🔧 Environment variables for security</div>
-            <div className="flex space-x-2 mt-auto">
+                {/* MCP Servers Tabbed Interface */}
+        <div className="bg-white rounded-lg border border-gray-200 mb-6">
+          {/* Tab Navigation */}
+          <div className="border-b border-gray-200">
+            <nav className="-mb-px flex space-x-8 px-6">
               <button
                 onClick={() => setActiveMCP('github')}
-                className="flex-1 inline-flex items-center justify-center px-3 py-2 border border-purple-300 text-sm font-medium rounded-md text-purple-700 bg-purple-50 hover:bg-purple-100 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500 transition-colors"
+                className={`py-4 px-1 border-b-2 font-medium text-sm flex items-center space-x-2 ${
+                  activeMCP === 'github'
+                    ? 'border-purple-500 text-purple-600'
+                    : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                }`}
               >
-                <Zap className="w-4 h-4 mr-2" />
-                Execute
+                <Code className="w-4 h-4" />
+                <span>GitHub MCP</span>
               </button>
-              <button
-                onClick={async () => {
-                  try {
-                    // Fetch the collection JSON
-                    const response = await fetch('/postman-collections/github-mcp-unified.json');
-                    const collection = await response.json();
-                    
-                    // Create collection via Postman API
-                    const apiResponse = await fetch('/api/postman/create-collection', {
-                      method: 'POST',
-                      headers: {
-                        'Content-Type': 'application/json',
-                      },
-                      body: JSON.stringify({
-                        collection: collection,
-                        createInWeb: false, // Create in Desktop
-                      }),
-                    });
-                    
-                    const result = await apiResponse.json();
-                    
-                    if (result.success) {
-                      setDeploymentStatus({
-                        type: 'success',
-                        message: 'Working MCP Collection created successfully in Postman Desktop!'
-                      });
-                    } else {
-                      // Fallback to download if API key not configured
-                      if (result.fallback) {
-                        const blob = new Blob([JSON.stringify(collection, null, 2)], {
-                          type: 'application/json',
-                        });
-                        const url = URL.createObjectURL(blob);
-                        const a = document.createElement('a');
-                        a.href = url;
-                        a.download = 'github-mcp-unified.json';
-                        document.body.appendChild(a);
-                        a.click();
-                        document.body.removeChild(a);
-                        URL.revokeObjectURL(url);
-                        setDeploymentStatus({
-                          type: 'success',
-                          message: 'Collection downloaded! Import it manually into Postman.'
-                        });
-                      } else {
-                        throw new Error(result.message || 'Failed to create collection');
-                      }
-                    }
-                  } catch (error) {
-                    console.error('Error creating collection:', error);
-                    setDeploymentStatus({
-                      type: 'error',
-                      message: 'Failed to create collection. Try "Download & Import" instead.'
-                    });
-                  }
-                }}
-                className="flex-1 inline-flex items-center justify-center px-3 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-purple-600 hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500 transition-colors"
-              >
-                <img src="/postman-logo.svg" alt="Postman" className="w-4 h-4 mr-2" />
-                Add to Postman
-              </button>
-            </div>
-          </div>
-          <div className="bg-white rounded-lg p-6 border border-gray-200 hover:shadow-lg transition-shadow flex flex-col">
-            <div className="flex items-center space-x-3 mb-4">
-              <div className="w-10 h-10 bg-green-600 rounded-lg flex items-center justify-center">
-                <Database className="w-5 h-5 text-white" />
-              </div>
-              <h3 className="font-semibold text-gray-900">Filesystem MCP</h3>
-            </div>
-            <p className="text-sm text-gray-600 mb-4">Official MCP server with HTTP wrapper for Postman integration</p>
-            <div className="text-xs text-gray-500 mb-4">✅ 11 official tools + HTTP API</div>
-            <div className="text-xs text-green-600 mb-4">🌐 HTTP wrapper for Postman</div>
-            <div className="flex space-x-2 mt-auto">
               <button
                 onClick={() => setActiveMCP('filesystem')}
-                className="flex-1 inline-flex items-center justify-center px-3 py-2 border border-green-300 text-sm font-medium rounded-md text-green-700 bg-green-50 hover:bg-green-100 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 transition-colors"
+                className={`py-4 px-1 border-b-2 font-medium text-sm flex items-center space-x-2 ${
+                  activeMCP === 'filesystem'
+                    ? 'border-green-500 text-green-600'
+                    : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                }`}
               >
-                <Zap className="w-4 h-4 mr-2" />
-                Execute
+                <Database className="w-4 h-4" />
+                <span>Filesystem MCP</span>
               </button>
-              <button
-                onClick={async () => {
-                  try {
-                    // Fetch the collection JSON
-                    const response = await fetch('/postman-collections/official-filesystem-mcp-fixed.json');
-                    const collection = await response.json();
-                    
-                    // Create collection via Postman API
-                    const apiResponse = await fetch('/api/postman/create-collection', {
-                      method: 'POST',
-                      headers: {
-                        'Content-Type': 'application/json',
-                      },
-                      body: JSON.stringify({
-                        collection: collection,
-                        createInWeb: false, // Create in Desktop
-                      }),
-                    });
-                    
-                    const result = await apiResponse.json();
-                    
-                    if (result.success) {
-                      setDeploymentStatus({
-                        type: 'success',
-                        message: 'Filesystem MCP Collection created successfully in Postman Desktop!'
-                      });
-                    } else {
-                      // Fallback to download if API key not configured
-                      if (result.fallback) {
-                        const blob = new Blob([JSON.stringify(collection, null, 2)], {
-                          type: 'application/json',
-                        });
-                        const url = URL.createObjectURL(blob);
-                        const a = document.createElement('a');
-                        a.href = url;
-                        a.download = 'official-filesystem-mcp-fixed.json';
-                        document.body.appendChild(a);
-                        a.click();
-                        document.body.removeChild(a);
-                        URL.revokeObjectURL(url);
-                        setDeploymentStatus({
-                          type: 'success',
-                          message: 'Collection downloaded! Import it manually into Postman.'
-                        });
-                      } else {
-                        throw new Error(result.message || 'Failed to create collection');
-                      }
-                    }
-                  } catch (error) {
-                    console.error('Error creating collection:', error);
-                    setDeploymentStatus({
-                      type: 'error',
-                      message: 'Failed to create collection. Try "Download & Import" instead.'
-                    });
-                  }
-                }}
-                className="flex-1 inline-flex items-center justify-center px-3 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 transition-colors"
-              >
-                <img src="/postman-logo.svg" alt="Postman" className="w-4 h-4 mr-2" />
-                Add to Postman
-              </button>
-            </div>
-          </div>
-          <div className="bg-white rounded-lg p-6 border border-gray-200 hover:shadow-lg transition-shadow flex flex-col">
-            <div className="flex items-center space-x-3 mb-4">
-              <div className="w-10 h-10 bg-blue-600 rounded-lg flex items-center justify-center">
-                <Database className="w-5 h-5 text-white" />
-              </div>
-              <h3 className="font-semibold text-gray-900">SQLite MCP</h3>
-            </div>
-            <p className="text-sm text-gray-600 mb-4">Database operations with Docker HTTP mode for Postman integration</p>
-            <div className="text-xs text-gray-500 mb-4">✅ 15 database tools + HTTP API</div>
-                          <div className="text-xs text-blue-600 mb-4">🐳 Docker HTTP mode for API testing</div>
-            <div className="flex space-x-2 mt-auto">
               <button
                 onClick={() => setActiveMCP('sqlite')}
-                className="flex-1 inline-flex items-center justify-center px-3 py-2 border border-blue-300 text-sm font-medium rounded-md text-blue-700 bg-blue-50 hover:bg-blue-100 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors"
+                className={`py-4 px-1 border-b-2 font-medium text-sm flex items-center space-x-2 ${
+                  activeMCP === 'sqlite'
+                    ? 'border-blue-500 text-blue-600'
+                    : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                }`}
               >
-                <Zap className="w-4 h-4 mr-2" />
-                Execute
+                <Database className="w-4 h-4" />
+                <span>SQLite MCP</span>
               </button>
-              <button
-                onClick={async () => {
-                  try {
-                    // Fetch the collection JSON
-                    const response = await fetch('/postman-collections/sqlite-mcp-server.json');
-                    const collection = await response.json();
-                    
-                    // Create collection via Postman API
-                    const apiResponse = await fetch('/api/postman/create-collection', {
-                      method: 'POST',
-                      headers: {
-                        'Content-Type': 'application/json',
-                      },
-                      body: JSON.stringify({
-                        collection: collection,
-                        createInWeb: false, // Create in Desktop
-                      }),
-                    });
-                    
-                    const result = await apiResponse.json();
-                    
-                    if (result.success) {
-                      setDeploymentStatus({
-                        type: 'success',
-                        message: 'SQLite MCP Collection created successfully in Postman Desktop!'
-                      });
-                    } else {
-                      // Fallback to download if API key not configured
-                      if (result.fallback) {
-                        const blob = new Blob([JSON.stringify(collection, null, 2)], {
-                          type: 'application/json',
-                        });
-                        const url = URL.createObjectURL(blob);
-                        const a = document.createElement('a');
-                        a.href = url;
-                        a.download = 'sqlite-mcp-server.json';
-                        document.body.appendChild(a);
-                        a.click();
-                        document.body.removeChild(a);
-                        URL.revokeObjectURL(url);
-                        setDeploymentStatus({
-                          type: 'success',
-                          message: 'Collection downloaded! Import it manually into Postman.'
-                        });
-                      } else {
-                        throw new Error(result.message || 'Failed to create collection');
-                      }
-                    }
-                  } catch (error) {
-                    console.error('Error creating collection:', error);
-                    setDeploymentStatus({
-                      type: 'error',
-                      message: 'Failed to create collection. Try "Download & Import" instead.'
-                    });
-                  }
-                }}
-                className="flex-1 inline-flex items-center justify-center px-3 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors"
-              >
-                <img src="/postman-logo.svg" alt="Postman" className="w-4 h-4 mr-2" />
-                Add to Postman
-              </button>
-            </div>
+            </nav>
           </div>
-          <div className="bg-white rounded-lg p-6 border border-gray-200 hover:shadow-lg transition-shadow opacity-60">
+
+          {/* Tab Content */}
+          <div className="p-6">
+            {activeMCP === 'github' && (
+              <div className="space-y-4">
+                <div>
+                  <h3 className="text-lg font-semibold text-gray-900 mb-2">GitHub MCP</h3>
+                  <p className="text-sm text-gray-600 mb-4">Fast repository analysis with user repos, issues, PRs, and health reports</p>
+                  <div className="text-xs text-gray-500 mb-4">✅ 6 optimized MCP requests</div>
+                  <div className="text-xs text-purple-600 mb-4">🔧 Environment variables for security</div>
+                </div>
+                
+                {/* Sample Queries */}
+                <div>
+                  <h4 className="text-sm font-medium text-gray-900 mb-3">Sample Queries</h4>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
+                    {sampleQueries.github.map((query, index) => (
+                      <button
+                        key={index}
+                        onClick={() => setMcpQuery(query)}
+                        className="text-left p-3 border border-gray-200 rounded-md hover:bg-gray-50 transition-colors text-sm text-gray-700"
+                      >
+                        {query}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                <div className="flex space-x-3 pt-4">
+                  <button
+                    onClick={() => setActiveTab('execute')}
+                    className="flex-1 inline-flex items-center justify-center px-4 py-2 border border-purple-300 text-sm font-medium rounded-md text-purple-700 bg-purple-50 hover:bg-purple-100 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500 transition-colors"
+                  >
+                    <Zap className="w-4 h-4 mr-2" />
+                    Execute Queries
+                  </button>
+                  <button
+                    onClick={async () => {
+                      try {
+                        const response = await fetch('/postman-collections/github-mcp-unified.json');
+                        const collection = await response.json();
+                        
+                        const apiResponse = await fetch('/api/postman/create-collection', {
+                          method: 'POST',
+                          headers: { 'Content-Type': 'application/json' },
+                          body: JSON.stringify({ collection, createInWeb: false }),
+                        });
+                        
+                        const result = await apiResponse.json();
+                        
+                        if (result.success) {
+                          setDeploymentStatus({
+                            type: 'success',
+                            message: 'GitHub MCP Collection created successfully in Postman Desktop!'
+                          });
+                        } else {
+                          if (result.fallback) {
+                            const blob = new Blob([JSON.stringify(collection, null, 2)], { type: 'application/json' });
+                            const url = URL.createObjectURL(blob);
+                            const a = document.createElement('a');
+                            a.href = url;
+                            a.download = 'github-mcp-unified.json';
+                            document.body.appendChild(a);
+                            a.click();
+                            document.body.removeChild(a);
+                            URL.revokeObjectURL(url);
+                            setDeploymentStatus({
+                              type: 'success',
+                              message: 'Collection downloaded! Import it manually into Postman.'
+                            });
+                          } else {
+                            throw new Error(result.message || 'Failed to create collection');
+                          }
+                        }
+                      } catch (error) {
+                        console.error('Error creating collection:', error);
+                        setDeploymentStatus({
+                          type: 'error',
+                          message: 'Failed to create collection. Try "Download & Import" instead.'
+                        });
+                      }
+                    }}
+                    className="flex-1 inline-flex items-center justify-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-purple-600 hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500 transition-colors"
+                  >
+                    <img src="/postman-logo.svg" alt="Postman" className="w-4 h-4 mr-2" />
+                    Add to Postman
+                  </button>
+                </div>
+              </div>
+            )}
+
+            {activeMCP === 'filesystem' && (
+              <div className="space-y-4">
+                <div>
+                  <h3 className="text-lg font-semibold text-gray-900 mb-2">Filesystem MCP</h3>
+                  <p className="text-sm text-gray-600 mb-4">Official MCP server with HTTP wrapper for Postman integration</p>
+                  <div className="text-xs text-gray-500 mb-4">✅ 11 official tools + HTTP API</div>
+                  <div className="text-xs text-green-600 mb-4">🌐 HTTP wrapper for Postman</div>
+                </div>
+                
+                {/* Sample Queries */}
+                <div>
+                  <h4 className="text-sm font-medium text-gray-900 mb-3">Sample Queries</h4>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
+                    {sampleQueries.filesystem.map((query, index) => (
+                      <button
+                        key={index}
+                        onClick={() => setMcpQuery(query)}
+                        className="text-left p-3 border border-gray-200 rounded-md hover:bg-gray-50 transition-colors text-sm text-gray-700"
+                      >
+                        {query}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                <div className="flex space-x-3 pt-4">
+                  <button
+                    onClick={() => setActiveTab('execute')}
+                    className="flex-1 inline-flex items-center justify-center px-4 py-2 border border-green-300 text-sm font-medium rounded-md text-green-700 bg-green-50 hover:bg-green-100 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 transition-colors"
+                  >
+                    <Zap className="w-4 h-4 mr-2" />
+                    Execute Queries
+                  </button>
+                  <button
+                    onClick={async () => {
+                      try {
+                        const response = await fetch('/postman-collections/official-filesystem-mcp-fixed.json');
+                        const collection = await response.json();
+                        
+                        const apiResponse = await fetch('/api/postman/create-collection', {
+                          method: 'POST',
+                          headers: { 'Content-Type': 'application/json' },
+                          body: JSON.stringify({ collection, createInWeb: false }),
+                        });
+                        
+                        const result = await apiResponse.json();
+                        
+                        if (result.success) {
+                          setDeploymentStatus({
+                            type: 'success',
+                            message: 'Filesystem MCP Collection created successfully in Postman Desktop!'
+                          });
+                        } else {
+                          if (result.fallback) {
+                            const blob = new Blob([JSON.stringify(collection, null, 2)], { type: 'application/json' });
+                            const url = URL.createObjectURL(blob);
+                            const a = document.createElement('a');
+                            a.href = url;
+                            a.download = 'official-filesystem-mcp-fixed.json';
+                            document.body.appendChild(a);
+                            a.click();
+                            document.body.removeChild(a);
+                            URL.revokeObjectURL(url);
+                            setDeploymentStatus({
+                              type: 'success',
+                              message: 'Collection downloaded! Import it manually into Postman.'
+                            });
+                          } else {
+                            throw new Error(result.message || 'Failed to create collection');
+                          }
+                        }
+                      } catch (error) {
+                        console.error('Error creating collection:', error);
+                        setDeploymentStatus({
+                          type: 'error',
+                          message: 'Failed to create collection. Try "Download & Import" instead.'
+                        });
+                      }
+                    }}
+                    className="flex-1 inline-flex items-center justify-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 transition-colors"
+                  >
+                    <img src="/postman-logo.svg" alt="Postman" className="w-4 h-4 mr-2" />
+                    Add to Postman
+                  </button>
+                </div>
+              </div>
+            )}
+
+            {activeMCP === 'sqlite' && (
+              <div className="space-y-4">
+                <div>
+                  <h3 className="text-lg font-semibold text-gray-900 mb-2">SQLite MCP</h3>
+                  <p className="text-sm text-gray-600 mb-4">Database operations with Docker HTTP mode for Postman integration</p>
+                  <div className="text-xs text-gray-500 mb-4">✅ 15 database tools + HTTP API</div>
+                  <div className="text-xs text-blue-600 mb-4">🐳 Docker HTTP mode for API testing</div>
+                </div>
+                
+                {/* Sample Queries */}
+                <div>
+                  <h4 className="text-sm font-medium text-gray-900 mb-3">Sample Queries</h4>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
+                    {sampleQueries.sqlite.map((query, index) => (
+                      <button
+                        key={index}
+                        onClick={() => setMcpQuery(query)}
+                        className="text-left p-3 border border-gray-200 rounded-md hover:bg-gray-50 transition-colors text-sm text-gray-700"
+                      >
+                        {query}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                <div className="flex space-x-3 pt-4">
+                  <button
+                    onClick={() => setActiveTab('execute')}
+                    className="flex-1 inline-flex items-center justify-center px-4 py-2 border border-blue-300 text-sm font-medium rounded-md text-blue-700 bg-blue-50 hover:bg-blue-100 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors"
+                  >
+                    <Zap className="w-4 h-4 mr-2" />
+                    Execute Queries
+                  </button>
+                  <button
+                    onClick={async () => {
+                      try {
+                        const response = await fetch('/postman-collections/sqlite-mcp-server.json');
+                        const collection = await response.json();
+                        
+                        const apiResponse = await fetch('/api/postman/create-collection', {
+                          method: 'POST',
+                          headers: { 'Content-Type': 'application/json' },
+                          body: JSON.stringify({ collection, createInWeb: false }),
+                        });
+                        
+                        const result = await apiResponse.json();
+                        
+                        if (result.success) {
+                          setDeploymentStatus({
+                            type: 'success',
+                            message: 'SQLite MCP Collection created successfully in Postman Desktop!'
+                          });
+                        } else {
+                          if (result.fallback) {
+                            const blob = new Blob([JSON.stringify(collection, null, 2)], { type: 'application/json' });
+                            const url = URL.createObjectURL(blob);
+                            const a = document.createElement('a');
+                            a.href = url;
+                            a.download = 'sqlite-mcp-server.json';
+                            document.body.appendChild(a);
+                            a.click();
+                            document.body.removeChild(a);
+                            URL.revokeObjectURL(url);
+                            setDeploymentStatus({
+                              type: 'success',
+                              message: 'Collection downloaded! Import it manually into Postman.'
+                            });
+                          } else {
+                            throw new Error(result.message || 'Failed to create collection');
+                          }
+                        }
+                      } catch (error) {
+                        console.error('Error creating collection:', error);
+                        setDeploymentStatus({
+                          type: 'error',
+                          message: 'Failed to create collection. Try "Download & Import" instead.'
+                        });
+                      }
+                    }}
+                    className="flex-1 inline-flex items-center justify-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors"
+                  >
+                    <img src="/postman-logo.svg" alt="Postman" className="w-4 h-4 mr-2" />
+                    Add to Postman
+                  </button>
+                </div>
+              </div>
+            )}
+
+            {!activeMCP && (
+              <div className="text-center py-12">
+                <div className="w-12 h-12 bg-gray-100 rounded-lg flex items-center justify-center mx-auto mb-4">
+                  <Code className="w-6 h-6 text-gray-400" />
+                </div>
+                <h3 className="text-lg font-medium text-gray-900 mb-2">Select an MCP Server</h3>
+                <p className="text-gray-600">Choose a tab above to explore MCP operations and sample queries</p>
+              </div>
+            )}
+          </div>
+        </div>
             <div className="flex items-center space-x-3 mb-4">
               <div className="w-10 h-10 bg-gray-400 rounded-lg flex items-center justify-center">
                 <Globe className="w-5 h-5 text-white" />
