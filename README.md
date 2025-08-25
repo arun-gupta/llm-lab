@@ -100,6 +100,13 @@ npm run dev
 git clone https://github.com/arun-gupta/postman-labs.git
 cd postman-labs
 
+# Full production setup with all services
+docker-compose up -d
+
+# Or use development setup (simpler, fewer services)
+docker-compose -f docker-compose.dev.yml up -d
+```
+
 # Option 1: Use .env.local (recommended for local development)
 # Create .env.local with your API keys (this file is gitignored)
 cat > .env.local << EOF
@@ -150,6 +157,10 @@ docker run -p 3000:3000 --env-file .env postman-labs
 Docker Compose reads environment files in this order (later files override earlier ones):
 1. `.env.local` (gitignored, recommended for local development)
 2. `.env` (can be committed to git for default values)
+
+**Docker Compose Options:**
+- **Full Production** (`docker-compose.yml`): All services including gRPC server, gRPC-Web proxy, and MCP servers
+- **Development** (`docker-compose.dev.yml`): Simplified setup with just the main app and SQLite MCP server
 
 **Example .env.local file:**
 ```bash

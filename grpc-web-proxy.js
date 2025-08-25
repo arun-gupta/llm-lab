@@ -50,6 +50,16 @@ const grpcClient = new graphragProto.GraphRAGService(
   grpc.credentials.createInsecure()
 );
 
+// Health check endpoint
+app.get('/health', (req, res) => {
+  res.status(200).json({
+    status: 'healthy',
+    service: 'grpc-web-proxy',
+    timestamp: new Date().toISOString(),
+    grpc_server_port: GRPC_SERVER_PORT
+  });
+});
+
 // gRPC-Web proxy endpoints
 app.use(express.json());
 

@@ -1,0 +1,43 @@
+FROM node:20-alpine AS base
+
+# Install dependencies only when needed
+FROM base AS deps
+RUN apk add --no-cache libc6-compat curl
+WORKDIR /app
+
+# Install dependencies based on the preferred package manager
+COPY package.json package-lock.json* ./
+RUN npm ci --only=production
+
+# Rebuild the source code only when needed
+FROM base AS builder
+WORKDIR /app
+COPY --from=deps /app/node_modules ./node_modules
+COPY scripts/setup-http-filesystem-mcp.sh ./
+
+# Production image, copy all the files and run the app
+FROM base AS runner
+WORKDIR /app
+
+ENV NODE_ENV=production
+ENV PORT=3002
+
+RUN addgroup --system --gid 1001 nodejs
+RUN adduser --system --uid 1001 mcpuser
+
+# Create directories for MCP servers
+RUN mkdir -p /app/mcp-servers /app/data /app/sample-docs
+RUN chown -R mcpuser:nodejs /app
+
+COPY --from=builder --chown=mcpuser:nodejs /app/node_modules ./node_modules
+COPY --from=builder --chown=mcpuser:nodejs /app/setup-http-filesystem-mcp.sh ./setup-http-filesystem-mcp.sh
+
+USER mcpuser
+
+EXPOSE 3002
+
+HEALTHCHECK --interval=30s --timeout=3s --start-period=5s --retries=3 \
+  CMD curl -f http://localhost:3002/health || exit 1
+
+# Start the filesystem MCP server
+CMD ["sh", "setup-http-filesystem-mcp.sh"]

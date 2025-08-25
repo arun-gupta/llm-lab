@@ -24,21 +24,96 @@ services:
       retries: 3
       start_period: 40s
     restart: unless-stopped
+    depends_on:
+      - grpc-server
+      - grpc-web-proxy
+      - sqlite-mcp-server
+      - filesystem-mcp-server
     networks:
       - postman-labs-network
 
-  # Optional: Add other services like databases, caches, etc.
-  # redis:
-  #   image: redis:alpine
-  #   ports:
-  #     - "6379:6379"
-  #   networks:
-  #     - postman-labs-network
+  grpc-server:
+    build:
+      context: ./grpc-server
+      dockerfile: Dockerfile
+    ports:
+      - "50051:50051"
+    environment:
+      - NODE_ENV=production
+    healthcheck:
+      test: ["CMD", "grpc_health_probe", "-addr=localhost:50051"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 10s
+    restart: unless-stopped
+    networks:
+      - postman-labs-network
+
+  grpc-web-proxy:
+    build:
+      context: .
+      dockerfile: Dockerfile.grpc-web-proxy
+    ports:
+      - "50052:50052"
+    environment:
+      - GRPC_SERVER_HOST=grpc-server
+      - GRPC_SERVER_PORT=50051
+      - HTTP_PORT=50052
+    depends_on:
+      - grpc-server
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:50052/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 10s
+    restart: unless-stopped
+    networks:
+      - postman-labs-network
+
+  sqlite-mcp-server:
+    image: arungupta/sqlite-mcp-server:latest
+    ports:
+      - "3001:3001"
+    environment:
+      - PORT=3001
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:3001/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 10s
+    restart: unless-stopped
+    networks:
+      - postman-labs-network
+
+  filesystem-mcp-server:
+    build:
+      context: .
+      dockerfile: Dockerfile.filesystem-mcp
+    ports:
+      - "3002:3002"
+    environment:
+      - PORT=3002
+      - MCP_SERVER_DIR=/app/mcp-servers
+    volumes:
+      - ./data:/app/data:ro
+      - ./sample-docs:/app/sample-docs:ro
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:3002/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 10s
+    restart: unless-stopped
+    networks:
+      - postman-labs-network
 
 networks:
   postman-labs-network:
     driver: bridge
 
-# volumes:
-#   # Add any persistent volumes here
-#   app-data:
+volumes:
+  app-data:
+    driver: local
