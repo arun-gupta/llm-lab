@@ -39,7 +39,7 @@ export async function POST(request: NextRequest) {
       } else if (lowerQuery === 'describe table') {
         return { operation: 'describe_table', params: { table_name: 'users' } };
       } else if (lowerQuery === 'run query') {
-        return { operation: 'run_query', params: { query: 'SELECT * FROM users LIMIT 5' } };
+        return { operation: 'run_query', params: { query: 'SELECT * FROM users ORDER BY id DESC LIMIT 10' } };
       } else if (lowerQuery === 'insert row') {
         const timestamp = Date.now();
         return { 
@@ -70,7 +70,7 @@ export async function POST(request: NextRequest) {
           if (selectMatch) {
             return { operation: 'run_query', params: { query: q } };
           } else {
-            return { operation: 'run_query', params: { query: 'SELECT * FROM users LIMIT 5' } };
+            return { operation: 'run_query', params: { query: 'SELECT * FROM users ORDER BY id DESC LIMIT 10' } };
           }
         } else {
           // Default to listing tools
