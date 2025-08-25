@@ -282,8 +282,14 @@ export function GraphRAGTab() {
             const result = await postmanResponse.json();
 
             if (result.success) {
-                          setImportStatus('success');
-                              setImportMessage('✅ GraphRAG REST API Collection created successfully in Postman Desktop! Set base_url to http://localhost:3000 in your environment.');
+                                      setImportStatus('success');
+            setImportMessage('✅ GraphRAG REST API Collection created successfully in Postman Desktop! Set base_url to http://localhost:3000 in your environment.');
+            setShowSuccessCelebration(true);
+            setCelebrationData({
+              type: 'collection-created',
+              title: '🎉 GraphRAG REST API Collection Created!',
+              message: 'Your Postman collection has been created successfully in Postman Desktop!'
+            });
             
             // Don't open Postman Desktop automatically - just show success message
             } else {
@@ -358,8 +364,14 @@ export function GraphRAGTab() {
             const result = await postmanResponse.json();
 
             if (result.success) {
-              setImportStatus('success');
-              setImportMessage('✅ gRPC Collection created successfully in Postman Desktop! Import the .proto file for service definitions.');
+                          setImportStatus('success');
+            setImportMessage('✅ gRPC Collection created successfully in Postman Desktop! Import the .proto file for service definitions.');
+            setShowSuccessCelebration(true);
+            setCelebrationData({
+              type: 'collection-created',
+              title: '🎉 gRPC Collection Created!',
+              message: 'Your gRPC Postman collection has been created successfully in Postman Desktop!'
+            });
               
               // Don't open Postman Desktop automatically - just show success message
             } else {
@@ -551,6 +563,12 @@ export function GraphRAGTab() {
           if (result.success) {
             setImportStatus('success');
             setImportMessage('✅ gRPC-Web Collection created successfully in Postman Desktop! Configure your gRPC-Web proxy endpoint.');
+            setShowSuccessCelebration(true);
+            setCelebrationData({
+              type: 'collection-created',
+              title: '🎉 gRPC-Web Collection Created!',
+              message: 'Your gRPC-Web Postman collection has been created successfully in Postman Desktop!'
+            });
             
             // Don't open Postman Desktop automatically - just show success message
           } else {
@@ -1185,6 +1203,12 @@ export function GraphRAGTab() {
           if (result.success) {
             setImportStatus('success');
             setImportMessage('✅ SSE Collection created successfully in Postman Desktop! Set base_url to http://localhost:3000 in your environment.');
+            setShowSuccessCelebration(true);
+            setCelebrationData({
+              type: 'collection-created',
+              title: '🎉 SSE Collection Created!',
+              message: 'Your SSE Postman collection has been created successfully in Postman Desktop!'
+            });
           } else {
             // Fallback to download if API key not configured
             if (result.fallback) {
@@ -1366,6 +1390,12 @@ export function GraphRAGTab() {
           if (result.success) {
             setImportStatus('success');
             setImportMessage('✅ WebSocket Collection created successfully in Postman Desktop! Set base_url to ws://localhost:3000 in your environment.');
+            setShowSuccessCelebration(true);
+            setCelebrationData({
+              type: 'collection-created',
+              title: '🎉 WebSocket Collection Created!',
+              message: 'Your WebSocket Postman collection has been created successfully in Postman Desktop!'
+            });
           } else {
             // Fallback to download if API key not configured
             if (result.fallback) {
