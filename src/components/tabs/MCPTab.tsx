@@ -11,7 +11,7 @@ export function MCPTab() {
   const [deploymentStatus, setDeploymentStatus] = useState<{ type: 'success' | 'error', message: string } | null>(null);
   
   // MCP Execution States
-  const [activeMCP, setActiveMCP] = useState<'github' | 'filesystem' | 'sqlite' | null>(null);
+  const [activeMCP, setActiveMCP] = useState<'github' | 'filesystem' | 'sqlite' | null>('github');
   const [activeTab, setActiveTab] = useState<'execute' | 'collections'>('execute');
   const [mcpQuery, setMcpQuery] = useState('');
   const [mcpResult, setMcpResult] = useState<any>(null);
