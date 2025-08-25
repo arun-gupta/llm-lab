@@ -121,16 +121,56 @@ export function MCPTab() {
           }
         }
       } else {
+        // Handle specific error cases with user-friendly messages
+        let errorMessage = result.error || 'MCP query failed';
+        
+        // Provide more specific error messages based on the error content
+        if (errorMessage.includes('Failed to read directory')) {
+          errorMessage = 'Directory not found or not accessible. Please check the path and try again.';
+        } else if (errorMessage.includes('Failed to read file')) {
+          errorMessage = 'File not found or not accessible. Please check the file path and try again.';
+        } else if (errorMessage.includes('File path is required')) {
+          errorMessage = 'Please specify a file or directory path in your query.';
+        } else if (errorMessage.includes('Unknown operation')) {
+          errorMessage = 'This operation is not supported. Please try a different query.';
+        } else if (errorMessage.includes('Failed to search files')) {
+          errorMessage = 'Unable to search files. Please check the directory path and search term.';
+        }
+        
         setDeploymentStatus({
           type: 'error',
-          message: result.error || 'MCP query failed'
+          message: errorMessage
+        });
+        
+        // Also set the result to show the error in the results panel
+        setMcpResult({
+          error: true,
+          message: errorMessage,
+          details: result.error || 'Unknown error occurred'
         });
       }
     } catch (error) {
       console.error('MCP execution error:', error);
+      
+      let errorMessage = 'Failed to execute MCP query';
+      
+      // Handle network and connection errors
+      if (error instanceof TypeError && error.message.includes('fetch')) {
+        errorMessage = 'Network error: Unable to connect to the MCP server. Please check your connection and try again.';
+      } else if (error instanceof Error) {
+        errorMessage = `Error: ${error.message}`;
+      }
+      
       setDeploymentStatus({
         type: 'error',
-        message: 'Failed to execute MCP query'
+        message: errorMessage
+      });
+      
+      // Show error in results panel
+      setMcpResult({
+        error: true,
+        message: errorMessage,
+        details: error instanceof Error ? error.message : 'Unknown error occurred'
       });
     } finally {
       setIsExecuting(false);
@@ -388,22 +428,15 @@ export function MCPTab() {
                       </div>
 
                       {/* Action Buttons */}
-                      <div className="flex space-x-3">
-                        <button
-                          onClick={() => executeMCPQuery(activeMCP, mcpQuery, false)}
-                          disabled={!mcpQuery.trim() || isExecuting}
-                          className="flex-1 px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed"
-                        >
-                          {isExecuting ? 'Executing...' : 'Execute Query'}
-                        </button>
-                        <button
-                          onClick={() => executeMCPQuery(activeMCP, mcpQuery, true)}
-                          disabled={!mcpQuery.trim() || isExecuting}
-                          className="flex-1 px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 disabled:opacity-50 disabled:cursor-not-allowed"
-                        >
-                          {isExecuting ? 'Creating...' : 'Execute & Create Collection'}
-                        </button>
-                      </div>
+                                          <div className="flex justify-center">
+                      <button
+                        onClick={() => executeMCPQuery(activeMCP, mcpQuery, false)}
+                        disabled={!mcpQuery.trim() || isExecuting}
+                        className="px-8 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed"
+                      >
+                        {isExecuting ? 'Executing...' : 'Execute Query'}
+                      </button>
+                    </div>
 
                       {/* Sample Queries */}
                       <div>
@@ -431,9 +464,29 @@ export function MCPTab() {
                       </label>
                       <div className="bg-gray-50 border border-gray-200 rounded-md p-4 h-96 overflow-auto">
                         {mcpResult ? (
-                          <pre className="text-sm text-gray-800 whitespace-pre-wrap">
-                            {JSON.stringify(mcpResult, null, 2)}
-                          </pre>
+                          mcpResult.error ? (
+                            <div className="flex items-center justify-center h-full">
+                              <div className="text-center">
+                                <div className="w-12 h-12 bg-red-100 rounded-lg flex items-center justify-center mx-auto mb-3">
+                                  <span className="text-red-500 text-xl">⚠️</span>
+                                </div>
+                                <h4 className="text-sm font-medium text-red-800 mb-2">Query Failed</h4>
+                                <p className="text-sm text-red-600 mb-3">{mcpResult.message}</p>
+                                {mcpResult.details && (
+                                  <details className="text-xs text-gray-500">
+                                    <summary className="cursor-pointer hover:text-gray-700">Technical Details</summary>
+                                    <pre className="mt-2 text-left bg-gray-100 p-2 rounded text-xs overflow-auto">
+                                      {mcpResult.details}
+                                    </pre>
+                                  </details>
+                                )}
+                              </div>
+                            </div>
+                          ) : (
+                            <pre className="text-sm text-gray-800 whitespace-pre-wrap">
+                              {JSON.stringify(mcpResult, null, 2)}
+                            </pre>
+                          )
                         ) : (
                           <div className="flex items-center justify-center h-full text-gray-500">
                             <div className="text-center">
