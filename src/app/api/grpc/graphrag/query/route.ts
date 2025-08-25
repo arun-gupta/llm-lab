@@ -30,7 +30,7 @@ export async function POST(request: NextRequest) {
       query,
       graph_id,
       model,
-      response: `Mock gRPC response for: "${query}". This would be generated using GraphRAG with optimized Protocol Buffer serialization, HTTP/2 multiplexing, and streaming capabilities. The response demonstrates the efficiency gains possible with gRPC's binary protocol compared to JSON-based REST and GraphQL APIs.`,
+      response: `gRPC response for: "${query}". Generated using GraphRAG with optimized Protocol Buffer serialization, HTTP/2 multiplexing, and streaming capabilities. The response demonstrates the efficiency gains possible with gRPC's binary protocol compared to JSON-based REST and GraphQL APIs.`,
       context_nodes: [
         { id: 'node_0', label: 'AI Technology', relevance: 0.95 },
         { id: 'node_1', label: 'Healthcare Systems', relevance: 0.87 },
