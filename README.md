@@ -4,7 +4,7 @@ A comprehensive **Postman-focused platform** that combines **A/B testing for LLM
 
 ## 🎯 **What Makes This Special**
 
-### **🤖 A/B Testing & Model Comparison**
+### **🤖 A/B Testing & Multi-Provider LLM Comparison**
 - **Side-by-Side Comparison**: Test OpenAI, Anthropic, and Ollama models simultaneously
 - **Advanced Metrics**: Quality, accuracy, coherence, diversity, and safety guardrails
 - **Real-time Fact-Checking**: Wikipedia API integration for accuracy verification
