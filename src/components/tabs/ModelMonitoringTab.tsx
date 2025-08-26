@@ -364,7 +364,7 @@ export function ModelMonitoringTab({ onTabChange }: ModelMonitoringTabProps) {
   }, []);
 
   // Performance Monitoring State
-  const [monitoringEnabled, setMonitoringEnabled] = useState(false);
+
   const [metrics, setMetrics] = useState({
     totalRequests: 0,
     averageLatency: 0,
@@ -1919,20 +1919,13 @@ export function ModelMonitoringTab({ onTabChange }: ModelMonitoringTabProps) {
               <p className="text-gray-600 mt-1">Track and monitor model performance metrics</p>
             </div>
             <div className="p-6">
-              <div className="flex items-center justify-between">
-                <div>
-                  <h4 className="font-medium text-gray-900">Real-time Monitoring</h4>
-                  <p className="text-sm text-gray-600">Track latency, throughput, costs, and quality metrics</p>
+              <div>
+                <h4 className="font-medium text-gray-900">Real-time Monitoring</h4>
+                <p className="text-sm text-gray-600">Track latency, throughput, costs, and quality metrics</p>
+                <div className="mt-2 flex items-center">
+                  <div className="w-2 h-2 bg-green-500 rounded-full mr-2"></div>
+                  <span className="text-sm text-green-600 font-medium">Always Active</span>
                 </div>
-                <label className="relative inline-flex items-center cursor-pointer">
-                  <input
-                    type="checkbox"
-                    checked={monitoringEnabled}
-                    onChange={(e) => setMonitoringEnabled(e.target.checked)}
-                    className="sr-only peer"
-                  />
-                  <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
-                </label>
               </div>
             </div>
           </div>
