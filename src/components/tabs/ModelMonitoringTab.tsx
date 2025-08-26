@@ -1253,7 +1253,7 @@ export function ModelMonitoringTab({ onTabChange }: ModelMonitoringTabProps) {
                               <p className="text-xs text-gray-500 mt-1">{model.description}</p>
                               {!isRunning && (
                                 <p className="text-xs text-red-500 mt-1">
-                                  Model not running. Start with: <code className="bg-gray-100 px-1 rounded">ollama pull {model.model}</code>
+                                  Model not running. Start with: <code className="bg-gray-100 px-1 rounded">ollama run {model.model}</code>
                                 </p>
                               )}
                             </div>
