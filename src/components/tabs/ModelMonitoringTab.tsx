@@ -2379,9 +2379,87 @@ export function ABTestingTab({ onTabChange }: ABTestingTabProps) {
                 </div>
               </div>
             </div>
-          </div>
+                      </div>
 
-
+            {/* Fact-Checking Analysis Section */}
+            {savedTestRuns.length > 0 && savedTestRuns.some(run => run.results.some(result => result.factCheckResult)) && (
+              <div className="bg-white rounded-lg border shadow-sm p-6">
+                <h4 className="font-medium text-gray-900 mb-6">Fact-Checking Analysis</h4>
+                <div className="space-y-4">
+                  {savedTestRuns.map((run, runIndex) => (
+                    <div key={runIndex} className="border rounded-lg p-4">
+                      <div className="flex items-center justify-between mb-3">
+                        <h5 className="font-medium text-gray-900">Test Run {runIndex + 1}</h5>
+                        <span className="text-sm text-gray-500">{new Date(run.timestamp).toLocaleString()}</span>
+                      </div>
+                      <div className="space-y-3">
+                        {run.results.filter(result => result.factCheckResult).map((result, resultIndex) => {
+                          const model = run.models.find(m => m.id === result.modelId);
+                          const modelName = model?.name || result.modelId;
+                          return (
+                            <div key={resultIndex} className="bg-blue-50 rounded-lg p-4">
+                              <div className="flex items-center justify-between mb-3">
+                                <h6 className="font-medium text-blue-900">{modelName}</h6>
+                                <div className="text-sm">
+                                  <span className="text-blue-700 font-medium">Accuracy: </span>
+                                  <span className="text-blue-900">{(result.factCheckResult!.accuracy * 100).toFixed(1)}%</span>
+                                  <span className="text-blue-700 font-medium ml-4">Confidence: </span>
+                                  <span className="text-blue-900">{(result.factCheckResult!.confidence * 100).toFixed(1)}%</span>
+                                </div>
+                              </div>
+                              
+                              {result.factCheckResult!.verifiedFacts.length > 0 && (
+                                <div className="mb-3">
+                                  <span className="text-green-700 font-medium text-sm">✅ Verified Facts:</span>
+                                  <ul className="mt-1 space-y-1">
+                                    {result.factCheckResult!.verifiedFacts.slice(0, 3).map((fact, index) => (
+                                      <li key={index} className="text-green-800 text-xs pl-2">• {fact}</li>
+                                    ))}
+                                  </ul>
+                                </div>
+                              )}
+                              
+                              {result.factCheckResult!.unverifiedClaims.length > 0 && (
+                                <div className="mb-3">
+                                  <span className="text-orange-700 font-medium text-sm">⚠️ Unverified Claims:</span>
+                                  <ul className="mt-1 space-y-1">
+                                    {result.factCheckResult!.unverifiedClaims.slice(0, 3).map((claim, index) => (
+                                      <li key={index} className="text-orange-800 text-xs pl-2">• {claim}</li>
+                                    ))}
+                                  </ul>
+                                </div>
+                              )}
+                              
+                              {result.factCheckResult!.contradictions.length > 0 && (
+                                <div className="mb-3">
+                                  <span className="text-red-700 font-medium text-sm">🚨 Contradictions:</span>
+                                  <ul className="mt-1 space-y-1">
+                                    {result.factCheckResult!.contradictions.slice(0, 2).map((contradiction, index) => (
+                                      <li key={index} className="text-red-800 text-xs pl-2">• {contradiction}</li>
+                                    ))}
+                                  </ul>
+                                </div>
+                              )}
+                              
+                              {result.factCheckResult!.issues.length > 0 && (
+                                <div>
+                                  <span className="text-gray-700 font-medium text-sm">📋 Issues:</span>
+                                  <ul className="mt-1 space-y-1">
+                                    {result.factCheckResult!.issues.map((issue, index) => (
+                                      <li key={index} className="text-gray-800 text-xs pl-2">• {issue}</li>
+                                    ))}
+                                  </ul>
+                                </div>
+                              )}
+                            </div>
+                          );
+                        })}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
 
           {/* Analytics Sections */}
           <div className="space-y-6">
@@ -3226,66 +3304,7 @@ export function ABTestingTab({ onTabChange }: ABTestingTabProps) {
                             <p className="text-gray-700 whitespace-pre-wrap leading-relaxed">{result.response}</p>
                           </div>
                           
-                          {/* Fact-Checking Details */}
-                          {result.factCheckResult && (
-                            <div className="bg-blue-50 rounded-lg p-4">
-                              <h6 className="font-medium text-blue-900 mb-3">Fact-Checking Analysis</h6>
-                              <div className="grid grid-cols-2 gap-4 text-sm">
-                                <div>
-                                  <span className="text-blue-700 font-medium">Accuracy Score:</span>
-                                  <span className="ml-2 text-blue-900">{(result.factCheckResult.accuracy * 100).toFixed(1)}%</span>
-                                </div>
-                                <div>
-                                  <span className="text-blue-700 font-medium">Confidence:</span>
-                                  <span className="ml-2 text-blue-900">{(result.factCheckResult.confidence * 100).toFixed(1)}%</span>
-                                </div>
-                              </div>
-                              
-                              {result.factCheckResult.verifiedFacts.length > 0 && (
-                                <div className="mt-3">
-                                  <span className="text-blue-700 font-medium text-sm">✅ Verified Facts:</span>
-                                  <ul className="mt-1 space-y-1">
-                                    {result.factCheckResult.verifiedFacts.slice(0, 3).map((fact, index) => (
-                                      <li key={index} className="text-blue-800 text-xs pl-2">• {fact}</li>
-                                    ))}
-                                  </ul>
-                                </div>
-                              )}
-                              
-                              {result.factCheckResult.unverifiedClaims.length > 0 && (
-                                <div className="mt-3">
-                                  <span className="text-blue-700 font-medium text-sm">⚠️ Unverified Claims:</span>
-                                  <ul className="mt-1 space-y-1">
-                                    {result.factCheckResult.unverifiedClaims.slice(0, 3).map((claim, index) => (
-                                      <li key={index} className="text-blue-800 text-xs pl-2">• {claim}</li>
-                                    ))}
-                                  </ul>
-                                </div>
-                              )}
-                              
-                              {result.factCheckResult.contradictions.length > 0 && (
-                                <div className="mt-3">
-                                  <span className="text-blue-700 font-medium text-sm">🚨 Contradictions:</span>
-                                  <ul className="mt-1 space-y-1">
-                                    {result.factCheckResult.contradictions.slice(0, 2).map((contradiction, index) => (
-                                      <li key={index} className="text-blue-800 text-xs pl-2">• {contradiction}</li>
-                                    ))}
-                                  </ul>
-                                </div>
-                              )}
-                              
-                              {result.factCheckResult.issues.length > 0 && (
-                                <div className="mt-3">
-                                  <span className="text-blue-700 font-medium text-sm">📋 Issues:</span>
-                                  <ul className="mt-1 space-y-1">
-                                    {result.factCheckResult.issues.map((issue, index) => (
-                                      <li key={index} className="text-blue-800 text-xs pl-2">• {issue}</li>
-                                    ))}
-                                  </ul>
-                                </div>
-                              )}
-                            </div>
-                          )}
+
                         </div>
                       </div>
                     );
