@@ -16,6 +16,11 @@ A comprehensive **Postman-focused platform** that combines **A/B testing for LLM
 - **Document Processing**: Upload text documents and automatically build knowledge graphs
 - **Entity Extraction**: Extract entities, relationships, and context from your documents
 - **Graph Visualization**: Interactive knowledge graph exploration and analysis
+  - **Custom HTML5 Canvas Implementation**: High-performance rendering with force-directed layouts
+  - **Interactive Features**: Zoom, pan, node selection, and hover effects
+  - **Color-coded Nodes**: Person (blue), Organization (green), Concept (purple), Document (amber)
+  - **Connection Badges**: Visual indicators showing node connectivity
+  - **No External Dependencies**: Pure React and Canvas implementation
 - **Protocol Comparison**: Test REST vs GraphQL vs gRPC vs gRPC-Web vs WebSocket vs SSE performance side-by-side
 - **Performance Analytics**: Compare GraphRAG vs traditional RAG with detailed metrics
 
@@ -53,6 +58,14 @@ A comprehensive **Postman-focused platform** that combines **A/B testing for LLM
 - **Vector Database APIs**: Pinecone, Weaviate, Chroma, Qdrant integrations
 - **Neo4j Backend**: Native graph database integration for scalable knowledge graph storage
 - **Agentic Systems**: LangChain, AutoGen, CrewAI agent orchestration
+
+**📊 Alternative Graph Visualization Libraries:**
+- **D3.js**: Powerful data visualization with d3-force for force-directed layouts
+- **Cytoscape.js**: Comprehensive graph theory library with advanced algorithms
+- **Vis.js**: Network visualization with timeline and graph components
+- **React Force Graph**: React wrapper for D3 force-directed graphs
+- **Three.js**: 3D graph visualization for immersive experiences
+- **Sigma.js**: Lightweight graph drawing library for large networks
 
 **🔧 Development Tools:**
 - **GitHub Actions**: Automated testing and deployment ([docs](docs/github-actions.md))

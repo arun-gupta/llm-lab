@@ -1,5 +1,33 @@
 'use client';
 
+/**
+ * GraphPreview Component
+ * 
+ * Graph Visualization Library: Custom HTML5 Canvas Implementation
+ * 
+ * This component implements a custom force-directed graph visualization using:
+ * - HTML5 Canvas API for rendering
+ * - Custom force-directed layout algorithm
+ * - React hooks for state management and animations
+ * - No external graph visualization libraries
+ * 
+ * Features:
+ * - Force-directed node positioning with repulsion and attraction forces
+ * - Interactive node selection and hover effects
+ * - Zoom and pan functionality
+ * - Color-coded nodes by type (person, organization, concept, document)
+ * - Connection count badges
+ * - Responsive canvas sizing
+ * 
+ * Alternative libraries that could be used instead:
+ * - D3.js (d3-force for force-directed layouts)
+ * - Cytoscape.js (comprehensive graph library)
+ * - Vis.js (network visualization)
+ * - React Force Graph (React wrapper for D3)
+ * - Three.js (3D graph visualization)
+ * 
+ * @param graphData - Graph data containing nodes, edges, and statistics
+ */
 import { useEffect, useRef, useState } from 'react';
 
 interface GraphNode {
