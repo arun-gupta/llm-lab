@@ -49,7 +49,7 @@ interface TestResult {
 }
 
 export function ModelMonitoringTab({ onTabChange }: ModelMonitoringTabProps) {
-  const [activeTab, setActiveTab] = useState<'ab-testing' | 'monitoring' | 'analytics'>('ab-testing');
+  const [activeTab, setActiveTab] = useState<'ab-testing' | 'monitoring'>('ab-testing');
   const [importStatus, setImportStatus] = useState<'idle' | 'importing' | 'success' | 'error'>('idle');
   const [showSuccessCelebration, setShowSuccessCelebration] = useState(false);
   const [celebrationType, setCelebrationType] = useState<'collection-created' | 'api-key-setup' | 'first-response' | 'postman-connected'>('collection-created');
@@ -1148,19 +1148,8 @@ export function ModelMonitoringTab({ onTabChange }: ModelMonitoringTabProps) {
                 : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
             }`}
           >
-            <Activity className="w-4 h-4" />
-            <span>Performance Monitoring</span>
-          </button>
-          <button
-            onClick={() => setActiveTab('analytics')}
-            className={`flex items-center space-x-2 py-2 px-1 border-b-2 font-medium text-sm transition-colors ${
-              activeTab === 'analytics'
-                ? 'border-blue-500 text-blue-600'
-                : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
-            }`}
-          >
             <BarChart3 className="w-4 h-4" />
-            <span>Analytics Dashboard</span>
+            <span>Performance & Analytics</span>
           </button>
         </nav>
       </div>
@@ -1914,10 +1903,10 @@ export function ModelMonitoringTab({ onTabChange }: ModelMonitoringTabProps) {
         <div className="space-y-6">
           {/* Monitoring Controls */}
           <div className="bg-white rounded-lg border shadow-sm">
-            <div className="p-6 border-b">
-              <h3 className="text-lg font-semibold text-gray-900">Performance Monitoring</h3>
-              <p className="text-gray-600 mt-1">Track and monitor model performance metrics</p>
-            </div>
+                      <div className="p-6 border-b">
+            <h3 className="text-lg font-semibold text-gray-900">Performance Monitoring & Analytics</h3>
+            <p className="text-gray-600 mt-1">Track, monitor, and analyze model performance metrics</p>
+          </div>
             <div className="p-6">
               <div>
                 <h4 className="font-medium text-gray-900">Real-time Monitoring</h4>
@@ -2023,39 +2012,31 @@ export function ModelMonitoringTab({ onTabChange }: ModelMonitoringTabProps) {
               </ul>
             </div>
           </div>
-        </div>
-      )}
 
-      {/* Analytics Dashboard Tab */}
-      {activeTab === 'analytics' && (
-        <div className="space-y-6">
+          {/* Analytics Features */}
           <div className="bg-white rounded-lg border shadow-sm p-6">
-            <h3 className="text-lg font-semibold text-gray-900 mb-4">Analytics Dashboard</h3>
-            <p className="text-gray-600 mb-6">
-              Comprehensive analytics and insights for model performance comparison
-            </p>
-            
+            <h4 className="font-medium text-gray-900 mb-4">Analytics & Insights</h4>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div className="bg-gray-50 rounded-lg p-4">
-                <h4 className="font-medium text-gray-900 mb-2">Performance Trends</h4>
+                <h5 className="font-medium text-gray-900 mb-2">Performance Trends</h5>
                 <p className="text-sm text-gray-600">Track performance over time with detailed charts and metrics</p>
                 <div className="text-xs text-gray-500 mt-2">🚧 Coming Soon</div>
               </div>
               
               <div className="bg-gray-50 rounded-lg p-4">
-                <h4 className="font-medium text-gray-900 mb-2">Cost Analysis</h4>
+                <h5 className="font-medium text-gray-900 mb-2">Cost Analysis</h5>
                 <p className="text-sm text-gray-600">Compare costs across different models and providers</p>
                 <div className="text-xs text-gray-500 mt-2">🚧 Coming Soon</div>
               </div>
               
               <div className="bg-gray-50 rounded-lg p-4">
-                <h4 className="font-medium text-gray-900 mb-2">Quality Assessment</h4>
+                <h5 className="font-medium text-gray-900 mb-2">Quality Assessment</h5>
                 <p className="text-sm text-gray-600">Automated quality scoring and consistency checks</p>
                 <div className="text-xs text-gray-500 mt-2">🚧 Coming Soon</div>
               </div>
               
               <div className="bg-gray-50 rounded-lg p-4">
-                <h4 className="font-medium text-gray-900 mb-2">Recommendations</h4>
+                <h5 className="font-medium text-gray-900 mb-2">Recommendations</h5>
                 <p className="text-sm text-gray-600">AI-powered recommendations for model selection</p>
                 <div className="text-xs text-gray-500 mt-2">🚧 Coming Soon</div>
               </div>
