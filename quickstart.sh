@@ -28,6 +28,12 @@ export GRPC_PORT=$GRPC_SERVER_PORT
 export HTTP_PORT=$GRPC_HTTP_PORT
 
 echo "🚀 Setting up Postman Protocol Playground..."
+
+# Kill any processes running on required ports
+echo "🔫 Checking for conflicting processes..."
+if [ -f "scripts/kill-ports.sh" ]; then
+    bash scripts/kill-ports.sh
+fi
 echo ""
 
 # Check if Node.js is installed

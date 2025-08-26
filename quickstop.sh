@@ -8,6 +8,13 @@ set -e  # Exit on any error
 echo "🛑 Stopping Postman Protocol Playground services..."
 echo ""
 
+# Kill any processes on required ports for thorough cleanup
+echo "🔫 Ensuring all ports are free..."
+if [ -f "scripts/kill-ports.sh" ]; then
+    bash scripts/kill-ports.sh
+fi
+echo ""
+
 # Stop ArangoDB
 echo "🗄️ Stopping ArangoDB..."
 docker-compose -f docker-compose.arangodb.yml down 2>/dev/null || true
