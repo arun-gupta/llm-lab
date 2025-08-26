@@ -941,6 +941,51 @@ export function ModelMonitoringTab({ onTabChange }: ModelMonitoringTabProps) {
       // Simulate API call delay
       await new Promise(resolve => setTimeout(resolve, 1000 + Math.random() * 2000));
       
+      // Calculate realistic cost based on provider
+      const calculateCost = (provider: string, tokens: number) => {
+        switch (provider) {
+          case 'Ollama':
+            return 0; // Local models are free
+          case 'OpenAI':
+            // GPT-5 Nano: $0.00015 per 1K tokens
+            if (model.model.includes('nano')) {
+              return parseFloat(((tokens / 1000) * 0.00015).toFixed(4));
+            }
+            // GPT-5: $0.005 per 1K tokens
+            if (model.model.includes('gpt-5') && !model.model.includes('nano')) {
+              return parseFloat(((tokens / 1000) * 0.005).toFixed(4));
+            }
+            // GPT-4: $0.03 per 1K tokens
+            if (model.model.includes('gpt-4')) {
+              return parseFloat(((tokens / 1000) * 0.03).toFixed(4));
+            }
+            // GPT-3.5: $0.0015 per 1K tokens
+            if (model.model.includes('gpt-3.5')) {
+              return parseFloat(((tokens / 1000) * 0.0015).toFixed(4));
+            }
+            return parseFloat(((tokens / 1000) * 0.005).toFixed(4)); // Default
+          case 'Anthropic':
+            // Claude 3.5 Sonnet: $0.003 per 1K tokens
+            if (model.model.includes('sonnet')) {
+              return parseFloat(((tokens / 1000) * 0.003).toFixed(4));
+            }
+            // Claude 3.5 Haiku: $0.00025 per 1K tokens
+            if (model.model.includes('haiku')) {
+              return parseFloat(((tokens / 1000) * 0.00025).toFixed(4));
+            }
+            // Claude 3 Opus: $0.015 per 1K tokens
+            if (model.model.includes('opus')) {
+              return parseFloat(((tokens / 1000) * 0.015).toFixed(4));
+            }
+            return parseFloat(((tokens / 1000) * 0.003).toFixed(4)); // Default
+          default:
+            return 0;
+        }
+      };
+
+      const tokens = Math.floor(Math.random() * 1000) + 100;
+      const cost = calculateCost(model.provider, tokens);
+
       const result: TestResult = {
         id: `${model.id}-${Date.now()}`,
         timestamp: new Date().toISOString(),
@@ -948,8 +993,8 @@ export function ModelMonitoringTab({ onTabChange }: ModelMonitoringTabProps) {
         prompt: testPrompt,
         response: `Sample response from ${model.name} for: "${testPrompt}"`,
         latency: Math.floor(Math.random() * 2000) + 500,
-        tokens: Math.floor(Math.random() * 1000) + 100,
-        cost: parseFloat((Math.random() * 0.1).toFixed(4)),
+        tokens: tokens,
+        cost: cost,
         quality: parseFloat((Math.random() * 0.3 + 0.7).toFixed(2)),
         status: 'success'
       };
@@ -991,6 +1036,51 @@ export function ModelMonitoringTab({ onTabChange }: ModelMonitoringTabProps) {
       // Simulate API call delay
       await new Promise(resolve => setTimeout(resolve, 1000 + Math.random() * 2000));
       
+      // Calculate realistic cost based on provider
+      const calculateCost = (provider: string, tokens: number) => {
+        switch (provider) {
+          case 'Ollama':
+            return 0; // Local models are free
+          case 'OpenAI':
+            // GPT-5 Nano: $0.00015 per 1K tokens
+            if (model.model.includes('nano')) {
+              return parseFloat(((tokens / 1000) * 0.00015).toFixed(4));
+            }
+            // GPT-5: $0.005 per 1K tokens
+            if (model.model.includes('gpt-5') && !model.model.includes('nano')) {
+              return parseFloat(((tokens / 1000) * 0.005).toFixed(4));
+            }
+            // GPT-4: $0.03 per 1K tokens
+            if (model.model.includes('gpt-4')) {
+              return parseFloat(((tokens / 1000) * 0.03).toFixed(4));
+            }
+            // GPT-3.5: $0.0015 per 1K tokens
+            if (model.model.includes('gpt-3.5')) {
+              return parseFloat(((tokens / 1000) * 0.0015).toFixed(4));
+            }
+            return parseFloat(((tokens / 1000) * 0.005).toFixed(4)); // Default
+          case 'Anthropic':
+            // Claude 3.5 Sonnet: $0.003 per 1K tokens
+            if (model.model.includes('sonnet')) {
+              return parseFloat(((tokens / 1000) * 0.003).toFixed(4));
+            }
+            // Claude 3.5 Haiku: $0.00025 per 1K tokens
+            if (model.model.includes('haiku')) {
+              return parseFloat(((tokens / 1000) * 0.00025).toFixed(4));
+            }
+            // Claude 3 Opus: $0.015 per 1K tokens
+            if (model.model.includes('opus')) {
+              return parseFloat(((tokens / 1000) * 0.015).toFixed(4));
+            }
+            return parseFloat(((tokens / 1000) * 0.003).toFixed(4)); // Default
+          default:
+            return 0;
+        }
+      };
+
+      const tokens = Math.floor(Math.random() * 1000) + 100;
+      const cost = calculateCost(model.provider, tokens);
+      
       const response = {
         id: `${model.id}-${Date.now()}`,
         provider: model.provider,
@@ -998,8 +1088,8 @@ export function ModelMonitoringTab({ onTabChange }: ModelMonitoringTabProps) {
         modelName: model.name,
         content: `This is a detailed response from ${model.name} for the prompt: "${comparisonPrompt}". ${model.name} provides comprehensive analysis and insights based on the given context. The response demonstrates the model's capabilities in understanding and processing the input while maintaining coherence and relevance.`,
         latency: Math.floor(Math.random() * 2000) + 500,
-        tokens: Math.floor(Math.random() * 1000) + 100,
-        cost: parseFloat((Math.random() * 0.1).toFixed(4)),
+        tokens: tokens,
+        cost: cost,
         timestamp: new Date().toISOString(),
         error: null
       };
