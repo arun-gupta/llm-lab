@@ -1901,22 +1901,19 @@ export function ModelMonitoringTab({ onTabChange }: ModelMonitoringTabProps) {
       {/* Performance Monitoring Tab */}
       {activeTab === 'monitoring' && (
         <div className="space-y-6">
-          {/* Monitoring Controls */}
-          <div className="bg-white rounded-lg border shadow-sm">
-                      <div className="p-6 border-b">
-            <h3 className="text-lg font-semibold text-gray-900">Performance Monitoring & Analytics</h3>
-            <p className="text-gray-600 mt-1">Track, monitor, and analyze model performance metrics</p>
-          </div>
-            <div className="p-6">
+                    {/* Performance Monitoring & Analytics Header */}
+          <div className="bg-white rounded-lg border shadow-sm p-6">
+            <div className="flex items-center justify-between mb-4">
               <div>
-                <h4 className="font-medium text-gray-900">Real-time Monitoring</h4>
-                <p className="text-sm text-gray-600">Track latency, throughput, costs, and quality metrics</p>
-                <div className="mt-2 flex items-center">
-                  <div className="w-2 h-2 bg-green-500 rounded-full mr-2"></div>
-                  <span className="text-sm text-green-600 font-medium">Always Active</span>
-                </div>
+                <h3 className="text-lg font-semibold text-gray-900">Performance Monitoring & Analytics</h3>
+                <p className="text-gray-600 mt-1">Track, monitor, and analyze model performance metrics</p>
+              </div>
+              <div className="flex items-center">
+                <div className="w-2 h-2 bg-green-500 rounded-full mr-2"></div>
+                <span className="text-sm text-green-600 font-medium">Always Active</span>
               </div>
             </div>
+            <p className="text-sm text-gray-600">Real-time tracking of latency, throughput, costs, and quality metrics</p>
           </div>
 
           {/* Metrics Dashboard */}
