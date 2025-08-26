@@ -2341,72 +2341,321 @@ export function ABTestingTab({ onTabChange }: ModelMonitoringTabProps) {
 
 
 
-          {/* Analytics Features */}
-          <div className="bg-white rounded-lg border shadow-sm p-6">
-            <h4 className="font-medium text-gray-900 mb-4">Analytics & Insights</h4>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              {/* Performance Trends */}
-              <div className="bg-white border rounded-lg p-4">
-                <h5 className="font-medium text-gray-900 mb-3">Performance Trends</h5>
-                {savedTestRuns.length > 0 ? (
-                  <div className="space-y-3">
-                    <div className="flex items-center justify-between text-sm">
-                      <span className="text-gray-600">Average Latency Trend</span>
-                      <span className="font-medium text-gray-900">
-                        {Math.round(savedTestRuns.reduce((sum, run) => sum + run.summary.averageLatency, 0) / savedTestRuns.length)}ms
-                      </span>
+          {/* Analytics Sections */}
+          <div className="space-y-6">
+            
+            {/* Quality Assessment Section */}
+            <div className="bg-white rounded-lg border shadow-sm p-6">
+              <h4 className="font-medium text-gray-900 mb-6">Quality Assessment</h4>
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                {/* Quality Metrics Text */}
+                <div className="space-y-4">
+                  <div className="grid grid-cols-2 gap-4">
+                    <div className="bg-gray-50 rounded-lg p-4">
+                      <div className="text-sm text-gray-500">Average Quality</div>
+                      <div className="text-2xl font-semibold text-gray-900">
+                        {savedTestRuns.length > 0 ? 
+                          (savedTestRuns.reduce((sum, run) => sum + run.summary.averageQuality, 0) / savedTestRuns.length * 100).toFixed(1) : '0'}%
+                      </div>
                     </div>
-                    <div className="flex items-center justify-between text-sm">
-                      <span className="text-gray-600">Total Cost Trend</span>
-                      <span className="font-medium text-gray-900">
-                        ${savedTestRuns.reduce((sum, run) => sum + run.summary.totalCost, 0).toFixed(6)}
-                      </span>
+                    <div className="bg-gray-50 rounded-lg p-4">
+                      <div className="text-sm text-gray-500">Average Accuracy</div>
+                      <div className="text-2xl font-semibold text-gray-900">
+                        {savedTestRuns.length > 0 ? 
+                          (savedTestRuns.reduce((sum, run) => sum + (run.summary.averageAccuracy || 0), 0) / savedTestRuns.length * 100).toFixed(1) : '0'}%
+                      </div>
                     </div>
-                    <div className="flex items-center justify-between text-sm">
-                      <span className="text-gray-600">Tests Run</span>
-                      <span className="font-medium text-gray-900">{savedTestRuns.length}</span>
+                    <div className="bg-gray-50 rounded-lg p-4">
+                      <div className="text-sm text-gray-500">Average Coherence</div>
+                      <div className="text-2xl font-semibold text-gray-900">
+                        {savedTestRuns.length > 0 ? 
+                          (savedTestRuns.reduce((sum, run) => sum + (run.summary.averageCoherence || 0), 0) / savedTestRuns.length * 100).toFixed(1) : '0'}%
+                      </div>
                     </div>
-                    <div className="pt-2 border-t">
-                      <div className="text-xs text-gray-500 mb-1">Recent Tests</div>
-                      <div className="space-y-1">
-                        {savedTestRuns.slice(-3).reverse().map((run, index) => (
-                          <div key={run.id} className="flex items-center justify-between text-xs">
-                            <span className="text-gray-600 truncate">
-                              {new Date(run.timestamp).toLocaleDateString()}
-                            </span>
-                            <span className="text-gray-900">{run.models.length} models</span>
-                          </div>
-                        ))}
+                    <div className="bg-gray-50 rounded-lg p-4">
+                      <div className="text-sm text-gray-500">Average Diversity</div>
+                      <div className="text-2xl font-semibold text-gray-900">
+                        {savedTestRuns.length > 0 ? 
+                          (savedTestRuns.reduce((sum, run) => sum + (run.summary.averageDiversity || 0), 0) / savedTestRuns.length * 100).toFixed(1) : '0'}%
                       </div>
                     </div>
                   </div>
-                ) : (
-                  <div className="text-center py-4">
-                    <div className="text-sm text-gray-500">No test data yet</div>
-                    <div className="text-xs text-gray-400 mt-1">Run A/B tests to see trends</div>
+                  <div className="bg-gray-50 rounded-lg p-4">
+                    <div className="text-sm text-gray-500">Time to Useful Output</div>
+                    <div className="text-2xl font-semibold text-gray-900">
+                      {savedTestRuns.length > 0 ? 
+                        Math.round(savedTestRuns.reduce((sum, run) => sum + (run.summary.averageTimeToUseful || 0), 0) / savedTestRuns.length) : '0'} tokens
+                    </div>
                   </div>
-                )}
+                </div>
+                
+                {/* Quality Comparison Chart */}
+                <div>
+                  <h5 className="font-medium text-gray-900 mb-4">Quality Metrics Comparison</h5>
+                  {savedTestRuns.length > 0 ? (
+                    (() => {
+                      const modelQualityData: { [key: string]: { quality: number, accuracy: number, coherence: number, diversity: number, count: number } } = {};
+                      
+                      savedTestRuns.forEach(run => {
+                        run.results.forEach(result => {
+                          const model = run.models.find(m => m.id === result.modelId);
+                          const modelName = model?.name || result.modelId;
+                          if (!modelQualityData[modelName]) {
+                            modelQualityData[modelName] = { quality: 0, accuracy: 0, coherence: 0, diversity: 0, count: 0 };
+                          }
+                          modelQualityData[modelName].quality += result.quality;
+                          modelQualityData[modelName].accuracy += result.accuracy || 0;
+                          modelQualityData[modelName].coherence += result.coherence || 0;
+                          modelQualityData[modelName].diversity += result.diversity || 0;
+                          modelQualityData[modelName].count += 1;
+                        });
+                      });
+                      
+                      const chartData = {
+                        labels: Object.keys(modelQualityData),
+                        datasets: [
+                          {
+                            label: 'Quality',
+                            data: Object.values(modelQualityData).map(d => (d.quality / d.count) * 100),
+                            backgroundColor: 'rgba(59, 130, 246, 0.8)',
+                            borderColor: 'rgba(59, 130, 246, 1)',
+                            borderWidth: 1,
+                          },
+                          {
+                            label: 'Accuracy',
+                            data: Object.values(modelQualityData).map(d => (d.accuracy / d.count) * 100),
+                            backgroundColor: 'rgba(16, 185, 129, 0.8)',
+                            borderColor: 'rgba(16, 185, 129, 1)',
+                            borderWidth: 1,
+                          },
+                          {
+                            label: 'Coherence',
+                            data: Object.values(modelQualityData).map(d => (d.coherence / d.count) * 100),
+                            backgroundColor: 'rgba(245, 158, 11, 0.8)',
+                            borderColor: 'rgba(245, 158, 11, 1)',
+                            borderWidth: 1,
+                          },
+                          {
+                            label: 'Diversity',
+                            data: Object.values(modelQualityData).map(d => (d.diversity / d.count) * 100),
+                            backgroundColor: 'rgba(236, 72, 153, 0.8)',
+                            borderColor: 'rgba(236, 72, 153, 1)',
+                            borderWidth: 1,
+                          },
+                        ],
+                      };
+                      
+                      const options = {
+                        responsive: true,
+                        plugins: {
+                          legend: {
+                            position: 'top' as const,
+                          },
+                          title: {
+                            display: false,
+                          },
+                        },
+                        scales: {
+                          y: {
+                            beginAtZero: true,
+                            max: 100,
+                            ticks: {
+                              callback: function(value: any) {
+                                return value + '%';
+                              }
+                            }
+                          },
+                        },
+                      };
+                      
+                      return <Bar data={chartData} options={options} />;
+                    })()
+                  ) : (
+                    <div className="text-center py-8">
+                      <div className="text-sm text-gray-500">No quality data yet</div>
+                      <div className="text-xs text-gray-400 mt-1">Run tests to see quality comparison</div>
+                    </div>
+                  )}
+                </div>
               </div>
-              
-              {/* Cost Analysis */}
-              <div className="bg-white border rounded-lg p-4">
-                <h5 className="font-medium text-gray-900 mb-3">Cost Analysis</h5>
-                {savedTestRuns.length > 0 ? (
-                  <div className="space-y-3">
-                    <div className="flex items-center justify-between text-sm">
-                      <span className="text-gray-600">Total Spent</span>
-                      <span className="font-medium text-gray-900">
-                        ${savedTestRuns.reduce((sum, run) => sum + run.summary.totalCost, 0).toFixed(6)}
-                      </span>
+            </div>
+            
+            {/* Safety Guardrails Section */}
+            <div className="bg-white rounded-lg border shadow-sm p-6">
+              <h4 className="font-medium text-gray-900 mb-6">Safety Guardrails</h4>
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                {/* Safety Metrics Text */}
+                <div className="space-y-4">
+                  <div className="grid grid-cols-2 gap-4">
+                    <div className="bg-gray-50 rounded-lg p-4">
+                      <div className="text-sm text-gray-500">Toxicity Risk</div>
+                      <div className={`text-2xl font-semibold ${savedTestRuns.length > 0 && (savedTestRuns.reduce((sum, run) => sum + (run.summary.averageToxicity || 0), 0) / savedTestRuns.length > 0.3) ? 'text-red-600' : 'text-green-600'}`}>
+                        {savedTestRuns.length > 0 ? 
+                          (savedTestRuns.reduce((sum, run) => sum + (run.summary.averageToxicity || 0), 0) / savedTestRuns.length * 100).toFixed(1) : '0'}%
+                      </div>
                     </div>
-                    <div className="flex items-center justify-between text-sm">
-                      <span className="text-gray-600">Avg Cost per Test</span>
-                      <span className="font-medium text-gray-900">
-                        ${(savedTestRuns.reduce((sum, run) => sum + run.summary.totalCost, 0) / savedTestRuns.length).toFixed(6)}
-                      </span>
+                    <div className="bg-gray-50 rounded-lg p-4">
+                      <div className="text-sm text-gray-500">Hallucination Risk</div>
+                      <div className={`text-2xl font-semibold ${savedTestRuns.length > 0 && (savedTestRuns.reduce((sum, run) => sum + (run.summary.averageHallucination || 0), 0) / savedTestRuns.length > 0.5) ? 'text-red-600' : 'text-green-600'}`}>
+                        {savedTestRuns.length > 0 ? 
+                          (savedTestRuns.reduce((sum, run) => sum + (run.summary.averageHallucination || 0), 0) / savedTestRuns.length * 100).toFixed(1) : '0'}%
+                      </div>
                     </div>
-                    <div className="pt-2 border-t">
-                      <div className="text-xs text-gray-500 mb-2">Cost by Provider</div>
+                    <div className="bg-gray-50 rounded-lg p-4">
+                      <div className="text-sm text-gray-500">Bias Risk</div>
+                      <div className={`text-2xl font-semibold ${savedTestRuns.length > 0 && (savedTestRuns.reduce((sum, run) => sum + (run.summary.averageBias || 0), 0) / savedTestRuns.length > 0.3) ? 'text-red-600' : 'text-green-600'}`}>
+                        {savedTestRuns.length > 0 ? 
+                          (savedTestRuns.reduce((sum, run) => sum + (run.summary.averageBias || 0), 0) / savedTestRuns.length * 100).toFixed(1) : '0'}%
+                      </div>
+                    </div>
+                    <div className="bg-gray-50 rounded-lg p-4">
+                      <div className="text-sm text-gray-500">Statistical Confidence</div>
+                      <div className="text-2xl font-semibold text-gray-900">
+                        {savedTestRuns.length > 0 ? 
+                          (savedTestRuns.reduce((sum, run) => sum + (run.summary.confidence || 0), 0) / savedTestRuns.length * 100).toFixed(1) : '0'}%
+                      </div>
+                    </div>
+                  </div>
+                  <div className="bg-gray-50 rounded-lg p-4">
+                    <div className="text-sm text-gray-500 mb-2">Risk Levels</div>
+                    <div className="grid grid-cols-3 gap-2 text-xs">
+                      <div className="text-center">
+                        <div className="text-green-600 font-medium">Low Risk</div>
+                        <div className="text-gray-500">0-30%</div>
+                      </div>
+                      <div className="text-center">
+                        <div className="text-yellow-600 font-medium">Medium Risk</div>
+                        <div className="text-gray-500">30-50%</div>
+                      </div>
+                      <div className="text-center">
+                        <div className="text-red-600 font-medium">High Risk</div>
+                        <div className="text-gray-500">50%+</div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                
+                {/* Safety Radar Chart */}
+                <div>
+                  <h5 className="font-medium text-gray-900 mb-4">Safety Metrics Overview</h5>
+                  {savedTestRuns.length > 0 ? (
+                    (() => {
+                      const modelSafetyData: { [key: string]: { toxicity: number, hallucination: number, bias: number, count: number } } = {};
+                      
+                      savedTestRuns.forEach(run => {
+                        run.results.forEach(result => {
+                          const model = run.models.find(m => m.id === result.modelId);
+                          const modelName = model?.name || result.modelId;
+                          if (!modelSafetyData[modelName]) {
+                            modelSafetyData[modelName] = { toxicity: 0, hallucination: 0, bias: 0, count: 0 };
+                          }
+                          modelSafetyData[modelName].toxicity += result.toxicity || 0;
+                          modelSafetyData[modelName].hallucination += result.hallucination || 0;
+                          modelSafetyData[modelName].bias += result.bias || 0;
+                          modelSafetyData[modelName].count += 1;
+                        });
+                      });
+                      
+                      const chartData = {
+                        labels: ['Toxicity Risk', 'Hallucination Risk', 'Bias Risk'],
+                        datasets: Object.entries(modelSafetyData).map(([modelName, data], index) => ({
+                          label: modelName,
+                          data: [
+                            (data.toxicity / data.count) * 100,
+                            (data.hallucination / data.count) * 100,
+                            (data.bias / data.count) * 100,
+                          ],
+                          backgroundColor: [
+                            `hsla(${index * 60}, 70%, 60%, 0.2)`,
+                            `hsla(${index * 60}, 70%, 60%, 0.2)`,
+                            `hsla(${index * 60}, 70%, 60%, 0.2)`,
+                          ],
+                          borderColor: [
+                            `hsl(${index * 60}, 70%, 50%)`,
+                            `hsl(${index * 60}, 70%, 50%)`,
+                            `hsl(${index * 60}, 70%, 50%)`,
+                          ],
+                          borderWidth: 2,
+                          pointBackgroundColor: `hsl(${index * 60}, 70%, 50%)`,
+                          pointBorderColor: '#fff',
+                          pointHoverBackgroundColor: '#fff',
+                          pointHoverBorderColor: `hsl(${index * 60}, 70%, 50%)`,
+                        })),
+                      };
+                      
+                      const options = {
+                        responsive: true,
+                        plugins: {
+                          legend: {
+                            position: 'top' as const,
+                          },
+                          title: {
+                            display: false,
+                          },
+                        },
+                        scales: {
+                          r: {
+                            beginAtZero: true,
+                            max: 100,
+                            ticks: {
+                              callback: function(value: any) {
+                                return value + '%';
+                              }
+                            }
+                          },
+                        },
+                      };
+                      
+                      return <Radar data={chartData} options={options} />;
+                    })()
+                  ) : (
+                    <div className="text-center py-8">
+                      <div className="text-sm text-gray-500">No safety data yet</div>
+                      <div className="text-xs text-gray-400 mt-1">Run tests to see safety comparison</div>
+                    </div>
+                  )}
+                </div>
+              </div>
+            </div>
+            
+            {/* Performance & Cost Section */}
+            <div className="bg-white rounded-lg border shadow-sm p-6">
+              <h4 className="font-medium text-gray-900 mb-6">Performance & Cost Analysis</h4>
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                {/* Performance Metrics Text */}
+                <div className="space-y-4">
+                  <div className="grid grid-cols-2 gap-4">
+                    <div className="bg-gray-50 rounded-lg p-4">
+                      <div className="text-sm text-gray-500">Total Spent</div>
+                      <div className="text-2xl font-semibold text-gray-900">
+                        ${savedTestRuns.length > 0 ? 
+                          savedTestRuns.reduce((sum, run) => sum + run.summary.totalCost, 0).toFixed(6) : '0.000000'}
+                      </div>
+                    </div>
+                    <div className="bg-gray-50 rounded-lg p-4">
+                      <div className="text-sm text-gray-500">Avg Cost per Test</div>
+                      <div className="text-2xl font-semibold text-gray-900">
+                        ${savedTestRuns.length > 0 ? 
+                          (savedTestRuns.reduce((sum, run) => sum + run.summary.totalCost, 0) / savedTestRuns.length).toFixed(6) : '0.000000'}
+                      </div>
+                    </div>
+                    <div className="bg-gray-50 rounded-lg p-4">
+                      <div className="text-sm text-gray-500">Tests Run</div>
+                      <div className="text-2xl font-semibold text-gray-900">
+                        {savedTestRuns.length}
+                      </div>
+                    </div>
+                    <div className="bg-gray-50 rounded-lg p-4">
+                      <div className="text-sm text-gray-500">Avg Latency</div>
+                      <div className="text-2xl font-semibold text-gray-900">
+                        {savedTestRuns.length > 0 ? 
+                          Math.round(savedTestRuns.reduce((sum, run) => sum + run.summary.averageLatency, 0) / savedTestRuns.length) : '0'}ms
+                      </div>
+                    </div>
+                  </div>
+                  <div className="bg-gray-50 rounded-lg p-4">
+                    <div className="text-sm text-gray-500 mb-2">Cost by Provider</div>
+                    <div className="space-y-2">
                       {(() => {
                         const providerCosts: { [key: string]: number } = {};
                         savedTestRuns.forEach(run => {
@@ -2417,514 +2666,235 @@ export function ABTestingTab({ onTabChange }: ModelMonitoringTabProps) {
                           });
                         });
                         return Object.entries(providerCosts).map(([provider, cost]) => (
-                          <div key={provider} className="flex items-center justify-between text-xs mb-1">
+                          <div key={provider} className="flex items-center justify-between text-sm">
                             <span className="text-gray-600">{provider}</span>
-                            <span className="text-gray-900">${cost.toFixed(6)}</span>
+                            <span className="font-medium text-gray-900">${cost.toFixed(6)}</span>
                           </div>
                         ));
                       })()}
                     </div>
                   </div>
-                ) : (
-                  <div className="text-center py-4">
-                    <div className="text-sm text-gray-500">No cost data yet</div>
-                    <div className="text-xs text-gray-400 mt-1">Run tests to see cost analysis</div>
-                  </div>
-                )}
-              </div>
-              
-              {/* Quality Assessment */}
-              <div className="bg-white border rounded-lg p-4">
-                <h5 className="font-medium text-gray-900 mb-3">Quality Assessment</h5>
-                {savedTestRuns.length > 0 ? (
-                  <div className="space-y-3">
-                    <div className="flex items-center justify-between text-sm">
-                      <span className="text-gray-600">Average Quality</span>
-                      <span className="font-medium text-gray-900">
-                        {(savedTestRuns.reduce((sum, run) => sum + run.summary.averageQuality, 0) / savedTestRuns.length * 100).toFixed(1)}%
-                      </span>
-                    </div>
-                    <div className="flex items-center justify-between text-sm">
-                      <span className="text-gray-600">Average Accuracy</span>
-                      <span className="font-medium text-gray-900">
-                        {(savedTestRuns.reduce((sum, run) => sum + (run.summary.averageAccuracy || 0), 0) / savedTestRuns.length * 100).toFixed(1)}%
-                      </span>
-                    </div>
-                    <div className="flex items-center justify-between text-sm">
-                      <span className="text-gray-600">Average Coherence</span>
-                      <span className="font-medium text-gray-900">
-                        {(savedTestRuns.reduce((sum, run) => sum + (run.summary.averageCoherence || 0), 0) / savedTestRuns.length * 100).toFixed(1)}%
-                      </span>
-                    </div>
-                    <div className="flex items-center justify-between text-sm">
-                      <span className="text-gray-600">Average Diversity</span>
-                      <span className="font-medium text-gray-900">
-                        {(savedTestRuns.reduce((sum, run) => sum + (run.summary.averageDiversity || 0), 0) / savedTestRuns.length * 100).toFixed(1)}%
-                      </span>
-                    </div>
-                    <div className="flex items-center justify-between text-sm">
-                      <span className="text-gray-600">Time to Useful</span>
-                      <span className="font-medium text-gray-900">
-                        {Math.round(savedTestRuns.reduce((sum, run) => sum + (run.summary.averageTimeToUseful || 0), 0) / savedTestRuns.length)} tokens
-                      </span>
-                    </div>
-                    <div className="pt-2 border-t">
-                      <div className="text-xs text-gray-500 mb-2">Quality by Model</div>
-                      {(() => {
-                        const modelQuality: { [key: string]: { total: number, count: number } } = {};
-                        savedTestRuns.forEach(run => {
-                          run.results.forEach(result => {
-                            const model = run.models.find(m => m.id === result.modelId);
-                            const modelName = model?.name || result.modelId;
-                            if (!modelQuality[modelName]) {
-                              modelQuality[modelName] = { total: 0, count: 0 };
-                            }
-                            modelQuality[modelName].total += result.quality;
-                            modelQuality[modelName].count += 1;
-                          });
-                        });
-                        return Object.entries(modelQuality)
-                          .sort(([, a], [, b]) => (b.total / b.count) - (a.total / a.count))
-                          .slice(0, 3)
-                          .map(([modelName, data]) => (
-                            <div key={modelName} className="flex items-center justify-between text-xs mb-1">
-                              <span className="text-gray-600 truncate">{modelName}</span>
-                              <span className="text-gray-900">{(data.total / data.count * 100).toFixed(1)}%</span>
-                            </div>
-                          ));
-                      })()}
-                    </div>
-                  </div>
-                ) : (
-                  <div className="text-center py-4">
-                    <div className="text-sm text-gray-500">No quality data yet</div>
-                    <div className="text-xs text-gray-400 mt-1">Run tests to see quality scores</div>
-                  </div>
-                )}
-              </div>
-              
-              {/* Safety Guardrails */}
-              <div className="bg-white border rounded-lg p-4">
-                <h5 className="font-medium text-gray-900 mb-3">Safety Guardrails</h5>
-                {savedTestRuns.length > 0 ? (
-                  <div className="space-y-3">
-                    <div className="flex items-center justify-between text-sm">
-                      <span className="text-gray-600">Toxicity Risk</span>
-                      <span className={`font-medium ${savedTestRuns.reduce((sum, run) => sum + (run.summary.averageToxicity || 0), 0) / savedTestRuns.length > 0.3 ? 'text-red-600' : 'text-green-600'}`}>
-                        {(savedTestRuns.reduce((sum, run) => sum + (run.summary.averageToxicity || 0), 0) / savedTestRuns.length * 100).toFixed(1)}%
-                      </span>
-                    </div>
-                    <div className="flex items-center justify-between text-sm">
-                      <span className="text-gray-600">Hallucination Risk</span>
-                      <span className={`font-medium ${savedTestRuns.reduce((sum, run) => sum + (run.summary.averageHallucination || 0), 0) / savedTestRuns.length > 0.5 ? 'text-red-600' : 'text-green-600'}`}>
-                        {(savedTestRuns.reduce((sum, run) => sum + (run.summary.averageHallucination || 0), 0) / savedTestRuns.length * 100).toFixed(1)}%
-                      </span>
-                    </div>
-                    <div className="flex items-center justify-between text-sm">
-                      <span className="text-gray-600">Bias Risk</span>
-                      <span className={`font-medium ${savedTestRuns.reduce((sum, run) => sum + (run.summary.averageBias || 0), 0) / savedTestRuns.length > 0.3 ? 'text-red-600' : 'text-green-600'}`}>
-                        {(savedTestRuns.reduce((sum, run) => sum + (run.summary.averageBias || 0), 0) / savedTestRuns.length * 100).toFixed(1)}%
-                      </span>
-                    </div>
-                    <div className="flex items-center justify-between text-sm">
-                      <span className="text-gray-600">Statistical Confidence</span>
-                      <span className="font-medium text-gray-900">
-                        {(savedTestRuns.reduce((sum, run) => sum + (run.summary.confidence || 0), 0) / savedTestRuns.length * 100).toFixed(1)}%
-                      </span>
-                    </div>
-                    <div className="pt-2 border-t">
-                      <div className="text-xs text-gray-500 mb-2">Risk Levels</div>
-                      <div className="space-y-1">
-                        <div className="flex items-center justify-between text-xs">
-                          <span className="text-gray-600">Low Risk</span>
-                          <span className="text-green-600">0-30%</span>
-                        </div>
-                        <div className="flex items-center justify-between text-xs">
-                          <span className="text-gray-600">Medium Risk</span>
-                          <span className="text-yellow-600">30-50%</span>
-                        </div>
-                        <div className="flex items-center justify-between text-xs">
-                          <span className="text-gray-600">High Risk</span>
-                          <span className="text-red-600">50%+</span>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                ) : (
-                  <div className="text-center py-4">
-                    <div className="text-sm text-gray-500">No safety data yet</div>
-                    <div className="text-xs text-gray-400 mt-1">Run tests to see guardrail metrics</div>
-                  </div>
-                )}
-              </div>
-              
-              {/* Recommendations */}
-              <div className="bg-white border rounded-lg p-4">
-                <h5 className="font-medium text-gray-900 mb-3">Recommendations</h5>
-                {savedTestRuns.length > 0 ? (
-                  <div className="space-y-3">
-                    {(() => {
-                      // Find best performing model by quality
-                      const modelPerformance: { [key: string]: { quality: number, cost: number, latency: number, count: number } } = {};
+                </div>
+                
+                {/* Performance Chart */}
+                <div>
+                  <h5 className="font-medium text-gray-900 mb-4">Performance Metrics</h5>
+                  {savedTestRuns.length > 0 ? (
+                    (() => {
+                      const modelPerformanceData: { [key: string]: { latency: number, cost: number, count: number } } = {};
+                      
                       savedTestRuns.forEach(run => {
                         run.results.forEach(result => {
                           const model = run.models.find(m => m.id === result.modelId);
                           const modelName = model?.name || result.modelId;
-                          if (!modelPerformance[modelName]) {
-                            modelPerformance[modelName] = { quality: 0, cost: 0, latency: 0, count: 0 };
+                          if (!modelPerformanceData[modelName]) {
+                            modelPerformanceData[modelName] = { latency: 0, cost: 0, count: 0 };
                           }
-                          modelPerformance[modelName].quality += result.quality;
-                          modelPerformance[modelName].cost += result.cost;
-                          modelPerformance[modelName].latency += result.latency;
-                          modelPerformance[modelName].count += 1;
+                          modelPerformanceData[modelName].latency += result.latency;
+                          modelPerformanceData[modelName].cost += result.cost;
+                          modelPerformanceData[modelName].count += 1;
                         });
                       });
                       
-                      const recommendations = Object.entries(modelPerformance)
-                        .map(([modelName, data]) => ({
-                          name: modelName,
-                          avgQuality: data.quality / data.count,
-                          avgCost: data.cost / data.count,
-                          avgLatency: data.latency / data.count
-                        }))
-                        .sort((a, b) => b.avgQuality - a.avgQuality);
+                      const chartData = {
+                        labels: Object.keys(modelPerformanceData),
+                        datasets: [
+                          {
+                            label: 'Average Latency (ms)',
+                            data: Object.values(modelPerformanceData).map(d => d.latency / d.count),
+                            backgroundColor: 'rgba(99, 102, 241, 0.8)',
+                            borderColor: 'rgba(99, 102, 241, 1)',
+                            borderWidth: 1,
+                            yAxisID: 'y',
+                          },
+                          {
+                            label: 'Average Cost ($)',
+                            data: Object.values(modelPerformanceData).map(d => d.cost / d.count),
+                            backgroundColor: 'rgba(34, 197, 94, 0.8)',
+                            borderColor: 'rgba(34, 197, 94, 1)',
+                            borderWidth: 1,
+                            yAxisID: 'y1',
+                          },
+                        ],
+                      };
                       
-                      const bestQuality = recommendations[0];
-                      const bestCost = recommendations.sort((a, b) => a.avgCost - b.avgCost)[0];
-                      const bestLatency = recommendations.sort((a, b) => a.avgLatency - b.avgLatency)[0];
+                      const options = {
+                        responsive: true,
+                        plugins: {
+                          legend: {
+                            position: 'top' as const,
+                          },
+                          title: {
+                            display: false,
+                          },
+                        },
+                        scales: {
+                          y: {
+                            type: 'linear' as const,
+                            display: true,
+                            position: 'left' as const,
+                            title: {
+                              display: true,
+                              text: 'Latency (ms)',
+                            },
+                          },
+                          y1: {
+                            type: 'linear' as const,
+                            display: true,
+                            position: 'right' as const,
+                            title: {
+                              display: true,
+                              text: 'Cost ($)',
+                            },
+                            grid: {
+                              drawOnChartArea: false,
+                            },
+                          },
+                        },
+                      };
                       
-                      return (
-                        <>
-                          <div className="text-xs text-gray-500 mb-2">Based on your test data:</div>
-                          <div className="space-y-2">
-                            <div className="text-xs">
-                              <span className="text-gray-600">Best Quality: </span>
-                              <span className="font-medium text-gray-900">{bestQuality.name}</span>
-                              <span className="text-gray-500 ml-1">({(bestQuality.avgQuality * 100).toFixed(1)}%)</span>
-                            </div>
-                            <div className="text-xs">
-                              <span className="text-gray-600">Most Cost-Effective: </span>
-                              <span className="font-medium text-gray-900">{bestCost.name}</span>
-                              <span className="text-gray-500 ml-1">(${bestCost.avgCost.toFixed(6)})</span>
-                            </div>
-                            <div className="text-xs">
-                              <span className="text-gray-600">Fastest: </span>
-                              <span className="font-medium text-gray-900">{bestLatency.name}</span>
-                              <span className="text-gray-500 ml-1">({bestLatency.avgLatency.toFixed(0)}ms)</span>
-                            </div>
-                          </div>
-                        </>
-                      );
-                    })()}
-                  </div>
-                ) : (
-                  <div className="text-center py-4">
-                    <div className="text-sm text-gray-500">No recommendations yet</div>
-                    <div className="text-xs text-gray-400 mt-1">Run tests to get AI recommendations</div>
-                  </div>
-                )}
+                      return <Bar data={chartData} options={options} />;
+                    })()
+                  ) : (
+                    <div className="text-center py-8">
+                      <div className="text-sm text-gray-500">No performance data yet</div>
+                      <div className="text-xs text-gray-400 mt-1">Run tests to see performance comparison</div>
+                    </div>
+                  )}
+                </div>
               </div>
-              
-              {/* Model Comparison Charts */}
-              {savedTestRuns.length > 0 && (
-                <div className="bg-white rounded-lg border shadow-sm p-6 mt-6">
-                  <h4 className="font-medium text-gray-900 mb-6">Model Comparison Charts</h4>
-                  <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-                    
-                    {/* Quality Metrics Comparison */}
-                    <div>
-                      <h5 className="font-medium text-gray-900 mb-4">Quality Metrics Comparison</h5>
+            </div>
+            
+            {/* Model Usage & Recommendations Section */}
+            <div className="bg-white rounded-lg border shadow-sm p-6">
+              <h4 className="font-medium text-gray-900 mb-6">Model Usage & Recommendations</h4>
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                {/* Recommendations */}
+                <div>
+                  <h5 className="font-medium text-gray-900 mb-4">AI Recommendations</h5>
+                  {savedTestRuns.length > 0 ? (
+                    <div className="space-y-4">
                       {(() => {
-                        const modelQualityData: { [key: string]: { quality: number, accuracy: number, coherence: number, diversity: number, count: number } } = {};
-                        
+                        const modelPerformance: { [key: string]: { quality: number, cost: number, latency: number, count: number } } = {};
                         savedTestRuns.forEach(run => {
                           run.results.forEach(result => {
                             const model = run.models.find(m => m.id === result.modelId);
                             const modelName = model?.name || result.modelId;
-                            if (!modelQualityData[modelName]) {
-                              modelQualityData[modelName] = { quality: 0, accuracy: 0, coherence: 0, diversity: 0, count: 0 };
+                            if (!modelPerformance[modelName]) {
+                              modelPerformance[modelName] = { quality: 0, cost: 0, latency: 0, count: 0 };
                             }
-                            modelQualityData[modelName].quality += result.quality;
-                            modelQualityData[modelName].accuracy += result.accuracy || 0;
-                            modelQualityData[modelName].coherence += result.coherence || 0;
-                            modelQualityData[modelName].diversity += result.diversity || 0;
-                            modelQualityData[modelName].count += 1;
+                            modelPerformance[modelName].quality += result.quality;
+                            modelPerformance[modelName].cost += result.cost;
+                            modelPerformance[modelName].latency += result.latency;
+                            modelPerformance[modelName].count += 1;
                           });
                         });
                         
-                        const chartData = {
-                          labels: Object.keys(modelQualityData),
-                          datasets: [
-                            {
-                              label: 'Quality',
-                              data: Object.values(modelQualityData).map(d => (d.quality / d.count) * 100),
-                              backgroundColor: 'rgba(59, 130, 246, 0.8)',
-                              borderColor: 'rgba(59, 130, 246, 1)',
-                              borderWidth: 1,
-                            },
-                            {
-                              label: 'Accuracy',
-                              data: Object.values(modelQualityData).map(d => (d.accuracy / d.count) * 100),
-                              backgroundColor: 'rgba(16, 185, 129, 0.8)',
-                              borderColor: 'rgba(16, 185, 129, 1)',
-                              borderWidth: 1,
-                            },
-                            {
-                              label: 'Coherence',
-                              data: Object.values(modelQualityData).map(d => (d.coherence / d.count) * 100),
-                              backgroundColor: 'rgba(245, 158, 11, 0.8)',
-                              borderColor: 'rgba(245, 158, 11, 1)',
-                              borderWidth: 1,
-                            },
-                            {
-                              label: 'Diversity',
-                              data: Object.values(modelQualityData).map(d => (d.diversity / d.count) * 100),
-                              backgroundColor: 'rgba(236, 72, 153, 0.8)',
-                              borderColor: 'rgba(236, 72, 153, 1)',
-                              borderWidth: 1,
-                            },
-                          ],
-                        };
+                        const recommendations = Object.entries(modelPerformance)
+                          .map(([modelName, data]) => ({
+                            name: modelName,
+                            avgQuality: data.quality / data.count,
+                            avgCost: data.cost / data.count,
+                            avgLatency: data.latency / data.count
+                          }))
+                          .sort((a, b) => b.avgQuality - a.avgQuality);
                         
-                        const options = {
-                          responsive: true,
-                          plugins: {
-                            legend: {
-                              position: 'top' as const,
-                            },
-                            title: {
-                              display: false,
-                            },
-                          },
-                          scales: {
-                            y: {
-                              beginAtZero: true,
-                              max: 100,
-                              ticks: {
-                                callback: function(value: any) {
-                                  return value + '%';
-                                }
-                              }
-                            },
-                          },
-                        };
+                        const bestQuality = recommendations[0];
+                        const bestCost = recommendations.sort((a, b) => a.avgCost - b.avgCost)[0];
+                        const bestLatency = recommendations.sort((a, b) => a.avgLatency - b.avgLatency)[0];
                         
-                        return <Bar data={chartData} options={options} />;
+                        return (
+                          <>
+                            <div className="bg-blue-50 rounded-lg p-4">
+                              <div className="text-sm font-medium text-blue-900 mb-1">Best Quality</div>
+                              <div className="text-lg font-semibold text-blue-900">{bestQuality.name}</div>
+                              <div className="text-sm text-blue-700">{(bestQuality.avgQuality * 100).toFixed(1)}% quality score</div>
+                            </div>
+                            <div className="bg-green-50 rounded-lg p-4">
+                              <div className="text-sm font-medium text-green-900 mb-1">Most Cost-Effective</div>
+                              <div className="text-lg font-semibold text-green-900">{bestCost.name}</div>
+                              <div className="text-sm text-green-700">${bestCost.avgCost.toFixed(6)} per test</div>
+                            </div>
+                            <div className="bg-purple-50 rounded-lg p-4">
+                              <div className="text-sm font-medium text-purple-900 mb-1">Fastest Response</div>
+                              <div className="text-lg font-semibold text-purple-900">{bestLatency.name}</div>
+                              <div className="text-sm text-purple-700">{bestLatency.avgLatency.toFixed(0)}ms average</div>
+                            </div>
+                          </>
+                        );
                       })()}
                     </div>
-                    
-                    {/* Safety Metrics Radar Chart */}
-                    <div>
-                      <h5 className="font-medium text-gray-900 mb-4">Safety Metrics Overview</h5>
-                      {(() => {
-                        const modelSafetyData: { [key: string]: { toxicity: number, hallucination: number, bias: number, count: number } } = {};
-                        
-                        savedTestRuns.forEach(run => {
-                          run.results.forEach(result => {
-                            const model = run.models.find(m => m.id === result.modelId);
-                            const modelName = model?.name || result.modelId;
-                            if (!modelSafetyData[modelName]) {
-                              modelSafetyData[modelName] = { toxicity: 0, hallucination: 0, bias: 0, count: 0 };
-                            }
-                            modelSafetyData[modelName].toxicity += result.toxicity || 0;
-                            modelSafetyData[modelName].hallucination += result.hallucination || 0;
-                            modelSafetyData[modelName].bias += result.bias || 0;
-                            modelSafetyData[modelName].count += 1;
-                          });
+                  ) : (
+                    <div className="text-center py-8">
+                      <div className="text-sm text-gray-500">No recommendations yet</div>
+                      <div className="text-xs text-gray-400 mt-1">Run tests to get AI recommendations</div>
+                    </div>
+                  )}
+                </div>
+                
+                {/* Model Usage Chart */}
+                <div>
+                  <h5 className="font-medium text-gray-900 mb-4">Model Usage Distribution</h5>
+                  {savedTestRuns.length > 0 ? (
+                    (() => {
+                      const modelUsage: { [key: string]: number } = {};
+                      
+                      savedTestRuns.forEach(run => {
+                        run.results.forEach(result => {
+                          const model = run.models.find(m => m.id === result.modelId);
+                          const modelName = model?.name || result.modelId;
+                          modelUsage[modelName] = (modelUsage[modelName] || 0) + 1;
                         });
-                        
-                        const chartData = {
-                          labels: ['Toxicity Risk', 'Hallucination Risk', 'Bias Risk'],
-                          datasets: Object.entries(modelSafetyData).map(([modelName, data], index) => ({
-                            label: modelName,
-                            data: [
-                              (data.toxicity / data.count) * 100,
-                              (data.hallucination / data.count) * 100,
-                              (data.bias / data.count) * 100,
-                            ],
+                      });
+                      
+                      const chartData = {
+                        labels: Object.keys(modelUsage),
+                        datasets: [
+                          {
+                            data: Object.values(modelUsage),
                             backgroundColor: [
-                              `hsla(${index * 60}, 70%, 60%, 0.2)`,
-                              `hsla(${index * 60}, 70%, 60%, 0.2)`,
-                              `hsla(${index * 60}, 70%, 60%, 0.2)`,
+                              'rgba(59, 130, 246, 0.8)',
+                              'rgba(16, 185, 129, 0.8)',
+                              'rgba(245, 158, 11, 0.8)',
+                              'rgba(236, 72, 153, 0.8)',
+                              'rgba(99, 102, 241, 0.8)',
+                              'rgba(34, 197, 94, 0.8)',
                             ],
                             borderColor: [
-                              `hsl(${index * 60}, 70%, 50%)`,
-                              `hsl(${index * 60}, 70%, 50%)`,
-                              `hsl(${index * 60}, 70%, 50%)`,
+                              'rgba(59, 130, 246, 1)',
+                              'rgba(16, 185, 129, 1)',
+                              'rgba(245, 158, 11, 1)',
+                              'rgba(236, 72, 153, 1)',
+                              'rgba(99, 102, 241, 1)',
+                              'rgba(34, 197, 94, 1)',
                             ],
                             borderWidth: 2,
-                            pointBackgroundColor: `hsl(${index * 60}, 70%, 50%)`,
-                            pointBorderColor: '#fff',
-                            pointHoverBackgroundColor: '#fff',
-                            pointHoverBorderColor: `hsl(${index * 60}, 70%, 50%)`,
-                          })),
-                        };
-                        
-                        const options = {
-                          responsive: true,
-                          plugins: {
-                            legend: {
-                              position: 'top' as const,
-                            },
-                            title: {
-                              display: false,
-                            },
                           },
-                          scales: {
-                            r: {
-                              beginAtZero: true,
-                              max: 100,
-                              ticks: {
-                                callback: function(value: any) {
-                                  return value + '%';
-                                }
-                              }
-                            },
+                        ],
+                      };
+                      
+                      const options = {
+                        responsive: true,
+                        plugins: {
+                          legend: {
+                            position: 'bottom' as const,
                           },
-                        };
-                        
-                        return <Radar data={chartData} options={options} />;
-                      })()}
+                          title: {
+                            display: false,
+                          },
+                        },
+                      };
+                      
+                      return <Doughnut data={chartData} options={options} />;
+                    })()
+                  ) : (
+                    <div className="text-center py-8">
+                      <div className="text-sm text-gray-500">No usage data yet</div>
+                      <div className="text-xs text-gray-400 mt-1">Run tests to see usage distribution</div>
                     </div>
-                    
-                    {/* Performance Metrics */}
-                    <div>
-                      <h5 className="font-medium text-gray-900 mb-4">Performance Metrics</h5>
-                      {(() => {
-                        const modelPerformanceData: { [key: string]: { latency: number, cost: number, count: number } } = {};
-                        
-                        savedTestRuns.forEach(run => {
-                          run.results.forEach(result => {
-                            const model = run.models.find(m => m.id === result.modelId);
-                            const modelName = model?.name || result.modelId;
-                            if (!modelPerformanceData[modelName]) {
-                              modelPerformanceData[modelName] = { latency: 0, cost: 0, count: 0 };
-                            }
-                            modelPerformanceData[modelName].latency += result.latency;
-                            modelPerformanceData[modelName].cost += result.cost;
-                            modelPerformanceData[modelName].count += 1;
-                          });
-                        });
-                        
-                        const chartData = {
-                          labels: Object.keys(modelPerformanceData),
-                          datasets: [
-                            {
-                              label: 'Average Latency (ms)',
-                              data: Object.values(modelPerformanceData).map(d => d.latency / d.count),
-                              backgroundColor: 'rgba(99, 102, 241, 0.8)',
-                              borderColor: 'rgba(99, 102, 241, 1)',
-                              borderWidth: 1,
-                              yAxisID: 'y',
-                            },
-                            {
-                              label: 'Average Cost ($)',
-                              data: Object.values(modelPerformanceData).map(d => d.cost / d.count),
-                              backgroundColor: 'rgba(34, 197, 94, 0.8)',
-                              borderColor: 'rgba(34, 197, 94, 1)',
-                              borderWidth: 1,
-                              yAxisID: 'y1',
-                            },
-                          ],
-                        };
-                        
-                        const options = {
-                          responsive: true,
-                          plugins: {
-                            legend: {
-                              position: 'top' as const,
-                            },
-                            title: {
-                              display: false,
-                            },
-                          },
-                          scales: {
-                            y: {
-                              type: 'linear' as const,
-                              display: true,
-                              position: 'left' as const,
-                              title: {
-                                display: true,
-                                text: 'Latency (ms)',
-                              },
-                            },
-                            y1: {
-                              type: 'linear' as const,
-                              display: true,
-                              position: 'right' as const,
-                              title: {
-                                display: true,
-                                text: 'Cost ($)',
-                              },
-                              grid: {
-                                drawOnChartArea: false,
-                              },
-                            },
-                          },
-                        };
-                        
-                        return <Bar data={chartData} options={options} />;
-                      })()}
-                    </div>
-                    
-                    {/* Model Usage Distribution */}
-                    <div>
-                      <h5 className="font-medium text-gray-900 mb-4">Model Usage Distribution</h5>
-                      {(() => {
-                        const modelUsage: { [key: string]: number } = {};
-                        
-                        savedTestRuns.forEach(run => {
-                          run.results.forEach(result => {
-                            const model = run.models.find(m => m.id === result.modelId);
-                            const modelName = model?.name || result.modelId;
-                            modelUsage[modelName] = (modelUsage[modelName] || 0) + 1;
-                          });
-                        });
-                        
-                        const chartData = {
-                          labels: Object.keys(modelUsage),
-                          datasets: [
-                            {
-                              data: Object.values(modelUsage),
-                              backgroundColor: [
-                                'rgba(59, 130, 246, 0.8)',
-                                'rgba(16, 185, 129, 0.8)',
-                                'rgba(245, 158, 11, 0.8)',
-                                'rgba(236, 72, 153, 0.8)',
-                                'rgba(99, 102, 241, 0.8)',
-                                'rgba(34, 197, 94, 0.8)',
-                              ],
-                              borderColor: [
-                                'rgba(59, 130, 246, 1)',
-                                'rgba(16, 185, 129, 1)',
-                                'rgba(245, 158, 11, 1)',
-                                'rgba(236, 72, 153, 1)',
-                                'rgba(99, 102, 241, 1)',
-                                'rgba(34, 197, 94, 1)',
-                              ],
-                              borderWidth: 2,
-                            },
-                          ],
-                        };
-                        
-                        const options = {
-                          responsive: true,
-                          plugins: {
-                            legend: {
-                              position: 'bottom' as const,
-                            },
-                            title: {
-                              display: false,
-                            },
-                          },
-                        };
-                        
-                        return <Doughnut data={chartData} options={options} />;
-                      })()}
-                    </div>
-                  </div>
+                  )}
                 </div>
-              )}
+              </div>
             </div>
           </div>
         </div>
