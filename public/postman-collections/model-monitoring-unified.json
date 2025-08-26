@@ -414,6 +414,90 @@
               "path": ["api", "llm"]
             }
           }
+        },
+        {
+          "name": "Test Grok 2.5 (Local)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"prompt\": \"{{test_prompt}}\",\n  \"provider\": \"Ollama\",\n  \"model\": \"grok2.5:latest\",\n  \"track_performance\": true\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/llm",
+              "host": ["{{base_url}}"],
+              "path": ["api", "llm"]
+            }
+          }
+        },
+        {
+          "name": "Test GPT OSS 20B (Local)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"prompt\": \"{{test_prompt}}\",\n  \"provider\": \"Ollama\",\n  \"model\": \"gpt-oss:20b\",\n  \"track_performance\": true\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/llm",
+              "host": ["{{base_url}}"],
+              "path": ["api", "llm"]
+            }
+          }
+        },
+        {
+          "name": "Test Qwen 7B (Local)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"prompt\": \"{{test_prompt}}\",\n  \"provider\": \"Ollama\",\n  \"model\": \"qwen:7b\",\n  \"track_performance\": true\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/llm",
+              "host": ["{{base_url}}"],
+              "path": ["api", "llm"]
+            }
+          }
+        },
+        {
+          "name": "Test Gemma2 9B (Local)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"prompt\": \"{{test_prompt}}\",\n  \"provider\": \"Ollama\",\n  \"model\": \"gemma2:9b\",\n  \"track_performance\": true\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/llm",
+              "host": ["{{base_url}}"],
+              "path": ["api", "llm"]
+            }
+          }
         }
       ]
     }

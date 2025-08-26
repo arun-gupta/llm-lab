@@ -139,30 +139,12 @@ export function ModelMonitoringTab({ onTabChange }: ModelMonitoringTabProps) {
       enabled: false
     },
     {
-      id: 'llama-3.1-8b',
-      name: 'Llama 3.1 8B',
-      provider: 'Ollama',
-      model: 'llama3.1:8b',
-      description: 'Local Llama model for privacy-focused testing',
-      color: 'red',
-      enabled: false
-    },
-    {
-      id: 'llama-3.2-1b',
-      name: 'Llama 3.2 1B',
-      provider: 'Ollama',
-      model: 'llama3.2:1b',
-      description: 'Ultra-fast local Llama 3.2 model',
-      color: 'amber',
-      enabled: false
-    },
-    {
       id: 'llama-3.2-3b',
       name: 'Llama 3.2 3B',
       provider: 'Ollama',
       model: 'llama3.2:3b',
       description: 'Fast local Llama 3.2 model with good performance',
-      color: 'yellow',
+      color: 'amber',
       enabled: false
     },
     {
@@ -171,16 +153,43 @@ export function ModelMonitoringTab({ onTabChange }: ModelMonitoringTabProps) {
       provider: 'Ollama',
       model: 'llama3.2:8b',
       description: 'Balanced local Llama 3.2 model',
-      color: 'lime',
+      color: 'yellow',
       enabled: false
     },
     {
-      id: 'llama-3.2-70b',
-      name: 'Llama 3.2 70B',
+      id: 'grok-2.5',
+      name: 'Grok 2.5',
       provider: 'Ollama',
-      model: 'llama3.2:70b',
-      description: 'High-performance local Llama 3.2 model',
-      color: 'emerald',
+      model: 'grok2.5:latest',
+      description: 'Open source Grok 2.5 model from xAI',
+      color: 'red',
+      enabled: false
+    },
+    {
+      id: 'gpt-oss-20b',
+      name: 'GPT OSS 20B',
+      provider: 'Ollama',
+      model: 'gpt-oss:20b',
+      description: 'Open source GPT model with 20B parameters',
+      color: 'blue',
+      enabled: false
+    },
+    {
+      id: 'qwen-7b',
+      name: 'Qwen 7B',
+      provider: 'Ollama',
+      model: 'qwen:7b',
+      description: 'Alibaba Cloud Qwen 7B model',
+      color: 'green',
+      enabled: false
+    },
+    {
+      id: 'gemma2-9b',
+      name: 'Gemma2 9B',
+      provider: 'Ollama',
+      model: 'gemma2:9b',
+      description: 'Google Gemma2 9B open model',
+      color: 'purple',
       enabled: false
     },
     {
@@ -190,15 +199,6 @@ export function ModelMonitoringTab({ onTabChange }: ModelMonitoringTabProps) {
       model: 'mistral:7b',
       description: 'Efficient local Mistral model',
       color: 'sky',
-      enabled: false
-    },
-    {
-      id: 'codellama-7b',
-      name: 'Code Llama 7B',
-      provider: 'Ollama',
-      model: 'codellama:7b',
-      description: 'Specialized local model for code generation',
-      color: 'indigo',
       enabled: false
     },
     {
@@ -282,7 +282,7 @@ export function ModelMonitoringTab({ onTabChange }: ModelMonitoringTabProps) {
       id: 'speed-test',
       title: 'Speed Test',
       description: 'Compare response times across models',
-      models: ['gpt-5-nano', 'gpt-5-mini', 'llama-3.2-1b', 'llama-3.2-3b'],
+      models: ['gpt-5-nano', 'gpt-5-mini', 'llama-3.2-3b', 'phi-3-mini'],
       prompt: 'Write a 100-word summary of the benefits of renewable energy sources.',
       icon: '⚡'
     },
@@ -290,7 +290,7 @@ export function ModelMonitoringTab({ onTabChange }: ModelMonitoringTabProps) {
       id: 'quality-test',
       title: 'Quality Test',
       description: 'Compare response quality across models',
-      models: ['gpt-5', 'claude-3-5-sonnet', 'llama-3.2-70b', 'gpt-4'],
+      models: ['gpt-5', 'claude-3-5-sonnet', 'llama-3.2-8b', 'grok-2.5'],
       prompt: 'Explain the concept of machine learning in detail, including its applications, limitations, and future prospects.',
       icon: '🎯'
     },
@@ -298,7 +298,7 @@ export function ModelMonitoringTab({ onTabChange }: ModelMonitoringTabProps) {
       id: 'cost-test',
       title: 'Cost Test',
       description: 'Compare cost-effectiveness across models',
-      models: ['llama-3.2-1b', 'llama-3.2-3b', 'phi-3-mini', 'gpt-3.5-turbo'],
+      models: ['llama-3.2-3b', 'phi-3-mini', 'mistral-7b', 'gpt-3.5-turbo'],
       prompt: 'Provide a brief analysis of the current trends in remote work.',
       icon: '💰'
     },
@@ -314,15 +314,15 @@ export function ModelMonitoringTab({ onTabChange }: ModelMonitoringTabProps) {
       id: 'local-vs-cloud',
       title: 'Local vs Cloud',
       description: 'Compare local Ollama models with cloud models',
-      models: ['llama-3.2-8b', 'gpt-5-mini', 'claude-3-5-haiku', 'mistral-7b'],
+      models: ['llama-3.2-8b', 'gpt-5-mini', 'claude-3-5-haiku', 'qwen-7b'],
       prompt: 'Explain the differences between supervised and unsupervised learning with examples.',
       icon: '🏠'
     },
     {
-      id: 'code-generation',
-      title: 'Code Generation',
-      description: 'Test code generation capabilities',
-      models: ['codellama-7b', 'gpt-5', 'claude-3-5-sonnet', 'llama-3.2-8b'],
+      id: 'open-source-comparison',
+      title: 'Open Source Comparison',
+      description: 'Compare different open source models',
+      models: ['llama-3.2-8b', 'grok-2.5', 'gpt-oss-20b', 'gemma2-9b'],
       prompt: 'Write a Python function that implements a binary search algorithm with proper error handling and documentation.',
       icon: '💻'
     },
@@ -330,7 +330,7 @@ export function ModelMonitoringTab({ onTabChange }: ModelMonitoringTabProps) {
       id: 'privacy-focused',
       title: 'Privacy Focused',
       description: 'Compare local models for privacy-sensitive tasks',
-      models: ['llama-3.2-8b', 'llama-3.2-70b', 'mistral-7b', 'phi-3-mini'],
+      models: ['llama-3.2-8b', 'mistral-7b', 'phi-3-mini', 'qwen-7b'],
       prompt: 'Analyze the privacy implications of using cloud-based AI services versus local models.',
       icon: '🔒'
     }
@@ -1161,15 +1161,31 @@ export function ModelMonitoringTab({ onTabChange }: ModelMonitoringTabProps) {
                         <div className="flex flex-wrap gap-2 text-xs">
                           <div className="flex items-center space-x-1">
                             <span className="w-2 h-2 bg-red-500 rounded-full"></span>
-                            <span className="text-gray-600">Legacy Models</span>
+                            <span className="text-gray-600">xAI Models</span>
                           </div>
                           <div className="flex items-center space-x-1">
                             <span className="w-2 h-2 bg-amber-500 rounded-full"></span>
-                            <span className="text-gray-600">Fast Models</span>
+                            <span className="text-gray-600">Llama Models</span>
                           </div>
                           <div className="flex items-center space-x-1">
                             <span className="w-2 h-2 bg-blue-500 rounded-full"></span>
-                            <span className="text-gray-600">Specialized Models</span>
+                            <span className="text-gray-600">Open Source GPT</span>
+                          </div>
+                          <div className="flex items-center space-x-1">
+                            <span className="w-2 h-2 bg-green-500 rounded-full"></span>
+                            <span className="text-gray-600">Cloud Models</span>
+                          </div>
+                          <div className="flex items-center space-x-1">
+                            <span className="w-2 h-2 bg-purple-500 rounded-full"></span>
+                            <span className="text-gray-600">Google Models</span>
+                          </div>
+                          <div className="flex items-center space-x-1">
+                            <span className="w-2 h-2 bg-sky-500 rounded-full"></span>
+                            <span className="text-gray-600">Mistral Models</span>
+                          </div>
+                          <div className="flex items-center space-x-1">
+                            <span className="w-2 h-2 bg-rose-500 rounded-full"></span>
+                            <span className="text-gray-600">Microsoft Models</span>
                           </div>
                         </div>
                       </div>
