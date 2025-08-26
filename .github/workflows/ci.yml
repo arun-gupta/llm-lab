@@ -25,6 +25,15 @@ jobs:
 
     - name: Set up Docker Buildx
       uses: docker/setup-buildx-action@v3
+      with:
+        driver-opts: |
+          image=moby/buildkit:v0.12.0
+
+    - name: Clear Docker cache if corrupted
+      run: |
+        # Clear any corrupted cache entries
+        docker builder prune -f || true
+        docker system prune -f || true
 
     - name: Log in to Container Registry
       if: github.event_name != 'pull_request'
@@ -86,8 +95,9 @@ jobs:
         push: ${{ github.event_name != 'pull_request' }}
         tags: ${{ steps.meta-app.outputs.tags }}
         labels: ${{ steps.meta-app.outputs.labels }}
-        cache-from: type=gha
-        cache-to: type=gha,mode=max
+        # Temporarily disabled cache due to GHA cache issues
+        # cache-from: type=gha,scope=main-app-${{ github.sha }}
+        # cache-to: type=gha,mode=max,scope=main-app-${{ github.sha }}
         platforms: linux/amd64
 
     - name: Build and push gRPC server image
@@ -98,8 +108,9 @@ jobs:
         push: ${{ github.event_name != 'pull_request' }}
         tags: ${{ steps.meta-grpc.outputs.tags }}
         labels: ${{ steps.meta-grpc.outputs.labels }}
-        cache-from: type=gha
-        cache-to: type=gha,mode=max
+        # Temporarily disabled cache due to GHA cache issues
+        # cache-from: type=gha,scope=grpc-server-${{ github.sha }}
+        # cache-to: type=gha,mode=max,scope=grpc-server-${{ github.sha }}
         platforms: linux/amd64
 
     - name: Build and push gRPC-Web proxy image
@@ -110,8 +121,9 @@ jobs:
         push: ${{ github.event_name != 'pull_request' }}
         tags: ${{ steps.meta-grpc-web.outputs.tags }}
         labels: ${{ steps.meta-grpc-web.outputs.labels }}
-        cache-from: type=gha
-        cache-to: type=gha,mode=max
+        # Temporarily disabled cache due to GHA cache issues
+        # cache-from: type=gha,scope=grpc-web-proxy-${{ github.sha }}
+        # cache-to: type=gha,mode=max,scope=grpc-web-proxy-${{ github.sha }}
         platforms: linux/amd64
 
     - name: Build and push filesystem MCP image
@@ -122,8 +134,9 @@ jobs:
         push: ${{ github.event_name != 'pull_request' }}
         tags: ${{ steps.meta-filesystem-mcp.outputs.tags }}
         labels: ${{ steps.meta-filesystem-mcp.outputs.labels }}
-        cache-from: type=gha
-        cache-to: type=gha,mode=max
+        # Temporarily disabled cache due to GHA cache issues
+        # cache-from: type=gha,scope=filesystem-mcp-${{ github.sha }}
+        # cache-to: type=gha,mode=max,scope=filesystem-mcp-${{ github.sha }}
         platforms: linux/amd64
 
     - name: Test main app container health
