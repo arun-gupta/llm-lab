@@ -1,0 +1,332 @@
+{
+  "info": {
+    "name": "Model Monitoring - Unified Collection",
+    "description": "Comprehensive model monitoring collection with A/B testing, response comparison, and performance monitoring APIs",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "base_url",
+      "value": "http://localhost:3000",
+      "type": "string"
+    },
+    {
+      "key": "test_prompt",
+      "value": "Compare the performance of different AI models",
+      "type": "string"
+    },
+    {
+      "key": "openai_api_key",
+      "value": "your_openai_api_key_here",
+      "type": "string"
+    },
+    {
+      "key": "anthropic_api_key",
+      "value": "your_anthropic_api_key_here",
+      "type": "string"
+    }
+  ],
+  "item": [
+    {
+      "name": "A/B Testing",
+      "item": [
+        {
+          "name": "Setup A/B Testing Environment",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"models\": [\n    {\n      \"id\": \"gpt-5\",\n      \"provider\": \"OpenAI\",\n      \"model\": \"gpt-5\"\n    },\n    {\n      \"id\": \"gpt-5-mini\",\n      \"provider\": \"OpenAI\",\n      \"model\": \"gpt-5-mini\"\n    },\n    {\n      \"id\": \"claude-3-5-sonnet\",\n      \"provider\": \"Anthropic\",\n      \"model\": \"claude-3-5-sonnet\"\n    }\n  ],\n  \"test_prompt\": \"{{test_prompt}}\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/monitoring/setup-ab-test",
+              "host": ["{{base_url}}"],
+              "path": ["api", "monitoring", "setup-ab-test"]
+            }
+          }
+        },
+        {
+          "name": "Run A/B Test",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"prompt\": \"{{test_prompt}}\",\n  \"models\": [\n    {\n      \"provider\": \"OpenAI\",\n      \"model\": \"gpt-5\"\n    },\n    {\n      \"provider\": \"OpenAI\",\n      \"model\": \"gpt-5-mini\"\n    },\n    {\n      \"provider\": \"Anthropic\",\n      \"model\": \"claude-3-5-sonnet\"\n    }\n  ],\n  \"track_performance\": true\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/monitoring/ab-test-results",
+              "host": ["{{base_url}}"],
+              "path": ["api", "monitoring", "ab-test-results"]
+            }
+          }
+        },
+        {
+          "name": "Get A/B Test Results",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/monitoring/ab-test-results",
+              "host": ["{{base_url}}"],
+              "path": ["api", "monitoring", "ab-test-results"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Response Comparison",
+      "item": [
+        {
+          "name": "Compare Model Responses",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"prompt\": \"{{test_prompt}}\",\n  \"models\": [\n    {\n      \"provider\": \"OpenAI\",\n      \"model\": \"gpt-5\"\n    },\n    {\n      \"provider\": \"OpenAI\",\n      \"model\": \"gpt-5-mini\"\n    },\n    {\n      \"provider\": \"Anthropic\",\n      \"model\": \"claude-3-5-sonnet\"\n    }\n  ],\n  \"include_metrics\": true\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/monitoring/model-comparison",
+              "host": ["{{base_url}}"],
+              "path": ["api", "monitoring", "model-comparison"]
+            }
+          }
+        },
+        {
+          "name": "Get Response Comparison History",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/monitoring/comparison-history",
+              "host": ["{{base_url}}"],
+              "path": ["api", "monitoring", "comparison-history"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Performance Monitoring",
+      "item": [
+        {
+          "name": "Start Performance Monitoring",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"enabled\": true,\n  \"track_metrics\": [\"latency\", \"throughput\", \"cost\", \"quality\", \"tokens\"]\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/monitoring/start",
+              "host": ["{{base_url}}"],
+              "path": ["api", "monitoring", "start"]
+            }
+          }
+        },
+        {
+          "name": "Get Performance Metrics",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/monitoring/metrics",
+              "host": ["{{base_url}}"],
+              "path": ["api", "monitoring", "metrics"]
+            }
+          }
+        },
+        {
+          "name": "Get Real-time Metrics",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/monitoring/metrics/realtime",
+              "host": ["{{base_url}}"],
+              "path": ["api", "monitoring", "metrics", "realtime"]
+            }
+          }
+        },
+        {
+          "name": "Export Performance Report",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/monitoring/export-report?format=json",
+              "host": ["{{base_url}}"],
+              "path": ["api", "monitoring", "export-report"],
+              "query": [
+                {
+                  "key": "format",
+                  "value": "json"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Stop Performance Monitoring",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"enabled\": false\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/monitoring/stop",
+              "host": ["{{base_url}}"],
+              "path": ["api", "monitoring", "stop"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Analytics Dashboard",
+      "item": [
+        {
+          "name": "Get Analytics Overview",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/monitoring/analytics/overview",
+              "host": ["{{base_url}}"],
+              "path": ["api", "monitoring", "analytics", "overview"]
+            }
+          }
+        },
+        {
+          "name": "Get Model Performance Trends",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/monitoring/analytics/trends?days=30",
+              "host": ["{{base_url}}"],
+              "path": ["api", "monitoring", "analytics", "trends"],
+              "query": [
+                {
+                  "key": "days",
+                  "value": "30"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get Cost Analysis",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/monitoring/analytics/costs",
+              "host": ["{{base_url}}"],
+              "path": ["api", "monitoring", "analytics", "costs"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Individual Model Tests",
+      "item": [
+        {
+          "name": "Test GPT-5",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"prompt\": \"{{test_prompt}}\",\n  \"provider\": \"OpenAI\",\n  \"model\": \"gpt-5\",\n  \"track_performance\": true\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/llm",
+              "host": ["{{base_url}}"],
+              "path": ["api", "llm"]
+            }
+          }
+        },
+        {
+          "name": "Test GPT-5 Mini",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"prompt\": \"{{test_prompt}}\",\n  \"provider\": \"OpenAI\",\n  \"model\": \"gpt-5-mini\",\n  \"track_performance\": true\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/llm",
+              "host": ["{{base_url}}"],
+              "path": ["api", "llm"]
+            }
+          }
+        },
+        {
+          "name": "Test Claude 3.5 Sonnet",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"prompt\": \"{{test_prompt}}\",\n  \"provider\": \"Anthropic\",\n  \"model\": \"claude-3-5-sonnet\",\n  \"track_performance\": true\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/llm",
+              "host": ["{{base_url}}"],
+              "path": ["api", "llm"]
+            }
+          }
+        }
+      ]
+    }
+  ]
+}

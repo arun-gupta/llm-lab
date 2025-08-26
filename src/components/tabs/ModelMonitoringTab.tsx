@@ -265,7 +265,7 @@ export function ModelMonitoringTab({ onTabChange }: ModelMonitoringTabProps) {
     successRate: 0
   });
 
-  const generateABTestingCollection = async () => {
+  const generateUnifiedCollection = async () => {
     if (!models.filter(m => m.enabled).length) return;
 
     setImportStatus('importing');
@@ -874,28 +874,12 @@ export function ModelMonitoringTab({ onTabChange }: ModelMonitoringTabProps) {
           </div>
           <div className="flex items-center space-x-3">
             <button
-              onClick={generateABTestingCollection}
-              disabled={!models.filter(m => m.enabled).length || importStatus === 'importing'}
+              onClick={generateUnifiedCollection}
+              disabled={importStatus === 'importing'}
               className="flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed"
             >
               <img src="/postman-logo.svg" alt="Postman" className="w-4 h-4 mr-2" />
-              {importStatus === 'importing' ? 'Importing...' : 'Add A/B Testing Collection'}
-            </button>
-            <button
-              onClick={generateResponseComparisonCollection}
-              disabled={!comparisonResponses.length || importStatus === 'importing'}
-              className="flex items-center px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 disabled:opacity-50 disabled:cursor-not-allowed"
-            >
-              <img src="/postman-logo.svg" alt="Postman" className="w-4 h-4 mr-2" />
-              {importStatus === 'importing' ? 'Importing...' : 'Add Response Collection'}
-            </button>
-            <button
-              onClick={generateMonitoringCollection}
-              disabled={importStatus === 'importing'}
-              className="flex items-center px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 disabled:opacity-50 disabled:cursor-not-allowed"
-            >
-              <img src="/postman-logo.svg" alt="Postman" className="w-4 h-4 mr-2" />
-              {importStatus === 'importing' ? 'Importing...' : 'Add Monitoring Collection'}
+              {importStatus === 'importing' ? 'Importing...' : 'Add Model Monitoring Collection'}
             </button>
           </div>
         </div>
