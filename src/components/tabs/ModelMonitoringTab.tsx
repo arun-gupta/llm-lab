@@ -20,7 +20,27 @@ import {
   FileText
 } from 'lucide-react';
 import { SuccessCelebration } from '../SuccessCelebration';
-import { factChecker, FactCheckResult } from '../../lib/fact-checker';
+// Fact-checking types (moved from fact-checker.ts to avoid client-side import)
+interface ExtractedClaim {
+  text: string;
+  type: 'factual' | 'statistic' | 'general' | 'opinion';
+  confidence: number;
+}
+
+interface FactCheckResult {
+  accuracy: number;
+  confidence: number;
+  verifiedFacts: string[];
+  unverifiedClaims: string[];
+  contradictions: string[];
+  issues: string[];
+  claimResults: Array<{
+    claim: ExtractedClaim;
+    verified: boolean;
+    confidence: number;
+    source?: string;
+  }>;
+}
 import {
   Chart as ChartJS,
   CategoryScale,
@@ -91,7 +111,38 @@ interface TestResult {
   factCheckResult?: FactCheckResult;
 }
 
-export function ABTestingTab({ onTabChange }: ModelMonitoringTabProps) {
+// Helper function to call fact-checking API
+async function performFactCheck(response: string, prompt: string): Promise<FactCheckResult> {
+  try {
+    const res = await fetch('/api/fact-check', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ response, prompt }),
+    });
+    
+    if (!res.ok) {
+      throw new Error('Fact-checking failed');
+    }
+    
+    return await res.json();
+  } catch (error) {
+    console.error('Fact-checking error:', error);
+    // Return a fallback result
+    return {
+      accuracy: 0.5,
+      confidence: 0.3,
+      verifiedFacts: [],
+      unverifiedClaims: [],
+      contradictions: [],
+      issues: ['Fact-checking service unavailable'],
+      claimResults: [],
+    };
+  }
+}
+
+export function ABTestingTab({ onTabChange }: ABTestingTabProps) {
   const [activeTab, setActiveTab] = useState<'ab-testing' | 'monitoring' | 'results'>('ab-testing');
   const [importStatus, setImportStatus] = useState<'idle' | 'importing' | 'success' | 'error'>('idle');
   const [showSuccessCelebration, setShowSuccessCelebration] = useState(false);
@@ -1211,7 +1262,7 @@ export function ABTestingTab({ onTabChange }: ModelMonitoringTabProps) {
         const cost = calculateCost(model.provider, tokens);
 
         // Calculate advanced metrics
-        const factCheckResult = await factChecker.checkAccuracy(llmResponse.content, testPrompt);
+        const factCheckResult = await performFactCheck(llmResponse.content, testPrompt);
         const accuracy = factCheckResult.accuracy;
         const coherence = calculateCoherence(llmResponse.content);
         const timeToUseful = calculateTimeToUseful(llmResponse.content);
@@ -1289,7 +1340,7 @@ export function ABTestingTab({ onTabChange }: ModelMonitoringTabProps) {
         const mockCost = calculateCost(model.provider, mockTokens);
         
         // Calculate advanced metrics for mock data
-        const factCheckResult = await factChecker.checkAccuracy(mockContent, testPrompt);
+        const factCheckResult = await performFactCheck(mockContent, testPrompt);
         const accuracy = factCheckResult.accuracy;
         const coherence = calculateCoherence(mockContent);
         const timeToUseful = calculateTimeToUseful(mockContent);

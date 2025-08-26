@@ -525,5 +525,5 @@ export class FactChecker {
   }
 }
 
-// Export singleton instance
+// Export singleton instance (server-side only)
 export const factChecker = new FactChecker();
