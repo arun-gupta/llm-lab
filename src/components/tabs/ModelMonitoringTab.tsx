@@ -878,9 +878,15 @@ export function ModelMonitoringTab({ onTabChange }: ModelMonitoringTabProps) {
   };
 
   const toggleModel = (modelId: string) => {
-    setModels(prev => prev.map(m => 
-      m.id === modelId ? { ...m, enabled: !m.enabled } : m
-    ));
+    console.log('toggleModel called with:', modelId);
+    setModels(prev => {
+      console.log('Previous models state:', prev);
+      const updated = prev.map(m => 
+        m.id === modelId ? { ...m, enabled: !m.enabled } : m
+      );
+      console.log('Updated models state:', updated);
+      return updated;
+    });
   };
 
   const toggleSection = (section: 'ollama' | 'openai' | 'anthropic') => {
@@ -1245,6 +1251,7 @@ export function ModelMonitoringTab({ onTabChange }: ModelMonitoringTabProps) {
                                     type="checkbox"
                                     checked={model.enabled}
                                     onChange={(e) => {
+                                      console.log('Ollama checkbox clicked for model:', model.id, 'Current enabled:', model.enabled);
                                       e.stopPropagation();
                                       toggleModel(model.id);
                                     }}
@@ -1304,6 +1311,7 @@ export function ModelMonitoringTab({ onTabChange }: ModelMonitoringTabProps) {
                                 type="checkbox"
                                 checked={model.enabled}
                                 onChange={(e) => {
+                                  console.log('OpenAI checkbox clicked for model:', model.id, 'Current enabled:', model.enabled);
                                   e.stopPropagation();
                                   toggleModel(model.id);
                                 }}
@@ -1355,6 +1363,7 @@ export function ModelMonitoringTab({ onTabChange }: ModelMonitoringTabProps) {
                                 type="checkbox"
                                 checked={model.enabled}
                                 onChange={(e) => {
+                                  console.log('Anthropic checkbox clicked for model:', model.id, 'Current enabled:', model.enabled);
                                   e.stopPropagation();
                                   toggleModel(model.id);
                                 }}
