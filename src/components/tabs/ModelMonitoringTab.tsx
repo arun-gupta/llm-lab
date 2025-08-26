@@ -1917,17 +1917,11 @@ export function ModelMonitoringTab({ onTabChange }: ModelMonitoringTabProps) {
         <div className="space-y-6">
                     {/* Performance Monitoring & Analytics Header */}
           <div className="bg-white rounded-lg border shadow-sm p-6">
-            <div className="flex items-center justify-between mb-4">
-              <div>
+                          <div className="mb-4">
                 <h3 className="text-lg font-semibold text-gray-900">Analytics</h3>
                 <p className="text-gray-600 mt-1">Track, monitor, and analyze model performance metrics</p>
               </div>
-              <div className="flex items-center">
-                <div className="w-2 h-2 bg-green-500 rounded-full mr-2"></div>
-                <span className="text-sm text-green-600 font-medium">Always Active</span>
-              </div>
-            </div>
-            <p className="text-sm text-gray-600">Real-time tracking of latency, throughput, costs, and quality metrics</p>
+              <p className="text-sm text-gray-600">Real-time tracking of latency, throughput, costs, and quality metrics</p>
           </div>
 
           {/* Metrics Dashboard */}
