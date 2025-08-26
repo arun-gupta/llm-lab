@@ -205,21 +205,28 @@ export function GraphRAGTab() {
 
       if (response.ok) {
         const data = await response.json();
+        console.log('API Response data:', data);
+        console.log('Entities:', data.entities?.length || 0);
+        console.log('Relationships:', data.relationships?.length || 0);
+        if (data.relationships?.length > 0) {
+          console.log('Sample relationship:', data.relationships[0]);
+        }
+        
         // Convert ArangoDB response to expected format
         const graphData = {
           nodes: data.entities?.map((entity: any) => ({
-            id: entity._key,
+            id: entity.id || entity._key,
             label: entity.label,
             type: entity.type,
             connections: entity.connections,
             frequency: entity.frequency,
           })) || [],
           edges: data.relationships?.map((rel: any) => ({
-            source: rel._from.split('/')[1],
-            target: rel._to.split('/')[1],
+            source: rel.source || (rel._from ? rel._from.split('/')[1] : ''),
+            target: rel.target || (rel._to ? rel._to.split('/')[1] : ''),
             relationship: rel.relationship,
             weight: rel.weight,
-          })) || [],
+          })).filter(edge => edge.source && edge.target) || [],
           stats: data.stats || { totalNodes: 0, totalEdges: 0, topEntities: [] },
         };
         setGraphData(graphData);
