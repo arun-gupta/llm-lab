@@ -36,9 +36,118 @@ fi
 cat > migrate-graphs.js << 'EOF'
 const fs = require('fs');
 const path = require('path');
+const { Database } = require('arangojs');
 
-// Import ArangoDB functions
-const { migrateGraphFromJSON } = require('../src/lib/arangodb.ts');
+// ArangoDB configuration
+const ARANGO_CONFIG = {
+    url: process.env.ARANGO_URL || 'http://localhost:8529',
+    databaseName: process.env.ARANGO_DB_NAME || 'graphrag',
+    username: process.env.ARANGO_USERNAME || 'graphrag_user',
+    password: process.env.ARANGO_PASSWORD || 'graphrag123',
+};
+
+async function initDatabase() {
+    const db = new Database({
+        url: ARANGO_CONFIG.url,
+        databaseName: ARANGO_CONFIG.databaseName,
+        auth: {
+            username: ARANGO_CONFIG.username,
+            password: ARANGO_CONFIG.password,
+        },
+    });
+    
+    await db.version();
+    console.log('✅ Connected to ArangoDB');
+    return db;
+}
+
+async function ensureCollections(db) {
+    const collections = ['entities', 'relationships', 'documents', 'graphs'];
+    
+    for (const collectionName of collections) {
+        try {
+            const collection = db.collection(collectionName);
+            await collection.create();
+            console.log(`✅ Created collection: ${collectionName}`);
+        } catch (error) {
+            if (error.code !== 409) { // 409 = collection already exists
+                console.error(`❌ Failed to create collection ${collectionName}:`, error.message);
+            }
+        }
+    }
+    
+    // Create graph
+    try {
+        const graph = db.graph('knowledge_graph');
+        await graph.create([
+            {
+                collection: 'entities',
+                from: ['relationships'],
+                to: ['relationships']
+            }
+        ]);
+        console.log('✅ Created knowledge_graph');
+    } catch (error) {
+        if (error.code !== 409) { // 409 = graph already exists
+            console.error('❌ Failed to create knowledge_graph:', error.message);
+        }
+    }
+}
+
+async function migrateGraphFromJSON(graphId, jsonData) {
+    const db = await initDatabase();
+    await ensureCollections(db);
+    
+    const entitiesCollection = db.collection('entities');
+    const relationshipsCollection = db.collection('relationships');
+    const graphsCollection = db.collection('graphs');
+    
+    // Create graph metadata
+    const graphDoc = {
+        _key: graphId,
+        name: graphId,
+        stats: {
+            totalNodes: jsonData.nodes?.length || 0,
+            totalEdges: jsonData.edges?.length || 0,
+            topEntities: jsonData.stats?.topEntities || []
+        },
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString()
+    };
+    
+    await graphsCollection.save(graphDoc);
+    
+    // Migrate entities
+    if (jsonData.nodes && jsonData.nodes.length > 0) {
+        const entities = jsonData.nodes.map(node => ({
+            _key: node.id,
+            graphId: graphId,
+            label: node.label,
+            type: node.type,
+            connections: node.connections || 0,
+            frequency: node.frequency || 1
+        }));
+        
+        await entitiesCollection.import(entities);
+        console.log(`   📊 Migrated ${entities.length} entities`);
+    }
+    
+    // Migrate relationships
+    if (jsonData.edges && jsonData.edges.length > 0) {
+        const relationships = jsonData.edges.map(edge => ({
+            _from: `entities/${edge.source}`,
+            _to: `entities/${edge.target}`,
+            graphId: graphId,
+            relationship: edge.relationship,
+            weight: edge.weight || 1
+        }));
+        
+        await relationshipsCollection.import(relationships);
+        console.log(`   🔗 Migrated ${relationships.length} relationships`);
+    }
+    
+    return graphId;
+}
 
 async function migrateGraphs() {
     const graphsDir = path.join(process.cwd(), 'data', 'graphs');
