@@ -37,7 +37,7 @@ interface GraphPreviewD3Props {
 const GraphPreviewD3: React.FC<GraphPreviewD3Props> = ({ 
   graphData, 
   width = 800, 
-  height = 600 
+  height = 400 
 }) => {
   const svgRef = useRef<SVGSVGElement>(null);
   const zoomRef = useRef<d3.ZoomBehavior<SVGSVGElement, unknown> | null>(null);

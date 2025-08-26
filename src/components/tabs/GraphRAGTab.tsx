@@ -214,6 +214,7 @@ export function GraphRAGTab() {
         
         // Convert ArangoDB response to expected format
         const graphData = {
+          graphId: data.graphId, // Store the graphId from the API response
           nodes: data.entities?.map((entity: any) => ({
             id: entity.id || entity._key,
             label: entity.label,
@@ -469,7 +470,7 @@ export function GraphRAGTab() {
                 mode: "raw",
                 raw: JSON.stringify({
                   query: "AI healthcare relationships",
-                  graph_id: "graph_1755797167093",
+                  graph_id: graphData.graphId,
                   max_depth: 3,
                   node_types: ["person", "organization", "concept"]
                 }, null, 2)
@@ -495,7 +496,7 @@ export function GraphRAGTab() {
                 mode: "raw",
                 raw: JSON.stringify({
                   query: "AI healthcare relationships",
-                  graph_id: "graph_1755797167093",
+                  graph_id: graphData.graphId,
                   max_depth: 3
                 }, null, 2)
               }
@@ -520,7 +521,7 @@ export function GraphRAGTab() {
                 mode: "raw",
                 raw: JSON.stringify({
                   query: "What are AI benefits in healthcare?",
-                  graph_id: "graph_1755797167093",
+                  graph_id: graphData.graphId,
                   max_context_size: 10,
                   relevance_threshold: 0.7,
                   client_id: "browser_session_123"
@@ -547,7 +548,7 @@ export function GraphRAGTab() {
                 mode: "raw",
                 raw: JSON.stringify({
                   query: "AI healthcare",
-                  graph_id: "graph_1755797167093",
+                  graph_id: graphData.graphId,
                   session_id: "session_123"
                 }, null, 2)
               }
@@ -642,7 +643,7 @@ export function GraphRAGTab() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           query: query.trim(),
-          graphId: graphData.graphId || 'graph_1755797167093',
+          graphId: graphData.graphId,
           model: selectedModel
         })
       });
@@ -2396,14 +2397,14 @@ export function GraphRAGTab() {
                         Compare REST, GraphQL, gRPC, gRPC-Web, WebSocket, and SSE performance using the same GraphRAG query
                       </p>
                     </div>
-                                          <button
-                        onClick={generateComparisonCollection}
-                        disabled={!graphData || importStatus === 'importing'}
-                        className="flex items-center px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 disabled:opacity-50 disabled:cursor-not-allowed"
-                      >
-                        <img src="/postman-logo.svg" alt="Postman" className="w-4 h-4 mr-2" />
-                        {importStatus === 'importing' ? 'Importing...' : 'Add Comparison Collection to Postman'}
-                      </button>
+                                                              <button
+                      onClick={generateComparisonCollection}
+                      disabled={!graphData || !responses || importStatus === 'importing'}
+                      className="flex items-center px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 disabled:opacity-50 disabled:cursor-not-allowed"
+                    >
+                      <img src="/postman-logo.svg" alt="Postman" className="w-4 h-4 mr-2" />
+                      {importStatus === 'importing' ? 'Importing...' : !responses ? 'Run Comparison First' : 'Add Comparison Collection to Postman'}
+                    </button>
                   </div>
                   <div className="p-6">
                     <div className="space-y-4">
@@ -3279,33 +3280,7 @@ export function GraphRAGTab() {
                   </div>
                 </div>
 
-                {/* Documentation Link */}
-                <div className="bg-red-50 border border-red-200 rounded-lg p-4">
-                  <div className="flex items-start space-x-3">
-                    <div className="flex-shrink-0">
-                      <svg className="w-6 h-6 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.746 0 3.332.477 4.5 1.253v13C19.832 18.477 18.246 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
-                      </svg>
-                    </div>
-                    <div>
-                      <h4 className="text-lg font-medium text-red-900">📚 Complete SSE Documentation</h4>
-                      <p className="text-red-700 mt-1">
-                        For detailed implementation guides, client examples, and setup instructions, see the comprehensive documentation.
-                      </p>
-                      <a 
-                        href="/docs/sse-integration.md" 
-                        target="_blank" 
-                        rel="noopener noreferrer"
-                        className="inline-flex items-center mt-3 px-4 py-2 bg-red-600 text-white text-sm font-medium rounded-lg hover:bg-red-700 transition-colors"
-                      >
-                        <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
-                        </svg>
-                        View Documentation
-                      </a>
-                    </div>
-                  </div>
-                </div>
+
 
               </div>
             ) : (
@@ -3469,33 +3444,7 @@ export function GraphRAGTab() {
                   </div>
                 </div>
 
-                {/* Documentation Link */}
-                <div className="bg-orange-50 border border-orange-200 rounded-lg p-4">
-                  <div className="flex items-start space-x-3">
-                    <div className="flex-shrink-0">
-                      <svg className="w-6 h-6 text-orange-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.746 0 3.332.477 4.5 1.253v13C19.832 18.477 18.246 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
-                      </svg>
-                    </div>
-                    <div>
-                      <h4 className="text-lg font-medium text-orange-900">📚 Complete WebSocket Documentation</h4>
-                      <p className="text-orange-700 mt-1">
-                        For detailed implementation guides, client examples, and setup instructions, see the comprehensive documentation.
-                      </p>
-                      <a 
-                        href="/docs/websocket-integration.md" 
-                        target="_blank" 
-                        rel="noopener noreferrer"
-                        className="inline-flex items-center mt-3 px-4 py-2 bg-orange-600 text-white text-sm font-medium rounded-lg hover:bg-orange-700 transition-colors"
-                      >
-                        <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
-                        </svg>
-                        View Documentation
-                      </a>
-                    </div>
-                  </div>
-                </div>
+
 
               </div>
             ) : (
