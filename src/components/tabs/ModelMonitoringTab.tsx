@@ -1981,28 +1981,205 @@ export function ModelMonitoringTab({ onTabChange }: ModelMonitoringTabProps) {
           <div className="bg-white rounded-lg border shadow-sm p-6">
             <h4 className="font-medium text-gray-900 mb-4">Analytics & Insights</h4>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <div className="bg-gray-50 rounded-lg p-4">
-                <h5 className="font-medium text-gray-900 mb-2">Performance Trends</h5>
-                <p className="text-sm text-gray-600">Track performance over time with detailed charts and metrics</p>
-                <div className="text-xs text-gray-500 mt-2">🚧 Coming Soon</div>
+              {/* Performance Trends */}
+              <div className="bg-white border rounded-lg p-4">
+                <h5 className="font-medium text-gray-900 mb-3">Performance Trends</h5>
+                {savedTestRuns.length > 0 ? (
+                  <div className="space-y-3">
+                    <div className="flex items-center justify-between text-sm">
+                      <span className="text-gray-600">Average Latency Trend</span>
+                      <span className="font-medium text-gray-900">
+                        {Math.round(savedTestRuns.reduce((sum, run) => sum + run.summary.averageLatency, 0) / savedTestRuns.length)}ms
+                      </span>
+                    </div>
+                    <div className="flex items-center justify-between text-sm">
+                      <span className="text-gray-600">Total Cost Trend</span>
+                      <span className="font-medium text-gray-900">
+                        ${savedTestRuns.reduce((sum, run) => sum + run.summary.totalCost, 0).toFixed(4)}
+                      </span>
+                    </div>
+                    <div className="flex items-center justify-between text-sm">
+                      <span className="text-gray-600">Tests Run</span>
+                      <span className="font-medium text-gray-900">{savedTestRuns.length}</span>
+                    </div>
+                    <div className="pt-2 border-t">
+                      <div className="text-xs text-gray-500 mb-1">Recent Tests</div>
+                      <div className="space-y-1">
+                        {savedTestRuns.slice(-3).reverse().map((run, index) => (
+                          <div key={run.id} className="flex items-center justify-between text-xs">
+                            <span className="text-gray-600 truncate">
+                              {new Date(run.timestamp).toLocaleDateString()}
+                            </span>
+                            <span className="text-gray-900">{run.models.length} models</span>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+                ) : (
+                  <div className="text-center py-4">
+                    <div className="text-sm text-gray-500">No test data yet</div>
+                    <div className="text-xs text-gray-400 mt-1">Run A/B tests to see trends</div>
+                  </div>
+                )}
               </div>
               
-              <div className="bg-gray-50 rounded-lg p-4">
-                <h5 className="font-medium text-gray-900 mb-2">Cost Analysis</h5>
-                <p className="text-sm text-gray-600">Compare costs across different models and providers</p>
-                <div className="text-xs text-gray-500 mt-2">🚧 Coming Soon</div>
+              {/* Cost Analysis */}
+              <div className="bg-white border rounded-lg p-4">
+                <h5 className="font-medium text-gray-900 mb-3">Cost Analysis</h5>
+                {savedTestRuns.length > 0 ? (
+                  <div className="space-y-3">
+                    <div className="flex items-center justify-between text-sm">
+                      <span className="text-gray-600">Total Spent</span>
+                      <span className="font-medium text-gray-900">
+                        ${savedTestRuns.reduce((sum, run) => sum + run.summary.totalCost, 0).toFixed(4)}
+                      </span>
+                    </div>
+                    <div className="flex items-center justify-between text-sm">
+                      <span className="text-gray-600">Avg Cost per Test</span>
+                      <span className="font-medium text-gray-900">
+                        ${(savedTestRuns.reduce((sum, run) => sum + run.summary.totalCost, 0) / savedTestRuns.length).toFixed(4)}
+                      </span>
+                    </div>
+                    <div className="pt-2 border-t">
+                      <div className="text-xs text-gray-500 mb-2">Cost by Provider</div>
+                      {(() => {
+                        const providerCosts: { [key: string]: number } = {};
+                        savedTestRuns.forEach(run => {
+                          run.results.forEach(result => {
+                            const model = run.models.find(m => m.id === result.modelId);
+                            const provider = model?.provider || 'Unknown';
+                            providerCosts[provider] = (providerCosts[provider] || 0) + result.cost;
+                          });
+                        });
+                        return Object.entries(providerCosts).map(([provider, cost]) => (
+                          <div key={provider} className="flex items-center justify-between text-xs mb-1">
+                            <span className="text-gray-600">{provider}</span>
+                            <span className="text-gray-900">${cost.toFixed(4)}</span>
+                          </div>
+                        ));
+                      })()}
+                    </div>
+                  </div>
+                ) : (
+                  <div className="text-center py-4">
+                    <div className="text-sm text-gray-500">No cost data yet</div>
+                    <div className="text-xs text-gray-400 mt-1">Run tests to see cost analysis</div>
+                  </div>
+                )}
               </div>
               
-              <div className="bg-gray-50 rounded-lg p-4">
-                <h5 className="font-medium text-gray-900 mb-2">Quality Assessment</h5>
-                <p className="text-sm text-gray-600">Automated quality scoring and consistency checks</p>
-                <div className="text-xs text-gray-500 mt-2">🚧 Coming Soon</div>
+              {/* Quality Assessment */}
+              <div className="bg-white border rounded-lg p-4">
+                <h5 className="font-medium text-gray-900 mb-3">Quality Assessment</h5>
+                {savedTestRuns.length > 0 ? (
+                  <div className="space-y-3">
+                    <div className="flex items-center justify-between text-sm">
+                      <span className="text-gray-600">Average Quality</span>
+                      <span className="font-medium text-gray-900">
+                        {(savedTestRuns.reduce((sum, run) => sum + run.summary.averageQuality, 0) / savedTestRuns.length * 100).toFixed(1)}%
+                      </span>
+                    </div>
+                    <div className="pt-2 border-t">
+                      <div className="text-xs text-gray-500 mb-2">Quality by Model</div>
+                      {(() => {
+                        const modelQuality: { [key: string]: { total: number, count: number } } = {};
+                        savedTestRuns.forEach(run => {
+                          run.results.forEach(result => {
+                            const model = run.models.find(m => m.id === result.modelId);
+                            const modelName = model?.name || result.modelId;
+                            if (!modelQuality[modelName]) {
+                              modelQuality[modelName] = { total: 0, count: 0 };
+                            }
+                            modelQuality[modelName].total += result.quality;
+                            modelQuality[modelName].count += 1;
+                          });
+                        });
+                        return Object.entries(modelQuality)
+                          .sort(([, a], [, b]) => (b.total / b.count) - (a.total / a.count))
+                          .slice(0, 3)
+                          .map(([modelName, data]) => (
+                            <div key={modelName} className="flex items-center justify-between text-xs mb-1">
+                              <span className="text-gray-600 truncate">{modelName}</span>
+                              <span className="text-gray-900">{(data.total / data.count * 100).toFixed(1)}%</span>
+                            </div>
+                          ));
+                      })()}
+                    </div>
+                  </div>
+                ) : (
+                  <div className="text-center py-4">
+                    <div className="text-sm text-gray-500">No quality data yet</div>
+                    <div className="text-xs text-gray-400 mt-1">Run tests to see quality scores</div>
+                  </div>
+                )}
               </div>
               
-              <div className="bg-gray-50 rounded-lg p-4">
-                <h5 className="font-medium text-gray-900 mb-2">Recommendations</h5>
-                <p className="text-sm text-gray-600">AI-powered recommendations for model selection</p>
-                <div className="text-xs text-gray-500 mt-2">🚧 Coming Soon</div>
+              {/* Recommendations */}
+              <div className="bg-white border rounded-lg p-4">
+                <h5 className="font-medium text-gray-900 mb-3">Recommendations</h5>
+                {savedTestRuns.length > 0 ? (
+                  <div className="space-y-3">
+                    {(() => {
+                      // Find best performing model by quality
+                      const modelPerformance: { [key: string]: { quality: number, cost: number, latency: number, count: number } } = {};
+                      savedTestRuns.forEach(run => {
+                        run.results.forEach(result => {
+                          const model = run.models.find(m => m.id === result.modelId);
+                          const modelName = model?.name || result.modelId;
+                          if (!modelPerformance[modelName]) {
+                            modelPerformance[modelName] = { quality: 0, cost: 0, latency: 0, count: 0 };
+                          }
+                          modelPerformance[modelName].quality += result.quality;
+                          modelPerformance[modelName].cost += result.cost;
+                          modelPerformance[modelName].latency += result.latency;
+                          modelPerformance[modelName].count += 1;
+                        });
+                      });
+                      
+                      const recommendations = Object.entries(modelPerformance)
+                        .map(([modelName, data]) => ({
+                          name: modelName,
+                          avgQuality: data.quality / data.count,
+                          avgCost: data.cost / data.count,
+                          avgLatency: data.latency / data.count
+                        }))
+                        .sort((a, b) => b.avgQuality - a.avgQuality);
+                      
+                      const bestQuality = recommendations[0];
+                      const bestCost = recommendations.sort((a, b) => a.avgCost - b.avgCost)[0];
+                      const bestLatency = recommendations.sort((a, b) => a.avgLatency - b.avgLatency)[0];
+                      
+                      return (
+                        <>
+                          <div className="text-xs text-gray-500 mb-2">Based on your test data:</div>
+                          <div className="space-y-2">
+                            <div className="text-xs">
+                              <span className="text-gray-600">Best Quality: </span>
+                              <span className="font-medium text-gray-900">{bestQuality.name}</span>
+                              <span className="text-gray-500 ml-1">({(bestQuality.avgQuality * 100).toFixed(1)}%)</span>
+                            </div>
+                            <div className="text-xs">
+                              <span className="text-gray-600">Most Cost-Effective: </span>
+                              <span className="font-medium text-gray-900">{bestCost.name}</span>
+                              <span className="text-gray-500 ml-1">(${bestCost.avgCost.toFixed(4)})</span>
+                            </div>
+                            <div className="text-xs">
+                              <span className="text-gray-600">Fastest: </span>
+                              <span className="font-medium text-gray-900">{bestLatency.name}</span>
+                              <span className="text-gray-500 ml-1">({bestLatency.avgLatency.toFixed(0)}ms)</span>
+                            </div>
+                          </div>
+                        </>
+                      );
+                    })()}
+                  </div>
+                ) : (
+                  <div className="text-center py-4">
+                    <div className="text-sm text-gray-500">No recommendations yet</div>
+                    <div className="text-xs text-gray-400 mt-1">Run tests to get AI recommendations</div>
+                  </div>
+                )}
               </div>
             </div>
           </div>
