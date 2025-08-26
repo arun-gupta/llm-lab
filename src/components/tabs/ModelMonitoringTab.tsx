@@ -2635,201 +2635,38 @@ export function ABTestingTab({ onTabChange }: ModelMonitoringTabProps) {
               </div>
             ) : (
               <div className="space-y-6">
-                {/* Test Summary */}
+                {/* Prompt Display */}
                 <div className="bg-gray-50 rounded-lg p-4">
-                  <h4 className="font-medium text-gray-900 mb-3">Test Summary</h4>
-                  <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                    <div>
-                      <p className="text-sm text-gray-500">Prompt</p>
-                      <p className="font-medium text-gray-900 truncate" title={testPrompt}>
-                        {testPrompt || 'No prompt specified'}
-                      </p>
-                    </div>
-                    <div>
-                      <p className="text-sm text-gray-500">Models Tested</p>
-                      <p className="font-medium text-gray-900">{testResults.length}</p>
-                    </div>
-                    <div>
-                      <p className="text-sm text-gray-500">Total Cost</p>
-                      <p className="font-medium text-gray-900">
-                        ${testResults.reduce((sum, r) => sum + r.cost, 0).toFixed(6)}
-                      </p>
-                    </div>
-                    <div>
-                      <p className="text-sm text-gray-500">Avg Latency</p>
-                      <p className="font-medium text-gray-900">
-                        {Math.round(testResults.reduce((sum, r) => sum + r.latency, 0) / testResults.length)}ms
-                      </p>
-                    </div>
-                  </div>
+                  <h4 className="font-medium text-gray-900 mb-3">Test Prompt</h4>
+                  <p className="text-gray-700 whitespace-pre-wrap">{testPrompt || 'No prompt specified'}</p>
                 </div>
 
-                {/* Results Table */}
-                <div className="bg-white rounded-lg border shadow-sm overflow-hidden">
-                  <div className="px-6 py-4 border-b">
-                    <h4 className="font-medium text-gray-900">Model Performance Comparison</h4>
-                  </div>
-                  <div className="overflow-x-auto">
-                    <table className="min-w-full divide-y divide-gray-200">
-                      <thead className="bg-gray-50">
-                        <tr>
-                          <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                            Model
-                          </th>
-                          <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                            Latency
-                          </th>
-                          <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                            Tokens
-                          </th>
-                          <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                            Cost
-                          </th>
-                          <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                            Quality
-                          </th>
-                          <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                            Response
-                          </th>
-                        </tr>
-                      </thead>
-                      <tbody className="bg-white divide-y divide-gray-200">
-                        {testResults.map((result) => {
-                          const model = models.find(m => m.id === result.modelId);
-                          return (
-                            <tr key={result.id} className="hover:bg-gray-50">
-                              <td className="px-6 py-4 whitespace-nowrap">
-                                <div className="flex items-center">
-                                  <div className={`w-3 h-3 rounded-full bg-${model?.color || 'gray'}-500 mr-3`}></div>
-                                  <div>
-                                    <div className="text-sm font-medium text-gray-900">{model?.name || result.modelId}</div>
-                                    <div className="text-sm text-gray-500">{model?.provider || 'Unknown'}</div>
-                                  </div>
-                                </div>
-                              </td>
-                              <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                                {result.latency}ms
-                              </td>
-                              <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                                {result.tokens}
-                              </td>
-                              <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                                ${result.cost.toFixed(6)}
-                              </td>
-                              <td className="px-6 py-4 whitespace-nowrap">
-                                <div className="flex items-center">
-                                  <div className="w-16 bg-gray-200 rounded-full h-2 mr-2">
-                                    <div 
-                                      className="bg-blue-600 h-2 rounded-full" 
-                                      style={{ width: `${result.quality * 100}%` }}
-                                    ></div>
-                                  </div>
-                                  <span className="text-sm text-gray-900">{(result.quality * 100).toFixed(0)}%</span>
-                                </div>
-                              </td>
-                              <td className="px-6 py-4 text-sm text-gray-900">
-                                <div className="max-w-xs truncate" title={result.response}>
-                                  {result.response}
-                                </div>
-                              </td>
-                            </tr>
-                          );
-                        })}
-                      </tbody>
-                    </table>
-                  </div>
-                </div>
-
-                {/* Detailed Responses */}
-                <div className="bg-white rounded-lg border shadow-sm">
-                  <div className="px-6 py-4 border-b">
-                    <h4 className="font-medium text-gray-900">Detailed Responses</h4>
-                  </div>
-                  <div className="p-6 space-y-4">
-                    {testResults.map((result) => {
-                      const model = models.find(m => m.id === result.modelId);
-                      return (
-                        <div key={result.id} className="border rounded-lg p-4">
-                          <div className="flex items-center justify-between mb-3">
+                {/* Model Responses */}
+                <div className="space-y-4">
+                  {testResults.map((result) => {
+                    const model = models.find(m => m.id === result.modelId);
+                    return (
+                      <div key={result.id} className="bg-white rounded-lg border shadow-sm">
+                        <div className="px-6 py-4 border-b">
+                          <div className="flex items-center justify-between">
                             <div className="flex items-center">
-                              <div className={`w-3 h-3 rounded-full bg-${model?.color || 'gray'}-500 mr-2`}></div>
+                              <div className={`w-3 h-3 rounded-full bg-${model?.color || 'gray'}-500 mr-3`}></div>
                               <h5 className="font-medium text-gray-900">{model?.name || result.modelId}</h5>
+                              <span className="text-sm text-gray-500 ml-2">({model?.provider || 'Unknown'})</span>
                             </div>
                             <div className="text-sm text-gray-500">
                               {new Date(result.timestamp).toLocaleTimeString()}
                             </div>
                           </div>
-                          <div className="bg-gray-50 rounded-lg p-3">
-                            <p className="text-sm text-gray-700 whitespace-pre-wrap">{result.response}</p>
-                          </div>
-                          <div className="mt-3 grid grid-cols-2 md:grid-cols-4 gap-2 text-xs">
-                            <div className="text-center p-2 bg-blue-50 rounded">
-                              <div className="font-medium text-blue-900">{result.latency}ms</div>
-                              <div className="text-blue-600">Latency</div>
-                            </div>
-                            <div className="text-center p-2 bg-green-50 rounded">
-                              <div className="font-medium text-green-900">{result.tokens}</div>
-                              <div className="text-green-600">Tokens</div>
-                            </div>
-                            <div className="text-center p-2 bg-yellow-50 rounded">
-                              <div className="font-medium text-yellow-900">${result.cost.toFixed(6)}</div>
-                              <div className="text-yellow-600">Cost</div>
-                            </div>
-                            <div className="text-center p-2 bg-purple-50 rounded">
-                              <div className="font-medium text-purple-900">{(result.quality * 100).toFixed(0)}%</div>
-                              <div className="text-purple-600">Quality</div>
-                            </div>
-                          </div>
-                          
-                          {/* Advanced Metrics */}
-                          {result.accuracy !== undefined && (
-                            <div className="mt-3 grid grid-cols-2 md:grid-cols-4 gap-2 text-xs">
-                              <div className="text-center p-2 bg-indigo-50 rounded">
-                                <div className="font-medium text-indigo-900">{(result.accuracy * 100).toFixed(0)}%</div>
-                                <div className="text-indigo-600">Accuracy</div>
-                              </div>
-                              <div className="text-center p-2 bg-teal-50 rounded">
-                                <div className="font-medium text-teal-900">{(result.coherence * 100).toFixed(0)}%</div>
-                                <div className="text-teal-600">Coherence</div>
-                              </div>
-                              <div className="text-center p-2 bg-orange-50 rounded">
-                                <div className="font-medium text-orange-900">{result.timeToUseful}</div>
-                                <div className="text-orange-600">Useful Tokens</div>
-                              </div>
-                              <div className="text-center p-2 bg-pink-50 rounded">
-                                <div className="font-medium text-pink-900">{(result.diversity * 100).toFixed(0)}%</div>
-                                <div className="text-pink-600">Diversity</div>
-                              </div>
-                            </div>
-                          )}
-                          
-                          {/* Safety Metrics */}
-                          {result.toxicity !== undefined && (
-                            <div className="mt-3 grid grid-cols-3 gap-2 text-xs">
-                              <div className={`text-center p-2 rounded ${result.toxicity > 0.3 ? 'bg-red-50' : 'bg-green-50'}`}>
-                                <div className={`font-medium ${result.toxicity > 0.3 ? 'text-red-900' : 'text-green-900'}`}>
-                                  {(result.toxicity * 100).toFixed(0)}%
-                                </div>
-                                <div className={`${result.toxicity > 0.3 ? 'text-red-600' : 'text-green-600'}`}>Toxicity</div>
-                              </div>
-                              <div className={`text-center p-2 rounded ${result.hallucination > 0.5 ? 'bg-red-50' : 'bg-green-50'}`}>
-                                <div className={`font-medium ${result.hallucination > 0.5 ? 'text-red-900' : 'text-green-900'}`}>
-                                  {(result.hallucination * 100).toFixed(0)}%
-                                </div>
-                                <div className={`${result.hallucination > 0.5 ? 'text-red-600' : 'text-green-600'}`}>Hallucination</div>
-                              </div>
-                              <div className={`text-center p-2 rounded ${result.bias > 0.3 ? 'bg-red-50' : 'bg-green-50'}`}>
-                                <div className={`font-medium ${result.bias > 0.3 ? 'text-red-900' : 'text-green-900'}`}>
-                                  {(result.bias * 100).toFixed(0)}%
-                                </div>
-                                <div className={`${result.bias > 0.3 ? 'text-red-600' : 'text-green-600'}`}>Bias</div>
-                              </div>
-                            </div>
-                          )}
                         </div>
-                      );
-                    })}
-                  </div>
+                        <div className="p-6">
+                          <div className="bg-gray-50 rounded-lg p-4">
+                            <p className="text-gray-700 whitespace-pre-wrap leading-relaxed">{result.response}</p>
+                          </div>
+                        </div>
+                      </div>
+                    );
+                  })}
                 </div>
               </div>
             )}
