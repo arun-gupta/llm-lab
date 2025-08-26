@@ -37,9 +37,9 @@ stop_server "gRPC Server" "grpc-server"
 stop_server "gRPC-Web Proxy" "grpc-web-proxy"
 
 # Stop MCP servers
-if [ -f "$HOME/.mcp-servers/stop-mcp-servers.sh" ]; then
+if [ -f "mcp-servers/stop-mcp-servers.sh" ]; then
     echo "Stopping MCP servers..."
-    bash "$HOME/.mcp-servers/stop-mcp-servers.sh" > /dev/null 2>&1
+    bash "mcp-servers/stop-mcp-servers.sh" > /dev/null 2>&1
     echo "✅ MCP servers stopped"
 fi
 

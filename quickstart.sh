@@ -97,8 +97,8 @@ echo "🚀 Starting servers..."
 echo "📋 Ports: Next.js:$NEXTJS_PORT | gRPC:$GRPC_SERVER_PORT | MCP:$MCP_FILESYSTEM_PORT"
 
 # Start MCP servers in background
-if [ -f "$HOME/.mcp-servers/start-mcp-servers.sh" ]; then
-    bash "$HOME/.mcp-servers/start-mcp-servers.sh" > /dev/null 2>&1 &
+if [ -f "mcp-servers/start-mcp-servers.sh" ]; then
+    bash "mcp-servers/start-mcp-servers.sh" > /dev/null 2>&1 &
     MCP_PID=$!
 fi
 
@@ -189,9 +189,9 @@ cleanup() {
     fi
     
     # Stop MCP servers
-    if [ -f "$HOME/.mcp-servers/stop-mcp-servers.sh" ]; then
+    if [ -f "mcp-servers/stop-mcp-servers.sh" ]; then
         echo "Stopping MCP servers..."
-        bash "$HOME/.mcp-servers/stop-mcp-servers.sh" > /dev/null 2>&1
+        bash "mcp-servers/stop-mcp-servers.sh" > /dev/null 2>&1
     fi
     
     # Stop Docker container

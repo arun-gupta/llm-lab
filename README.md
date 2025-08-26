@@ -76,8 +76,9 @@ A comprehensive **Postman-focused platform** that combines **A/B testing for LLM
 **Quick and Easy Setup:**
 ```bash
 # Clone and run with one command
-git clone https://github.com/arun-gupta/postman-protocol-playground.git
-cd postman-protocol-playground
+git clone https://github.com/arun-gupta/postman-labs.git
+cd postman-labs
+./setup-mcp-servers.sh  # Set up MCP servers (first time only)
 ./quickstart.sh
 
 # To stop all services (two options):
@@ -96,7 +97,7 @@ cp .env.local.example .env.local
 npm run dev
 
 # Optional: Set up MCP servers manually (if not using quickstart.sh)
-./scripts/setup-http-filesystem-mcp.sh
+./setup-mcp-servers.sh
 ```
 
 ### **Option 2: Docker Deployment**

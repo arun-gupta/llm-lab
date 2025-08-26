@@ -1,0 +1,17 @@
+file:///Users/arungupta/.mcp-servers/mcp-server-template/node_modules/@modelcontextprotocol/sdk/dist/shared/protocol.js:202
+        this._requestHandlers.set(requestSchema.shape.method.value, (request) => Promise.resolve(handler(requestSchema.parse(request))));
+                                                      ^
+
+TypeError: Cannot read properties of undefined (reading 'method')
+    at Server.setRequestHandler (/Users/arungupta/.mcp-servers/mcp-server-template/node_modules/@modelcontextprotocol/sdk/src/shared/protocol.ts:325:51)
+    at Object.<anonymous> (/Users/arungupta/.mcp-servers/mcp-server-template/index.js:16:8)
+    at Module._compile (node:internal/modules/cjs/loader:1738:14)
+    at Object..js (node:internal/modules/cjs/loader:1871:10)
+    at Module.load (node:internal/modules/cjs/loader:1470:32)
+    at Module._load (node:internal/modules/cjs/loader:1290:12)
+    at TracingChannel.traceSync (node:diagnostics_channel:322:14)
+    at wrapModuleLoad (node:internal/modules/cjs/loader:238:24)
+    at Module.executeUserEntryPoint [as runMain] (node:internal/modules/run_main:154:5)
+    at node:internal/main/run_main_module:33:47
+
+Node.js v24.5.0
