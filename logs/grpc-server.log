@@ -15,5 +15,5 @@
    • BuildGraph: Incremental graph building
    • StreamGraphUpdates: Real-time graph updates
    • HealthCheck: Service health monitoring
-(node:99634) DeprecationWarning: Calling start() is no longer necessary. It can be safely omitted.
+(node:64511) DeprecationWarning: Calling start() is no longer necessary. It can be safely omitted.
 (Use `node --trace-deprecation ...` to show where the warning was created)

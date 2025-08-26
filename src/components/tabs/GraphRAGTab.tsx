@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { Upload, Network, Search, BarChart3, Download, Code, Zap } from 'lucide-react';
-import { GraphPreview } from '@/components/GraphPreview';
+import GraphPreviewD3 from '@/components/GraphPreviewD3';
 import { GraphQLPlayground } from '@/components/GraphQLPlayground';
 import { SuccessCelebration } from '@/components/SuccessCelebration';
 
@@ -1886,7 +1886,7 @@ export function GraphRAGTab() {
                   </p>
                 </div>
                 <div className="p-6">
-                  <GraphPreview graphData={graphData} />
+                  <GraphPreviewD3 graphData={graphData} />
                 </div>
               </div>
             </div>

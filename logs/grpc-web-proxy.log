@@ -1,0 +1,2 @@
+gRPC-Web proxy server running on port 50053
+Connect to gRPC server at localhost:50051
