@@ -1113,31 +1113,32 @@ export function ModelMonitoringTab({ onTabChange }: ModelMonitoringTabProps) {
                     {expandedSections.ollama && (
                       <div className="space-y-2">
                         {models.filter(model => model.provider === 'Ollama').map((model) => (
-                        <div
-                          key={model.id}
-                          className={`border rounded-lg p-3 cursor-pointer transition-all ${
-                            model.enabled
-                              ? 'border-blue-500 bg-blue-50'
-                              : 'border-gray-200 hover:border-gray-300'
-                          }`}
-                          onClick={() => toggleModel(model.id)}
-                        >
-                          <div className="flex items-center justify-between">
-                            <div className="flex items-center space-x-2">
-                              <div className={`w-3 h-3 rounded-full bg-${model.color}-500`}></div>
-                              <span className="font-medium text-gray-900 text-sm">{model.name}</span>
+                          <div
+                            key={model.id}
+                            className={`border rounded-lg p-3 cursor-pointer transition-all ${
+                              model.enabled
+                                ? 'border-blue-500 bg-blue-50'
+                                : 'border-gray-200 hover:border-gray-300'
+                            }`}
+                            onClick={() => toggleModel(model.id)}
+                          >
+                            <div className="flex items-center justify-between">
+                              <div className="flex items-center space-x-2">
+                                <div className={`w-3 h-3 rounded-full bg-${model.color}-500`}></div>
+                                <span className="font-medium text-gray-900 text-sm">{model.name}</span>
+                              </div>
+                              <input
+                                type="checkbox"
+                                checked={model.enabled}
+                                onChange={() => toggleModel(model.id)}
+                                className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
+                              />
                             </div>
-                            <input
-                              type="checkbox"
-                              checked={model.enabled}
-                              onChange={() => toggleModel(model.id)}
-                              className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
-                            />
+                            <p className="text-xs text-gray-500 mt-1">{model.description}</p>
                           </div>
-                          <p className="text-xs text-gray-500 mt-1">{model.description}</p>
-                        </div>
-                      ))}
-                    </div>
+                        ))}
+                      </div>
+                    )}
                   </div>
 
                   {/* OpenAI Models Section */}
