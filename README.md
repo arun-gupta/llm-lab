@@ -1,12 +1,14 @@
 # Postman Labs
 
-A comprehensive **Postman-focused protocol testing and GraphRAG development platform** that combines traditional LLM testing with advanced **Graph-based Retrieval-Augmented Generation (GraphRAG)** capabilities. Build knowledge graphs from documents, compare GraphRAG vs traditional RAG, and test multiple protocols (REST, GraphQL, gRPC, gRPC-Web, WebSocket, SSE) with seamless **Postman integration**. Perfect for API testing and protocol comparison.
+A comprehensive **Postman-focused platform** that combines **A/B testing for LLM models**, **MCP (Model Context Protocol) integration**, **GraphRAG development**, and **multi-protocol testing**. Compare OpenAI, Anthropic, and Ollama models side-by-side, integrate with GitHub, Filesystem, and SQLite via MCP, build knowledge graphs from documents, and test multiple protocols (REST, GraphQL, gRPC, gRPC-Web, WebSocket, SSE) with seamless **Postman integration**. Perfect for model evaluation, API testing, and protocol comparison.
 
 ## 🎯 **What Makes This Special**
 
-### **🤖 Multi-Provider LLM Testing**
+### **🤖 A/B Testing & Model Comparison**
 - **Side-by-Side Comparison**: Test OpenAI, Anthropic, and Ollama models simultaneously
-- **Performance Metrics**: Latency, token usage, and response quality analysis
+- **Advanced Metrics**: Quality, accuracy, coherence, diversity, and safety guardrails
+- **Real-time Fact-Checking**: Wikipedia API integration for accuracy verification
+- **Performance Analytics**: Latency, cost, and comprehensive model evaluation
 - **Streaming Support**: Real-time response streaming for GPT-5 and other models
 - **Custom Prompts**: Advanced prompt engineering with context and examples
 
@@ -34,10 +36,17 @@ A comprehensive **Postman-focused protocol testing and GraphRAG development plat
 - **Real-Time Feedback**: Live status updates and error handling
 - **Production Ready**: Docker support, environment management, and deployment guides
 
+### **🔌 MCP (Model Context Protocol) Integration**
+- **GitHub MCP**: Repository analysis, issues, PRs, health reports, and user data
+- **Filesystem MCP**: File operations, directory listing, content reading, and search
+- **SQLite MCP**: Database operations with Docker HTTP mode for data persistence
+- **Natural Language Queries**: Execute complex operations with simple text commands
+- **Dynamic Collection Creation**: Generate Postman collections from MCP operations
+
 ### **📱 Postman Integration**
 - **Direct Collection Creation**: Generate Postman collections with one click
 - **Multi-Protocol Support**: REST, GraphQL, gRPC, gRPC-Web, WebSocket, SSE, and MCP collections
-- **MCP Server Integration**: GitHub, Filesystem, and SQLite MCP servers
+- **A/B Testing Collections**: Export model comparison results as Postman collections
 - **Automated Testing**: Pre-built test scripts and environment templates
 
 **🚧 Coming Soon:**
