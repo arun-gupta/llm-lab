@@ -255,8 +255,12 @@ export function GraphPreview({ graphData }: GraphPreviewProps) {
     if (!canvas) return;
 
     const rect = canvas.getBoundingClientRect();
-    const x = (e.clientX - rect.left - pan.x) / zoom;
-    const y = (e.clientY - rect.top - pan.y) / zoom;
+    const scaleX = canvas.width / rect.width;
+    const scaleY = canvas.height / rect.height;
+    
+    // Convert mouse position to canvas coordinates, accounting for zoom and pan
+    const x = ((e.clientX - rect.left) * scaleX - pan.x) / zoom;
+    const y = ((e.clientY - rect.top) * scaleY - pan.y) / zoom;
 
     // Check for node hover
     let foundHover = false;
@@ -264,7 +268,7 @@ export function GraphPreview({ graphData }: GraphPreviewProps) {
       const pos = nodePositions.current.get(node.id);
       if (pos) {
         const distance = Math.sqrt((x - pos.x) ** 2 + (y - pos.y) ** 2);
-        if (distance < 15) {
+        if (distance < 20) {
           setHoveredNode(node.id);
           foundHover = true;
           canvas.style.cursor = 'pointer';
@@ -283,16 +287,21 @@ export function GraphPreview({ graphData }: GraphPreviewProps) {
     if (!canvas) return;
 
     const rect = canvas.getBoundingClientRect();
-    const x = (e.clientX - rect.left - pan.x) / zoom;
-    const y = (e.clientY - rect.top - pan.y) / zoom;
+    const scaleX = canvas.width / rect.width;
+    const scaleY = canvas.height / rect.height;
+    
+    // Convert mouse position to canvas coordinates, accounting for zoom and pan
+    const x = ((e.clientX - rect.left) * scaleX - pan.x) / zoom;
+    const y = ((e.clientY - rect.top) * scaleY - pan.y) / zoom;
 
     // Check for node click
     graphData.nodes.forEach(node => {
       const pos = nodePositions.current.get(node.id);
       if (pos) {
         const distance = Math.sqrt((x - pos.x) ** 2 + (y - pos.y) ** 2);
-        if (distance < 15) {
+        if (distance < 20) {
           setSelectedNode(selectedNode === node.id ? null : node.id);
+          return; // Exit early after finding a node
         }
       }
     });
@@ -300,8 +309,24 @@ export function GraphPreview({ graphData }: GraphPreviewProps) {
 
   const handleWheel = (e: React.WheelEvent<HTMLCanvasElement>) => {
     e.preventDefault();
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+
+    const rect = canvas.getBoundingClientRect();
+    const mouseX = e.clientX - rect.left;
+    const mouseY = e.clientY - rect.top;
+    
     const delta = e.deltaY > 0 ? 0.9 : 1.1;
-    setZoom(prev => Math.max(0.5, Math.min(2, prev * delta)));
+    const newZoom = Math.max(0.5, Math.min(3, zoom * delta));
+    
+    // Zoom towards mouse position
+    const zoomFactor = newZoom / zoom;
+    setPan(prev => ({
+      x: mouseX - (mouseX - prev.x) * zoomFactor,
+      y: mouseY - (mouseY - prev.y) * zoomFactor
+    }));
+    
+    setZoom(newZoom);
   };
 
   // Initialize and start animation
@@ -317,6 +342,28 @@ export function GraphPreview({ graphData }: GraphPreviewProps) {
       }
     };
   }, [graphData]);
+
+  // Handle canvas resize
+  useEffect(() => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+
+    const resizeCanvas = () => {
+      const container = canvas.parentElement;
+      if (!container) return;
+
+      const rect = container.getBoundingClientRect();
+      canvas.width = rect.width;
+      canvas.height = rect.height;
+    };
+
+    resizeCanvas();
+    window.addEventListener('resize', resizeCanvas);
+
+    return () => {
+      window.removeEventListener('resize', resizeCanvas);
+    };
+  }, []);
 
   if (!graphData || graphData.nodes.length === 0) {
     return (
@@ -363,6 +410,20 @@ export function GraphPreview({ graphData }: GraphPreviewProps) {
           onClick={handleClick}
           onWheel={handleWheel}
         />
+        
+        {/* Zoom controls */}
+        <div className="absolute top-2 right-2 flex space-x-2">
+          <button
+            onClick={() => {
+              setZoom(1);
+              setPan({ x: 0, y: 0 });
+            }}
+            className="px-2 py-1 bg-white border border-gray-200 rounded text-xs hover:bg-gray-50"
+            title="Reset zoom"
+          >
+            🔍
+          </button>
+        </div>
         
         {selectedNode && (
           <div className="absolute top-2 left-2 bg-white border border-gray-200 rounded-lg p-3 shadow-lg max-w-xs">
