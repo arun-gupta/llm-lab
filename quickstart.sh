@@ -292,6 +292,7 @@ echo "   • gRPC Server: localhost:$GRPC_SERVER_PORT"
 echo "   • gRPC-Web Proxy: http://localhost:$GRPC_HTTP_PORT/health"
 echo "   • MCP Filesystem: localhost:$MCP_FILESYSTEM_PORT"
 echo "   • MCP SQLite: localhost:$MCP_SQLITE_PORT"
+echo "   • ArangoDB: http://localhost:8529"
 
 # Start the browser opener in background
 open_browser &
