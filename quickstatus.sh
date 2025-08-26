@@ -15,12 +15,14 @@ if [ -f "$CONFIG_FILE" ] && command -v jq &> /dev/null; then
     NEXTJS_PORT=$(jq -r '.development.nextjs' "$CONFIG_FILE")
     GRPC_SERVER_PORT=$(jq -r '.development.grpc.server' "$CONFIG_FILE")
     GRPC_HTTP_PORT=$(jq -r '.development.grpc.http' "$CONFIG_FILE")
+    GRPC_WEB_PROXY_PORT=$(jq -r '.development.grpc.web_proxy' "$CONFIG_FILE")
     MCP_SQLITE_PORT=$(jq -r '.development.mcp.sqlite' "$CONFIG_FILE")
     MCP_FILESYSTEM_PORT=$(jq -r '.development.mcp.filesystem' "$CONFIG_FILE")
 else
     NEXTJS_PORT=3000
     GRPC_SERVER_PORT=50051
     GRPC_HTTP_PORT=50052
+    GRPC_WEB_PROXY_PORT=50053
     MCP_SQLITE_PORT=3001
     MCP_FILESYSTEM_PORT=3002
 fi
@@ -49,10 +51,10 @@ else
 fi
 
 # Check gRPC-Web Proxy
-if check_port $GRPC_HTTP_PORT; then
-    echo "✅ gRPC-Web Proxy: Running on port $GRPC_HTTP_PORT"
+if check_port $GRPC_WEB_PROXY_PORT; then
+    echo "✅ gRPC-Web Proxy: Running on port $GRPC_WEB_PROXY_PORT"
 else
-    echo "❌ gRPC-Web Proxy: Not running on port $GRPC_HTTP_PORT"
+    echo "❌ gRPC-Web Proxy: Not running on port $GRPC_WEB_PROXY_PORT"
 fi
 
 # Check MCP Filesystem
