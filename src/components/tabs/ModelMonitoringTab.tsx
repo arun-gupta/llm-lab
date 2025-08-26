@@ -342,6 +342,13 @@ export function ModelMonitoringTab({ onTabChange }: ModelMonitoringTabProps) {
   const [isRunningComparison, setIsRunningComparison] = useState(false);
   const [comparisonResponses, setComparisonResponses] = useState<any[]>([]);
   const [showMorePrompts, setShowMorePrompts] = useState(false);
+  
+  // Section expansion state
+  const [expandedSections, setExpandedSections] = useState({
+    ollama: true,
+    openai: true,
+    anthropic: true
+  });
 
   // Performance Monitoring State
   const [monitoringEnabled, setMonitoringEnabled] = useState(false);
@@ -863,6 +870,13 @@ export function ModelMonitoringTab({ onTabChange }: ModelMonitoringTabProps) {
     ));
   };
 
+  const toggleSection = (section: 'ollama' | 'openai' | 'anthropic') => {
+    setExpandedSections(prev => ({
+      ...prev,
+      [section]: !prev[section]
+    }));
+  };
+
   const selectSamplePrompt = (prompt: string) => {
     setTestPrompt(prompt);
     setComparisonPrompt(prompt);
@@ -1069,12 +1083,24 @@ export function ModelMonitoringTab({ onTabChange }: ModelMonitoringTabProps) {
                 <div className="space-y-6">
                   {/* Ollama Models Section */}
                   <div>
-                    <h4 className="text-sm font-semibold text-gray-700 mb-3 flex items-center">
-                      <span className="w-2 h-2 bg-amber-500 rounded-full mr-2"></span>
-                      Ollama (Local Models)
+                    <h4 
+                      className="text-sm font-semibold text-gray-700 mb-3 flex items-center justify-between cursor-pointer hover:text-gray-900"
+                      onClick={() => toggleSection('ollama')}
+                    >
+                      <div className="flex items-center">
+                        <span className="w-2 h-2 bg-amber-500 rounded-full mr-2"></span>
+                        Ollama (Local Models)
+                        <span className="text-xs text-gray-500 ml-2">
+                          ({models.filter(model => model.provider === 'Ollama' && model.enabled).length} selected)
+                        </span>
+                      </div>
+                      <span className="text-gray-400">
+                        {expandedSections.ollama ? '−' : '+'}
+                      </span>
                     </h4>
-                    <div className="space-y-2">
-                      {models.filter(model => model.provider === 'Ollama').map((model) => (
+                    {expandedSections.ollama && (
+                      <div className="space-y-2">
+                        {models.filter(model => model.provider === 'Ollama').map((model) => (
                         <div
                           key={model.id}
                           className={`border rounded-lg p-3 cursor-pointer transition-all ${
@@ -1104,12 +1130,24 @@ export function ModelMonitoringTab({ onTabChange }: ModelMonitoringTabProps) {
 
                   {/* OpenAI Models Section */}
                   <div>
-                    <h4 className="text-sm font-semibold text-gray-700 mb-3 flex items-center">
-                      <span className="w-2 h-2 bg-blue-500 rounded-full mr-2"></span>
-                      OpenAI (Cloud Models)
+                    <h4 
+                      className="text-sm font-semibold text-gray-700 mb-3 flex items-center justify-between cursor-pointer hover:text-gray-900"
+                      onClick={() => toggleSection('openai')}
+                    >
+                      <div className="flex items-center">
+                        <span className="w-2 h-2 bg-blue-500 rounded-full mr-2"></span>
+                        OpenAI (Cloud Models)
+                        <span className="text-xs text-gray-500 ml-2">
+                          ({models.filter(model => model.provider === 'OpenAI' && model.enabled).length} selected)
+                        </span>
+                      </div>
+                      <span className="text-gray-400">
+                        {expandedSections.openai ? '−' : '+'}
+                      </span>
                     </h4>
-                    <div className="space-y-2">
-                      {models.filter(model => model.provider === 'OpenAI').map((model) => (
+                    {expandedSections.openai && (
+                      <div className="space-y-2">
+                        {models.filter(model => model.provider === 'OpenAI').map((model) => (
                         <div
                           key={model.id}
                           className={`border rounded-lg p-3 cursor-pointer transition-all ${
@@ -1139,12 +1177,24 @@ export function ModelMonitoringTab({ onTabChange }: ModelMonitoringTabProps) {
 
                   {/* Anthropic Models Section */}
                   <div>
-                    <h4 className="text-sm font-semibold text-gray-700 mb-3 flex items-center">
-                      <span className="w-2 h-2 bg-purple-500 rounded-full mr-2"></span>
-                      Anthropic (Cloud Models)
+                    <h4 
+                      className="text-sm font-semibold text-gray-700 mb-3 flex items-center justify-between cursor-pointer hover:text-gray-900"
+                      onClick={() => toggleSection('anthropic')}
+                    >
+                      <div className="flex items-center">
+                        <span className="w-2 h-2 bg-purple-500 rounded-full mr-2"></span>
+                        Anthropic (Cloud Models)
+                        <span className="text-xs text-gray-500 ml-2">
+                          ({models.filter(model => model.provider === 'Anthropic' && model.enabled).length} selected)
+                        </span>
+                      </div>
+                      <span className="text-gray-400">
+                        {expandedSections.anthropic ? '−' : '+'}
+                      </span>
                     </h4>
-                    <div className="space-y-2">
-                      {models.filter(model => model.provider === 'Anthropic').map((model) => (
+                    {expandedSections.anthropic && (
+                      <div className="space-y-2">
+                        {models.filter(model => model.provider === 'Anthropic').map((model) => (
                         <div
                           key={model.id}
                           className={`border rounded-lg p-3 cursor-pointer transition-all ${
