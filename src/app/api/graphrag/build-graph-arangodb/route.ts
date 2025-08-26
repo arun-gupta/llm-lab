@@ -1,15 +1,31 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { extractEntities, buildGraph } from '@/lib/graphrag';
-import { 
-  createGraph, 
-  createEntities, 
-  createRelationships, 
-  createDocument,
-  ArangoEntity,
-  ArangoRelationship,
-  ArangoDocument,
-  ArangoGraph
-} from '@/lib/arangodb';
+
+// ArangoDB configuration
+const ARANGO_CONFIG = {
+  url: 'http://localhost:8529',
+  databaseName: 'graphrag',
+  username: 'root',
+  password: 'postmanlabs123',
+};
+
+// Helper function to make ArangoDB REST API calls
+async function arangoRequest(endpoint: string, method: string = 'GET', body?: any) {
+  const response = await fetch(`${ARANGO_CONFIG.url}/_db/${ARANGO_CONFIG.databaseName}${endpoint}`, {
+    method,
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': `Basic ${Buffer.from(`${ARANGO_CONFIG.username}:${ARANGO_CONFIG.password}`).toString('base64')}`
+    },
+    body: body ? JSON.stringify(body) : undefined
+  });
+  
+  if (!response.ok) {
+    throw new Error(`ArangoDB request failed: ${response.statusText}`);
+  }
+  
+  return response.json();
+}
 
 export async function POST(request: NextRequest) {
   try {
@@ -36,7 +52,10 @@ export async function POST(request: NextRequest) {
 
     // Create ArangoDB graph record
     const graphId = `graph_${Date.now()}`;
-    const arangoGraph: Omit<ArangoGraph, '_key' | '_id'> = {
+    const graphKey = graphId.replace(/[^a-zA-Z0-9_-]/g, '_');
+    
+    const arangoGraph = {
+      _key: graphKey,
       name: graphId,
       description: `Graph built from ${files.length} document(s)`,
       stats: {
@@ -55,10 +74,12 @@ export async function POST(request: NextRequest) {
       updatedAt: new Date().toISOString(),
     };
 
-    const graphKey = await createGraph(arangoGraph);
+    // Create graph using REST API
+    await arangoRequest('/_api/document/graphs', 'POST', arangoGraph);
 
     // Create entities in ArangoDB
-    const arangoEntities: Omit<ArangoEntity, '_key' | '_id'>[] = graphData.nodes.map(node => ({
+    const arangoEntities = graphData.nodes.map(node => ({
+      _key: node.id,
       label: node.label,
       type: node.type,
       frequency: node.frequency,
@@ -69,7 +90,9 @@ export async function POST(request: NextRequest) {
       updatedAt: new Date().toISOString(),
     }));
 
-    const entityKeys = await createEntities(arangoEntities);
+    // Create entities using REST API
+    const entityResults = await arangoRequest('/_api/document/entities', 'POST', arangoEntities);
+    const entityKeys = entityResults.map((result: any) => result._key);
     
     // Create entity ID mapping
     const entityMap = new Map();
@@ -78,7 +101,7 @@ export async function POST(request: NextRequest) {
     });
 
     // Create relationships in ArangoDB
-    const arangoRelationships: Omit<ArangoRelationship, '_key' | '_id'>[] = graphData.edges.map(edge => ({
+    const arangoRelationships = graphData.edges.map(edge => ({
       _from: `entities/${entityMap.get(edge.source)}`,
       _to: `entities/${entityMap.get(edge.target)}`,
       relationship: edge.relationship,
@@ -88,12 +111,14 @@ export async function POST(request: NextRequest) {
       createdAt: new Date().toISOString(),
     }));
 
-    await createRelationships(arangoRelationships);
+    // Create relationships using REST API
+    await arangoRequest('/_api/document/relationships', 'POST', arangoRelationships);
 
     // Create documents in ArangoDB
     for (const file of files) {
       const text = await file.text();
-      const arangoDocument: Omit<ArangoDocument, '_key' | '_id'> = {
+      const arangoDocument = {
+        _key: file.name.replace(/[^a-zA-Z0-9_-]/g, '_'),
         name: file.name,
         content: text,
         type: file.type || 'text/plain',
@@ -102,7 +127,7 @@ export async function POST(request: NextRequest) {
         uploadedAt: new Date().toISOString(),
       };
       
-      await createDocument(arangoDocument);
+      await arangoRequest('/_api/document/documents', 'POST', arangoDocument);
     }
 
     return NextResponse.json({

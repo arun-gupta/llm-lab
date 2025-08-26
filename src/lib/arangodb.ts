@@ -2,11 +2,18 @@ import { Database, aql } from 'arangojs';
 
 // ArangoDB configuration
 const ARANGO_CONFIG = {
-  url: process.env.ARANGO_URL || 'http://localhost:8529',
-  databaseName: process.env.ARANGO_DB_NAME || 'graphrag',
-  username: process.env.ARANGO_USERNAME || 'graphrag_user',
-  password: process.env.ARANGO_PASSWORD || 'graphrag123',
+  url: 'http://localhost:8529',
+  databaseName: 'graphrag',
+  username: 'root',
+  password: 'postmanlabs123',
 };
+
+console.log('ArangoDB Config:', {
+  url: ARANGO_CONFIG.url,
+  databaseName: ARANGO_CONFIG.databaseName,
+  username: ARANGO_CONFIG.username,
+  // Don't log password
+});
 
 // Database connection
 let db: Database | null = null;
@@ -16,6 +23,13 @@ export async function initDatabase(): Promise<Database> {
   if (db) return db;
 
   try {
+    console.log('Initializing ArangoDB connection...');
+    console.log('Config:', {
+      url: ARANGO_CONFIG.url,
+      databaseName: ARANGO_CONFIG.databaseName,
+      username: ARANGO_CONFIG.username
+    });
+    
     db = new Database({
       url: ARANGO_CONFIG.url,
       databaseName: ARANGO_CONFIG.databaseName,
@@ -26,11 +40,13 @@ export async function initDatabase(): Promise<Database> {
     });
 
     // Test connection
-    await db.version();
-    console.log('✅ ArangoDB connected successfully');
+    const version = await db.version();
+    console.log('✅ ArangoDB connected successfully:', version);
     
     // Ensure collections and graph exist
+    console.log('Ensuring collections exist...');
     await ensureCollections();
+    console.log('Collections ensured successfully');
     
     return db;
   } catch (error) {
@@ -47,26 +63,40 @@ async function ensureCollections() {
   const collections = ['entities', 'relationships', 'documents', 'graphs'];
   
   for (const collectionName of collections) {
-    const collection = db.collection(collectionName);
-    if (!(await collection.exists())) {
-      await collection.create();
-      console.log(`📁 Created collection: ${collectionName}`);
+    try {
+      const collection = db.collection(collectionName);
+      if (!(await collection.exists())) {
+        await collection.create();
+        console.log(`📁 Created collection: ${collectionName}`);
+      } else {
+        console.log(`📁 Collection already exists: ${collectionName}`);
+      }
+    } catch (error) {
+      console.warn(`⚠️ Could not create collection ${collectionName}:`, error.message);
+      // Continue with other collections
     }
   }
 
   // Create graph if it doesn't exist
-  const graphName = 'knowledge_graph';
-  const graph = db.graph(graphName);
-  
-  if (!(await graph.exists())) {
-    await graph.create([
-      {
-        collection: 'relationships',
-        from: ['entities'],
-        to: ['entities']
-      }
-    ]);
-    console.log(`🕸️ Created graph: ${graphName}`);
+  try {
+    const graphName = 'knowledge_graph';
+    const graph = db.graph(graphName);
+    
+    if (!(await graph.exists())) {
+      await graph.create([
+        {
+          collection: 'relationships',
+          from: ['entities'],
+          to: ['entities']
+        }
+      ]);
+      console.log(`🕸️ Created graph: ${graphName}`);
+    } else {
+      console.log(`🕸️ Graph already exists: ${graphName}`);
+    }
+  } catch (error) {
+    console.warn(`⚠️ Could not create graph:`, error.message);
+    // Continue without graph creation
   }
 }
 

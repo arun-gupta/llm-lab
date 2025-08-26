@@ -1680,10 +1680,10 @@ export function GraphRAGTab() {
                     <svg className="w-4 h-4 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                     </svg>
-                    <span className="text-sm font-medium text-blue-800">In-Memory Database</span>
+                    <span className="text-sm font-medium text-blue-800">ArangoDB Graph Database</span>
                   </div>
                   <p className="text-sm text-blue-700 mt-1">
-                    Knowledge graphs are stored in <code className="bg-blue-100 px-1 rounded">data/graphs/</code> as JSON files for fast access and persistence across sessions.
+                    Knowledge graphs are stored in <strong>ArangoDB</strong> for high-performance graph operations, advanced queries, and scalable storage. Access the web interface at <code className="bg-blue-100 px-1 rounded">http://localhost:8529</code>.
                   </p>
                 </div>
               </div>
