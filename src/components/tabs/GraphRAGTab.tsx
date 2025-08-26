@@ -195,7 +195,7 @@ export function GraphRAGTab() {
         setProcessingProgress(prev => Math.min(prev + 10, 90));
       }, 500);
 
-      const response = await fetch('/api/graphrag/build-graph', {
+      const response = await fetch('/api/graphrag/build-graph-arangodb', {
         method: 'POST',
         body: formData,
       });
@@ -205,7 +205,24 @@ export function GraphRAGTab() {
 
       if (response.ok) {
         const data = await response.json();
-        setGraphData(data);
+        // Convert ArangoDB response to expected format
+        const graphData = {
+          nodes: data.entities?.map((entity: any) => ({
+            id: entity._key,
+            label: entity.label,
+            type: entity.type,
+            connections: entity.connections,
+            frequency: entity.frequency,
+          })) || [],
+          edges: data.relationships?.map((rel: any) => ({
+            source: rel._from.split('/')[1],
+            target: rel._to.split('/')[1],
+            relationship: rel.relationship,
+            weight: rel.weight,
+          })) || [],
+          stats: data.stats || { totalNodes: 0, totalEdges: 0, topEntities: [] },
+        };
+        setGraphData(graphData);
         setBuildSuccess(true);
         // Auto-switch to graph tab after successful build
         setTimeout(() => setActiveTab('graph'), 1000);

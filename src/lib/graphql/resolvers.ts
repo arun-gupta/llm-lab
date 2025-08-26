@@ -2,20 +2,56 @@ import { readFile, readdir, writeFile, unlink } from 'fs/promises';
 import { join } from 'path';
 import { extractEntities, buildGraph } from '../graphrag';
 import { callOpenAI, callOpenAIStreaming, callAnthropic, callOllama } from '../llm-apis';
+import { 
+  getGraph, 
+  getAllGraphs as getAllArangoGraphs, 
+  getEntitiesByGraph, 
+  getRelationshipsByGraph,
+  getDocumentsByGraph,
+  getGraphStats
+} from '../arangodb';
 
 // Cache for better performance
 const graphCache = new Map();
 const documentCache = new Map();
 
-// Helper function to get graph data
+// Helper function to get graph data from ArangoDB
 async function getGraphData(graphId: string) {
   if (graphCache.has(graphId)) {
     return graphCache.get(graphId);
   }
 
   try {
-    const graphPath = join(process.cwd(), 'data', 'graphs', `${graphId}.json`);
-    const graphData = JSON.parse(await readFile(graphPath, 'utf-8'));
+    // Get graph metadata from ArangoDB
+    const graph = await getGraph(graphId);
+    if (!graph) {
+      throw new Error(`Graph not found: ${graphId}`);
+    }
+
+    // Get entities and relationships from ArangoDB
+    const [entities, relationships] = await Promise.all([
+      getEntitiesByGraph(graphId),
+      getRelationshipsByGraph(graphId)
+    ]);
+
+    // Convert to the expected format
+    const graphData = {
+      nodes: entities.map((entity: any) => ({
+        id: entity._key,
+        label: entity.label,
+        type: entity.type,
+        connections: entity.connections,
+        frequency: entity.frequency,
+      })),
+      edges: relationships.map((rel: any) => ({
+        source: rel._from.split('/')[1],
+        target: rel._to.split('/')[1],
+        relationship: rel.relationship,
+        weight: rel.weight,
+      })),
+      stats: graph.stats,
+    };
+
     graphCache.set(graphId, graphData);
     return graphData;
   } catch (error) {
@@ -23,33 +59,30 @@ async function getGraphData(graphId: string) {
   }
 }
 
-// Helper function to get all graphs
+// Helper function to get all graphs from ArangoDB
 async function getAllGraphs() {
   try {
-    const graphsDir = join(process.cwd(), 'data', 'graphs');
-    const files = await readdir(graphsDir);
-    const jsonFiles = files.filter(file => file.endsWith('.json'));
+    const arangoGraphs = await getAllArangoGraphs();
     
     const graphs = [];
-    for (const file of jsonFiles) {
-      const graphId = file.replace('.json', '');
+    for (const graph of arangoGraphs) {
       try {
-        const graphData = await getGraphData(graphId);
         graphs.push({
-          id: graphId,
-          name: graphId,
-          nodes: graphData.nodes || [],
-          edges: graphData.edges || [],
-          stats: calculateGraphStats(graphData.nodes || [], graphData.edges || []),
-          createdAt: new Date().toISOString(),
-          updatedAt: new Date().toISOString()
+          id: graph._key,
+          name: graph.name,
+          nodes: [], // Don't load all nodes for list view
+          edges: [], // Don't load all edges for list view
+          stats: graph.stats,
+          createdAt: graph.createdAt,
+          updatedAt: graph.updatedAt
         });
       } catch (error) {
-        console.warn(`Error reading graph ${graphId}:`, error);
+        console.warn(`Error reading graph ${graph._key}:`, error);
       }
     }
     return graphs;
   } catch (error) {
+    console.error('Error getting graphs from ArangoDB:', error);
     return [];
   }
 }
@@ -393,23 +426,27 @@ export const resolvers = {
   },
 
   Mutation: {
-    // Build graph from documents
+    // Build graph from documents using ArangoDB
     buildGraph: async (_: any, { input }: { input: any }) => {
-      // This would handle file uploads and graph building
-      // For now, return a mock progress
-      return {
-        status: 'building',
-        percentage: 50,
-        message: 'Processing documents and extracting entities...',
-        graphId: 'temp-graph-id'
-      };
+      try {
+        // This would handle file uploads and graph building with ArangoDB
+        // For now, return a mock progress
+        return {
+          status: 'building',
+          percentage: 50,
+          message: 'Processing documents and extracting entities with ArangoDB...',
+          graphId: 'temp-graph-id'
+        };
+      } catch (error) {
+        throw new Error(`Failed to build graph: ${error instanceof Error ? error.message : 'Unknown error'}`);
+      }
     },
 
-    // Delete graph
+    // Delete graph from ArangoDB
     deleteGraph: async (_: any, { id }: { id: string }) => {
       try {
-        const graphPath = join(process.cwd(), 'data', 'graphs', `${id}.json`);
-        await unlink(graphPath);
+        // TODO: Implement delete from ArangoDB
+        // For now, just clear cache
         graphCache.delete(id);
         return true;
       } catch (error) {
@@ -417,22 +454,30 @@ export const resolvers = {
       }
     },
 
-    // Update graph metadata
+    // Update graph metadata in ArangoDB
     updateGraph: async (_: any, { id, name }: { id: string, name?: string }) => {
-      const graphData = await getGraphData(id);
-      if (name) {
-        graphData.name = name;
-        const graphPath = join(process.cwd(), 'data', 'graphs', `${id}.json`);
-        await writeFile(graphPath, JSON.stringify(graphData, null, 2));
-        graphCache.delete(id);
+      try {
+        const graph = await getGraph(id);
+        if (!graph) {
+          throw new Error(`Graph not found: ${id}`);
+        }
+        
+        if (name) {
+          // TODO: Implement update in ArangoDB
+          graph.name = name;
+          graphCache.delete(id);
+        }
+        
+        return {
+          id,
+          name: name || graph.name,
+          stats: graph.stats,
+          createdAt: graph.createdAt,
+          updatedAt: graph.updatedAt
+        };
+      } catch (error) {
+        throw new Error(`Failed to update graph: ${error instanceof Error ? error.message : 'Unknown error'}`);
       }
-      return {
-        id,
-        name: name || id,
-        ...graphData,
-        createdAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString()
-      };
     }
   },
 

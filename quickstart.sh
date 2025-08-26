@@ -104,6 +104,20 @@ else
     echo "✅ ArangoDB is already running"
 fi
 
+# Migrate existing JSON graphs to ArangoDB if they exist
+if [ -d "data/graphs" ] && [ "$(ls -A data/graphs/*.json 2>/dev/null)" ]; then
+    echo "🔄 Checking for existing JSON graphs to migrate..."
+    JSON_GRAPH_COUNT=$(find data/graphs -name "*.json" | wc -l)
+    if [ $JSON_GRAPH_COUNT -gt 0 ]; then
+        echo "📊 Found $JSON_GRAPH_COUNT JSON graphs to migrate to ArangoDB"
+        echo "🔄 Running migration..."
+        ./scripts/migrate-to-arangodb.sh
+        echo "✅ Migration completed"
+    fi
+else
+    echo "✅ No existing JSON graphs found - ready to use ArangoDB"
+fi
+
 echo "🚀 Starting servers..."
 echo "📋 Ports: Next.js:$NEXTJS_PORT | gRPC:$GRPC_SERVER_PORT | MCP:$MCP_FILESYSTEM_PORT | ArangoDB:8529"
 
