@@ -219,10 +219,15 @@ export function GraphPreview({ graphData }: GraphPreviewProps) {
     // Clear canvas
     ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-    // Apply zoom and pan
+    // Calculate viewport center
+    const viewportCenterX = canvas.width / 2;
+    const viewportCenterY = canvas.height / 2;
+
+    // Apply zoom and pan with proper viewport transformation
     ctx.save();
-    ctx.translate(pan.x, pan.y);
+    ctx.translate(viewportCenterX, viewportCenterY);
     ctx.scale(zoom, zoom);
+    ctx.translate(-viewportCenterX + pan.x, -viewportCenterY + pan.y);
 
     // Draw edges
     graphData.edges.forEach(edge => {
@@ -323,12 +328,15 @@ export function GraphPreview({ graphData }: GraphPreviewProps) {
     if (!canvas) return;
 
     const rect = canvas.getBoundingClientRect();
-    const scaleX = canvas.width / rect.width;
-    const scaleY = canvas.height / rect.height;
+    const viewportCenterX = canvas.width / 2;
+    const viewportCenterY = canvas.height / 2;
     
     // Convert mouse position to canvas coordinates, accounting for zoom and pan
-    const x = ((e.clientX - rect.left) * scaleX - pan.x) / zoom;
-    const y = ((e.clientY - rect.top) * scaleY - pan.y) / zoom;
+    const mouseX = e.clientX - rect.left;
+    const mouseY = e.clientY - rect.top;
+    
+    const x = (mouseX - viewportCenterX) / zoom + viewportCenterX - pan.x / zoom;
+    const y = (mouseY - viewportCenterY) / zoom + viewportCenterY - pan.y / zoom;
 
     // Check for node hover
     let foundHover = false;
@@ -355,12 +363,15 @@ export function GraphPreview({ graphData }: GraphPreviewProps) {
     if (!canvas) return;
 
     const rect = canvas.getBoundingClientRect();
-    const scaleX = canvas.width / rect.width;
-    const scaleY = canvas.height / rect.height;
+    const viewportCenterX = canvas.width / 2;
+    const viewportCenterY = canvas.height / 2;
     
     // Convert mouse position to canvas coordinates, accounting for zoom and pan
-    const x = ((e.clientX - rect.left) * scaleX - pan.x) / zoom;
-    const y = ((e.clientY - rect.top) * scaleY - pan.y) / zoom;
+    const mouseX = e.clientX - rect.left;
+    const mouseY = e.clientY - rect.top;
+    
+    const x = (mouseX - viewportCenterX) / zoom + viewportCenterX - pan.x / zoom;
+    const y = (mouseY - viewportCenterY) / zoom + viewportCenterY - pan.y / zoom;
 
     // Check for node click
     graphData.nodes.forEach(node => {
@@ -387,11 +398,14 @@ export function GraphPreview({ graphData }: GraphPreviewProps) {
     const delta = e.deltaY > 0 ? 0.9 : 1.1;
     const newZoom = Math.max(0.5, Math.min(3, zoom * delta));
     
-    // Zoom towards mouse position
+    // Zoom towards mouse position with proper coordinate transformation
+    const viewportCenterX = canvas.width / 2;
+    const viewportCenterY = canvas.height / 2;
+    
     const zoomFactor = newZoom / zoom;
     setPan(prev => ({
-      x: mouseX - (mouseX - prev.x) * zoomFactor,
-      y: mouseY - (mouseY - prev.y) * zoomFactor
+      x: prev.x + (mouseX - viewportCenterX) * (1 - zoomFactor),
+      y: prev.y + (mouseY - viewportCenterY) * (1 - zoomFactor)
     }));
     
     setZoom(newZoom);
