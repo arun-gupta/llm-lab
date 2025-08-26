@@ -45,7 +45,7 @@ kill_port() {
                 # Get process name
                 local process_name=$(ps -p $pid -o comm= 2>/dev/null || echo "")
                 # Skip system processes
-                if [[ "$process_name" == "com.docker.backend" ]] || [[ "$process_name" == "Docker" ]] || [[ "$process_name" == "docker" ]]; then
+                if [[ "$process_name" == "com.docker.backend" ]] || [[ "$process_name" == "Docker" ]] || [[ "$process_name" == "docker" ]] || [[ "$process_name" == "com.docke" ]] || [[ "$process_name" =~ ^com\.docker ]]; then
                     echo "⚠️  Skipping system process $process_name (PID: $pid) on port $port"
                     safe_to_kill=false
                 fi
