@@ -1,0 +1,7 @@
+# Disable GitHub Codespaces button
+*.devcontainer linguist-documentation
+*.codespaces linguist-documentation
+
+# Mark as non-Codespaces compatible
+devcontainer.json linguist-documentation
+.codespaces/* linguist-documentation

@@ -1,0 +1,38 @@
+{
+  "name": "Postman Labs Development Environment",
+  "image": "mcr.microsoft.com/devcontainers/javascript-node:18",
+  
+  // Disable GitHub Codespaces
+  "features": {
+    "ghcr.io/devcontainers/features/github-cli:1": {}
+  },
+  
+  // Customize container settings
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "ms-vscode.vscode-typescript-next",
+        "bradlc.vscode-tailwindcss",
+        "esbenp.prettier-vscode",
+        "ms-vscode.vscode-eslint"
+      ]
+    }
+  },
+  
+  // Disable automatic Codespaces detection
+  "postCreateCommand": "echo 'Codespaces disabled'",
+  
+  // Forward ports for development
+  "forwardPorts": [3000, 50051, 50052, 3001, 3002],
+  
+  // Set working directory
+  "workspaceFolder": "/workspaces/postman-labs",
+  
+  // Disable Codespaces-specific features
+  "remoteUser": "node",
+  
+  // Environment variables
+  "remoteEnv": {
+    "NODE_ENV": "development"
+  }
+}
