@@ -878,15 +878,9 @@ export function ModelMonitoringTab({ onTabChange }: ModelMonitoringTabProps) {
   };
 
   const toggleModel = (modelId: string) => {
-    console.log('toggleModel called with:', modelId);
-    setModels(prev => {
-      console.log('Previous models state:', prev);
-      const updated = prev.map(m => 
-        m.id === modelId ? { ...m, enabled: !m.enabled } : m
-      );
-      console.log('Updated models state:', updated);
-      return updated;
-    });
+    setModels(prev => prev.map(m => 
+      m.id === modelId ? { ...m, enabled: !m.enabled } : m
+    ));
   };
 
   const toggleSection = (section: 'ollama' | 'openai' | 'anthropic') => {
@@ -1231,7 +1225,11 @@ export function ModelMonitoringTab({ onTabChange }: ModelMonitoringTabProps) {
                                   ? 'border-blue-500 bg-blue-50'
                                   : 'border-gray-200 hover:border-gray-300'
                               } ${isRunning ? 'ring-1 ring-green-500' : ''}`}
-                              onClick={() => toggleModel(model.id)}
+                              onClick={(e) => {
+                                if (e.target.type !== 'checkbox') {
+                                  toggleModel(model.id);
+                                }
+                              }}
                             >
                               <div className="flex items-center justify-between">
                                 <div className="flex items-center space-x-2">
@@ -1250,11 +1248,10 @@ export function ModelMonitoringTab({ onTabChange }: ModelMonitoringTabProps) {
                                   <input
                                     type="checkbox"
                                     checked={model.enabled}
-                                    onChange={(e) => {
-                                      console.log('Ollama checkbox clicked for model:', model.id, 'Current enabled:', model.enabled);
-                                      e.stopPropagation();
-                                      toggleModel(model.id);
-                                    }}
+                                                                    onChange={(e) => {
+                                  e.stopPropagation();
+                                  toggleModel(model.id);
+                                }}
                                     className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
                                     disabled={!isRunning}
                                   />
@@ -1300,7 +1297,11 @@ export function ModelMonitoringTab({ onTabChange }: ModelMonitoringTabProps) {
                                 ? 'border-blue-500 bg-blue-50'
                                 : 'border-gray-200 hover:border-gray-300'
                             }`}
-                            onClick={() => toggleModel(model.id)}
+                            onClick={(e) => {
+                              if (e.target.type !== 'checkbox') {
+                                toggleModel(model.id);
+                              }
+                            }}
                           >
                             <div className="flex items-center justify-between">
                               <div className="flex items-center space-x-2">
@@ -1311,7 +1312,6 @@ export function ModelMonitoringTab({ onTabChange }: ModelMonitoringTabProps) {
                                 type="checkbox"
                                 checked={model.enabled}
                                 onChange={(e) => {
-                                  console.log('OpenAI checkbox clicked for model:', model.id, 'Current enabled:', model.enabled);
                                   e.stopPropagation();
                                   toggleModel(model.id);
                                 }}
@@ -1352,7 +1352,11 @@ export function ModelMonitoringTab({ onTabChange }: ModelMonitoringTabProps) {
                                 ? 'border-blue-500 bg-blue-50'
                                 : 'border-gray-200 hover:border-gray-300'
                             }`}
-                            onClick={() => toggleModel(model.id)}
+                            onClick={(e) => {
+                              if (e.target.type !== 'checkbox') {
+                                toggleModel(model.id);
+                              }
+                            }}
                           >
                             <div className="flex items-center justify-between">
                               <div className="flex items-center space-x-2">
@@ -1363,7 +1367,6 @@ export function ModelMonitoringTab({ onTabChange }: ModelMonitoringTabProps) {
                                 type="checkbox"
                                 checked={model.enabled}
                                 onChange={(e) => {
-                                  console.log('Anthropic checkbox clicked for model:', model.id, 'Current enabled:', model.enabled);
                                   e.stopPropagation();
                                   toggleModel(model.id);
                                 }}
