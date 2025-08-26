@@ -93,8 +93,19 @@ else
     echo "✅ .env.local already exists"
 fi
 
+# Start ArangoDB if not running
+echo "🗄️ Checking ArangoDB..."
+if ! curl -s http://localhost:8529/_api/version > /dev/null 2>&1; then
+    echo "📦 Starting ArangoDB..."
+    docker-compose -f docker-compose.arangodb.yml up -d
+    echo "⏳ Waiting for ArangoDB to be ready..."
+    sleep 10
+else
+    echo "✅ ArangoDB is already running"
+fi
+
 echo "🚀 Starting servers..."
-echo "📋 Ports: Next.js:$NEXTJS_PORT | gRPC:$GRPC_SERVER_PORT | MCP:$MCP_FILESYSTEM_PORT"
+echo "📋 Ports: Next.js:$NEXTJS_PORT | gRPC:$GRPC_SERVER_PORT | MCP:$MCP_FILESYSTEM_PORT | ArangoDB:8529"
 
 # Start MCP servers in background
 if [ -f "mcp-servers/start-mcp-servers.sh" ]; then

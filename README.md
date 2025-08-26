@@ -56,8 +56,10 @@ A comprehensive **Postman-focused platform** that combines **A/B testing for LLM
 
 **🚧 Coming Soon:**
 - **Vector Database APIs**: Pinecone, Weaviate, Chroma, Qdrant integrations
-- **Neo4j Backend**: Native graph database integration for scalable knowledge graph storage
 - **Agentic Systems**: LangChain, AutoGen, CrewAI agent orchestration
+
+**✅ Recently Added:**
+- **ArangoDB Integration**: Native graph database for scalable knowledge graph storage
 
 **📊 Alternative Graph Visualization Libraries:**
 - **D3.js**: Powerful data visualization with d3-force for force-directed layouts
@@ -247,12 +249,32 @@ The `quickstart.sh` script automatically sets up MCP servers for enhanced Postma
 The `quickstart.sh` script also sets up GraphRAG functionality:
 - **Data Directories**: `data/graphs/` and `sample-docs/`
 - **Sample Documents**: AI healthcare and tech companies examples
-- **Knowledge Graph Storage**: JSON-based graph persistence
+- **Knowledge Graph Storage**: ArangoDB graph database with JSON fallback
 - **API Endpoints**: Document upload, graph building, query comparison
 - **gRPC Server**: Port 50051 (gRPC protocol) and 50053 (gRPC-Web proxy)
 - **Protocol Comparison**: REST vs GraphQL vs gRPC vs gRPC-Web vs WebSocket vs SSE performance testing
 - **Real-time Streaming**: SSE with meaningful context content and WebSocket bidirectional communication
 - **UI Improvements**: Previous comparison results clear automatically for better UX
+
+### **ArangoDB Graph Database**
+
+Postman Labs now uses **ArangoDB** as the primary graph database:
+- **Multi-Model Database**: Documents, graphs, and key-value in one system
+- **AQL Language**: SQL-like graph queries for complex traversals
+- **High Performance**: Optimized for graph operations and analytics
+- **Scalable**: Supports large knowledge graphs with millions of entities
+- **Web Interface**: Access at http://localhost:8529 (username: `graphrag_user`, password: `graphrag123`)
+
+**Migration from JSON Storage:**
+```bash
+# Migrate existing JSON graphs to ArangoDB
+./scripts/migrate-to-arangodb.sh
+
+# Use new ArangoDB endpoints
+/api/graphrag/build-graph-arangodb  # Build graphs
+/api/graphrag/graphs-arangodb       # Retrieve graphs
+/api/arangodb/health                # Health check
+```
 
 **Manual Setup (if needed):**
 ```bash

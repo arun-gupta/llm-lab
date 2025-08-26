@@ -8,6 +8,13 @@ set -e  # Exit on any error
 echo "🛑 Stopping Postman Protocol Playground services..."
 echo ""
 
+# Stop ArangoDB
+echo "🗄️ Stopping ArangoDB..."
+docker-compose -f docker-compose.arangodb.yml down 2>/dev/null || true
+echo "✅ ArangoDB stopped"
+
+echo ""
+
 # Function to stop server by PID file
 stop_server() {
     local name=$1

@@ -1,0 +1,27 @@
+version: '3.8'
+
+services:
+  arangodb:
+    image: arangodb:latest
+    container_name: postman-labs-arangodb
+    environment:
+      - ARANGO_ROOT_PASSWORD=postmanlabs123
+      - ARANGO_DB_NAME=graphrag
+      - ARANGO_DB_USER=graphrag_user
+      - ARANGO_DB_PASSWORD=graphrag123
+    ports:
+      - "8529:8529"
+    volumes:
+      - arangodb_data:/var/lib/arangodb3
+      - arangodb_apps:/var/lib/arangodb3-apps
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8529/_api/version"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+volumes:
+  arangodb_data:
+  arangodb_apps:
