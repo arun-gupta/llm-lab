@@ -85,9 +85,12 @@ export function GraphPreview({ graphData }: GraphPreviewProps) {
 
   // Initialize node positions in a circle layout
   const initializePositions = () => {
-    const centerX = 400;
-    const centerY = 200;
-    const radius = 150;
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+    
+    const centerX = canvas.width / 2;
+    const centerY = canvas.height / 2;
+    const radius = Math.min(canvas.width, canvas.height) * 0.3;
     
     graphData.nodes.forEach((node, index) => {
       const angle = (index / graphData.nodes.length) * 2 * Math.PI;
@@ -161,6 +164,19 @@ export function GraphPreview({ graphData }: GraphPreviewProps) {
       // Update position
       pos.x += pos.vx;
       pos.y += pos.vy;
+
+      // Centering force - pull nodes towards the center
+      const centerX = width / 2;
+      const centerY = height / 2;
+      const dx = centerX - pos.x;
+      const dy = centerY - pos.y;
+      const distance = Math.sqrt(dx * dx + dy * dy);
+      
+      if (distance > 0) {
+        const centeringForce = 0.001; // Weak centering force
+        pos.vx += (dx / distance) * centeringForce;
+        pos.vy += (dy / distance) * centeringForce;
+      }
 
       // Keep nodes within bounds
       pos.x = Math.max(50, Math.min(width - 50, pos.x));
@@ -362,6 +378,15 @@ export function GraphPreview({ graphData }: GraphPreviewProps) {
     if (graphData && graphData.nodes.length > 0) {
       initializePositions();
       animate();
+      
+      // Auto-center the view after a short delay
+      setTimeout(() => {
+        const canvas = canvasRef.current;
+        if (canvas) {
+          setPan({ x: 0, y: 0 });
+          setZoom(1);
+        }
+      }, 1000);
     }
 
     return () => {
@@ -383,6 +408,11 @@ export function GraphPreview({ graphData }: GraphPreviewProps) {
       const rect = container.getBoundingClientRect();
       canvas.width = rect.width;
       canvas.height = rect.height;
+      
+      // Reinitialize positions when canvas size changes
+      if (graphData && graphData.nodes.length > 0) {
+        initializePositions();
+      }
     };
 
     resizeCanvas();
@@ -391,7 +421,7 @@ export function GraphPreview({ graphData }: GraphPreviewProps) {
     return () => {
       window.removeEventListener('resize', resizeCanvas);
     };
-  }, []);
+  }, [graphData]);
 
   if (!graphData || graphData.nodes.length === 0) {
     return (
@@ -450,6 +480,18 @@ export function GraphPreview({ graphData }: GraphPreviewProps) {
             title="Reset zoom"
           >
             🔍
+          </button>
+          <button
+            onClick={() => {
+              // Reinitialize positions to center the graph
+              initializePositions();
+              setZoom(1);
+              setPan({ x: 0, y: 0 });
+            }}
+            className="px-2 py-1 bg-white border border-gray-200 rounded text-xs hover:bg-gray-50"
+            title="Center graph"
+          >
+            🎯
           </button>
         </div>
         
