@@ -206,6 +206,16 @@ export function GraphPreview({ graphData }: GraphPreviewProps) {
     const ctx = canvas.getContext('2d');
     if (!ctx) return;
 
+    // Get the container dimensions
+    const container = canvas.parentElement;
+    if (!container) return;
+    
+    const rect = container.getBoundingClientRect();
+    
+    // Set canvas size to match container
+    canvas.width = rect.width;
+    canvas.height = rect.height;
+
     // Clear canvas
     ctx.clearRect(0, 0, canvas.width, canvas.height);
 
@@ -476,6 +486,13 @@ export function GraphPreview({ graphData }: GraphPreviewProps) {
     };
   }, [graphData]);
 
+  // Redraw when zoom or pan changes
+  useEffect(() => {
+    if (graphData && graphData.nodes.length > 0) {
+      draw();
+    }
+  }, [zoom, pan]);
+
   if (!graphData || graphData.nodes.length === 0) {
     return (
       <div className="h-64 bg-gray-50 rounded-lg flex items-center justify-center">
@@ -514,8 +531,6 @@ export function GraphPreview({ graphData }: GraphPreviewProps) {
       <div className="relative">
         <canvas
           ref={canvasRef}
-          width={800}
-          height={400}
           className="w-full h-64 border border-gray-200 rounded-lg cursor-default"
           onMouseMove={handleMouseMove}
           onClick={handleClick}
