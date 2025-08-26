@@ -1,7 +1,5 @@
 # Postman Labs
 
-[![Open in GitHub Codespaces](https://github.com/codespaces/badge.svg)](https://codespaces.new/arun-gupta/postman-labs) *(Outdated - Use Local Setup)*
-
 A comprehensive **Postman-focused protocol testing and GraphRAG development platform** that combines traditional LLM testing with advanced **Graph-based Retrieval-Augmented Generation (GraphRAG)** capabilities. Build knowledge graphs from documents, compare GraphRAG vs traditional RAG, and test multiple protocols (REST, GraphQL, gRPC, gRPC-Web, WebSocket, SSE) with seamless **Postman integration**. Perfect for API testing and protocol comparison.
 
 ## 🎯 **What Makes This Special**
@@ -110,28 +108,41 @@ docker-compose -f docker-compose.dev.yml up -d
 docker-compose -f docker-compose.build.yml up -d
 ```
 
-# Option 1: Use .env.local (recommended for local development)
-# Create .env.local with your API keys (this file is gitignored)
+### **Option 1: Use .env.local (recommended for local development)**
+
+**Create .env.local with your API keys (this file is gitignored):**
+```bash
 cat > .env.local << EOF
 OPENAI_API_KEY=your_openai_api_key_here
 ANTHROPIC_API_KEY=your_anthropic_api_key_here
 POSTMAN_API_KEY=your_postman_api_key_here
 OLLAMA_BASE_URL=http://host.docker.internal:11434
 EOF
+```
 
-# Option 2: Use .env file
-# Create environment file with your API keys
+### **Option 2: Use .env file**
+
+**Create environment file with your API keys:**
+```bash
 cp .env.example .env
-# Edit .env and add your API keys
+```
 
-# Build and run with Docker Compose
+**Edit .env and add your API keys**
+
+### **Build and run with Docker Compose**
+```bash
 docker-compose up --build
+```
 
-# To run in background
+**To run in background:**
+```bash
 docker-compose up -d --build
+```
 
-# To stop
+**To stop:**
+```bash
 docker-compose down
+```
 ```
 
 **Using Docker directly:**
