@@ -1858,11 +1858,11 @@ export function GraphRAGTab() {
                 <div className="p-6 space-y-4">
                   <div className="grid grid-cols-2 gap-4">
                     <div className="text-center p-4 bg-blue-50 rounded-lg">
-                      <div className="text-2xl font-bold text-blue-600">{graphData.stats.totalNodes}</div>
+                      <div className="text-2xl font-bold text-blue-600">{graphData.stats?.totalNodes || 0}</div>
                       <div className="text-sm text-gray-600">Entities</div>
                     </div>
                     <div className="text-center p-4 bg-green-50 rounded-lg">
-                      <div className="text-2xl font-bold text-green-600">{graphData.stats.totalEdges}</div>
+                      <div className="text-2xl font-bold text-green-600">{graphData.stats?.totalEdges || 0}</div>
                       <div className="text-sm text-gray-600">Relationships</div>
                     </div>
                   </div>
@@ -1870,9 +1870,9 @@ export function GraphRAGTab() {
                   <div>
                     <h4 className="font-medium mb-2">Top Entities:</h4>
                     <div className="flex flex-wrap gap-2">
-                      {graphData.stats.topEntities.map((entity, index) => (
+                      {graphData.stats.topEntities?.map((entity, index) => (
                         <span key={index} className="px-2 py-1 text-xs border border-gray-300 text-gray-700 rounded">{entity}</span>
-                      ))}
+                      )) || <span className="text-gray-500 text-xs">No top entities available</span>}
                     </div>
                   </div>
                 </div>
