@@ -212,7 +212,7 @@ export function ABTestingTab({ onTabChange }: ModelMonitoringTabProps) {
     }
   ]);
 
-  const [testPrompt, setTestPrompt] = useState('');
+  const [testPrompt, setTestPrompt] = useState('Write a short story about a time traveler who accidentally changes a small event in history, but discovers that this change leads to a much better future than the original timeline.');
   const [isRunningTest, setIsRunningTest] = useState(false);
   const [testResults, setTestResults] = useState<TestResult[]>([]);
   const [savedTestRuns, setSavedTestRuns] = useState<any[]>([]);
@@ -1503,8 +1503,8 @@ export function ABTestingTab({ onTabChange }: ModelMonitoringTabProps) {
                     value={testPrompt}
                     onChange={(e) => setTestPrompt(e.target.value)}
                     placeholder="Enter a prompt to test across all selected models..."
-                    rows={4}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                    rows={6}
+                    className="w-full px-3 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm"
                   />
                 </div>
                 
