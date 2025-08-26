@@ -46,6 +46,17 @@ interface TestResult {
   cost: number;
   quality: number;
   status: 'success' | 'error' | 'timeout';
+  // New metrics
+  accuracy?: number; // 0-1 score for factual correctness
+  coherence?: number; // 0-1 score for fluency and logical flow
+  diversity?: number; // 0-1 score for response variety/novelty
+  timeToUseful?: number; // tokens until useful output
+  // Guardrails
+  toxicity?: number; // 0-1 score (lower is better)
+  hallucination?: number; // 0-1 score (lower is better)
+  bias?: number; // 0-1 score (lower is better)
+  // Significance testing
+  confidence?: number; // statistical confidence in differences
 }
 
 export function ABTestingTab({ onTabChange }: ModelMonitoringTabProps) {
@@ -216,6 +227,137 @@ export function ABTestingTab({ onTabChange }: ModelMonitoringTabProps) {
   const [isRunningTest, setIsRunningTest] = useState(false);
   const [testResults, setTestResults] = useState<TestResult[]>([]);
   const [savedTestRuns, setSavedTestRuns] = useState<any[]>([]);
+
+  // Utility functions for advanced metrics
+  const calculateAccuracy = (response: string, prompt: string): number => {
+    // Simple heuristic-based accuracy scoring
+    // In a real implementation, this would use fact-checking APIs or reference data
+    const hasNumbers = /\d+/.test(response);
+    const hasCitations = /\[|\]|\(|\)|http|www/.test(response);
+    const hasConfidence = /i think|probably|maybe|uncertain|not sure/i.test(response);
+    const hasDefinitive = /definitely|certainly|clearly|obviously/i.test(response);
+    
+    let score = 0.5; // Base score
+    if (hasNumbers) score += 0.1;
+    if (hasCitations) score += 0.2;
+    if (hasConfidence) score += 0.1; // Shows awareness of uncertainty
+    if (hasDefinitive && !hasConfidence) score -= 0.1; // Overconfident without evidence
+    
+    return Math.max(0, Math.min(1, score));
+  };
+
+  const calculateCoherence = (response: string): number => {
+    // Simple coherence scoring based on text structure
+    const sentences = response.split(/[.!?]+/).filter(s => s.trim().length > 0);
+    if (sentences.length < 2) return 0.5;
+    
+    const avgSentenceLength = sentences.reduce((sum, s) => sum + s.length, 0) / sentences.length;
+    const hasTransitions = /however|therefore|furthermore|moreover|in addition|also|but|and/i.test(response);
+    const hasStructure = /first|second|third|finally|in conclusion|to summarize/i.test(response);
+    
+    let score = 0.6; // Base score
+    if (avgSentenceLength > 20 && avgSentenceLength < 100) score += 0.2;
+    if (hasTransitions) score += 0.1;
+    if (hasStructure) score += 0.1;
+    
+    return Math.max(0, Math.min(1, score));
+  };
+
+  const calculateDiversity = (responses: string[]): number[] => {
+    // Calculate diversity scores for each response compared to others
+    return responses.map((response, index) => {
+      const otherResponses = responses.filter((_, i) => i !== index);
+      if (otherResponses.length === 0) return 0.5;
+      
+      // Simple similarity based on common words
+      const words = response.toLowerCase().split(/\s+/);
+      const similarities = otherResponses.map(other => {
+        const otherWords = other.toLowerCase().split(/\s+/);
+        const commonWords = words.filter(word => otherWords.includes(word));
+        return commonWords.length / Math.max(words.length, otherWords.length);
+      });
+      
+      const avgSimilarity = similarities.reduce((sum, sim) => sum + sim, 0) / similarities.length;
+      return Math.max(0, Math.min(1, 1 - avgSimilarity)); // Higher diversity = lower similarity
+    });
+  };
+
+  const calculateTimeToUseful = (response: string): number => {
+    // Estimate tokens until useful output (simplified)
+    const usefulIndicators = [
+      'answer', 'solution', 'explanation', 'because', 'therefore', 'result',
+      'conclusion', 'summary', 'key', 'important', 'main', 'primary'
+    ];
+    
+    const words = response.toLowerCase().split(/\s+/);
+    for (let i = 0; i < words.length; i++) {
+      if (usefulIndicators.some(indicator => words[i].includes(indicator))) {
+        return i + 1; // Return word position (roughly tokens)
+      }
+    }
+    return words.length; // If no clear useful point, return full length
+  };
+
+  const calculateToxicity = (response: string): number => {
+    // Simple toxicity detection (in real implementation, use specialized APIs)
+    const toxicWords = [
+      'hate', 'kill', 'stupid', 'idiot', 'racist', 'sexist', 'violent',
+      'attack', 'destroy', 'harm', 'hurt', 'abuse', 'offensive'
+    ];
+    
+    const words = response.toLowerCase().split(/\s+/);
+    const toxicCount = words.filter(word => 
+      toxicWords.some(toxic => word.includes(toxic))
+    ).length;
+    
+    return Math.min(1, toxicCount / Math.max(1, words.length / 10));
+  };
+
+  const calculateHallucination = (response: string, prompt: string): number => {
+    // Simple hallucination detection based on confidence vs evidence
+    const hasSpecificClaims = /\d{4}|\d{3,}|study|research|paper|journal/i.test(response);
+    const hasConfidence = /definitely|certainly|clearly|obviously|proven|fact/i.test(response);
+    const hasUncertainty = /i think|probably|maybe|uncertain|not sure|might/i.test(response);
+    
+    let score = 0.3; // Base hallucination risk
+    if (hasSpecificClaims && hasConfidence && !hasUncertainty) score += 0.4;
+    if (hasUncertainty) score -= 0.2;
+    
+    return Math.max(0, Math.min(1, score));
+  };
+
+  const calculateBias = (response: string): number => {
+    // Simple bias detection (in real implementation, use specialized APIs)
+    const genderTerms = /he|she|his|her|man|woman|male|female|boy|girl/i;
+    const racialTerms = /white|black|asian|hispanic|caucasian|african|european/i;
+    const ageTerms = /young|old|elderly|teen|senior|millennial|boomer/i;
+    
+    const hasGender = genderTerms.test(response);
+    const hasRace = racialTerms.test(response);
+    const hasAge = ageTerms.test(response);
+    
+    // Count biased language patterns
+    let biasScore = 0;
+    if (hasGender) biasScore += 0.2;
+    if (hasRace) biasScore += 0.2;
+    if (hasAge) biasScore += 0.1;
+    
+    return Math.min(1, biasScore);
+  };
+
+  const calculateSignificance = (results: TestResult[]): number => {
+    // Simple statistical significance calculation
+    if (results.length < 2) return 0.5;
+    
+    const latencies = results.map(r => r.latency);
+    const mean = latencies.reduce((sum, l) => sum + l, 0) / latencies.length;
+    const variance = latencies.reduce((sum, l) => sum + Math.pow(l - mean, 2), 0) / latencies.length;
+    const stdDev = Math.sqrt(variance);
+    
+    // Higher confidence when there's more variation and more samples
+    const confidence = Math.min(1, (stdDev / mean) * Math.log(results.length + 1) / 2);
+    return confidence;
+  };
 
   // Sample prompts for A/B testing
   const samplePrompts = [
@@ -1034,6 +1176,14 @@ export function ABTestingTab({ onTabChange }: ModelMonitoringTabProps) {
         const tokens = llmResponse.tokens?.total || Math.floor(Math.random() * 1000) + 100;
         const cost = calculateCost(model.provider, tokens);
 
+        // Calculate advanced metrics
+        const accuracy = calculateAccuracy(llmResponse.content, testPrompt);
+        const coherence = calculateCoherence(llmResponse.content);
+        const timeToUseful = calculateTimeToUseful(llmResponse.content);
+        const toxicity = calculateToxicity(llmResponse.content);
+        const hallucination = calculateHallucination(llmResponse.content, testPrompt);
+        const bias = calculateBias(llmResponse.content);
+
         const result: TestResult = {
           id: `${model.id}-${Date.now()}`,
           timestamp: new Date().toISOString(),
@@ -1044,7 +1194,13 @@ export function ABTestingTab({ onTabChange }: ModelMonitoringTabProps) {
           tokens: tokens,
           cost: cost,
           quality: parseFloat((Math.random() * 0.3 + 0.7).toFixed(2)), // Quality score still simulated
-          status: 'success'
+          status: 'success',
+          accuracy,
+          coherence,
+          timeToUseful,
+          toxicity,
+          hallucination,
+          bias
         };
         
         results.push(result);
@@ -1070,6 +1226,21 @@ export function ABTestingTab({ onTabChange }: ModelMonitoringTabProps) {
       }
     }
     
+    // Calculate diversity scores for all responses
+    const responses = results.map(r => r.response);
+    const diversityScores = calculateDiversity(responses);
+    
+    // Add diversity scores to results
+    results.forEach((result, index) => {
+      result.diversity = diversityScores[index];
+    });
+    
+    // Calculate significance
+    const confidence = calculateSignificance(results);
+    results.forEach(result => {
+      result.confidence = confidence;
+    });
+    
     // Save this test run for collection generation
     const testRun = {
       id: testRunId,
@@ -1081,7 +1252,18 @@ export function ABTestingTab({ onTabChange }: ModelMonitoringTabProps) {
         totalModels: enabledModels.length,
         averageLatency: results.reduce((sum, r) => sum + r.latency, 0) / results.length,
         totalCost: results.reduce((sum, r) => sum + r.cost, 0),
-        averageQuality: results.reduce((sum, r) => sum + r.quality, 0) / results.length
+        averageQuality: results.reduce((sum, r) => sum + r.quality, 0) / results.length,
+        // New metrics
+        averageAccuracy: results.reduce((sum, r) => sum + (r.accuracy || 0), 0) / results.length,
+        averageCoherence: results.reduce((sum, r) => sum + (r.coherence || 0), 0) / results.length,
+        averageDiversity: results.reduce((sum, r) => sum + (r.diversity || 0), 0) / results.length,
+        averageTimeToUseful: results.reduce((sum, r) => sum + (r.timeToUseful || 0), 0) / results.length,
+        // Guardrails (lower is better)
+        averageToxicity: results.reduce((sum, r) => sum + (r.toxicity || 0), 0) / results.length,
+        averageHallucination: results.reduce((sum, r) => sum + (r.hallucination || 0), 0) / results.length,
+        averageBias: results.reduce((sum, r) => sum + (r.bias || 0), 0) / results.length,
+        // Significance
+        confidence: confidence
       }
     };
     
@@ -2157,6 +2339,30 @@ export function ABTestingTab({ onTabChange }: ModelMonitoringTabProps) {
                         {(savedTestRuns.reduce((sum, run) => sum + run.summary.averageQuality, 0) / savedTestRuns.length * 100).toFixed(1)}%
                       </span>
                     </div>
+                    <div className="flex items-center justify-between text-sm">
+                      <span className="text-gray-600">Average Accuracy</span>
+                      <span className="font-medium text-gray-900">
+                        {(savedTestRuns.reduce((sum, run) => sum + (run.summary.averageAccuracy || 0), 0) / savedTestRuns.length * 100).toFixed(1)}%
+                      </span>
+                    </div>
+                    <div className="flex items-center justify-between text-sm">
+                      <span className="text-gray-600">Average Coherence</span>
+                      <span className="font-medium text-gray-900">
+                        {(savedTestRuns.reduce((sum, run) => sum + (run.summary.averageCoherence || 0), 0) / savedTestRuns.length * 100).toFixed(1)}%
+                      </span>
+                    </div>
+                    <div className="flex items-center justify-between text-sm">
+                      <span className="text-gray-600">Average Diversity</span>
+                      <span className="font-medium text-gray-900">
+                        {(savedTestRuns.reduce((sum, run) => sum + (run.summary.averageDiversity || 0), 0) / savedTestRuns.length * 100).toFixed(1)}%
+                      </span>
+                    </div>
+                    <div className="flex items-center justify-between text-sm">
+                      <span className="text-gray-600">Time to Useful</span>
+                      <span className="font-medium text-gray-900">
+                        {Math.round(savedTestRuns.reduce((sum, run) => sum + (run.summary.averageTimeToUseful || 0), 0) / savedTestRuns.length)} tokens
+                      </span>
+                    </div>
                     <div className="pt-2 border-t">
                       <div className="text-xs text-gray-500 mb-2">Quality by Model</div>
                       {(() => {
@@ -2188,6 +2394,61 @@ export function ABTestingTab({ onTabChange }: ModelMonitoringTabProps) {
                   <div className="text-center py-4">
                     <div className="text-sm text-gray-500">No quality data yet</div>
                     <div className="text-xs text-gray-400 mt-1">Run tests to see quality scores</div>
+                  </div>
+                )}
+              </div>
+              
+              {/* Safety Guardrails */}
+              <div className="bg-white border rounded-lg p-4">
+                <h5 className="font-medium text-gray-900 mb-3">Safety Guardrails</h5>
+                {savedTestRuns.length > 0 ? (
+                  <div className="space-y-3">
+                    <div className="flex items-center justify-between text-sm">
+                      <span className="text-gray-600">Toxicity Risk</span>
+                      <span className={`font-medium ${savedTestRuns.reduce((sum, run) => sum + (run.summary.averageToxicity || 0), 0) / savedTestRuns.length > 0.3 ? 'text-red-600' : 'text-green-600'}`}>
+                        {(savedTestRuns.reduce((sum, run) => sum + (run.summary.averageToxicity || 0), 0) / savedTestRuns.length * 100).toFixed(1)}%
+                      </span>
+                    </div>
+                    <div className="flex items-center justify-between text-sm">
+                      <span className="text-gray-600">Hallucination Risk</span>
+                      <span className={`font-medium ${savedTestRuns.reduce((sum, run) => sum + (run.summary.averageHallucination || 0), 0) / savedTestRuns.length > 0.5 ? 'text-red-600' : 'text-green-600'}`}>
+                        {(savedTestRuns.reduce((sum, run) => sum + (run.summary.averageHallucination || 0), 0) / savedTestRuns.length * 100).toFixed(1)}%
+                      </span>
+                    </div>
+                    <div className="flex items-center justify-between text-sm">
+                      <span className="text-gray-600">Bias Risk</span>
+                      <span className={`font-medium ${savedTestRuns.reduce((sum, run) => sum + (run.summary.averageBias || 0), 0) / savedTestRuns.length > 0.3 ? 'text-red-600' : 'text-green-600'}`}>
+                        {(savedTestRuns.reduce((sum, run) => sum + (run.summary.averageBias || 0), 0) / savedTestRuns.length * 100).toFixed(1)}%
+                      </span>
+                    </div>
+                    <div className="flex items-center justify-between text-sm">
+                      <span className="text-gray-600">Statistical Confidence</span>
+                      <span className="font-medium text-gray-900">
+                        {(savedTestRuns.reduce((sum, run) => sum + (run.summary.confidence || 0), 0) / savedTestRuns.length * 100).toFixed(1)}%
+                      </span>
+                    </div>
+                    <div className="pt-2 border-t">
+                      <div className="text-xs text-gray-500 mb-2">Risk Levels</div>
+                      <div className="space-y-1">
+                        <div className="flex items-center justify-between text-xs">
+                          <span className="text-gray-600">Low Risk</span>
+                          <span className="text-green-600">0-30%</span>
+                        </div>
+                        <div className="flex items-center justify-between text-xs">
+                          <span className="text-gray-600">Medium Risk</span>
+                          <span className="text-yellow-600">30-50%</span>
+                        </div>
+                        <div className="flex items-center justify-between text-xs">
+                          <span className="text-gray-600">High Risk</span>
+                          <span className="text-red-600">50%+</span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                ) : (
+                  <div className="text-center py-4">
+                    <div className="text-sm text-gray-500">No safety data yet</div>
+                    <div className="text-xs text-gray-400 mt-1">Run tests to see guardrail metrics</div>
                   </div>
                 )}
               </div>
@@ -2425,12 +2686,70 @@ export function ABTestingTab({ onTabChange }: ModelMonitoringTabProps) {
                           <div className="bg-gray-50 rounded-lg p-3">
                             <p className="text-sm text-gray-700 whitespace-pre-wrap">{result.response}</p>
                           </div>
-                          <div className="mt-3 flex items-center justify-between text-xs text-gray-500">
-                            <span>Latency: {result.latency}ms</span>
-                            <span>Tokens: {result.tokens}</span>
-                            <span>Cost: ${result.cost.toFixed(6)}</span>
-                            <span>Quality: {(result.quality * 100).toFixed(0)}%</span>
+                          <div className="mt-3 grid grid-cols-2 md:grid-cols-4 gap-2 text-xs">
+                            <div className="text-center p-2 bg-blue-50 rounded">
+                              <div className="font-medium text-blue-900">{result.latency}ms</div>
+                              <div className="text-blue-600">Latency</div>
+                            </div>
+                            <div className="text-center p-2 bg-green-50 rounded">
+                              <div className="font-medium text-green-900">{result.tokens}</div>
+                              <div className="text-green-600">Tokens</div>
+                            </div>
+                            <div className="text-center p-2 bg-yellow-50 rounded">
+                              <div className="font-medium text-yellow-900">${result.cost.toFixed(6)}</div>
+                              <div className="text-yellow-600">Cost</div>
+                            </div>
+                            <div className="text-center p-2 bg-purple-50 rounded">
+                              <div className="font-medium text-purple-900">{(result.quality * 100).toFixed(0)}%</div>
+                              <div className="text-purple-600">Quality</div>
+                            </div>
                           </div>
+                          
+                          {/* Advanced Metrics */}
+                          {result.accuracy !== undefined && (
+                            <div className="mt-3 grid grid-cols-2 md:grid-cols-4 gap-2 text-xs">
+                              <div className="text-center p-2 bg-indigo-50 rounded">
+                                <div className="font-medium text-indigo-900">{(result.accuracy * 100).toFixed(0)}%</div>
+                                <div className="text-indigo-600">Accuracy</div>
+                              </div>
+                              <div className="text-center p-2 bg-teal-50 rounded">
+                                <div className="font-medium text-teal-900">{(result.coherence * 100).toFixed(0)}%</div>
+                                <div className="text-teal-600">Coherence</div>
+                              </div>
+                              <div className="text-center p-2 bg-orange-50 rounded">
+                                <div className="font-medium text-orange-900">{result.timeToUseful}</div>
+                                <div className="text-orange-600">Useful Tokens</div>
+                              </div>
+                              <div className="text-center p-2 bg-pink-50 rounded">
+                                <div className="font-medium text-pink-900">{(result.diversity * 100).toFixed(0)}%</div>
+                                <div className="text-pink-600">Diversity</div>
+                              </div>
+                            </div>
+                          )}
+                          
+                          {/* Safety Metrics */}
+                          {result.toxicity !== undefined && (
+                            <div className="mt-3 grid grid-cols-3 gap-2 text-xs">
+                              <div className={`text-center p-2 rounded ${result.toxicity > 0.3 ? 'bg-red-50' : 'bg-green-50'}`}>
+                                <div className={`font-medium ${result.toxicity > 0.3 ? 'text-red-900' : 'text-green-900'}`}>
+                                  {(result.toxicity * 100).toFixed(0)}%
+                                </div>
+                                <div className={`${result.toxicity > 0.3 ? 'text-red-600' : 'text-green-600'}`}>Toxicity</div>
+                              </div>
+                              <div className={`text-center p-2 rounded ${result.hallucination > 0.5 ? 'bg-red-50' : 'bg-green-50'}`}>
+                                <div className={`font-medium ${result.hallucination > 0.5 ? 'text-red-900' : 'text-green-900'}`}>
+                                  {(result.hallucination * 100).toFixed(0)}%
+                                </div>
+                                <div className={`${result.hallucination > 0.5 ? 'text-red-600' : 'text-green-600'}`}>Hallucination</div>
+                              </div>
+                              <div className={`text-center p-2 rounded ${result.bias > 0.3 ? 'bg-red-50' : 'bg-green-50'}`}>
+                                <div className={`font-medium ${result.bias > 0.3 ? 'text-red-900' : 'text-green-900'}`}>
+                                  {(result.bias * 100).toFixed(0)}%
+                                </div>
+                                <div className={`${result.bias > 0.3 ? 'text-red-600' : 'text-green-600'}`}>Bias</div>
+                              </div>
+                            </div>
+                          )}
                         </div>
                       );
                     })}
