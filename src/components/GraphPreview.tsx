@@ -90,7 +90,7 @@ export function GraphPreview({ graphData }: GraphPreviewProps) {
     
     const centerX = canvas.width / 2;
     const centerY = canvas.height / 2;
-    const radius = Math.min(canvas.width, canvas.height) * 0.3;
+    const radius = Math.min(canvas.width, canvas.height) * 0.2; // Smaller radius for tighter initial layout
     
     graphData.nodes.forEach((node, index) => {
       const angle = (index / graphData.nodes.length) * 2 * Math.PI;
@@ -157,7 +157,7 @@ export function GraphPreview({ graphData }: GraphPreviewProps) {
         }
       });
 
-      // Centering force - pull nodes towards the center
+      // Strong centering force - pull nodes towards the center
       const centerX = width / 2;
       const centerY = height / 2;
       const dx = centerX - pos.x;
@@ -165,14 +165,28 @@ export function GraphPreview({ graphData }: GraphPreviewProps) {
       const distance = Math.sqrt(dx * dx + dy * dy);
       
       if (distance > 0) {
-        const centeringForce = 0.01; // Much stronger centering force
+        const centeringForce = 0.05; // Very strong centering force
         pos.vx += (dx / distance) * centeringForce;
         pos.vy += (dy / distance) * centeringForce;
       }
 
+      // Boundary force - push nodes away from edges
+      const margin = 100;
+      if (pos.x < margin) {
+        pos.vx += (margin - pos.x) * 0.02;
+      } else if (pos.x > width - margin) {
+        pos.vx += (width - margin - pos.x) * 0.02;
+      }
+      
+      if (pos.y < margin) {
+        pos.vy += (margin - pos.y) * 0.02;
+      } else if (pos.y > height - margin) {
+        pos.vy += (height - margin - pos.y) * 0.02;
+      }
+
       // Damping
-      pos.vx *= 0.95;
-      pos.vy *= 0.95;
+      pos.vx *= 0.98;
+      pos.vy *= 0.98;
 
       // Update position
       pos.x += pos.vx;
@@ -379,6 +393,54 @@ export function GraphPreview({ graphData }: GraphPreviewProps) {
     if (graphData && graphData.nodes.length > 0) {
       initializePositions();
       animate();
+      
+      // Periodic re-centering every 3 seconds
+      const recenterInterval = setInterval(() => {
+        const canvas = canvasRef.current;
+        if (canvas) {
+          const centerX = canvas.width / 2;
+          const centerY = canvas.height / 2;
+          
+          // Calculate current graph center
+          let avgX = 0, avgY = 0;
+          let count = 0;
+          graphData.nodes.forEach(node => {
+            const pos = nodePositions.current.get(node.id);
+            if (pos) {
+              avgX += pos.x;
+              avgY += pos.y;
+              count++;
+            }
+          });
+          
+          if (count > 0) {
+            avgX /= count;
+            avgY /= count;
+            
+            // If graph has drifted significantly, apply extra centering force
+            const driftX = centerX - avgX;
+            const driftY = centerY - avgY;
+            const driftDistance = Math.sqrt(driftX * driftX + driftY * driftY);
+            
+            if (driftDistance > 50) {
+              graphData.nodes.forEach(node => {
+                const pos = nodePositions.current.get(node.id);
+                if (pos) {
+                  pos.vx += driftX * 0.01;
+                  pos.vy += driftY * 0.01;
+                }
+              });
+            }
+          }
+        }
+      }, 3000);
+      
+      return () => {
+        clearInterval(recenterInterval);
+        if (animationId.current) {
+          cancelAnimationFrame(animationId.current);
+        }
+      };
     }
 
     return () => {
