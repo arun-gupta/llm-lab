@@ -215,6 +215,7 @@ export function ModelMonitoringTab({ onTabChange }: ModelMonitoringTabProps) {
   const [testPrompt, setTestPrompt] = useState('');
   const [isRunningTest, setIsRunningTest] = useState(false);
   const [testResults, setTestResults] = useState<TestResult[]>([]);
+  const [savedTestRuns, setSavedTestRuns] = useState<any[]>([]);
 
   // Sample prompts for A/B testing
   const samplePrompts = [
@@ -934,6 +935,7 @@ export function ModelMonitoringTab({ onTabChange }: ModelMonitoringTabProps) {
     // Simulate A/B testing
     const enabledModels = models.filter(m => m.enabled);
     const results: TestResult[] = [];
+    const testRunId = `ab-test-${Date.now()}`;
     
     for (const model of enabledModels) {
       // Simulate API call delay
@@ -956,6 +958,22 @@ export function ModelMonitoringTab({ onTabChange }: ModelMonitoringTabProps) {
       setTestResults(prev => [...prev, result]);
     }
     
+    // Save this test run for collection generation
+    const testRun = {
+      id: testRunId,
+      timestamp: new Date().toISOString(),
+      prompt: testPrompt,
+      models: enabledModels,
+      results: results,
+      summary: {
+        totalModels: enabledModels.length,
+        averageLatency: results.reduce((sum, r) => sum + r.latency, 0) / results.length,
+        totalCost: results.reduce((sum, r) => sum + r.cost, 0),
+        averageQuality: results.reduce((sum, r) => sum + r.quality, 0) / results.length
+      }
+    };
+    
+    setSavedTestRuns(prev => [...prev, testRun]);
     setIsRunningTest(false);
   };
 
