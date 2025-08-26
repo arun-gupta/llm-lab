@@ -20,6 +20,35 @@ import {
   FileText
 } from 'lucide-react';
 import { SuccessCelebration } from '../SuccessCelebration';
+import {
+  Chart as ChartJS,
+  CategoryScale,
+  LinearScale,
+  BarElement,
+  Title,
+  Tooltip,
+  Legend,
+  ArcElement,
+  RadialLinearScale,
+  PointElement,
+  LineElement,
+  Filler,
+} from 'chart.js';
+import { Bar, Doughnut, Radar } from 'react-chartjs-2';
+
+ChartJS.register(
+  CategoryScale,
+  LinearScale,
+  BarElement,
+  Title,
+  Tooltip,
+  Legend,
+  ArcElement,
+  RadialLinearScale,
+  PointElement,
+  LineElement,
+  Filler
+);
 
 interface ABTestingTabProps {
   onTabChange?: (tab: string) => void;
@@ -2595,6 +2624,307 @@ export function ABTestingTab({ onTabChange }: ModelMonitoringTabProps) {
                   </div>
                 )}
               </div>
+              
+              {/* Model Comparison Charts */}
+              {savedTestRuns.length > 0 && (
+                <div className="bg-white rounded-lg border shadow-sm p-6 mt-6">
+                  <h4 className="font-medium text-gray-900 mb-6">Model Comparison Charts</h4>
+                  <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                    
+                    {/* Quality Metrics Comparison */}
+                    <div>
+                      <h5 className="font-medium text-gray-900 mb-4">Quality Metrics Comparison</h5>
+                      {(() => {
+                        const modelQualityData: { [key: string]: { quality: number, accuracy: number, coherence: number, diversity: number, count: number } } = {};
+                        
+                        savedTestRuns.forEach(run => {
+                          run.results.forEach(result => {
+                            const model = run.models.find(m => m.id === result.modelId);
+                            const modelName = model?.name || result.modelId;
+                            if (!modelQualityData[modelName]) {
+                              modelQualityData[modelName] = { quality: 0, accuracy: 0, coherence: 0, diversity: 0, count: 0 };
+                            }
+                            modelQualityData[modelName].quality += result.quality;
+                            modelQualityData[modelName].accuracy += result.accuracy || 0;
+                            modelQualityData[modelName].coherence += result.coherence || 0;
+                            modelQualityData[modelName].diversity += result.diversity || 0;
+                            modelQualityData[modelName].count += 1;
+                          });
+                        });
+                        
+                        const chartData = {
+                          labels: Object.keys(modelQualityData),
+                          datasets: [
+                            {
+                              label: 'Quality',
+                              data: Object.values(modelQualityData).map(d => (d.quality / d.count) * 100),
+                              backgroundColor: 'rgba(59, 130, 246, 0.8)',
+                              borderColor: 'rgba(59, 130, 246, 1)',
+                              borderWidth: 1,
+                            },
+                            {
+                              label: 'Accuracy',
+                              data: Object.values(modelQualityData).map(d => (d.accuracy / d.count) * 100),
+                              backgroundColor: 'rgba(16, 185, 129, 0.8)',
+                              borderColor: 'rgba(16, 185, 129, 1)',
+                              borderWidth: 1,
+                            },
+                            {
+                              label: 'Coherence',
+                              data: Object.values(modelQualityData).map(d => (d.coherence / d.count) * 100),
+                              backgroundColor: 'rgba(245, 158, 11, 0.8)',
+                              borderColor: 'rgba(245, 158, 11, 1)',
+                              borderWidth: 1,
+                            },
+                            {
+                              label: 'Diversity',
+                              data: Object.values(modelQualityData).map(d => (d.diversity / d.count) * 100),
+                              backgroundColor: 'rgba(236, 72, 153, 0.8)',
+                              borderColor: 'rgba(236, 72, 153, 1)',
+                              borderWidth: 1,
+                            },
+                          ],
+                        };
+                        
+                        const options = {
+                          responsive: true,
+                          plugins: {
+                            legend: {
+                              position: 'top' as const,
+                            },
+                            title: {
+                              display: false,
+                            },
+                          },
+                          scales: {
+                            y: {
+                              beginAtZero: true,
+                              max: 100,
+                              ticks: {
+                                callback: function(value: any) {
+                                  return value + '%';
+                                }
+                              }
+                            },
+                          },
+                        };
+                        
+                        return <Bar data={chartData} options={options} />;
+                      })()}
+                    </div>
+                    
+                    {/* Safety Metrics Radar Chart */}
+                    <div>
+                      <h5 className="font-medium text-gray-900 mb-4">Safety Metrics Overview</h5>
+                      {(() => {
+                        const modelSafetyData: { [key: string]: { toxicity: number, hallucination: number, bias: number, count: number } } = {};
+                        
+                        savedTestRuns.forEach(run => {
+                          run.results.forEach(result => {
+                            const model = run.models.find(m => m.id === result.modelId);
+                            const modelName = model?.name || result.modelId;
+                            if (!modelSafetyData[modelName]) {
+                              modelSafetyData[modelName] = { toxicity: 0, hallucination: 0, bias: 0, count: 0 };
+                            }
+                            modelSafetyData[modelName].toxicity += result.toxicity || 0;
+                            modelSafetyData[modelName].hallucination += result.hallucination || 0;
+                            modelSafetyData[modelName].bias += result.bias || 0;
+                            modelSafetyData[modelName].count += 1;
+                          });
+                        });
+                        
+                        const chartData = {
+                          labels: ['Toxicity Risk', 'Hallucination Risk', 'Bias Risk'],
+                          datasets: Object.entries(modelSafetyData).map(([modelName, data], index) => ({
+                            label: modelName,
+                            data: [
+                              (data.toxicity / data.count) * 100,
+                              (data.hallucination / data.count) * 100,
+                              (data.bias / data.count) * 100,
+                            ],
+                            backgroundColor: [
+                              `hsla(${index * 60}, 70%, 60%, 0.2)`,
+                              `hsla(${index * 60}, 70%, 60%, 0.2)`,
+                              `hsla(${index * 60}, 70%, 60%, 0.2)`,
+                            ],
+                            borderColor: [
+                              `hsl(${index * 60}, 70%, 50%)`,
+                              `hsl(${index * 60}, 70%, 50%)`,
+                              `hsl(${index * 60}, 70%, 50%)`,
+                            ],
+                            borderWidth: 2,
+                            pointBackgroundColor: `hsl(${index * 60}, 70%, 50%)`,
+                            pointBorderColor: '#fff',
+                            pointHoverBackgroundColor: '#fff',
+                            pointHoverBorderColor: `hsl(${index * 60}, 70%, 50%)`,
+                          })),
+                        };
+                        
+                        const options = {
+                          responsive: true,
+                          plugins: {
+                            legend: {
+                              position: 'top' as const,
+                            },
+                            title: {
+                              display: false,
+                            },
+                          },
+                          scales: {
+                            r: {
+                              beginAtZero: true,
+                              max: 100,
+                              ticks: {
+                                callback: function(value: any) {
+                                  return value + '%';
+                                }
+                              }
+                            },
+                          },
+                        };
+                        
+                        return <Radar data={chartData} options={options} />;
+                      })()}
+                    </div>
+                    
+                    {/* Performance Metrics */}
+                    <div>
+                      <h5 className="font-medium text-gray-900 mb-4">Performance Metrics</h5>
+                      {(() => {
+                        const modelPerformanceData: { [key: string]: { latency: number, cost: number, count: number } } = {};
+                        
+                        savedTestRuns.forEach(run => {
+                          run.results.forEach(result => {
+                            const model = run.models.find(m => m.id === result.modelId);
+                            const modelName = model?.name || result.modelId;
+                            if (!modelPerformanceData[modelName]) {
+                              modelPerformanceData[modelName] = { latency: 0, cost: 0, count: 0 };
+                            }
+                            modelPerformanceData[modelName].latency += result.latency;
+                            modelPerformanceData[modelName].cost += result.cost;
+                            modelPerformanceData[modelName].count += 1;
+                          });
+                        });
+                        
+                        const chartData = {
+                          labels: Object.keys(modelPerformanceData),
+                          datasets: [
+                            {
+                              label: 'Average Latency (ms)',
+                              data: Object.values(modelPerformanceData).map(d => d.latency / d.count),
+                              backgroundColor: 'rgba(99, 102, 241, 0.8)',
+                              borderColor: 'rgba(99, 102, 241, 1)',
+                              borderWidth: 1,
+                              yAxisID: 'y',
+                            },
+                            {
+                              label: 'Average Cost ($)',
+                              data: Object.values(modelPerformanceData).map(d => d.cost / d.count),
+                              backgroundColor: 'rgba(34, 197, 94, 0.8)',
+                              borderColor: 'rgba(34, 197, 94, 1)',
+                              borderWidth: 1,
+                              yAxisID: 'y1',
+                            },
+                          ],
+                        };
+                        
+                        const options = {
+                          responsive: true,
+                          plugins: {
+                            legend: {
+                              position: 'top' as const,
+                            },
+                            title: {
+                              display: false,
+                            },
+                          },
+                          scales: {
+                            y: {
+                              type: 'linear' as const,
+                              display: true,
+                              position: 'left' as const,
+                              title: {
+                                display: true,
+                                text: 'Latency (ms)',
+                              },
+                            },
+                            y1: {
+                              type: 'linear' as const,
+                              display: true,
+                              position: 'right' as const,
+                              title: {
+                                display: true,
+                                text: 'Cost ($)',
+                              },
+                              grid: {
+                                drawOnChartArea: false,
+                              },
+                            },
+                          },
+                        };
+                        
+                        return <Bar data={chartData} options={options} />;
+                      })()}
+                    </div>
+                    
+                    {/* Model Usage Distribution */}
+                    <div>
+                      <h5 className="font-medium text-gray-900 mb-4">Model Usage Distribution</h5>
+                      {(() => {
+                        const modelUsage: { [key: string]: number } = {};
+                        
+                        savedTestRuns.forEach(run => {
+                          run.results.forEach(result => {
+                            const model = run.models.find(m => m.id === result.modelId);
+                            const modelName = model?.name || result.modelId;
+                            modelUsage[modelName] = (modelUsage[modelName] || 0) + 1;
+                          });
+                        });
+                        
+                        const chartData = {
+                          labels: Object.keys(modelUsage),
+                          datasets: [
+                            {
+                              data: Object.values(modelUsage),
+                              backgroundColor: [
+                                'rgba(59, 130, 246, 0.8)',
+                                'rgba(16, 185, 129, 0.8)',
+                                'rgba(245, 158, 11, 0.8)',
+                                'rgba(236, 72, 153, 0.8)',
+                                'rgba(99, 102, 241, 0.8)',
+                                'rgba(34, 197, 94, 0.8)',
+                              ],
+                              borderColor: [
+                                'rgba(59, 130, 246, 1)',
+                                'rgba(16, 185, 129, 1)',
+                                'rgba(245, 158, 11, 1)',
+                                'rgba(236, 72, 153, 1)',
+                                'rgba(99, 102, 241, 1)',
+                                'rgba(34, 197, 94, 1)',
+                              ],
+                              borderWidth: 2,
+                            },
+                          ],
+                        };
+                        
+                        const options = {
+                          responsive: true,
+                          plugins: {
+                            legend: {
+                              position: 'bottom' as const,
+                            },
+                            title: {
+                              display: false,
+                            },
+                          },
+                        };
+                        
+                        return <Doughnut data={chartData} options={options} />;
+                      })()}
+                    </div>
+                  </div>
+                </div>
+              )}
             </div>
           </div>
         </div>
