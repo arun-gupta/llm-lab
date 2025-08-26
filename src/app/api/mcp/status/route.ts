@@ -69,17 +69,17 @@ export async function GET() {
           // Check local process status
           const pidFilePath = path.join(mcpDir, server.pidFile);
           
-          // Check if PID file exists
-          if (fs.existsSync(pidFilePath)) {
-            const pid = parseInt(fs.readFileSync(pidFilePath, 'utf8').trim());
+          // First check if port is listening (most reliable indicator)
+          try {
+            await execAsync(`lsof -i :${server.port} | grep LISTEN`);
             
-            // Check if process is running
-            try {
-              await execAsync(`kill -0 ${pid}`);
+            // Port is listening, now check PID file
+            if (fs.existsSync(pidFilePath)) {
+              const pid = parseInt(fs.readFileSync(pidFilePath, 'utf8').trim());
               
-              // Check if port is actually listening
+              // Verify the process is still running
               try {
-                await execAsync(`lsof -i :${server.port} | grep LISTEN`);
+                await execAsync(`kill -0 ${pid}`);
                 statusData[server.port] = {
                   status: 'running',
                   pid,
@@ -87,7 +87,66 @@ export async function GET() {
                   name: server.displayName,
                   description: server.description
                 };
-              } catch (portError) {
+              } catch (processError) {
+                // Process not running, but port is listening - create new PID file
+                try {
+                  const portOutput = await execAsync(`lsof -i :${server.port} | grep LISTEN`);
+                  const lines = portOutput.stdout.trim().split('\n');
+                  if (lines.length > 0) {
+                    const parts = lines[0].split(/\s+/);
+                    const newPid = parseInt(parts[1]);
+                    fs.writeFileSync(pidFilePath, newPid.toString());
+                    statusData[server.port] = {
+                      status: 'running',
+                      pid: newPid,
+                      port: server.port,
+                      name: server.displayName,
+                      description: server.description
+                    };
+                  }
+                } catch (pidError) {
+                  // Fallback to running without PID
+                  statusData[server.port] = {
+                    status: 'running',
+                    port: server.port,
+                    name: server.displayName,
+                    description: server.description
+                  };
+                }
+              }
+            } else {
+              // PID file doesn't exist but port is listening - create PID file
+              try {
+                const portOutput = await execAsync(`lsof -i :${server.port} | grep LISTEN`);
+                const lines = portOutput.stdout.trim().split('\n');
+                if (lines.length > 0) {
+                  const parts = lines[0].split(/\s+/);
+                  const newPid = parseInt(parts[1]);
+                  fs.writeFileSync(pidFilePath, newPid.toString());
+                  statusData[server.port] = {
+                    status: 'running',
+                    pid: newPid,
+                    port: server.port,
+                    name: server.displayName,
+                    description: server.description
+                  };
+                }
+              } catch (pidError) {
+                // Fallback to running without PID
+                statusData[server.port] = {
+                  status: 'running',
+                  port: server.port,
+                  name: server.displayName,
+                  description: server.description
+                };
+              }
+            }
+          } catch (portError) {
+            // Port not listening, check if PID file exists but process is dead
+            if (fs.existsSync(pidFilePath)) {
+              const pid = parseInt(fs.readFileSync(pidFilePath, 'utf8').trim());
+              try {
+                await execAsync(`kill -0 ${pid}`);
                 // Process exists but port not listening
                 statusData[server.port] = {
                   status: 'error',
@@ -96,14 +155,21 @@ export async function GET() {
                   name: server.displayName,
                   description: server.description
                 };
+              } catch (processError) {
+                // Process not running, remove stale PID file
+                try {
+                  fs.unlinkSync(pidFilePath);
+                } catch (unlinkError) {
+                  // Ignore unlink errors
+                }
+                statusData[server.port] = {
+                  status: 'stopped',
+                  port: server.port,
+                  name: server.displayName,
+                  description: server.description
+                };
               }
-            } catch (processError) {
-              // Process not running, remove stale PID file
-              try {
-                fs.unlinkSync(pidFilePath);
-              } catch (unlinkError) {
-                // Ignore unlink errors
-              }
+            } else {
               statusData[server.port] = {
                 status: 'stopped',
                 port: server.port,
@@ -111,13 +177,6 @@ export async function GET() {
                 description: server.description
               };
             }
-          } else {
-            statusData[server.port] = {
-              status: 'stopped',
-              port: server.port,
-              name: server.displayName,
-              description: server.description
-            };
           }
         }
       } catch (error) {
