@@ -1227,8 +1227,18 @@ export function ABTestingTab({ onTabChange }: ModelMonitoringTabProps) {
             {/* Model Configuration */}
             <div className="bg-white rounded-lg border shadow-sm">
               <div className="p-4 border-b">
-                <h3 className="text-lg font-semibold text-gray-900">Model Configuration</h3>
-                <p className="text-gray-600 text-sm mt-1">Select models to include in A/B testing</p>
+                <div className="flex items-center justify-between">
+                  <div>
+                    <h3 className="text-lg font-semibold text-gray-900">Model Configuration</h3>
+                    <p className="text-gray-600 text-sm mt-1">Select models to include in A/B testing</p>
+                  </div>
+                  <button
+                    onClick={() => setModels(prev => prev.map(m => ({ ...m, enabled: false })))}
+                    className="text-sm text-gray-600 hover:text-gray-900 hover:bg-gray-100 px-2 py-1 rounded transition-colors"
+                  >
+                    Clear All
+                  </button>
+                </div>
               </div>
               <div className="p-4">
                 <div className="space-y-6">
