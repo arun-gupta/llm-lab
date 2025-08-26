@@ -132,8 +132,8 @@ export function GraphPreview({ graphData }: GraphPreviewProps) {
         const dy = pos.y - otherPos.y;
         const distance = Math.sqrt(dx * dx + dy * dy);
         
-        if (distance > 0 && distance < 100) {
-          const force = (100 - distance) / distance * 0.1;
+        if (distance > 0 && distance < 120) {
+          const force = (120 - distance) / distance * 0.15;
           pos.vx += (dx / distance) * force;
           pos.vy += (dy / distance) * force;
         }
@@ -157,14 +157,6 @@ export function GraphPreview({ graphData }: GraphPreviewProps) {
         }
       });
 
-      // Damping
-      pos.vx *= 0.95;
-      pos.vy *= 0.95;
-
-      // Update position
-      pos.x += pos.vx;
-      pos.y += pos.vy;
-
       // Centering force - pull nodes towards the center
       const centerX = width / 2;
       const centerY = height / 2;
@@ -173,10 +165,18 @@ export function GraphPreview({ graphData }: GraphPreviewProps) {
       const distance = Math.sqrt(dx * dx + dy * dy);
       
       if (distance > 0) {
-        const centeringForce = 0.001; // Weak centering force
+        const centeringForce = 0.01; // Much stronger centering force
         pos.vx += (dx / distance) * centeringForce;
         pos.vy += (dy / distance) * centeringForce;
       }
+
+      // Damping
+      pos.vx *= 0.95;
+      pos.vy *= 0.95;
+
+      // Update position
+      pos.x += pos.vx;
+      pos.y += pos.vy;
 
       // Keep nodes within bounds
       pos.x = Math.max(50, Math.min(width - 50, pos.x));
@@ -371,6 +371,7 @@ export function GraphPreview({ graphData }: GraphPreviewProps) {
     }));
     
     setZoom(newZoom);
+    console.log('Zoom changed:', { zoom: newZoom, pan: { x: mouseX - (mouseX - pan.x) * zoomFactor, y: mouseY - (mouseY - pan.y) * zoomFactor } });
   };
 
   // Initialize and start animation
@@ -378,15 +379,6 @@ export function GraphPreview({ graphData }: GraphPreviewProps) {
     if (graphData && graphData.nodes.length > 0) {
       initializePositions();
       animate();
-      
-      // Auto-center the view after a short delay
-      setTimeout(() => {
-        const canvas = canvasRef.current;
-        if (canvas) {
-          setPan({ x: 0, y: 0 });
-          setZoom(1);
-        }
-      }, 1000);
     }
 
     return () => {
