@@ -1144,17 +1144,6 @@ export function ModelMonitoringTab({ onTabChange }: ModelMonitoringTabProps) {
           </button>
 
           <button
-            onClick={() => setActiveTab('monitoring')}
-            className={`flex items-center space-x-2 py-2 px-1 border-b-2 font-medium text-sm transition-colors ${
-              activeTab === 'monitoring'
-                ? 'border-blue-500 text-blue-600'
-                : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
-            }`}
-          >
-            <BarChart3 className="w-4 h-4" />
-            <span>Performance & Analytics</span>
-          </button>
-          <button
             onClick={() => setActiveTab('results')}
             className={`flex items-center space-x-2 py-2 px-1 border-b-2 font-medium text-sm transition-colors ${
               activeTab === 'results'
@@ -1164,6 +1153,17 @@ export function ModelMonitoringTab({ onTabChange }: ModelMonitoringTabProps) {
           >
             <FileText className="w-4 h-4" />
             <span>Results</span>
+          </button>
+          <button
+            onClick={() => setActiveTab('monitoring')}
+            className={`flex items-center space-x-2 py-2 px-1 border-b-2 font-medium text-sm transition-colors ${
+              activeTab === 'monitoring'
+                ? 'border-blue-500 text-blue-600'
+                : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+            }`}
+          >
+            <BarChart3 className="w-4 h-4" />
+            <span>Analytics</span>
           </button>
         </nav>
       </div>
@@ -1919,7 +1919,7 @@ export function ModelMonitoringTab({ onTabChange }: ModelMonitoringTabProps) {
           <div className="bg-white rounded-lg border shadow-sm p-6">
             <div className="flex items-center justify-between mb-4">
               <div>
-                <h3 className="text-lg font-semibold text-gray-900">Performance Monitoring & Analytics</h3>
+                <h3 className="text-lg font-semibold text-gray-900">Analytics</h3>
                 <p className="text-gray-600 mt-1">Track, monitor, and analyze model performance metrics</p>
               </div>
               <div className="flex items-center">
