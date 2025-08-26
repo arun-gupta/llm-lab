@@ -152,7 +152,6 @@ docker-compose up -d --build
 ```bash
 docker-compose down
 ```
-```
 
 **Using Docker directly:**
 ```bash
