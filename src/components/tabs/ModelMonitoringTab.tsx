@@ -2380,93 +2380,275 @@ export function ABTestingTab({ onTabChange }: ModelMonitoringTabProps) {
                   </div>
                 </div>
                 
-                {/* Quality Comparison Chart */}
-                <div>
-                  <h5 className="font-medium text-gray-900 mb-4">Quality Metrics Comparison</h5>
-                  {savedTestRuns.length > 0 ? (
-                    (() => {
-                      const modelQualityData: { [key: string]: { quality: number, accuracy: number, coherence: number, diversity: number, count: number } } = {};
-                      
-                      savedTestRuns.forEach(run => {
-                        run.results.forEach(result => {
-                          const model = run.models.find(m => m.id === result.modelId);
-                          const modelName = model?.name || result.modelId;
-                          if (!modelQualityData[modelName]) {
-                            modelQualityData[modelName] = { quality: 0, accuracy: 0, coherence: 0, diversity: 0, count: 0 };
-                          }
-                          modelQualityData[modelName].quality += result.quality;
-                          modelQualityData[modelName].accuracy += result.accuracy || 0;
-                          modelQualityData[modelName].coherence += result.coherence || 0;
-                          modelQualityData[modelName].diversity += result.diversity || 0;
-                          modelQualityData[modelName].count += 1;
+                {/* Individual Quality Metrics Charts */}
+                <div className="space-y-6">
+                  {/* Quality Chart */}
+                  <div>
+                    <h5 className="font-medium text-gray-900 mb-4">Quality Comparison</h5>
+                    {savedTestRuns.length > 0 ? (
+                      (() => {
+                        const modelQualityData: { [key: string]: { quality: number, count: number } } = {};
+                        
+                        savedTestRuns.forEach(run => {
+                          run.results.forEach(result => {
+                            const model = run.models.find(m => m.id === result.modelId);
+                            const modelName = model?.name || result.modelId;
+                            if (!modelQualityData[modelName]) {
+                              modelQualityData[modelName] = { quality: 0, count: 0 };
+                            }
+                            modelQualityData[modelName].quality += result.quality;
+                            modelQualityData[modelName].count += 1;
+                          });
                         });
-                      });
-                      
-                      const chartData = {
-                        labels: Object.keys(modelQualityData),
-                        datasets: [
-                          {
-                            label: 'Quality',
+                        
+                        const chartData = {
+                          labels: Object.keys(modelQualityData),
+                          datasets: [{
+                            label: 'Quality Score',
                             data: Object.values(modelQualityData).map(d => (d.quality / d.count) * 100),
                             backgroundColor: 'rgba(59, 130, 246, 0.8)',
                             borderColor: 'rgba(59, 130, 246, 1)',
-                            borderWidth: 1,
+                            borderWidth: 2,
+                          }],
+                        };
+                        
+                        const options = {
+                          responsive: true,
+                          plugins: {
+                            legend: {
+                              display: false,
+                            },
+                            title: {
+                              display: false,
+                            },
                           },
-                          {
-                            label: 'Accuracy',
-                            data: Object.values(modelQualityData).map(d => (d.accuracy / d.count) * 100),
+                          scales: {
+                            y: {
+                              beginAtZero: true,
+                              max: 100,
+                              title: {
+                                display: true,
+                                text: 'Quality Score (%)',
+                              },
+                              ticks: {
+                                callback: function(value: any) {
+                                  return value + '%';
+                                }
+                              }
+                            },
+                          },
+                        };
+                        
+                        return <Bar data={chartData} options={options} />;
+                      })()
+                    ) : (
+                      <div className="text-center py-8">
+                        <div className="text-sm text-gray-500">No quality data yet</div>
+                        <div className="text-xs text-gray-400 mt-1">Run tests to see quality comparison</div>
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Accuracy Chart */}
+                  <div>
+                    <h5 className="font-medium text-gray-900 mb-4">Accuracy Comparison</h5>
+                    {savedTestRuns.length > 0 ? (
+                      (() => {
+                        const modelAccuracyData: { [key: string]: { accuracy: number, count: number } } = {};
+                        
+                        savedTestRuns.forEach(run => {
+                          run.results.forEach(result => {
+                            const model = run.models.find(m => m.id === result.modelId);
+                            const modelName = model?.name || result.modelId;
+                            if (!modelAccuracyData[modelName]) {
+                              modelAccuracyData[modelName] = { accuracy: 0, count: 0 };
+                            }
+                            modelAccuracyData[modelName].accuracy += result.accuracy || 0;
+                            modelAccuracyData[modelName].count += 1;
+                          });
+                        });
+                        
+                        const chartData = {
+                          labels: Object.keys(modelAccuracyData),
+                          datasets: [{
+                            label: 'Accuracy Score',
+                            data: Object.values(modelAccuracyData).map(d => (d.accuracy / d.count) * 100),
                             backgroundColor: 'rgba(16, 185, 129, 0.8)',
                             borderColor: 'rgba(16, 185, 129, 1)',
-                            borderWidth: 1,
+                            borderWidth: 2,
+                          }],
+                        };
+                        
+                        const options = {
+                          responsive: true,
+                          plugins: {
+                            legend: {
+                              display: false,
+                            },
+                            title: {
+                              display: false,
+                            },
                           },
-                          {
-                            label: 'Coherence',
-                            data: Object.values(modelQualityData).map(d => (d.coherence / d.count) * 100),
+                          scales: {
+                            y: {
+                              beginAtZero: true,
+                              max: 100,
+                              title: {
+                                display: true,
+                                text: 'Accuracy Score (%)',
+                              },
+                              ticks: {
+                                callback: function(value: any) {
+                                  return value + '%';
+                                }
+                              }
+                            },
+                          },
+                        };
+                        
+                        return <Bar data={chartData} options={options} />;
+                      })()
+                    ) : (
+                      <div className="text-center py-8">
+                        <div className="text-sm text-gray-500">No accuracy data yet</div>
+                        <div className="text-xs text-gray-400 mt-1">Run tests to see accuracy comparison</div>
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Coherence Chart */}
+                  <div>
+                    <h5 className="font-medium text-gray-900 mb-4">Coherence Comparison</h5>
+                    {savedTestRuns.length > 0 ? (
+                      (() => {
+                        const modelCoherenceData: { [key: string]: { coherence: number, count: number } } = {};
+                        
+                        savedTestRuns.forEach(run => {
+                          run.results.forEach(result => {
+                            const model = run.models.find(m => m.id === result.modelId);
+                            const modelName = model?.name || result.modelId;
+                            if (!modelCoherenceData[modelName]) {
+                              modelCoherenceData[modelName] = { coherence: 0, count: 0 };
+                            }
+                            modelCoherenceData[modelName].coherence += result.coherence || 0;
+                            modelCoherenceData[modelName].count += 1;
+                          });
+                        });
+                        
+                        const chartData = {
+                          labels: Object.keys(modelCoherenceData),
+                          datasets: [{
+                            label: 'Coherence Score',
+                            data: Object.values(modelCoherenceData).map(d => (d.coherence / d.count) * 100),
                             backgroundColor: 'rgba(245, 158, 11, 0.8)',
                             borderColor: 'rgba(245, 158, 11, 1)',
-                            borderWidth: 1,
+                            borderWidth: 2,
+                          }],
+                        };
+                        
+                        const options = {
+                          responsive: true,
+                          plugins: {
+                            legend: {
+                              display: false,
+                            },
+                            title: {
+                              display: false,
+                            },
                           },
-                          {
-                            label: 'Diversity',
-                            data: Object.values(modelQualityData).map(d => (d.diversity / d.count) * 100),
+                          scales: {
+                            y: {
+                              beginAtZero: true,
+                              max: 100,
+                              title: {
+                                display: true,
+                                text: 'Coherence Score (%)',
+                              },
+                              ticks: {
+                                callback: function(value: any) {
+                                  return value + '%';
+                                }
+                              }
+                            },
+                          },
+                        };
+                        
+                        return <Bar data={chartData} options={options} />;
+                      })()
+                    ) : (
+                      <div className="text-center py-8">
+                        <div className="text-sm text-gray-500">No coherence data yet</div>
+                        <div className="text-xs text-gray-400 mt-1">Run tests to see coherence comparison</div>
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Diversity Chart */}
+                  <div>
+                    <h5 className="font-medium text-gray-900 mb-4">Diversity Comparison</h5>
+                    {savedTestRuns.length > 0 ? (
+                      (() => {
+                        const modelDiversityData: { [key: string]: { diversity: number, count: number } } = {};
+                        
+                        savedTestRuns.forEach(run => {
+                          run.results.forEach(result => {
+                            const model = run.models.find(m => m.id === result.modelId);
+                            const modelName = model?.name || result.modelId;
+                            if (!modelDiversityData[modelName]) {
+                              modelDiversityData[modelName] = { diversity: 0, count: 0 };
+                            }
+                            modelDiversityData[modelName].diversity += result.diversity || 0;
+                            modelDiversityData[modelName].count += 1;
+                          });
+                        });
+                        
+                        const chartData = {
+                          labels: Object.keys(modelDiversityData),
+                          datasets: [{
+                            label: 'Diversity Score',
+                            data: Object.values(modelDiversityData).map(d => (d.diversity / d.count) * 100),
                             backgroundColor: 'rgba(236, 72, 153, 0.8)',
                             borderColor: 'rgba(236, 72, 153, 1)',
-                            borderWidth: 1,
+                            borderWidth: 2,
+                          }],
+                        };
+                        
+                        const options = {
+                          responsive: true,
+                          plugins: {
+                            legend: {
+                              display: false,
+                            },
+                            title: {
+                              display: false,
+                            },
                           },
-                        ],
-                      };
-                      
-                      const options = {
-                        responsive: true,
-                        plugins: {
-                          legend: {
-                            position: 'top' as const,
-                          },
-                          title: {
-                            display: false,
-                          },
-                        },
-                        scales: {
-                          y: {
-                            beginAtZero: true,
-                            max: 100,
-                            ticks: {
-                              callback: function(value: any) {
-                                return value + '%';
+                          scales: {
+                            y: {
+                              beginAtZero: true,
+                              max: 100,
+                              title: {
+                                display: true,
+                                text: 'Diversity Score (%)',
+                              },
+                              ticks: {
+                                callback: function(value: any) {
+                                  return value + '%';
+                                }
                               }
-                            }
+                            },
                           },
-                        },
-                      };
-                      
-                      return <Bar data={chartData} options={options} />;
-                    })()
-                  ) : (
-                    <div className="text-center py-8">
-                      <div className="text-sm text-gray-500">No quality data yet</div>
-                      <div className="text-xs text-gray-400 mt-1">Run tests to see quality comparison</div>
-                    </div>
-                  )}
+                        };
+                        
+                        return <Bar data={chartData} options={options} />;
+                      })()
+                    ) : (
+                      <div className="text-center py-8">
+                        <div className="text-sm text-gray-500">No diversity data yet</div>
+                        <div className="text-xs text-gray-400 mt-1">Run tests to see diversity comparison</div>
+                      </div>
+                    )}
+                  </div>
                 </div>
               </div>
             </div>
@@ -2667,91 +2849,129 @@ export function ABTestingTab({ onTabChange }: ModelMonitoringTabProps) {
                   </div>
                 </div>
                 
-                {/* Performance Chart */}
-                <div>
-                  <h5 className="font-medium text-gray-900 mb-4">Performance Metrics</h5>
-                  {savedTestRuns.length > 0 ? (
-                    (() => {
-                      const modelPerformanceData: { [key: string]: { latency: number, cost: number, count: number } } = {};
-                      
-                      savedTestRuns.forEach(run => {
-                        run.results.forEach(result => {
-                          const model = run.models.find(m => m.id === result.modelId);
-                          const modelName = model?.name || result.modelId;
-                          if (!modelPerformanceData[modelName]) {
-                            modelPerformanceData[modelName] = { latency: 0, cost: 0, count: 0 };
-                          }
-                          modelPerformanceData[modelName].latency += result.latency;
-                          modelPerformanceData[modelName].cost += result.cost;
-                          modelPerformanceData[modelName].count += 1;
+                {/* Individual Performance Metrics Charts */}
+                <div className="space-y-6">
+                  {/* Latency Chart */}
+                  <div>
+                    <h5 className="font-medium text-gray-900 mb-4">Latency Comparison</h5>
+                    {savedTestRuns.length > 0 ? (
+                      (() => {
+                        const modelLatencyData: { [key: string]: { latency: number, count: number } } = {};
+                        
+                        savedTestRuns.forEach(run => {
+                          run.results.forEach(result => {
+                            const model = run.models.find(m => m.id === result.modelId);
+                            const modelName = model?.name || result.modelId;
+                            if (!modelLatencyData[modelName]) {
+                              modelLatencyData[modelName] = { latency: 0, count: 0 };
+                            }
+                            modelLatencyData[modelName].latency += result.latency;
+                            modelLatencyData[modelName].count += 1;
+                          });
                         });
-                      });
-                      
-                      const chartData = {
-                        labels: Object.keys(modelPerformanceData),
-                        datasets: [
-                          {
-                            label: 'Average Latency (ms)',
-                            data: Object.values(modelPerformanceData).map(d => d.latency / d.count),
+                        
+                        const chartData = {
+                          labels: Object.keys(modelLatencyData),
+                          datasets: [{
+                            label: 'Average Latency',
+                            data: Object.values(modelLatencyData).map(d => d.latency / d.count),
                             backgroundColor: 'rgba(99, 102, 241, 0.8)',
                             borderColor: 'rgba(99, 102, 241, 1)',
-                            borderWidth: 1,
-                            yAxisID: 'y',
+                            borderWidth: 2,
+                          }],
+                        };
+                        
+                        const options = {
+                          responsive: true,
+                          plugins: {
+                            legend: {
+                              display: false,
+                            },
+                            title: {
+                              display: false,
+                            },
                           },
-                          {
-                            label: 'Average Cost ($)',
-                            data: Object.values(modelPerformanceData).map(d => d.cost / d.count),
+                          scales: {
+                            y: {
+                              beginAtZero: true,
+                              title: {
+                                display: true,
+                                text: 'Latency (ms)',
+                              },
+                            },
+                          },
+                        };
+                        
+                        return <Bar data={chartData} options={options} />;
+                      })()
+                    ) : (
+                      <div className="text-center py-8">
+                        <div className="text-sm text-gray-500">No latency data yet</div>
+                        <div className="text-xs text-gray-400 mt-1">Run tests to see latency comparison</div>
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Cost Chart */}
+                  <div>
+                    <h5 className="font-medium text-gray-900 mb-4">Cost Comparison</h5>
+                    {savedTestRuns.length > 0 ? (
+                      (() => {
+                        const modelCostData: { [key: string]: { cost: number, count: number } } = {};
+                        
+                        savedTestRuns.forEach(run => {
+                          run.results.forEach(result => {
+                            const model = run.models.find(m => m.id === result.modelId);
+                            const modelName = model?.name || result.modelId;
+                            if (!modelCostData[modelName]) {
+                              modelCostData[modelName] = { cost: 0, count: 0 };
+                            }
+                            modelCostData[modelName].cost += result.cost;
+                            modelCostData[modelName].count += 1;
+                          });
+                        });
+                        
+                        const chartData = {
+                          labels: Object.keys(modelCostData),
+                          datasets: [{
+                            label: 'Average Cost',
+                            data: Object.values(modelCostData).map(d => d.cost / d.count),
                             backgroundColor: 'rgba(34, 197, 94, 0.8)',
                             borderColor: 'rgba(34, 197, 94, 1)',
-                            borderWidth: 1,
-                            yAxisID: 'y1',
-                          },
-                        ],
-                      };
-                      
-                      const options = {
-                        responsive: true,
-                        plugins: {
-                          legend: {
-                            position: 'top' as const,
-                          },
-                          title: {
-                            display: false,
-                          },
-                        },
-                        scales: {
-                          y: {
-                            type: 'linear' as const,
-                            display: true,
-                            position: 'left' as const,
+                            borderWidth: 2,
+                          }],
+                        };
+                        
+                        const options = {
+                          responsive: true,
+                          plugins: {
+                            legend: {
+                              display: false,
+                            },
                             title: {
-                              display: true,
-                              text: 'Latency (ms)',
+                              display: false,
                             },
                           },
-                          y1: {
-                            type: 'linear' as const,
-                            display: true,
-                            position: 'right' as const,
-                            title: {
-                              display: true,
-                              text: 'Cost ($)',
-                            },
-                            grid: {
-                              drawOnChartArea: false,
+                          scales: {
+                            y: {
+                              beginAtZero: true,
+                              title: {
+                                display: true,
+                                text: 'Cost ($)',
+                              },
                             },
                           },
-                        },
-                      };
-                      
-                      return <Bar data={chartData} options={options} />;
-                    })()
-                  ) : (
-                    <div className="text-center py-8">
-                      <div className="text-sm text-gray-500">No performance data yet</div>
-                      <div className="text-xs text-gray-400 mt-1">Run tests to see performance comparison</div>
-                    </div>
-                  )}
+                        };
+                        
+                        return <Bar data={chartData} options={options} />;
+                      })()
+                    ) : (
+                      <div className="text-center py-8">
+                        <div className="text-sm text-gray-500">No cost data yet</div>
+                        <div className="text-xs text-gray-400 mt-1">Run tests to see cost comparison</div>
+                      </div>
+                    )}
+                  </div>
                 </div>
               </div>
             </div>
