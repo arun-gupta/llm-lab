@@ -200,29 +200,7 @@ POSTMAN_API_KEY=your-actual-postman-key
 OLLAMA_BASE_URL=http://host.docker.internal:11434
 ```
 
-### **Option 3: GitHub Codespaces (Outdated - Use Local Setup Instead)**
 
-⚠️ **Note**: GitHub Codespaces setup is currently outdated and may not work properly. We recommend using the local development setup above for the best experience.
-
-If you still want to try Codespaces:
-- Click the button at the top of this README
-- May require manual dependency installation
-- Environment setup may need manual configuration
-- Use local setup for optimal performance and reliability
-```bash
-# Clone and run
-git clone https://github.com/arun-gupta/postman-labs.git
-cd postman-labs
-./quickstart.sh
-```
-
-**Or manually:**
-```bash
-npm install
-cp .env.local.example .env.local
-# Add your API keys to .env.local
-npm run dev
-```
 
 ### **gRPC Services Setup (Automatic)**
 
@@ -322,12 +300,7 @@ GITHUB_TOKEN=your_github_personal_access_token_here
 - **Neo4j Backend**: Native graph database integration for scalable knowledge graph storage
 - **Persistent Storage**: Database-backed storage for long-term data persistence
 - **Cloud Integration**: Optional cloud storage for collaborative features
-⚠️ **Note**: Codespaces setup is outdated. Use local development instead.
 
-If you still want to try Codespaces:
-1. Go to your Codespace settings and add environment variables, or
-2. Edit `.env.local` directly in the Codespace
-3. Set `NEXT_PUBLIC_BASE_URL` to your Codespaces URL
 
 
 
