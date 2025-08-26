@@ -118,7 +118,7 @@ export async function POST(request: NextRequest) {
     for (const file of files) {
       const text = await file.text();
       const arangoDocument = {
-        _key: file.name.replace(/[^a-zA-Z0-9_-]/g, '_'),
+        _key: `${graphKey}_${file.name.replace(/[^a-zA-Z0-9_-]/g, '_')}_${Date.now()}`,
         name: file.name,
         content: text,
         type: file.type || 'text/plain',
@@ -142,8 +142,13 @@ export async function POST(request: NextRequest) {
 
   } catch (error) {
     console.error('Error building graph with ArangoDB:', error);
+    console.error('Error details:', {
+      message: error.message,
+      stack: error.stack,
+      name: error.name
+    });
     return NextResponse.json(
-      { error: 'Failed to build knowledge graph with ArangoDB' },
+      { error: `Failed to build knowledge graph with ArangoDB: ${error.message}` },
       { status: 500 }
     );
   }
