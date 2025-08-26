@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { 
   BarChart3, 
   TrendingUp, 
@@ -352,6 +352,15 @@ export function ModelMonitoringTab({ onTabChange }: ModelMonitoringTabProps) {
   
   // Quick Combos expansion state
   const [showAllQuickCombos, setShowAllQuickCombos] = useState(false);
+  
+  // Ollama models status
+  const [runningOllamaModels, setRunningOllamaModels] = useState<string[]>([]);
+  const [isCheckingOllama, setIsCheckingOllama] = useState(false);
+
+  // Check Ollama models on component mount
+  useEffect(() => {
+    checkOllamaModels();
+  }, []);
 
   // Performance Monitoring State
   const [monitoringEnabled, setMonitoringEnabled] = useState(false);
@@ -880,6 +889,25 @@ export function ModelMonitoringTab({ onTabChange }: ModelMonitoringTabProps) {
     }));
   };
 
+  const checkOllamaModels = async () => {
+    setIsCheckingOllama(true);
+    try {
+      const response = await fetch('/api/ollama/models');
+      if (response.ok) {
+        const data = await response.json();
+        const availableModels = data.models?.map((model: any) => model.name) || [];
+        setRunningOllamaModels(availableModels);
+      } else {
+        setRunningOllamaModels([]);
+      }
+    } catch (error) {
+      console.error('Error checking Ollama models:', error);
+      setRunningOllamaModels([]);
+    } finally {
+      setIsCheckingOllama(false);
+    }
+  };
+
   const selectSamplePrompt = (prompt: string) => {
     setTestPrompt(prompt);
     setComparisonPrompt(prompt);
@@ -1105,38 +1133,93 @@ export function ModelMonitoringTab({ onTabChange }: ModelMonitoringTabProps) {
                         <span className="text-xs text-gray-500 ml-2">
                           ({models.filter(model => model.provider === 'Ollama' && model.enabled).length} selected)
                         </span>
+                        {isCheckingOllama && (
+                          <RefreshCw className="w-3 h-3 ml-2 animate-spin text-gray-400" />
+                        )}
                       </div>
-                      <span className="text-gray-400">
-                        {expandedSections.ollama ? '−' : '+'}
-                      </span>
+                      <div className="flex items-center space-x-2">
+                        <button
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            checkOllamaModels();
+                          }}
+                          className="text-xs text-blue-600 hover:text-blue-700"
+                          title="Refresh Ollama models"
+                        >
+                          Refresh
+                        </button>
+                        <span className="text-gray-400">
+                          {expandedSections.ollama ? '−' : '+'}
+                        </span>
+                      </div>
                     </h4>
+                    
+                    {/* Color Legend */}
+                    {expandedSections.ollama && (
+                      <div className="mb-3 p-2 bg-gray-50 rounded-lg">
+                        <p className="text-xs font-medium text-gray-700 mb-2">Model Categories:</p>
+                        <div className="flex flex-wrap gap-2 text-xs">
+                          <div className="flex items-center space-x-1">
+                            <span className="w-2 h-2 bg-red-500 rounded-full"></span>
+                            <span className="text-gray-600">Legacy Models</span>
+                          </div>
+                          <div className="flex items-center space-x-1">
+                            <span className="w-2 h-2 bg-amber-500 rounded-full"></span>
+                            <span className="text-gray-600">Fast Models</span>
+                          </div>
+                          <div className="flex items-center space-x-1">
+                            <span className="w-2 h-2 bg-blue-500 rounded-full"></span>
+                            <span className="text-gray-600">Specialized Models</span>
+                          </div>
+                        </div>
+                      </div>
+                    )}
                     {expandedSections.ollama && (
                       <div className="space-y-2">
-                        {models.filter(model => model.provider === 'Ollama').map((model) => (
-                          <div
-                            key={model.id}
-                            className={`border rounded-lg p-3 cursor-pointer transition-all ${
-                              model.enabled
-                                ? 'border-blue-500 bg-blue-50'
-                                : 'border-gray-200 hover:border-gray-300'
-                            }`}
-                            onClick={() => toggleModel(model.id)}
-                          >
-                            <div className="flex items-center justify-between">
-                              <div className="flex items-center space-x-2">
-                                <div className={`w-3 h-3 rounded-full bg-${model.color}-500`}></div>
-                                <span className="font-medium text-gray-900 text-sm">{model.name}</span>
+                        {models.filter(model => model.provider === 'Ollama').map((model) => {
+                          const isRunning = runningOllamaModels.includes(model.model);
+                          return (
+                            <div
+                              key={model.id}
+                              className={`border rounded-lg p-3 cursor-pointer transition-all ${
+                                model.enabled
+                                  ? 'border-blue-500 bg-blue-50'
+                                  : 'border-gray-200 hover:border-gray-300'
+                              } ${isRunning ? 'ring-1 ring-green-500' : ''}`}
+                              onClick={() => toggleModel(model.id)}
+                            >
+                              <div className="flex items-center justify-between">
+                                <div className="flex items-center space-x-2">
+                                  <div className={`w-3 h-3 rounded-full bg-${model.color}-500`}></div>
+                                  <span className="font-medium text-gray-900 text-sm">{model.name}</span>
+                                  {isRunning && (
+                                    <span className="inline-flex items-center px-1.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                                      Running
+                                    </span>
+                                  )}
+                                </div>
+                                <div className="flex items-center space-x-2">
+                                  {!isRunning && (
+                                    <span className="text-xs text-gray-400">Not Available</span>
+                                  )}
+                                  <input
+                                    type="checkbox"
+                                    checked={model.enabled}
+                                    onChange={() => toggleModel(model.id)}
+                                    className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
+                                    disabled={!isRunning}
+                                  />
+                                </div>
                               </div>
-                              <input
-                                type="checkbox"
-                                checked={model.enabled}
-                                onChange={() => toggleModel(model.id)}
-                                className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
-                              />
+                              <p className="text-xs text-gray-500 mt-1">{model.description}</p>
+                              {!isRunning && (
+                                <p className="text-xs text-red-500 mt-1">
+                                  Model not running. Start with: <code className="bg-gray-100 px-1 rounded">ollama pull {model.model}</code>
+                                </p>
+                              )}
                             </div>
-                            <p className="text-xs text-gray-500 mt-1">{model.description}</p>
-                          </div>
-                        ))}
+                          );
+                        })}
                       </div>
                     )}
                   </div>
