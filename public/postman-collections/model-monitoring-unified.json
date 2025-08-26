@@ -1,7 +1,7 @@
 {
   "info": {
     "name": "Model Monitoring - Unified Collection",
-    "description": "Comprehensive model monitoring collection with A/B testing, response comparison, and performance monitoring APIs",
+    "description": "Comprehensive model monitoring collection with A/B testing, response comparison, and performance monitoring APIs. Supports OpenAI, Anthropic, and Ollama (local) models.",
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
   },
   "variable": [
@@ -23,6 +23,11 @@
     {
       "key": "anthropic_api_key",
       "value": "your_anthropic_api_key_here",
+      "type": "string"
+    },
+    {
+      "key": "ollama_base_url",
+      "value": "http://localhost:11434",
       "type": "string"
     }
   ],
@@ -318,6 +323,90 @@
             "body": {
               "mode": "raw",
               "raw": "{\n  \"prompt\": \"{{test_prompt}}\",\n  \"provider\": \"Anthropic\",\n  \"model\": \"claude-3-5-sonnet\",\n  \"track_performance\": true\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/llm",
+              "host": ["{{base_url}}"],
+              "path": ["api", "llm"]
+            }
+          }
+        },
+        {
+          "name": "Test Llama 3.2 8B (Local)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"prompt\": \"{{test_prompt}}\",\n  \"provider\": \"Ollama\",\n  \"model\": \"llama3.2:8b\",\n  \"track_performance\": true\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/llm",
+              "host": ["{{base_url}}"],
+              "path": ["api", "llm"]
+            }
+          }
+        },
+        {
+          "name": "Test Llama 3.2 70B (Local)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"prompt\": \"{{test_prompt}}\",\n  \"provider\": \"Ollama\",\n  \"model\": \"llama3.2:70b\",\n  \"track_performance\": true\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/llm",
+              "host": ["{{base_url}}"],
+              "path": ["api", "llm"]
+            }
+          }
+        },
+        {
+          "name": "Test Code Llama 7B (Local)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"prompt\": \"{{test_prompt}}\",\n  \"provider\": \"Ollama\",\n  \"model\": \"codellama:7b\",\n  \"track_performance\": true\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/llm",
+              "host": ["{{base_url}}"],
+              "path": ["api", "llm"]
+            }
+          }
+        },
+        {
+          "name": "Test Mistral 7B (Local)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"prompt\": \"{{test_prompt}}\",\n  \"provider\": \"Ollama\",\n  \"model\": \"mistral:7b\",\n  \"track_performance\": true\n}"
             },
             "url": {
               "raw": "{{base_url}}/api/llm",

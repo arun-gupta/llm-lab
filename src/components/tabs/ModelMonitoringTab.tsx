@@ -146,6 +146,69 @@ export function ModelMonitoringTab({ onTabChange }: ModelMonitoringTabProps) {
       description: 'Local Llama model for privacy-focused testing',
       color: 'red',
       enabled: false
+    },
+    {
+      id: 'llama-3.2-1b',
+      name: 'Llama 3.2 1B',
+      provider: 'Ollama',
+      model: 'llama3.2:1b',
+      description: 'Ultra-fast local Llama 3.2 model',
+      color: 'amber',
+      enabled: false
+    },
+    {
+      id: 'llama-3.2-3b',
+      name: 'Llama 3.2 3B',
+      provider: 'Ollama',
+      model: 'llama3.2:3b',
+      description: 'Fast local Llama 3.2 model with good performance',
+      color: 'yellow',
+      enabled: false
+    },
+    {
+      id: 'llama-3.2-8b',
+      name: 'Llama 3.2 8B',
+      provider: 'Ollama',
+      model: 'llama3.2:8b',
+      description: 'Balanced local Llama 3.2 model',
+      color: 'lime',
+      enabled: false
+    },
+    {
+      id: 'llama-3.2-70b',
+      name: 'Llama 3.2 70B',
+      provider: 'Ollama',
+      model: 'llama3.2:70b',
+      description: 'High-performance local Llama 3.2 model',
+      color: 'emerald',
+      enabled: false
+    },
+    {
+      id: 'mistral-7b',
+      name: 'Mistral 7B',
+      provider: 'Ollama',
+      model: 'mistral:7b',
+      description: 'Efficient local Mistral model',
+      color: 'sky',
+      enabled: false
+    },
+    {
+      id: 'codellama-7b',
+      name: 'Code Llama 7B',
+      provider: 'Ollama',
+      model: 'codellama:7b',
+      description: 'Specialized local model for code generation',
+      color: 'indigo',
+      enabled: false
+    },
+    {
+      id: 'phi-3-mini',
+      name: 'Phi-3 Mini',
+      provider: 'Ollama',
+      model: 'phi3:mini',
+      description: 'Lightweight local Microsoft Phi-3 model',
+      color: 'rose',
+      enabled: false
     }
   ]);
 
@@ -219,7 +282,7 @@ export function ModelMonitoringTab({ onTabChange }: ModelMonitoringTabProps) {
       id: 'speed-test',
       title: 'Speed Test',
       description: 'Compare response times across models',
-      models: ['gpt-5-nano', 'gpt-5-mini', 'claude-3-5-haiku'],
+      models: ['gpt-5-nano', 'gpt-5-mini', 'llama-3.2-1b', 'llama-3.2-3b'],
       prompt: 'Write a 100-word summary of the benefits of renewable energy sources.',
       icon: '⚡'
     },
@@ -227,7 +290,7 @@ export function ModelMonitoringTab({ onTabChange }: ModelMonitoringTabProps) {
       id: 'quality-test',
       title: 'Quality Test',
       description: 'Compare response quality across models',
-      models: ['gpt-5', 'claude-3-5-sonnet', 'gpt-4'],
+      models: ['gpt-5', 'claude-3-5-sonnet', 'llama-3.2-70b', 'gpt-4'],
       prompt: 'Explain the concept of machine learning in detail, including its applications, limitations, and future prospects.',
       icon: '🎯'
     },
@@ -235,7 +298,7 @@ export function ModelMonitoringTab({ onTabChange }: ModelMonitoringTabProps) {
       id: 'cost-test',
       title: 'Cost Test',
       description: 'Compare cost-effectiveness across models',
-      models: ['gpt-5-nano', 'claude-3-5-haiku', 'gpt-3.5-turbo'],
+      models: ['llama-3.2-1b', 'llama-3.2-3b', 'phi-3-mini', 'gpt-3.5-turbo'],
       prompt: 'Provide a brief analysis of the current trends in remote work.',
       icon: '💰'
     },
@@ -243,9 +306,33 @@ export function ModelMonitoringTab({ onTabChange }: ModelMonitoringTabProps) {
       id: 'creative-test',
       title: 'Creative Test',
       description: 'Test creative writing capabilities',
-      models: ['gpt-5', 'claude-3-5-sonnet', 'gpt-5-mini'],
+      models: ['gpt-5', 'claude-3-5-sonnet', 'llama-3.2-8b', 'mistral-7b'],
       prompt: 'Write a creative story about a robot learning to paint.',
       icon: '🎨'
+    },
+    {
+      id: 'local-vs-cloud',
+      title: 'Local vs Cloud',
+      description: 'Compare local Ollama models with cloud models',
+      models: ['llama-3.2-8b', 'gpt-5-mini', 'claude-3-5-haiku', 'mistral-7b'],
+      prompt: 'Explain the differences between supervised and unsupervised learning with examples.',
+      icon: '🏠'
+    },
+    {
+      id: 'code-generation',
+      title: 'Code Generation',
+      description: 'Test code generation capabilities',
+      models: ['codellama-7b', 'gpt-5', 'claude-3-5-sonnet', 'llama-3.2-8b'],
+      prompt: 'Write a Python function that implements a binary search algorithm with proper error handling and documentation.',
+      icon: '💻'
+    },
+    {
+      id: 'privacy-focused',
+      title: 'Privacy Focused',
+      description: 'Compare local models for privacy-sensitive tasks',
+      models: ['llama-3.2-8b', 'llama-3.2-70b', 'mistral-7b', 'phi-3-mini'],
+      prompt: 'Analyze the privacy implications of using cloud-based AI services versus local models.',
+      icon: '🔒'
     }
   ];
 
@@ -979,33 +1066,111 @@ export function ModelMonitoringTab({ onTabChange }: ModelMonitoringTabProps) {
                 <p className="text-gray-600 text-sm mt-1">Select models to include in A/B testing</p>
               </div>
               <div className="p-4">
-                <div className="space-y-3">
-                  {models.map((model) => (
-                    <div
-                      key={model.id}
-                      className={`border rounded-lg p-3 cursor-pointer transition-all ${
-                        model.enabled
-                          ? 'border-blue-500 bg-blue-50'
-                          : 'border-gray-200 hover:border-gray-300'
-                      }`}
-                      onClick={() => toggleModel(model.id)}
-                    >
-                      <div className="flex items-center justify-between">
-                        <div className="flex items-center space-x-2">
-                          <div className={`w-3 h-3 rounded-full bg-${model.color}-500`}></div>
-                          <span className="font-medium text-gray-900 text-sm">{model.name}</span>
+                <div className="space-y-6">
+                  {/* Ollama Models Section */}
+                  <div>
+                    <h4 className="text-sm font-semibold text-gray-700 mb-3 flex items-center">
+                      <span className="w-2 h-2 bg-amber-500 rounded-full mr-2"></span>
+                      Ollama (Local Models)
+                    </h4>
+                    <div className="space-y-2">
+                      {models.filter(model => model.provider === 'Ollama').map((model) => (
+                        <div
+                          key={model.id}
+                          className={`border rounded-lg p-3 cursor-pointer transition-all ${
+                            model.enabled
+                              ? 'border-blue-500 bg-blue-50'
+                              : 'border-gray-200 hover:border-gray-300'
+                          }`}
+                          onClick={() => toggleModel(model.id)}
+                        >
+                          <div className="flex items-center justify-between">
+                            <div className="flex items-center space-x-2">
+                              <div className={`w-3 h-3 rounded-full bg-${model.color}-500`}></div>
+                              <span className="font-medium text-gray-900 text-sm">{model.name}</span>
+                            </div>
+                            <input
+                              type="checkbox"
+                              checked={model.enabled}
+                              onChange={() => toggleModel(model.id)}
+                              className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
+                            />
+                          </div>
+                          <p className="text-xs text-gray-500 mt-1">{model.description}</p>
                         </div>
-                        <input
-                          type="checkbox"
-                          checked={model.enabled}
-                          onChange={() => toggleModel(model.id)}
-                          className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
-                        />
-                      </div>
-                      <p className="text-xs text-gray-600 mt-1">{model.provider}</p>
-                      <p className="text-xs text-gray-500 mt-1">{model.description}</p>
+                      ))}
                     </div>
-                  ))}
+                  </div>
+
+                  {/* OpenAI Models Section */}
+                  <div>
+                    <h4 className="text-sm font-semibold text-gray-700 mb-3 flex items-center">
+                      <span className="w-2 h-2 bg-blue-500 rounded-full mr-2"></span>
+                      OpenAI (Cloud Models)
+                    </h4>
+                    <div className="space-y-2">
+                      {models.filter(model => model.provider === 'OpenAI').map((model) => (
+                        <div
+                          key={model.id}
+                          className={`border rounded-lg p-3 cursor-pointer transition-all ${
+                            model.enabled
+                              ? 'border-blue-500 bg-blue-50'
+                              : 'border-gray-200 hover:border-gray-300'
+                          }`}
+                          onClick={() => toggleModel(model.id)}
+                        >
+                          <div className="flex items-center justify-between">
+                            <div className="flex items-center space-x-2">
+                              <div className={`w-3 h-3 rounded-full bg-${model.color}-500`}></div>
+                              <span className="font-medium text-gray-900 text-sm">{model.name}</span>
+                            </div>
+                            <input
+                              type="checkbox"
+                              checked={model.enabled}
+                              onChange={() => toggleModel(model.id)}
+                              className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
+                            />
+                          </div>
+                          <p className="text-xs text-gray-500 mt-1">{model.description}</p>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+
+                  {/* Anthropic Models Section */}
+                  <div>
+                    <h4 className="text-sm font-semibold text-gray-700 mb-3 flex items-center">
+                      <span className="w-2 h-2 bg-purple-500 rounded-full mr-2"></span>
+                      Anthropic (Cloud Models)
+                    </h4>
+                    <div className="space-y-2">
+                      {models.filter(model => model.provider === 'Anthropic').map((model) => (
+                        <div
+                          key={model.id}
+                          className={`border rounded-lg p-3 cursor-pointer transition-all ${
+                            model.enabled
+                              ? 'border-blue-500 bg-blue-50'
+                              : 'border-gray-200 hover:border-gray-300'
+                          }`}
+                          onClick={() => toggleModel(model.id)}
+                        >
+                          <div className="flex items-center justify-between">
+                            <div className="flex items-center space-x-2">
+                              <div className={`w-3 h-3 rounded-full bg-${model.color}-500`}></div>
+                              <span className="font-medium text-gray-900 text-sm">{model.name}</span>
+                            </div>
+                            <input
+                              type="checkbox"
+                              checked={model.enabled}
+                              onChange={() => toggleModel(model.id)}
+                              className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
+                            />
+                          </div>
+                          <p className="text-xs text-gray-500 mt-1">{model.description}</p>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
                 </div>
               </div>
             </div>
