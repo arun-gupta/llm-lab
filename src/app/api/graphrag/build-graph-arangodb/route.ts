@@ -134,6 +134,8 @@ export async function POST(request: NextRequest) {
       graphId: graphKey,
       name: graphId,
       stats: arangoGraph.stats,
+      entities: graphData.nodes,
+      relationships: graphData.edges,
       message: 'Knowledge graph built successfully with ArangoDB',
       documentsProcessed: files.length,
       entitiesCreated: graphData.nodes.length,
