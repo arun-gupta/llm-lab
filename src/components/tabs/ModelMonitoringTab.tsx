@@ -1138,16 +1138,21 @@ export function ModelMonitoringTab({ onTabChange }: ModelMonitoringTabProps) {
                         )}
                       </div>
                       <div className="flex items-center space-x-2">
-                        <button
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            checkOllamaModels();
-                          }}
-                          className="text-xs text-blue-600 hover:text-blue-700"
-                          title="Refresh Ollama models"
-                        >
-                          Refresh
-                        </button>
+                        <div className="flex items-center space-x-2">
+                          <span className="text-xs text-gray-500">
+                            {runningOllamaModels.length} running
+                          </span>
+                          <button
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              checkOllamaModels();
+                            }}
+                            className="text-xs text-blue-600 hover:text-blue-700"
+                            title="Check which Ollama models are running"
+                          >
+                            {isCheckingOllama ? 'Checking...' : 'Check Status'}
+                          </button>
+                        </div>
                         <span className="text-gray-400">
                           {expandedSections.ollama ? '−' : '+'}
                         </span>
