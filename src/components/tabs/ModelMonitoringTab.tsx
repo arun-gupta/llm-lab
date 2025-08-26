@@ -1975,48 +1975,7 @@ export function ModelMonitoringTab({ onTabChange }: ModelMonitoringTabProps) {
             </div>
           </div>
 
-          {/* Monitoring Features */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <div className="bg-white rounded-lg border shadow-sm p-6">
-              <h4 className="font-medium text-gray-900 mb-4">Tracked Metrics</h4>
-              <ul className="space-y-2">
-                <li className="flex items-center text-sm text-gray-600">
-                  <Zap className="w-4 h-4 mr-2 text-blue-600" />
-                  Response latency and throughput
-                </li>
-                <li className="flex items-center text-sm text-gray-600">
-                  <DollarSign className="w-4 h-4 mr-2 text-green-600" />
-                  Cost per request and total spending
-                </li>
-                <li className="flex items-center text-sm text-gray-600">
-                  <Target className="w-4 h-4 mr-2 text-purple-600" />
-                  Quality scores and error rates
-                </li>
-                <li className="flex items-center text-sm text-gray-600">
-                  <Database className="w-4 h-4 mr-2 text-orange-600" />
-                  Token usage and efficiency
-                </li>
-              </ul>
-            </div>
 
-            <div className="bg-white rounded-lg border shadow-sm p-6">
-              <h4 className="font-medium text-gray-900 mb-4">API Endpoints</h4>
-              <ul className="space-y-2">
-                <li className="text-sm text-gray-600">
-                  <code className="bg-gray-100 px-2 py-1 rounded">POST /api/monitoring/start</code>
-                </li>
-                <li className="text-sm text-gray-600">
-                  <code className="bg-gray-100 px-2 py-1 rounded">GET /api/monitoring/metrics</code>
-                </li>
-                <li className="text-sm text-gray-600">
-                  <code className="bg-gray-100 px-2 py-1 rounded">GET /api/monitoring/model-comparison</code>
-                </li>
-                <li className="text-sm text-gray-600">
-                  <code className="bg-gray-100 px-2 py-1 rounded">POST /api/monitoring/stop</code>
-                </li>
-              </ul>
-            </div>
-          </div>
 
           {/* Analytics Features */}
           <div className="bg-white rounded-lg border shadow-sm p-6">
