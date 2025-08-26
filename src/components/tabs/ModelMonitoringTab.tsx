@@ -64,7 +64,7 @@ export function ABTestingTab({ onTabChange }: ModelMonitoringTabProps) {
       model: 'gpt-5',
       description: 'Latest flagship model with advanced capabilities',
       color: 'blue',
-      enabled: true
+      enabled: false
     },
     {
       id: 'gpt-5-mini',
@@ -73,7 +73,7 @@ export function ABTestingTab({ onTabChange }: ModelMonitoringTabProps) {
       model: 'gpt-5-mini',
       description: 'Fast and efficient GPT-5 variant',
       color: 'cyan',
-      enabled: true
+      enabled: false
     },
     {
       id: 'gpt-5-nano',
@@ -109,7 +109,7 @@ export function ABTestingTab({ onTabChange }: ModelMonitoringTabProps) {
       model: 'claude-3-5-sonnet-20241022',
       description: 'Latest Claude 3.5 model with advanced reasoning',
       color: 'purple',
-      enabled: true
+      enabled: false
     },
     {
       id: 'claude-3-5-haiku',
@@ -118,7 +118,7 @@ export function ABTestingTab({ onTabChange }: ModelMonitoringTabProps) {
       model: 'claude-3-5-haiku-20241022',
       description: 'Fast and efficient Claude 3.5 variant',
       color: 'pink',
-      enabled: true
+      enabled: false
     },
     {
       id: 'claude-3-opus',
@@ -145,7 +145,7 @@ export function ABTestingTab({ onTabChange }: ModelMonitoringTabProps) {
       model: 'llama3.2:3b',
       description: 'Fast local Llama 3.2 model with good performance',
       color: 'amber',
-      enabled: false
+      enabled: true
     },
     {
       id: 'llama-3.2-8b',
@@ -372,6 +372,30 @@ export function ABTestingTab({ onTabChange }: ModelMonitoringTabProps) {
     successRate: 0
   });
 
+  // Calculate metrics from saved test runs
+  useEffect(() => {
+    if (savedTestRuns.length > 0) {
+      const totalRequests = savedTestRuns.reduce((sum, run) => sum + run.results.length, 0);
+      const totalLatency = savedTestRuns.reduce((sum, run) => sum + run.results.reduce((rSum, result) => rSum + result.latency, 0), 0);
+      const totalCost = savedTestRuns.reduce((sum, run) => sum + run.summary.totalCost, 0);
+      const successfulRequests = savedTestRuns.reduce((sum, run) => sum + run.results.filter(r => !r.error).length, 0);
+      
+      setMetrics({
+        totalRequests,
+        averageLatency: totalRequests > 0 ? Math.round(totalLatency / totalRequests) : 0,
+        totalCost: parseFloat(totalCost.toFixed(6)),
+        successRate: totalRequests > 0 ? Math.round((successfulRequests / totalRequests) * 100) : 0
+      });
+    } else {
+      setMetrics({
+        totalRequests: 0,
+        averageLatency: 0,
+        totalCost: 0,
+        successRate: 0
+      });
+    }
+  }, [savedTestRuns]);
+
   const generateUnifiedCollection = async () => {
     if (!models.filter(m => m.enabled).length) return;
 
@@ -496,7 +520,7 @@ export function ABTestingTab({ onTabChange }: ModelMonitoringTabProps) {
                   content: `Sample response from ${model.name}`,
                   latency: Math.floor(Math.random() * 2000) + 500,
                   tokens: Math.floor(Math.random() * 1000) + 100,
-                  cost: (Math.random() * 0.1).toFixed(4),
+                  cost: (Math.random() * 0.1).toFixed(6),
                   quality: (Math.random() * 0.3 + 0.7).toFixed(2)
                 }, null, 2)
               }
@@ -932,75 +956,118 @@ export function ABTestingTab({ onTabChange }: ModelMonitoringTabProps) {
     setIsRunningTest(true);
     setTestResults([]);
     
-    // Simulate A/B testing
+    // Real A/B testing with actual API calls
     const enabledModels = models.filter(m => m.enabled);
     const results: TestResult[] = [];
     const testRunId = `ab-test-${Date.now()}`;
     
     for (const model of enabledModels) {
-      // Simulate API call delay
-      await new Promise(resolve => setTimeout(resolve, 1000 + Math.random() * 2000));
-      
-      // Calculate realistic cost based on provider
-      const calculateCost = (provider: string, tokens: number) => {
-        switch (provider) {
-          case 'Ollama':
-            return 0; // Local models are free
-          case 'OpenAI':
-            // GPT-5 Nano: $0.00015 per 1K tokens
-            if (model.model.includes('nano')) {
-              return parseFloat(((tokens / 1000) * 0.00015).toFixed(4));
+      try {
+        // Make real API call to the LLM endpoint
+        const response = await fetch('/api/llm', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            prompt: testPrompt,
+            providers: [model.provider],
+            models: {
+              [model.provider]: model.model
             }
-            // GPT-5: $0.005 per 1K tokens
-            if (model.model.includes('gpt-5') && !model.model.includes('nano')) {
-              return parseFloat(((tokens / 1000) * 0.005).toFixed(4));
-            }
-            // GPT-4: $0.03 per 1K tokens
-            if (model.model.includes('gpt-4')) {
-              return parseFloat(((tokens / 1000) * 0.03).toFixed(4));
-            }
-            // GPT-3.5: $0.0015 per 1K tokens
-            if (model.model.includes('gpt-3.5')) {
-              return parseFloat(((tokens / 1000) * 0.0015).toFixed(4));
-            }
-            return parseFloat(((tokens / 1000) * 0.005).toFixed(4)); // Default
-          case 'Anthropic':
-            // Claude 3.5 Sonnet: $0.003 per 1K tokens
-            if (model.model.includes('sonnet')) {
-              return parseFloat(((tokens / 1000) * 0.003).toFixed(4));
-            }
-            // Claude 3.5 Haiku: $0.00025 per 1K tokens
-            if (model.model.includes('haiku')) {
-              return parseFloat(((tokens / 1000) * 0.00025).toFixed(4));
-            }
-            // Claude 3 Opus: $0.015 per 1K tokens
-            if (model.model.includes('opus')) {
-              return parseFloat(((tokens / 1000) * 0.015).toFixed(4));
-            }
-            return parseFloat(((tokens / 1000) * 0.003).toFixed(4)); // Default
-          default:
-            return 0;
+          })
+        });
+
+        if (!response.ok) {
+          throw new Error(`API call failed: ${response.status}`);
         }
-      };
 
-      const tokens = Math.floor(Math.random() * 1000) + 100;
-      const cost = calculateCost(model.provider, tokens);
+        const data = await response.json();
+        const llmResponse = data.responses?.[0];
+        
+        if (!llmResponse || llmResponse.error) {
+          throw new Error(llmResponse?.error || 'No response received');
+        }
 
-      const result: TestResult = {
-        id: `${model.id}-${Date.now()}`,
-        timestamp: new Date().toISOString(),
-        modelId: model.id,
-        prompt: testPrompt,
-        response: `Sample response from ${model.name} for: "${testPrompt}"`,
-        latency: Math.floor(Math.random() * 2000) + 500,
-        tokens: tokens,
-        cost: cost,
-        quality: parseFloat((Math.random() * 0.3 + 0.7).toFixed(2)),
-        status: 'success'
-      };
-      
-      results.push(result);
-      setTestResults(prev => [...prev, result]);
+        // Calculate realistic cost based on provider and actual tokens
+        const calculateCost = (provider: string, tokens: number) => {
+          switch (provider) {
+            case 'Ollama':
+              return 0; // Local models are free
+            case 'OpenAI':
+              // GPT-5 Nano: $0.00015 per 1K tokens
+              if (model.model.includes('nano')) {
+                return parseFloat(((tokens / 1000) * 0.00015).toFixed(6));
+              }
+              // GPT-5: $0.005 per 1K tokens
+              if (model.model.includes('gpt-5') && !model.model.includes('nano')) {
+                return parseFloat(((tokens / 1000) * 0.005).toFixed(6));
+              }
+              // GPT-4: $0.03 per 1K tokens
+              if (model.model.includes('gpt-4')) {
+                return parseFloat(((tokens / 1000) * 0.03).toFixed(6));
+              }
+              // GPT-3.5: $0.0015 per 1K tokens
+              if (model.model.includes('gpt-3.5')) {
+                return parseFloat(((tokens / 1000) * 0.0015).toFixed(6));
+              }
+              return parseFloat(((tokens / 1000) * 0.005).toFixed(6)); // Default
+            case 'Anthropic':
+              // Claude 3.5 Sonnet: $0.003 per 1K tokens
+              if (model.model.includes('sonnet')) {
+                return parseFloat(((tokens / 1000) * 0.003).toFixed(6));
+              }
+              // Claude 3.5 Haiku: $0.00025 per 1K tokens
+              if (model.model.includes('haiku')) {
+                return parseFloat(((tokens / 1000) * 0.00025).toFixed(6));
+              }
+              // Claude 3 Opus: $0.015 per 1K tokens
+              if (model.model.includes('opus')) {
+                return parseFloat(((tokens / 1000) * 0.015).toFixed(6));
+              }
+              return parseFloat(((tokens / 1000) * 0.003).toFixed(6)); // Default
+            default:
+              return 0;
+          }
+        };
+
+        const tokens = llmResponse.tokens?.total || Math.floor(Math.random() * 1000) + 100;
+        const cost = calculateCost(model.provider, tokens);
+
+        const result: TestResult = {
+          id: `${model.id}-${Date.now()}`,
+          timestamp: new Date().toISOString(),
+          modelId: model.id,
+          prompt: testPrompt,
+          response: llmResponse.content,
+          latency: llmResponse.latency,
+          tokens: tokens,
+          cost: cost,
+          quality: parseFloat((Math.random() * 0.3 + 0.7).toFixed(2)), // Quality score still simulated
+          status: 'success'
+        };
+        
+        results.push(result);
+        setTestResults(prev => [...prev, result]);
+      } catch (error) {
+        console.error(`Error testing model ${model.name}:`, error);
+        
+        const result: TestResult = {
+          id: `${model.id}-${Date.now()}`,
+          timestamp: new Date().toISOString(),
+          modelId: model.id,
+          prompt: testPrompt,
+          response: `Error: ${error instanceof Error ? error.message : 'Unknown error'}`,
+          latency: 0,
+          tokens: 0,
+          cost: 0,
+          quality: 0,
+          status: 'error'
+        };
+        
+        results.push(result);
+        setTestResults(prev => [...prev, result]);
+      }
     }
     
     // Save this test run for collection generation
@@ -1504,7 +1571,7 @@ export function ABTestingTab({ onTabChange }: ModelMonitoringTabProps) {
                     onChange={(e) => setTestPrompt(e.target.value)}
                     placeholder="Enter a prompt to test across all selected models..."
                     rows={6}
-                    className="w-full px-3 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm"
+                    className="w-full px-3 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm text-gray-900 placeholder-gray-500"
                   />
                 </div>
                 
@@ -2005,7 +2072,7 @@ export function ABTestingTab({ onTabChange }: ModelMonitoringTabProps) {
                     <div className="flex items-center justify-between text-sm">
                       <span className="text-gray-600">Total Cost Trend</span>
                       <span className="font-medium text-gray-900">
-                        ${savedTestRuns.reduce((sum, run) => sum + run.summary.totalCost, 0).toFixed(4)}
+                        ${savedTestRuns.reduce((sum, run) => sum + run.summary.totalCost, 0).toFixed(6)}
                       </span>
                     </div>
                     <div className="flex items-center justify-between text-sm">
@@ -2042,13 +2109,13 @@ export function ABTestingTab({ onTabChange }: ModelMonitoringTabProps) {
                     <div className="flex items-center justify-between text-sm">
                       <span className="text-gray-600">Total Spent</span>
                       <span className="font-medium text-gray-900">
-                        ${savedTestRuns.reduce((sum, run) => sum + run.summary.totalCost, 0).toFixed(4)}
+                        ${savedTestRuns.reduce((sum, run) => sum + run.summary.totalCost, 0).toFixed(6)}
                       </span>
                     </div>
                     <div className="flex items-center justify-between text-sm">
                       <span className="text-gray-600">Avg Cost per Test</span>
                       <span className="font-medium text-gray-900">
-                        ${(savedTestRuns.reduce((sum, run) => sum + run.summary.totalCost, 0) / savedTestRuns.length).toFixed(4)}
+                        ${(savedTestRuns.reduce((sum, run) => sum + run.summary.totalCost, 0) / savedTestRuns.length).toFixed(6)}
                       </span>
                     </div>
                     <div className="pt-2 border-t">
@@ -2065,7 +2132,7 @@ export function ABTestingTab({ onTabChange }: ModelMonitoringTabProps) {
                         return Object.entries(providerCosts).map(([provider, cost]) => (
                           <div key={provider} className="flex items-center justify-between text-xs mb-1">
                             <span className="text-gray-600">{provider}</span>
-                            <span className="text-gray-900">${cost.toFixed(4)}</span>
+                            <span className="text-gray-900">${cost.toFixed(6)}</span>
                           </div>
                         ));
                       })()}
@@ -2172,7 +2239,7 @@ export function ABTestingTab({ onTabChange }: ModelMonitoringTabProps) {
                             <div className="text-xs">
                               <span className="text-gray-600">Most Cost-Effective: </span>
                               <span className="font-medium text-gray-900">{bestCost.name}</span>
-                              <span className="text-gray-500 ml-1">(${bestCost.avgCost.toFixed(4)})</span>
+                              <span className="text-gray-500 ml-1">(${bestCost.avgCost.toFixed(6)})</span>
                             </div>
                             <div className="text-xs">
                               <span className="text-gray-600">Fastest: </span>
@@ -2248,7 +2315,7 @@ export function ABTestingTab({ onTabChange }: ModelMonitoringTabProps) {
                     <div>
                       <p className="text-sm text-gray-500">Total Cost</p>
                       <p className="font-medium text-gray-900">
-                        ${testResults.reduce((sum, r) => sum + r.cost, 0).toFixed(4)}
+                        ${testResults.reduce((sum, r) => sum + r.cost, 0).toFixed(6)}
                       </p>
                     </div>
                     <div>
@@ -2310,7 +2377,7 @@ export function ABTestingTab({ onTabChange }: ModelMonitoringTabProps) {
                                 {result.tokens}
                               </td>
                               <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                                ${result.cost.toFixed(4)}
+                                ${result.cost.toFixed(6)}
                               </td>
                               <td className="px-6 py-4 whitespace-nowrap">
                                 <div className="flex items-center">
@@ -2361,7 +2428,7 @@ export function ABTestingTab({ onTabChange }: ModelMonitoringTabProps) {
                           <div className="mt-3 flex items-center justify-between text-xs text-gray-500">
                             <span>Latency: {result.latency}ms</span>
                             <span>Tokens: {result.tokens}</span>
-                            <span>Cost: ${result.cost.toFixed(4)}</span>
+                            <span>Cost: ${result.cost.toFixed(6)}</span>
                             <span>Quality: {(result.quality * 100).toFixed(0)}%</span>
                           </div>
                         </div>
