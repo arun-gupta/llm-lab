@@ -385,7 +385,6 @@ export function GraphPreview({ graphData }: GraphPreviewProps) {
     }));
     
     setZoom(newZoom);
-    console.log('Zoom changed:', { zoom: newZoom, pan: { x: mouseX - (mouseX - pan.x) * zoomFactor, y: mouseY - (mouseY - pan.y) * zoomFactor } });
   };
 
   // Initialize and start animation
@@ -524,29 +523,56 @@ export function GraphPreview({ graphData }: GraphPreviewProps) {
         />
         
         {/* Zoom controls */}
-        <div className="absolute top-2 right-2 flex space-x-2">
-          <button
-            onClick={() => {
-              setZoom(1);
-              setPan({ x: 0, y: 0 });
-            }}
-            className="px-2 py-1 bg-white border border-gray-200 rounded text-xs hover:bg-gray-50"
-            title="Reset zoom"
-          >
-            🔍
-          </button>
-          <button
-            onClick={() => {
-              // Reinitialize positions to center the graph
-              initializePositions();
-              setZoom(1);
-              setPan({ x: 0, y: 0 });
-            }}
-            className="px-2 py-1 bg-white border border-gray-200 rounded text-xs hover:bg-gray-50"
-            title="Center graph"
-          >
-            🎯
-          </button>
+        <div className="absolute top-2 right-2 flex flex-col space-y-1">
+          <div className="flex space-x-2">
+            <button
+              onClick={() => {
+                // Zoom in
+                setZoom(prev => Math.min(3, prev * 1.2));
+              }}
+              className="px-2 py-1 bg-white border border-gray-200 rounded text-xs hover:bg-gray-50"
+              title="Zoom in"
+            >
+              🔍+
+            </button>
+            <button
+              onClick={() => {
+                // Zoom out
+                setZoom(prev => Math.max(0.5, prev * 0.8));
+              }}
+              className="px-2 py-1 bg-white border border-gray-200 rounded text-xs hover:bg-gray-50"
+              title="Zoom out"
+            >
+              🔍-
+            </button>
+            <button
+              onClick={() => {
+                // Reset zoom and pan
+                setZoom(1);
+                setPan({ x: 0, y: 0 });
+              }}
+              className="px-2 py-1 bg-white border border-gray-200 rounded text-xs hover:bg-gray-50"
+              title="Reset view"
+            >
+              🔄
+            </button>
+            <button
+              onClick={() => {
+                // Reinitialize positions to center the graph
+                initializePositions();
+                setZoom(1);
+                setPan({ x: 0, y: 0 });
+              }}
+              className="px-2 py-1 bg-white border border-gray-200 rounded text-xs hover:bg-gray-50"
+              title="Center graph"
+            >
+              🎯
+            </button>
+          </div>
+          <div className="text-xs text-gray-600 bg-white px-2 py-1 rounded border border-gray-200 text-center">
+            {Math.round(zoom * 100)}%
+          </div>
+        </div>
         </div>
         
         {selectedNode && (
