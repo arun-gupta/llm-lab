@@ -29,7 +29,7 @@ export function HomeTab({ onTabChange, apiKeyStatus }: HomeTabProps) {
       color: 'bg-purple-500 hover:bg-purple-600'
     },
     {
-      title: 'Model Monitoring',
+              title: 'A/B Testing',
       description: 'A/B testing, response comparison, and performance monitoring for LLM models',
       icon: Activity,
       action: () => onTabChange('monitoring'),

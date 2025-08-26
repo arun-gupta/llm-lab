@@ -31,7 +31,7 @@ const tabs = [
   },
   {
     id: 'monitoring' as TabType,
-    label: 'Model Monitoring',
+    label: 'A/B Testing',
     icon: Activity,
     description: 'A/B testing and performance monitoring for LLM models'
   },

@@ -6,7 +6,7 @@ import { HomeTab } from '@/components/tabs/HomeTab';
 
 import { GraphRAGTab } from '@/components/tabs/GraphRAGTab';
 import { MCPTab } from '@/components/tabs/MCPTab';
-import { ModelMonitoringTab } from '@/components/tabs/ModelMonitoringTab';
+import { ABTestingTab } from '@/components/tabs/ModelMonitoringTab';
 
 
 import { SettingsTab } from '@/components/tabs/SettingsTab';
@@ -107,7 +107,7 @@ export default function Home() {
         )}
 
         {activeTab === 'monitoring' && (
-          <ModelMonitoringTab />
+          <ABTestingTab />
         )}
 
         {activeTab === 'settings' && (

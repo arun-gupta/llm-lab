@@ -21,7 +21,7 @@ import {
 } from 'lucide-react';
 import { SuccessCelebration } from '../SuccessCelebration';
 
-interface ModelMonitoringTabProps {
+interface ABTestingTabProps {
   onTabChange?: (tab: string) => void;
 }
 
@@ -48,7 +48,7 @@ interface TestResult {
   status: 'success' | 'error' | 'timeout';
 }
 
-export function ModelMonitoringTab({ onTabChange }: ModelMonitoringTabProps) {
+export function ABTestingTab({ onTabChange }: ModelMonitoringTabProps) {
   const [activeTab, setActiveTab] = useState<'ab-testing' | 'monitoring' | 'results'>('ab-testing');
   const [importStatus, setImportStatus] = useState<'idle' | 'importing' | 'success' | 'error'>('idle');
   const [showSuccessCelebration, setShowSuccessCelebration] = useState(false);
@@ -1110,9 +1110,9 @@ export function ModelMonitoringTab({ onTabChange }: ModelMonitoringTabProps) {
       <div className="mb-8">
         <div className="flex items-center justify-between">
           <div>
-            <h1 className="text-3xl font-bold text-gray-900 mb-2">Model Monitoring</h1>
+            <h1 className="text-3xl font-bold text-gray-900 mb-2">A/B Testing</h1>
             <p className="text-gray-600">
-              A/B testing and performance monitoring for LLM models with comprehensive analytics
+              Compare LLM models with comprehensive testing, analysis, and recommendations
             </p>
           </div>
           <div className="flex items-center space-x-3">
@@ -1122,7 +1122,7 @@ export function ModelMonitoringTab({ onTabChange }: ModelMonitoringTabProps) {
               className="flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed"
             >
               <img src="/postman-logo.svg" alt="Postman" className="w-4 h-4 mr-2" />
-              {importStatus === 'importing' ? 'Importing...' : 'Add Model Monitoring Collection'}
+              {importStatus === 'importing' ? 'Importing...' : 'Add A/B Testing Collection'}
             </button>
           </div>
         </div>
