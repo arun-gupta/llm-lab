@@ -49,7 +49,7 @@ interface TestResult {
 }
 
 export function ModelMonitoringTab({ onTabChange }: ModelMonitoringTabProps) {
-  const [activeTab, setActiveTab] = useState<'ab-testing' | 'monitoring'>('ab-testing');
+  const [activeTab, setActiveTab] = useState<'ab-testing' | 'monitoring' | 'results'>('ab-testing');
   const [importStatus, setImportStatus] = useState<'idle' | 'importing' | 'success' | 'error'>('idle');
   const [showSuccessCelebration, setShowSuccessCelebration] = useState(false);
   const [celebrationType, setCelebrationType] = useState<'collection-created' | 'api-key-setup' | 'first-response' | 'postman-connected'>('collection-created');
@@ -1020,6 +1020,9 @@ export function ModelMonitoringTab({ onTabChange }: ModelMonitoringTabProps) {
     
     setSavedTestRuns(prev => [...prev, testRun]);
     setIsRunningTest(false);
+    
+    // Automatically switch to results tab to show the new results
+    setActiveTab('results');
   };
 
   const runResponseComparison = async () => {
@@ -1150,6 +1153,17 @@ export function ModelMonitoringTab({ onTabChange }: ModelMonitoringTabProps) {
           >
             <BarChart3 className="w-4 h-4" />
             <span>Performance & Analytics</span>
+          </button>
+          <button
+            onClick={() => setActiveTab('results')}
+            className={`flex items-center space-x-2 py-2 px-1 border-b-2 font-medium text-sm transition-colors ${
+              activeTab === 'results'
+                ? 'border-blue-500 text-blue-600'
+                : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+            }`}
+          >
+            <FileText className="w-4 h-4" />
+            <span>Results</span>
           </button>
         </nav>
       </div>
@@ -2038,6 +2052,185 @@ export function ModelMonitoringTab({ onTabChange }: ModelMonitoringTabProps) {
                 <div className="text-xs text-gray-500 mt-2">🚧 Coming Soon</div>
               </div>
             </div>
+          </div>
+        </div>
+      )}
+
+      {/* Results Tab */}
+      {activeTab === 'results' && (
+        <div className="space-y-6">
+          {/* Results Header */}
+          <div className="bg-white rounded-lg border shadow-sm p-6">
+            <div className="flex items-center justify-between mb-4">
+              <div>
+                <h3 className="text-lg font-semibold text-gray-900">Latest Test Results</h3>
+                <p className="text-gray-600 mt-1">View and analyze results from your most recent A/B test run</p>
+              </div>
+              {testResults.length > 0 && (
+                <div className="flex items-center space-x-2">
+                  <div className="w-2 h-2 bg-green-500 rounded-full"></div>
+                  <span className="text-sm text-green-600 font-medium">
+                    {testResults.length} model(s) tested
+                  </span>
+                </div>
+              )}
+            </div>
+            
+            {testResults.length === 0 ? (
+              <div className="text-center py-12">
+                <FileText className="w-12 h-12 text-gray-400 mx-auto mb-4" />
+                <h4 className="text-lg font-medium text-gray-900 mb-2">No Test Results Yet</h4>
+                <p className="text-gray-600 mb-4">Run an A/B test to see results here</p>
+                <button
+                  onClick={() => setActiveTab('ab-testing')}
+                  className="inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+                >
+                  <Play className="w-4 h-4 mr-2" />
+                  Run A/B Test
+                </button>
+              </div>
+            ) : (
+              <div className="space-y-6">
+                {/* Test Summary */}
+                <div className="bg-gray-50 rounded-lg p-4">
+                  <h4 className="font-medium text-gray-900 mb-3">Test Summary</h4>
+                  <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                    <div>
+                      <p className="text-sm text-gray-500">Prompt</p>
+                      <p className="font-medium text-gray-900 truncate" title={testPrompt}>
+                        {testPrompt || 'No prompt specified'}
+                      </p>
+                    </div>
+                    <div>
+                      <p className="text-sm text-gray-500">Models Tested</p>
+                      <p className="font-medium text-gray-900">{testResults.length}</p>
+                    </div>
+                    <div>
+                      <p className="text-sm text-gray-500">Total Cost</p>
+                      <p className="font-medium text-gray-900">
+                        ${testResults.reduce((sum, r) => sum + r.cost, 0).toFixed(4)}
+                      </p>
+                    </div>
+                    <div>
+                      <p className="text-sm text-gray-500">Avg Latency</p>
+                      <p className="font-medium text-gray-900">
+                        {Math.round(testResults.reduce((sum, r) => sum + r.latency, 0) / testResults.length)}ms
+                      </p>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Results Table */}
+                <div className="bg-white rounded-lg border shadow-sm overflow-hidden">
+                  <div className="px-6 py-4 border-b">
+                    <h4 className="font-medium text-gray-900">Model Performance Comparison</h4>
+                  </div>
+                  <div className="overflow-x-auto">
+                    <table className="min-w-full divide-y divide-gray-200">
+                      <thead className="bg-gray-50">
+                        <tr>
+                          <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                            Model
+                          </th>
+                          <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                            Latency
+                          </th>
+                          <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                            Tokens
+                          </th>
+                          <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                            Cost
+                          </th>
+                          <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                            Quality
+                          </th>
+                          <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                            Response
+                          </th>
+                        </tr>
+                      </thead>
+                      <tbody className="bg-white divide-y divide-gray-200">
+                        {testResults.map((result) => {
+                          const model = models.find(m => m.id === result.modelId);
+                          return (
+                            <tr key={result.id} className="hover:bg-gray-50">
+                              <td className="px-6 py-4 whitespace-nowrap">
+                                <div className="flex items-center">
+                                  <div className={`w-3 h-3 rounded-full bg-${model?.color || 'gray'}-500 mr-3`}></div>
+                                  <div>
+                                    <div className="text-sm font-medium text-gray-900">{model?.name || result.modelId}</div>
+                                    <div className="text-sm text-gray-500">{model?.provider || 'Unknown'}</div>
+                                  </div>
+                                </div>
+                              </td>
+                              <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                                {result.latency}ms
+                              </td>
+                              <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                                {result.tokens}
+                              </td>
+                              <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                                ${result.cost.toFixed(4)}
+                              </td>
+                              <td className="px-6 py-4 whitespace-nowrap">
+                                <div className="flex items-center">
+                                  <div className="w-16 bg-gray-200 rounded-full h-2 mr-2">
+                                    <div 
+                                      className="bg-blue-600 h-2 rounded-full" 
+                                      style={{ width: `${result.quality * 100}%` }}
+                                    ></div>
+                                  </div>
+                                  <span className="text-sm text-gray-900">{(result.quality * 100).toFixed(0)}%</span>
+                                </div>
+                              </td>
+                              <td className="px-6 py-4 text-sm text-gray-900">
+                                <div className="max-w-xs truncate" title={result.response}>
+                                  {result.response}
+                                </div>
+                              </td>
+                            </tr>
+                          );
+                        })}
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+
+                {/* Detailed Responses */}
+                <div className="bg-white rounded-lg border shadow-sm">
+                  <div className="px-6 py-4 border-b">
+                    <h4 className="font-medium text-gray-900">Detailed Responses</h4>
+                  </div>
+                  <div className="p-6 space-y-4">
+                    {testResults.map((result) => {
+                      const model = models.find(m => m.id === result.modelId);
+                      return (
+                        <div key={result.id} className="border rounded-lg p-4">
+                          <div className="flex items-center justify-between mb-3">
+                            <div className="flex items-center">
+                              <div className={`w-3 h-3 rounded-full bg-${model?.color || 'gray'}-500 mr-2`}></div>
+                              <h5 className="font-medium text-gray-900">{model?.name || result.modelId}</h5>
+                            </div>
+                            <div className="text-sm text-gray-500">
+                              {new Date(result.timestamp).toLocaleTimeString()}
+                            </div>
+                          </div>
+                          <div className="bg-gray-50 rounded-lg p-3">
+                            <p className="text-sm text-gray-700 whitespace-pre-wrap">{result.response}</p>
+                          </div>
+                          <div className="mt-3 flex items-center justify-between text-xs text-gray-500">
+                            <span>Latency: {result.latency}ms</span>
+                            <span>Tokens: {result.tokens}</span>
+                            <span>Cost: ${result.cost.toFixed(4)}</span>
+                            <span>Quality: {(result.quality * 100).toFixed(0)}%</span>
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
+              </div>
+            )}
           </div>
         </div>
       )}
