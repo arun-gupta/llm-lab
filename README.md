@@ -60,6 +60,7 @@ A comprehensive **Postman-focused platform** that combines **A/B testing for LLM
 
 **✅ Recently Added:**
 - **ArangoDB Integration**: Native graph database for scalable knowledge graph storage
+- **Migration Process**: One-time migration script for existing JSON graphs (run manually)
 
 **📊 Graph Visualization:**
 - **D3.js**: Currently implemented with force-directed layouts, zoom, pan, and interactive features
@@ -111,9 +112,19 @@ npm run dev
 ./setup-mcp-servers.sh
 ```
 
-### **Option 2: Docker Deployment**
+### **Migration from JSON to ArangoDB (One-time)**
 
-**Using Docker Compose (Recommended for Production):**
+If you have existing JSON graph files in `data/graphs/`, you can migrate them to ArangoDB:
+
+```bash
+# Run the migration script (one-time only)
+./scripts/migrate-to-arangodb.sh
+
+# Check migration status
+./scripts/check-migration-status.sh
+```
+
+### **Option 2: Docker Deployment**
 ```bash
 # Clone the repository
 git clone https://github.com/arun-gupta/postman-labs.git

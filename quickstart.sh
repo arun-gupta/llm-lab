@@ -133,25 +133,8 @@ else
     echo "✅ ArangoDB is already running"
 fi
 
-# Migrate existing JSON graphs to ArangoDB if they exist (one-time only)
-if [ -d "data/graphs" ] && [ "$(ls -A data/graphs/*.json 2>/dev/null)" ] && [ ! -f ".arangodb-migrated" ]; then
-    echo "🔄 Checking for existing JSON graphs to migrate..."
-    JSON_GRAPH_COUNT=$(find data/graphs -name "*.json" | wc -l)
-    if [ $JSON_GRAPH_COUNT -gt 0 ]; then
-        echo "📊 Found $JSON_GRAPH_COUNT JSON graphs to migrate to ArangoDB"
-        echo "🔄 Running one-time migration..."
-        if ./scripts/migrate-to-arangodb.sh; then
-            echo "✅ Migration completed successfully"
-            touch .arangodb-migrated
-        else
-            echo "❌ Migration failed - will retry on next startup"
-        fi
-    fi
-elif [ -f ".arangodb-migrated" ]; then
-    echo "✅ ArangoDB migration already completed"
-else
-    echo "✅ No existing JSON graphs found - ready to use ArangoDB"
-fi
+# Migration is now a separate manual process - not part of quickstart
+# To migrate existing JSON graphs to ArangoDB, run: ./scripts/migrate-to-arangodb.sh
 
 echo "🚀 Starting servers..."
 echo "📋 Ports: Next.js:$NEXTJS_PORT | gRPC:$GRPC_SERVER_PORT | MCP:$MCP_FILESYSTEM_PORT | ArangoDB:8529"
