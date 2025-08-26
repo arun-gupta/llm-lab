@@ -20,6 +20,7 @@ import {
   FileText
 } from 'lucide-react';
 import { SuccessCelebration } from '../SuccessCelebration';
+import { factChecker, FactCheckResult } from '../../lib/fact-checker';
 import {
   Chart as ChartJS,
   CategoryScale,
@@ -86,6 +87,8 @@ interface TestResult {
   bias?: number; // 0-1 score (lower is better)
   // Significance testing
   confidence?: number; // statistical confidence in differences
+  // Fact checking results
+  factCheckResult?: FactCheckResult;
 }
 
 export function ABTestingTab({ onTabChange }: ModelMonitoringTabProps) {
@@ -257,23 +260,7 @@ export function ABTestingTab({ onTabChange }: ModelMonitoringTabProps) {
   const [testResults, setTestResults] = useState<TestResult[]>([]);
   const [savedTestRuns, setSavedTestRuns] = useState<any[]>([]);
 
-  // Utility functions for advanced metrics
-  const calculateAccuracy = (response: string, prompt: string): number => {
-    // Simple heuristic-based accuracy scoring
-    // In a real implementation, this would use fact-checking APIs or reference data
-    const hasNumbers = /\d+/.test(response);
-    const hasCitations = /\[|\]|\(|\)|http|www/.test(response);
-    const hasConfidence = /i think|probably|maybe|uncertain|not sure/i.test(response);
-    const hasDefinitive = /definitely|certainly|clearly|obviously/i.test(response);
-    
-    let score = 0.5; // Base score
-    if (hasNumbers) score += 0.1;
-    if (hasCitations) score += 0.2;
-    if (hasConfidence) score += 0.1; // Shows awareness of uncertainty
-    if (hasDefinitive && !hasConfidence) score -= 0.1; // Overconfident without evidence
-    
-    return Math.max(0, Math.min(1, score));
-  };
+
 
   const calculateCoherence = (response: string): number => {
     // Simple coherence scoring based on text structure
@@ -1224,7 +1211,8 @@ export function ABTestingTab({ onTabChange }: ModelMonitoringTabProps) {
         const cost = calculateCost(model.provider, tokens);
 
         // Calculate advanced metrics
-        const accuracy = calculateAccuracy(llmResponse.content, testPrompt);
+        const factCheckResult = await factChecker.checkAccuracy(llmResponse.content, testPrompt);
+        const accuracy = factCheckResult.accuracy;
         const coherence = calculateCoherence(llmResponse.content);
         const timeToUseful = calculateTimeToUseful(llmResponse.content);
         const toxicity = calculateToxicity(llmResponse.content);
@@ -1247,7 +1235,8 @@ export function ABTestingTab({ onTabChange }: ModelMonitoringTabProps) {
           timeToUseful,
           toxicity,
           hallucination,
-          bias
+          bias,
+          factCheckResult
         };
         
         results.push(result);
@@ -1300,7 +1289,8 @@ export function ABTestingTab({ onTabChange }: ModelMonitoringTabProps) {
         const mockCost = calculateCost(model.provider, mockTokens);
         
         // Calculate advanced metrics for mock data
-        const accuracy = calculateAccuracy(mockContent, testPrompt);
+        const factCheckResult = await factChecker.checkAccuracy(mockContent, testPrompt);
+        const accuracy = factCheckResult.accuracy;
         const coherence = calculateCoherence(mockContent);
         const timeToUseful = calculateTimeToUseful(mockContent);
         const toxicity = calculateToxicity(mockContent);
@@ -1323,7 +1313,8 @@ export function ABTestingTab({ onTabChange }: ModelMonitoringTabProps) {
           timeToUseful,
           toxicity,
           hallucination,
-          bias
+          bias,
+          factCheckResult
         };
         
         results.push(result);
@@ -2960,9 +2951,70 @@ export function ABTestingTab({ onTabChange }: ModelMonitoringTabProps) {
                           </div>
                         </div>
                         <div className="p-6">
-                          <div className="bg-gray-50 rounded-lg p-4">
+                          <div className="bg-gray-50 rounded-lg p-4 mb-4">
                             <p className="text-gray-700 whitespace-pre-wrap leading-relaxed">{result.response}</p>
                           </div>
+                          
+                          {/* Fact-Checking Details */}
+                          {result.factCheckResult && (
+                            <div className="bg-blue-50 rounded-lg p-4">
+                              <h6 className="font-medium text-blue-900 mb-3">Fact-Checking Analysis</h6>
+                              <div className="grid grid-cols-2 gap-4 text-sm">
+                                <div>
+                                  <span className="text-blue-700 font-medium">Accuracy Score:</span>
+                                  <span className="ml-2 text-blue-900">{(result.factCheckResult.accuracy * 100).toFixed(1)}%</span>
+                                </div>
+                                <div>
+                                  <span className="text-blue-700 font-medium">Confidence:</span>
+                                  <span className="ml-2 text-blue-900">{(result.factCheckResult.confidence * 100).toFixed(1)}%</span>
+                                </div>
+                              </div>
+                              
+                              {result.factCheckResult.verifiedFacts.length > 0 && (
+                                <div className="mt-3">
+                                  <span className="text-blue-700 font-medium text-sm">✅ Verified Facts:</span>
+                                  <ul className="mt-1 space-y-1">
+                                    {result.factCheckResult.verifiedFacts.slice(0, 3).map((fact, index) => (
+                                      <li key={index} className="text-blue-800 text-xs pl-2">• {fact}</li>
+                                    ))}
+                                  </ul>
+                                </div>
+                              )}
+                              
+                              {result.factCheckResult.unverifiedClaims.length > 0 && (
+                                <div className="mt-3">
+                                  <span className="text-blue-700 font-medium text-sm">⚠️ Unverified Claims:</span>
+                                  <ul className="mt-1 space-y-1">
+                                    {result.factCheckResult.unverifiedClaims.slice(0, 3).map((claim, index) => (
+                                      <li key={index} className="text-blue-800 text-xs pl-2">• {claim}</li>
+                                    ))}
+                                  </ul>
+                                </div>
+                              )}
+                              
+                              {result.factCheckResult.contradictions.length > 0 && (
+                                <div className="mt-3">
+                                  <span className="text-blue-700 font-medium text-sm">🚨 Contradictions:</span>
+                                  <ul className="mt-1 space-y-1">
+                                    {result.factCheckResult.contradictions.slice(0, 2).map((contradiction, index) => (
+                                      <li key={index} className="text-blue-800 text-xs pl-2">• {contradiction}</li>
+                                    ))}
+                                  </ul>
+                                </div>
+                              )}
+                              
+                              {result.factCheckResult.issues.length > 0 && (
+                                <div className="mt-3">
+                                  <span className="text-blue-700 font-medium text-sm">📋 Issues:</span>
+                                  <ul className="mt-1 space-y-1">
+                                    {result.factCheckResult.issues.map((issue, index) => (
+                                      <li key={index} className="text-blue-800 text-xs pl-2">• {issue}</li>
+                                    ))}
+                                  </ul>
+                                </div>
+                              )}
+                            </div>
+                          )}
                         </div>
                       </div>
                     );
