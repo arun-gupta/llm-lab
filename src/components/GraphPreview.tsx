@@ -219,15 +219,13 @@ export function GraphPreview({ graphData }: GraphPreviewProps) {
     // Clear canvas
     ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-    // Calculate viewport center
-    const viewportCenterX = canvas.width / 2;
-    const viewportCenterY = canvas.height / 2;
-
-    // Apply zoom and pan with proper viewport transformation
+    // Apply zoom and pan with simplified transformation
     ctx.save();
-    ctx.translate(viewportCenterX, viewportCenterY);
+    ctx.translate(pan.x, pan.y);
     ctx.scale(zoom, zoom);
-    ctx.translate(-viewportCenterX + pan.x, -viewportCenterY + pan.y);
+    
+    // Debug logging
+    console.log('Drawing with zoom:', zoom, 'pan:', pan);
 
     // Draw edges
     graphData.edges.forEach(edge => {
@@ -328,15 +326,13 @@ export function GraphPreview({ graphData }: GraphPreviewProps) {
     if (!canvas) return;
 
     const rect = canvas.getBoundingClientRect();
-    const viewportCenterX = canvas.width / 2;
-    const viewportCenterY = canvas.height / 2;
     
     // Convert mouse position to canvas coordinates, accounting for zoom and pan
     const mouseX = e.clientX - rect.left;
     const mouseY = e.clientY - rect.top;
     
-    const x = (mouseX - viewportCenterX) / zoom + viewportCenterX - pan.x / zoom;
-    const y = (mouseY - viewportCenterY) / zoom + viewportCenterY - pan.y / zoom;
+    const x = (mouseX - pan.x) / zoom;
+    const y = (mouseY - pan.y) / zoom;
 
     // Check for node hover
     let foundHover = false;
@@ -363,15 +359,13 @@ export function GraphPreview({ graphData }: GraphPreviewProps) {
     if (!canvas) return;
 
     const rect = canvas.getBoundingClientRect();
-    const viewportCenterX = canvas.width / 2;
-    const viewportCenterY = canvas.height / 2;
     
     // Convert mouse position to canvas coordinates, accounting for zoom and pan
     const mouseX = e.clientX - rect.left;
     const mouseY = e.clientY - rect.top;
     
-    const x = (mouseX - viewportCenterX) / zoom + viewportCenterX - pan.x / zoom;
-    const y = (mouseY - viewportCenterY) / zoom + viewportCenterY - pan.y / zoom;
+    const x = (mouseX - pan.x) / zoom;
+    const y = (mouseY - pan.y) / zoom;
 
     // Check for node click
     graphData.nodes.forEach(node => {
@@ -398,17 +392,15 @@ export function GraphPreview({ graphData }: GraphPreviewProps) {
     const delta = e.deltaY > 0 ? 0.9 : 1.1;
     const newZoom = Math.max(0.5, Math.min(3, zoom * delta));
     
-    // Zoom towards mouse position with proper coordinate transformation
-    const viewportCenterX = canvas.width / 2;
-    const viewportCenterY = canvas.height / 2;
-    
+    // Simple zoom towards mouse position
     const zoomFactor = newZoom / zoom;
     setPan(prev => ({
-      x: prev.x + (mouseX - viewportCenterX) * (1 - zoomFactor),
-      y: prev.y + (mouseY - viewportCenterY) * (1 - zoomFactor)
+      x: mouseX - (mouseX - prev.x) * zoomFactor,
+      y: mouseY - (mouseY - prev.y) * zoomFactor
     }));
     
     setZoom(newZoom);
+    console.log('Wheel zoom:', { newZoom, zoomFactor, mouseX, mouseY });
   };
 
   // Initialize and start animation
@@ -557,7 +549,9 @@ export function GraphPreview({ graphData }: GraphPreviewProps) {
             <button
               onClick={() => {
                 // Zoom in
-                setZoom(prev => Math.min(3, prev * 1.2));
+                const newZoom = Math.min(3, zoom * 1.2);
+                setZoom(newZoom);
+                console.log('Zoom in button clicked:', { oldZoom: zoom, newZoom });
               }}
               className="px-2 py-1 bg-white border border-gray-200 rounded text-xs hover:bg-gray-50"
               title="Zoom in"
@@ -567,7 +561,9 @@ export function GraphPreview({ graphData }: GraphPreviewProps) {
             <button
               onClick={() => {
                 // Zoom out
-                setZoom(prev => Math.max(0.5, prev * 0.8));
+                const newZoom = Math.max(0.5, zoom * 0.8);
+                setZoom(newZoom);
+                console.log('Zoom out button clicked:', { oldZoom: zoom, newZoom });
               }}
               className="px-2 py-1 bg-white border border-gray-200 rounded text-xs hover:bg-gray-50"
               title="Zoom out"
