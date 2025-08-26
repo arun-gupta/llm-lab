@@ -573,7 +573,6 @@ export function GraphPreview({ graphData }: GraphPreviewProps) {
             {Math.round(zoom * 100)}%
           </div>
         </div>
-        </div>
         
         {selectedNode && (
           <div className="absolute top-2 left-2 bg-white border border-gray-200 rounded-lg p-3 shadow-lg max-w-xs">
