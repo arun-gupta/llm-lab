@@ -1235,13 +1235,10 @@ export function ModelMonitoringTab({ onTabChange }: ModelMonitoringTabProps) {
                         ))}
                       </div>
                     )}
-                    </div>
                   </div>
                 </div>
               </div>
             </div>
-
-
           </div>
 
           {/* Right Panel - Test Configuration */}
