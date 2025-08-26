@@ -40,7 +40,7 @@ const GraphPreviewD3: React.FC<GraphPreviewD3Props> = ({
   height = 600 
 }) => {
   const svgRef = useRef<SVGSVGElement>(null);
-  const [zoom, setZoom] = useState<d3.ZoomBehavior<SVGSVGElement, unknown> | null>(null);
+  const zoomRef = useRef<d3.ZoomBehavior<SVGSVGElement, unknown> | null>(null);
 
   useEffect(() => {
     if (!graphData || !svgRef.current) return;
@@ -59,7 +59,7 @@ const GraphPreviewD3: React.FC<GraphPreviewD3Props> = ({
       });
 
     svg.call(zoomBehavior);
-    setZoom(zoomBehavior);
+    zoomRef.current = zoomBehavior;
 
     // Prepare data for D3
     const nodes = graphData.nodes.map(node => ({
@@ -164,27 +164,30 @@ const GraphPreviewD3: React.FC<GraphPreviewD3Props> = ({
   }, [graphData, width, height]);
 
   const handleResetZoom = () => {
-    if (zoom && svgRef.current) {
-      d3.select(svgRef.current).transition().duration(750).call(
-        zoom.transform as any,
+    if (zoomRef.current && svgRef.current) {
+      const svg = d3.select(svgRef.current);
+      svg.transition().duration(750).call(
+        zoomRef.current.transform as any,
         d3.zoomIdentity
       );
     }
   };
 
   const handleZoomIn = () => {
-    if (zoom && svgRef.current) {
-      d3.select(svgRef.current).transition().duration(300).call(
-        zoom.scaleBy as any,
+    if (zoomRef.current && svgRef.current) {
+      const svg = d3.select(svgRef.current);
+      svg.transition().duration(300).call(
+        zoomRef.current.scaleBy as any,
         1.3
       );
     }
   };
 
   const handleZoomOut = () => {
-    if (zoom && svgRef.current) {
-      d3.select(svgRef.current).transition().duration(300).call(
-        zoom.scaleBy as any,
+    if (zoomRef.current && svgRef.current) {
+      const svg = d3.select(svgRef.current);
+      svg.transition().duration(300).call(
+        zoomRef.current.scaleBy as any,
         1 / 1.3
       );
     }
