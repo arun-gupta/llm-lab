@@ -42,8 +42,8 @@ const { Database } = require('arangojs');
 const ARANGO_CONFIG = {
     url: process.env.ARANGO_URL || 'http://localhost:8529',
     databaseName: process.env.ARANGO_DB_NAME || 'graphrag',
-    username: process.env.ARANGO_USERNAME || 'graphrag_user',
-    password: process.env.ARANGO_PASSWORD || 'graphrag123',
+    username: process.env.ARANGO_USERNAME || 'root',
+    password: process.env.ARANGO_PASSWORD || 'postmanlabs123',
 };
 
 async function initDatabase() {
@@ -185,12 +185,17 @@ EOF
 
 # Run migration
 echo "🚀 Running migration script..."
-node migrate-graphs.js
-
-# Cleanup
-rm -f migrate-graphs.js
-
-echo "✅ Migration completed successfully!"
+if node migrate-graphs.js; then
+    echo "✅ Migration completed successfully!"
+    # Cleanup
+    rm -f migrate-graphs.js
+    exit 0
+else
+    echo "❌ Migration failed!"
+    # Cleanup
+    rm -f migrate-graphs.js
+    exit 1
+fi
 echo ""
 echo "📋 Next steps:"
 echo "   1. Test the new ArangoDB-based GraphRAG functionality"
