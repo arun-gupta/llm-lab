@@ -39,14 +39,28 @@ kill_port() {
         elif [ "$port" = "8529" ] && [ "$DOCKER_AVAILABLE" = false ]; then
             echo "⚠️  Skipping ArangoDB cleanup (Docker not available)"
         else
-            # Check if any of the PIDs are system processes we shouldn't kill
+            # EXTREMELY CONSERVATIVE: Only kill processes we're 100% sure are safe
             local safe_to_kill=true
             for pid in $pids; do
-                # Get process name
+                # Get process name and full command
                 local process_name=$(ps -p $pid -o comm= 2>/dev/null || echo "")
-                # Skip system processes
-                if [[ "$process_name" == "com.docker.backend" ]] || [[ "$process_name" == "Docker" ]] || [[ "$process_name" == "docker" ]] || [[ "$process_name" == "com.docke" ]] || [[ "$process_name" =~ ^com\.docker ]]; then
-                    echo "⚠️  Skipping system process $process_name (PID: $pid) on port $port"
+                local full_command=$(ps -p $pid -o command= 2>/dev/null || echo "")
+                
+                # Skip ANY process that might be Docker-related
+                if [[ "$process_name" == "com.docker.backend" ]] || 
+                   [[ "$process_name" == "Docker" ]] || 
+                   [[ "$process_name" == "docker" ]] || 
+                   [[ "$process_name" == "com.docke" ]] || 
+                   [[ "$process_name" =~ ^com\.docker ]] ||
+                   [[ "$full_command" =~ docker ]] ||
+                   [[ "$full_command" =~ Docker ]]; then
+                    echo "⚠️  Skipping Docker-related process $process_name (PID: $pid) on port $port"
+                    safe_to_kill=false
+                fi
+                
+                # Skip any process with "docker" in the command line
+                if [[ "$full_command" =~ docker ]] || [[ "$full_command" =~ Docker ]]; then
+                    echo "⚠️  Skipping process with Docker in command: $process_name (PID: $pid)"
                     safe_to_kill=false
                 fi
             done
@@ -56,7 +70,7 @@ kill_port() {
                 echo "$pids" | xargs kill -9 2>/dev/null || true
                 echo "✅ Killed process(es) on port $port"
             else
-                echo "⚠️  Skipping port $port due to system processes"
+                echo "⚠️  Skipping port $port due to Docker/system processes"
             fi
         fi
     else

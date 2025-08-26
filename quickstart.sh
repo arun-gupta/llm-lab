@@ -29,11 +29,11 @@ export HTTP_PORT=$GRPC_HTTP_PORT
 
 echo "🚀 Setting up Postman Protocol Playground..."
 
-# Kill any processes running on required ports
-echo "🔫 Checking for conflicting processes..."
-if [ -f "scripts/kill-ports.sh" ]; then
-    bash scripts/kill-ports.sh
-fi
+# Kill any processes running on required ports (DISABLED - too dangerous)
+echo "⚠️  Port cleanup disabled to prevent Docker daemon issues"
+# if [ -f "scripts/kill-ports.sh" ]; then
+#     bash scripts/kill-ports.sh
+# fi
 echo ""
 
 # Check if Node.js is installed
@@ -103,7 +103,30 @@ fi
 echo "🗄️ Checking ArangoDB..."
 if ! curl -s http://localhost:8529/_api/version > /dev/null 2>&1; then
     echo "📦 Starting ArangoDB..."
-    docker-compose -f docker-compose.arangodb.yml up -d
+    
+    # Check if Docker is ready
+    if ! docker info > /dev/null 2>&1; then
+        echo "⏳ Waiting for Docker to be ready..."
+        for i in {1..30}; do
+            if docker info > /dev/null 2>&1; then
+                echo "✅ Docker is ready"
+                break
+            fi
+            sleep 2
+        done
+    fi
+    
+    # Try to start ArangoDB with retries
+    for attempt in {1..3}; do
+        if docker-compose -f docker-compose.arangodb.yml up -d; then
+            echo "✅ ArangoDB started successfully"
+            break
+        else
+            echo "⚠️  Attempt $attempt failed, retrying..."
+            sleep 5
+        fi
+    done
+    
     echo "⏳ Waiting for ArangoDB to be ready..."
     sleep 10
 else
