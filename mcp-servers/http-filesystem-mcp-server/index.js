@@ -31,7 +31,7 @@ app.use(cors());
 app.use(express.json());
 
 // MCP server binary path
-const MCP_SERVER_PATH = path.join(__dirname, '../official-mcp-servers/src/filesystem/dist/index.js');
+const MCP_SERVER_PATH = path.join(process.env.HOME, '.mcp-servers/official-mcp-servers/src/filesystem/dist/index.js');
 
 // Configuration file path
 const CONFIG_PATH = path.join(__dirname, '../filesystem-mcp-config.env');
