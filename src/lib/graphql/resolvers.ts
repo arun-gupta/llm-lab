@@ -32,57 +32,7 @@ async function arangoRequest(endpoint: string, method: string = 'GET', body?: an
 const graphCache = new Map();
 const documentCache = new Map();
 
-// Helper function to get graph data from ArangoDB
-async function getGraphData(graphId: string) {
-  if (graphCache.has(graphId)) {
-    return graphCache.get(graphId);
-  }
 
-  try {
-    // Get graph metadata from ArangoDB using REST API
-    const graphResponse = await arangoRequest(`/_api/document/graphs/${graphId}`);
-    if (!graphResponse) {
-      throw new Error(`Graph not found: ${graphId}`);
-    }
-
-    // Get entities and relationships from ArangoDB using REST API
-    const [entitiesResponse, relationshipsResponse] = await Promise.all([
-      arangoRequest('/_api/cursor', 'POST', {
-        query: `FOR e IN entities FILTER e.graphId == "${graphId}" RETURN e`
-      }),
-      arangoRequest('/_api/cursor', 'POST', {
-        query: `FOR r IN relationships FILTER r.graphId == "${graphId}" RETURN r`
-      })
-    ]);
-
-    const entities = entitiesResponse.result || [];
-    const relationships = relationshipsResponse.result || [];
-
-    // Convert to the expected format
-    const graphData = {
-      nodes: entities.map((entity: any) => ({
-        id: entity._key,
-        label: entity.label,
-        type: entity.type,
-        connections: entity.connections,
-        frequency: entity.frequency,
-      })),
-      edges: relationships.map((rel: any) => ({
-        source: rel._from ? rel._from.split('/')[1] : '',
-        target: rel._to ? rel._to.split('/')[1] : '',
-        relationship: rel.relationship,
-        weight: rel.weight,
-      })),
-      stats: graph.stats,
-    };
-
-    graphCache.set(graphId, graphData);
-    return graphData;
-  } catch (error) {
-    console.error(`Error in getGraphData for graph ${graphId}:`, error);
-    throw new Error(`Graph not found: ${graphId}`);
-  }
-}
 
 // Helper function to get all graphs from ArangoDB
 async function getAllGraphs() {
@@ -208,16 +158,57 @@ export const resolvers = {
 
     // Get specific graph
     graph: async (_: any, { id }: { id: string }) => {
-      const graphData = await getGraphData(id);
-      return {
-        id,
-        name: id,
-        nodes: graphData.nodes || [],
-        edges: graphData.edges || [],
-        stats: calculateGraphStats(graphData.nodes || [], graphData.edges || []),
-        createdAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString()
-      };
+      try {
+        // Get graph metadata from ArangoDB using REST API
+        const graphResponse = await arangoRequest(`/_api/document/graphs/${id}`);
+        if (!graphResponse) {
+          throw new Error(`Graph not found: ${id}`);
+        }
+
+        // Get entities and relationships from ArangoDB using REST API
+        const [entitiesResponse, relationshipsResponse] = await Promise.all([
+          arangoRequest('/_api/cursor', 'POST', {
+            query: `FOR e IN entities FILTER e.graphId == "${id}" RETURN e`
+          }),
+          arangoRequest('/_api/cursor', 'POST', {
+            query: `FOR r IN relationships FILTER r.graphId == "${id}" RETURN r`
+          })
+        ]);
+
+        const entities = entitiesResponse.result || [];
+        const relationships = relationshipsResponse.result || [];
+
+        // Convert to the expected format
+        const nodes = entities.map((entity: any) => ({
+          id: entity._key,
+          label: entity.label,
+          type: entity.type,
+          connections: entity.connections,
+          frequency: entity.frequency,
+        }));
+
+        const edges = relationships.map((rel: any) => ({
+          id: rel._key,
+          source: rel._from ? rel._from.split('/')[1] : '',
+          target: rel._to ? rel._to.split('/')[1] : '',
+          label: rel.relationship,
+          type: rel.relationship,
+          properties: { weight: rel.weight }
+        }));
+
+        return {
+          id,
+          name: id,
+          nodes,
+          edges,
+          stats: graphResponse.stats,
+          createdAt: graphResponse.createdAt,
+          updatedAt: graphResponse.updatedAt
+        };
+      } catch (error) {
+        console.error(`Error getting graph ${id}:`, error);
+        throw new Error(`Graph not found: ${id}`);
+      }
     },
 
     // Get all documents
@@ -232,11 +223,12 @@ export const resolvers = {
     },
 
     // GraphRAG query - main functionality
-    graphRAGQuery: async (_: any, { input }: { input: any }) => {
+    graphRAGQuery: async (_: any, { input }: { input: any }, context: any, info: any) => {
       const { query, graphId, model = 'gpt-5-nano' } = input;
       
       try {
-        const graphData = await getGraphData(graphId);
+        // Use the existing graph resolver to get graph data
+        const graphData = await resolvers.Query.graph(null, { id: graphId });
         
         // Extract relevant context from graph
         const graphContext = extractRelevantContext(query, graphData);
