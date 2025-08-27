@@ -40,11 +40,16 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Verify graph exists (for mock data, we just check if the file exists)
+    // Verify graph exists in ArangoDB
     try {
-      const dataDir = join(process.cwd(), 'data', 'graphs');
-      const graphPath = join(dataDir, `${graphId}.json`);
-      await readFile(graphPath, 'utf-8');
+      const { getGraph } = await import('@/lib/arangodb');
+      const graph = await getGraph(graphId);
+      if (!graph) {
+        return NextResponse.json(
+          { error: `Graph not found: ${graphId}` },
+          { status: 404 }
+        );
+      }
     } catch (error) {
       return NextResponse.json(
         { error: `Graph not found: ${graphId}` },
