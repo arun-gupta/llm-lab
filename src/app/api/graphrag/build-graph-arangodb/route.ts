@@ -90,15 +90,20 @@ export async function POST(request: NextRequest) {
       updatedAt: new Date().toISOString(),
     }));
 
-    // Create entities using REST API
-    const entityResults = await arangoRequest('/_api/document/entities', 'POST', arangoEntities);
-    const entityKeys = entityResults.map((result: any) => result._key);
-    
-    // Create entity ID mapping
+    // Create entities using REST API (one by one)
+    const entityResults = [];
     const entityMap = new Map();
-    graphData.nodes.forEach((node, index) => {
-      entityMap.set(node.id, entityKeys[index]);
-    });
+    
+    for (const entity of arangoEntities) {
+      try {
+        const result = await arangoRequest('/_api/document/entities', 'POST', entity);
+        entityResults.push(result);
+        entityMap.set(entity._key, result._key);
+      } catch (error) {
+        console.error(`Failed to create entity ${entity._key}:`, error);
+        // Continue with other entities
+      }
+    }
 
     // Create relationships in ArangoDB
     const arangoRelationships = graphData.edges.map(edge => ({
@@ -111,8 +116,20 @@ export async function POST(request: NextRequest) {
       createdAt: new Date().toISOString(),
     }));
 
-    // Create relationships using REST API
-    await arangoRequest('/_api/document/relationships', 'POST', arangoRelationships);
+    // Create relationships using REST API (one by one)
+    for (const relationship of arangoRelationships) {
+      try {
+        // Only create relationship if both source and target entities exist
+        if (relationship._from && relationship._to && 
+            !relationship._from.includes('undefined') && 
+            !relationship._to.includes('undefined')) {
+          await arangoRequest('/_api/document/relationships', 'POST', relationship);
+        }
+      } catch (error) {
+        console.error(`Failed to create relationship:`, error);
+        // Continue with other relationships
+      }
+    }
 
     // Create documents in ArangoDB
     for (const file of files) {
