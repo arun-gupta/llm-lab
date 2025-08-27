@@ -44,8 +44,8 @@ async function getGraphData(graphId: string) {
         frequency: entity.frequency,
       })),
       edges: relationships.map((rel: any) => ({
-        source: rel._from.split('/')[1],
-        target: rel._to.split('/')[1],
+        source: rel._from ? rel._from.split('/')[1] : '',
+        target: rel._to ? rel._to.split('/')[1] : '',
         relationship: rel.relationship,
         weight: rel.weight,
       })),
@@ -55,6 +55,7 @@ async function getGraphData(graphId: string) {
     graphCache.set(graphId, graphData);
     return graphData;
   } catch (error) {
+    console.error(`Error in getGraphData for graph ${graphId}:`, error);
     throw new Error(`Graph not found: ${graphId}`);
   }
 }
