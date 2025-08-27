@@ -2369,7 +2369,7 @@ export function GraphRAGTab() {
         {activeTab === 'graphql' && (
           <div>
             {graphData ? (
-              <GraphQLPlayground />
+              <GraphQLPlayground graphData={graphData} />
             ) : (
               <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-6 text-center">
                 <div className="flex items-center justify-center mb-3">

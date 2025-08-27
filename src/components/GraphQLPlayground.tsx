@@ -2,7 +2,11 @@
 import { useState, useEffect } from 'react';
 import { SuccessCelebration } from './SuccessCelebration';
 
-export function GraphQLPlayground() {
+interface GraphQLPlaygroundProps {
+  graphData?: any;
+}
+
+export function GraphQLPlayground({ graphData }: GraphQLPlaygroundProps) {
   const [availableGraphs, setAvailableGraphs] = useState<string[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [importStatus, setImportStatus] = useState<'idle' | 'importing' | 'success' | 'manual' | 'error'>('idle');
@@ -45,27 +49,63 @@ export function GraphQLPlayground() {
   const [query, setQuery] = useState(`# GraphRAG GraphQL Playground
 # Welcome! Try this example query to get started:
 
-query GetAnalytics {
-  analytics {
-    graphStats {
-      totalGraphs
-      totalNodes
-      totalEdges
-      averageNodesPerGraph
-      averageEdgesPerGraph
+query GraphRAGQuery {
+  graphRAGQuery(input: {
+    query: "AI healthcare benefits"
+    graphId: "${graphData?.graphId || 'your-graph-id'}"
+    model: "gpt-5-nano"
+  }) {
+    query
+    model
+    graphRAGResponse
+    traditionalRAGResponse
+    graphContext
+    performance {
+      graphRAGLatency
+      traditionalRAGLatency
+      contextRelevance
     }
-    insights {
-      mostCommonEntities
-      graphDensity
-      connectivityScore
+    analytics {
+      tokens {
+        graphRAG {
+          input
+          output
+          total
+          efficiency
+          cost
+        }
+        traditionalRAG {
+          input
+          output
+          total
+          efficiency
+          cost
+        }
+      }
+      quality {
+        graphRAG {
+          accuracy
+          coherence
+          relevance
+          overall
+        }
+        traditionalRAG {
+          accuracy
+          coherence
+          relevance
+          overall
+        }
+      }
     }
-    timestamp
-    version
   }
 }`);
   
   const [variables, setVariables] = useState(`{
-  "query": "AI"
+  "input": {
+    "query": "AI healthcare benefits",
+    "graphId": "${graphData?.graphId || 'your-graph-id'}",
+    "model": "gpt-5-nano"
+  }
 }`);
   
   const [result, setResult] = useState('');
