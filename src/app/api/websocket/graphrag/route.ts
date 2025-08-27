@@ -24,8 +24,6 @@ export async function POST(request: NextRequest) {
 
     // Generate meaningful responses based on query content
     const queryLower = query.toLowerCase();
-    let response;
-    let streamingData = null;
 
     // Generate contextually relevant responses
     if (queryLower.includes('ai') && queryLower.includes('healthcare')) {
