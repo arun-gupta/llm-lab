@@ -2,14 +2,31 @@ import { readFile, readdir, writeFile, unlink } from 'fs/promises';
 import { join } from 'path';
 import { extractEntities, buildGraph } from '../graphrag';
 import { callOpenAI, callOpenAIStreaming, callAnthropic, callOllama } from '../llm-apis';
-import { 
-  getGraph, 
-  getAllGraphs as getAllArangoGraphs, 
-  getEntitiesByGraph, 
-  getRelationshipsByGraph,
-  getDocumentsByGraph,
-  getGraphStats
-} from '../arangodb';
+// ArangoDB configuration
+const ARANGO_CONFIG = {
+  url: 'http://localhost:8529',
+  databaseName: 'graphrag',
+  username: 'root',
+  password: 'postmanlabs123',
+};
+
+// Helper function to make ArangoDB REST API calls
+async function arangoRequest(endpoint: string, method: string = 'GET', body?: any) {
+  const response = await fetch(`${ARANGO_CONFIG.url}/_db/${ARANGO_CONFIG.databaseName}${endpoint}`, {
+    method,
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': `Basic ${Buffer.from(`${ARANGO_CONFIG.username}:${ARANGO_CONFIG.password}`).toString('base64')}`
+    },
+    body: body ? JSON.stringify(body) : undefined
+  });
+  
+  if (!response.ok) {
+    throw new Error(`ArangoDB request failed: ${response.statusText}`);
+  }
+  
+  return response.json();
+}
 
 // Cache for better performance
 const graphCache = new Map();
@@ -22,17 +39,24 @@ async function getGraphData(graphId: string) {
   }
 
   try {
-    // Get graph metadata from ArangoDB
-    const graph = await getGraph(graphId);
-    if (!graph) {
+    // Get graph metadata from ArangoDB using REST API
+    const graphResponse = await arangoRequest(`/_api/document/graphs/${graphId}`);
+    if (!graphResponse) {
       throw new Error(`Graph not found: ${graphId}`);
     }
 
-    // Get entities and relationships from ArangoDB
-    const [entities, relationships] = await Promise.all([
-      getEntitiesByGraph(graphId),
-      getRelationshipsByGraph(graphId)
+    // Get entities and relationships from ArangoDB using REST API
+    const [entitiesResponse, relationshipsResponse] = await Promise.all([
+      arangoRequest('/_api/cursor', 'POST', {
+        query: `FOR e IN entities FILTER e.graphId == "${graphId}" RETURN e`
+      }),
+      arangoRequest('/_api/cursor', 'POST', {
+        query: `FOR r IN relationships FILTER r.graphId == "${graphId}" RETURN r`
+      })
     ]);
+
+    const entities = entitiesResponse.result || [];
+    const relationships = relationshipsResponse.result || [];
 
     // Convert to the expected format
     const graphData = {
@@ -63,9 +87,13 @@ async function getGraphData(graphId: string) {
 // Helper function to get all graphs from ArangoDB
 async function getAllGraphs() {
   try {
-    const arangoGraphs = await getAllArangoGraphs();
+    const response = await arangoRequest('/_api/cursor', 'POST', {
+      query: 'FOR g IN graphs SORT g.createdAt DESC RETURN g'
+    });
     
+    const arangoGraphs = response.result || [];
     const graphs = [];
+    
     for (const graph of arangoGraphs) {
       try {
         graphs.push({
