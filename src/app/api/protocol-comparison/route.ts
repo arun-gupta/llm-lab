@@ -31,7 +31,7 @@ interface ComparisonResults {
 
 export async function POST(request: NextRequest) {
   try {
-    const { query, graphId, model = 'gpt-5-nano' } = await request.json();
+    const { query, graphId, model = 'gpt-5-mini' } = await request.json();
 
     if (!query || !graphId) {
       return NextResponse.json(

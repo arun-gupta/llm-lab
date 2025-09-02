@@ -181,7 +181,7 @@ export const typeDefs = gql`
   input GraphRAGQueryInput {
     query: String!
     graphId: ID!
-    model: String = "gpt-5-nano"
+    model: String = "gpt-5-mini"
   }
 
   # Document Upload Input

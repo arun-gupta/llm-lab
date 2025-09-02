@@ -224,7 +224,7 @@ export const resolvers = {
 
     // GraphRAG query - main functionality
     graphRAGQuery: async (_: any, { input }: { input: any }, context: any, info: any) => {
-      const { query, graphId, model = 'gpt-5-nano' } = input;
+              const { query, graphId, model = 'gpt-5-mini' } = input;
       
       try {
         // Use the existing graph resolver to get graph data

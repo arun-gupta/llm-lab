@@ -41,7 +41,7 @@ export async function POST(request: NextRequest) {
       query_id: `grpc_${Date.now()}`,
       query,
       graph_id,
-      model: model || 'gpt-5-nano',
+              model: model || 'gpt-5-mini',
       response: `Real gRPC GraphRAG response for: "${query}". This response comes from the actual gRPC server running on port 50051, demonstrating the efficiency of Protocol Buffers and HTTP/2. The query was processed using the knowledge graph with ${relevantNodes.length} relevant entities identified.`,
       context: relevantNodes.map((node: any) => ({
         entity_id: node.id,

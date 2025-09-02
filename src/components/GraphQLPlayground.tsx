@@ -53,7 +53,7 @@ query GraphRAGQuery {
   graphRAGQuery(input: {
     query: "AI healthcare benefits"
     graphId: "${graphData?.graphId || 'your-graph-id'}"
-    model: "gpt-5-nano"
+    model: "gpt-5-mini"
   }) {
     query
     model
@@ -84,16 +84,16 @@ query GraphRAGQuery {
       }
       quality {
         graphRAG {
-          accuracy
-          coherence
-          relevance
-          overall
+          length
+          completeness
+          specificity
+          readability
         }
         traditionalRAG {
-          accuracy
-          coherence
-          relevance
-          overall
+          length
+          completeness
+          specificity
+          readability
         }
       }
     }
@@ -104,7 +104,7 @@ query GraphRAGQuery {
   "input": {
     "query": "AI healthcare benefits",
     "graphId": "${graphData?.graphId || 'your-graph-id'}",
-    "model": "gpt-5-nano"
+    "model": "gpt-5-mini"
   }
 }`);
   

@@ -469,7 +469,7 @@ export async function POST(request: NextRequest) {
                       "input": {
                         "query": "What are the key relationships between AI and healthcare?",
                         "graphId": "graph_1755797167093",
-                        "model": "gpt-5-nano"
+                        "model": "gpt-5-mini"
                       }
                     }
                   }, null, 2)

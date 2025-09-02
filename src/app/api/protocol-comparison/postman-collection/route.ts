@@ -26,7 +26,7 @@ export async function POST(request: NextRequest) {
         },
         {
           key: "model",
-          value: "gpt-5-nano",
+          value: "gpt-5-mini",
           type: "string"
         },
         {
@@ -73,6 +73,52 @@ export async function POST(request: NextRequest) {
                   path: ["api", "protocol-comparison"]
                 },
                 description: "Run the same query across REST, GraphQL, and gRPC to compare performance"
+              },
+              response: []
+            },
+            {
+              name: "Get Comparison Analytics",
+              request: {
+                method: "GET",
+                header: [],
+                url: {
+                  raw: "{{base_url}}/api/protocol-comparison/analytics",
+                  host: ["{{base_url}}"],
+                  path: ["api", "protocol-comparison", "analytics"]
+                },
+                description: "Get aggregated performance analytics across all protocols"
+              },
+              response: []
+            },
+            {
+              name: "Protocol Benchmarks",
+              request: {
+                method: "POST",
+                header: [
+                  {
+                    key: "Content-Type",
+                    value: "application/json"
+                  }
+                ],
+                body: {
+                  mode: "raw",
+                  raw: JSON.stringify({
+                    queries: [
+                      "What are the main entities in this graph?",
+                      "How are healthcare and AI connected?",
+                      "What are the most important relationships?",
+                      "Give me a summary of the knowledge graph."
+                    ],
+                    graphId: "{{graph_id}}",
+                    iterations: 3
+                  }, null, 2)
+                },
+                url: {
+                  raw: "{{base_url}}/api/protocol-comparison/benchmark",
+                  host: ["{{base_url}}"],
+                  path: ["api", "protocol-comparison", "benchmark"]
+                },
+                description: "Run multiple queries across protocols for comprehensive benchmarking"
               },
               response: []
             }
@@ -473,57 +519,7 @@ export async function POST(request: NextRequest) {
             }
           ]
         },
-        {
-          name: "📊 Performance Analytics",
-          item: [
-            {
-              name: "Get Comparison Analytics",
-              request: {
-                method: "GET",
-                header: [],
-                url: {
-                  raw: "{{base_url}}/api/protocol-comparison/analytics",
-                  host: ["{{base_url}}"],
-                  path: ["api", "protocol-comparison", "analytics"]
-                },
-                description: "Get aggregated performance analytics across all protocols"
-              },
-              response: []
-            },
-            {
-              name: "Protocol Benchmarks",
-              request: {
-                method: "POST",
-                header: [
-                  {
-                    key: "Content-Type",
-                    value: "application/json"
-                  }
-                ],
-                body: {
-                  mode: "raw",
-                  raw: JSON.stringify({
-                    queries: [
-                      "What are the main entities in this graph?",
-                      "How are healthcare and AI connected?",
-                      "What are the most important relationships?",
-                      "Give me a summary of the knowledge graph."
-                    ],
-                    graphId: "{{graph_id}}",
-                    iterations: 3
-                  }, null, 2)
-                },
-                url: {
-                  raw: "{{base_url}}/api/protocol-comparison/benchmark",
-                  host: ["{{base_url}}"],
-                  path: ["api", "protocol-comparison", "benchmark"]
-                },
-                description: "Run multiple queries across protocols for comprehensive benchmarking"
-              },
-              response: []
-            }
-          ]
-        }
+
       ],
       event: [
         {

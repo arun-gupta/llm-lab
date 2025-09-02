@@ -6,7 +6,7 @@ import { NextRequest, NextResponse } from 'next/server';
 export async function POST(request: NextRequest) {
   try {
     const { message } = await request.json();
-    const { query, graph_id, model = 'gpt-5-nano', streaming = false } = message || {};
+    const { query, graph_id, model = 'gpt-5-mini', streaming = false } = message || {};
 
     if (!query || !graph_id) {
       return NextResponse.json(
