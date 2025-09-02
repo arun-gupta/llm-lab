@@ -53,6 +53,8 @@ A comprehensive **Postman-focused platform** that combines **A/B testing for LLM
 - **Multi-Protocol Support**: REST, GraphQL, gRPC, gRPC-Web, WebSocket, SSE, and MCP collections
 - **A/B Testing Collections**: Export model comparison results as Postman collections
 - **Automated Testing**: Pre-built test scripts and environment templates
+- **Enhanced Analytics Collections**: Meaningful insights and actionable recommendations
+- **Smart Benchmarking**: Comprehensive protocol performance testing with Postman
 
 **🚧 Coming Soon:**
 - **Vector Database APIs**: Pinecone, Weaviate, Chroma, Qdrant integrations
@@ -61,6 +63,10 @@ A comprehensive **Postman-focused platform** that combines **A/B testing for LLM
 **✅ Recently Added:**
 - **ArangoDB Integration**: Native graph database for scalable knowledge graph storage
 - **Migration Process**: One-time migration script for existing JSON graphs (run manually)
+- **GPT-5 Mini Integration**: Updated default LLM from GPT-5 Nano to GPT-5 Mini for better performance
+- **Meaningful Analytics**: Actionable protocol comparison insights instead of raw JSON data
+- **Smart Recommendations**: AI-powered suggestions for protocol selection based on performance data
+- **Comprehensive Benchmarking**: Multi-query, multi-iteration protocol performance testing
 
 **📊 Graph Visualization:**
 - **D3.js**: Currently implemented with force-directed layouts, zoom, pan, and interactive features
@@ -72,7 +78,20 @@ A comprehensive **Postman-focused platform** that combines **A/B testing for LLM
 - **Health Checks**: Container monitoring and status endpoints
 - **Newman Integration**: Automated Postman collection testing with HTML reports
 
+**📊 Enhanced Analytics & Insights:**
+- **Protocol Performance Analysis**: Detailed breakdown of strengths, weaknesses, and recommendations
+- **Trend Tracking**: Daily and weekly performance metrics with historical analysis
+- **Smart Recommendations**: AI-powered suggestions for protocol selection based on use case
+- **Performance Rankings**: Latency, payload efficiency, and reliability scoring
+- **Alert System**: Proactive notifications for performance issues and optimization opportunities
+- **Use Case Guidance**: Clear recommendations for when to use each protocol
+
 **✅ Recent Improvements:**
+- **GPT-5 Mini Integration**: Updated default LLM for better performance and no truncation
+- **GraphQL Schema Fixes**: Resolved validation errors and field mismatches
+- **Enhanced Analytics**: Meaningful insights instead of raw JSON data
+- **Smart Benchmarking**: Comprehensive protocol performance testing
+- **Postman Collection Reorganization**: Better logical grouping of related endpoints
 - **SSE Streaming**: Meaningful context content instead of generic messages
 - **Protocol Comparison UI**: Previous results clear automatically for better UX
 - **gRPC-Web Integration**: Fixed port conflicts and dependency issues
@@ -450,6 +469,9 @@ For complete API documentation, see our **[📚 API Reference](docs/api-referenc
 - **Postman Integration**: `POST /api/postman/create-collection` - Create collections
 - **GraphRAG**: `POST /api/graphrag/query` - Query knowledge graphs
 - **Protocol Comparison**: `POST /api/protocol-comparison` - Compare protocols
+- **Protocol Analytics**: `GET /api/protocol-comparison/analytics` - Get meaningful insights and recommendations
+- **Protocol Benchmarking**: `POST /api/protocol-comparison/benchmark` - Run comprehensive performance tests
+- **GraphQL**: `POST /api/graphql` - GraphQL endpoint for GraphRAG queries
 - **Ollama Models**: `GET /api/ollama/models` - List local models
 
 
