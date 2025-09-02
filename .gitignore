@@ -44,4 +44,11 @@ yarn-error.log*
 *.tsbuildinfo
 next-env.d.ts
 
+# logs and runtime files
+/logs/
+*.log
+*.pid
+mcp-servers/*.log
+mcp-servers/*.pid
+
 
