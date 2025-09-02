@@ -93,15 +93,20 @@ export async function POST(request: NextRequest) {
 
       switch (op) {
         case 'health_check':
-          mcpToolName = 'health_check';
-          mcpArguments = {};
-          break;
+          // Call the health endpoint directly instead of using MCP tool
+          const healthResponse = await fetch(`${filesystemMCPUrl}/health`);
+          if (healthResponse.ok) {
+            const healthData = await healthResponse.json();
+            return healthData;
+          } else {
+            throw new Error('Health check failed');
+          }
         case 'show_configuration':
-          mcpToolName = 'show_configuration';
+          mcpToolName = 'list_allowed_directories';
           mcpArguments = {};
           break;
         case 'list_available_tools':
-          mcpToolName = 'list_available_tools';
+          mcpToolName = 'list_allowed_directories';
           mcpArguments = {};
           break;
         case 'list_allowed_directories':

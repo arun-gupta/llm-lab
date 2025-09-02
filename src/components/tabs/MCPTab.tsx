@@ -29,8 +29,6 @@ export function MCPTab() {
     ],
     filesystem: [
       "Health Check",
-      "Show Configuration",
-      "List Available Tools",
       "List Allowed Directories",
       "List Directory Contents (/private/tmp)",
       "List Directory Contents (/Users/arungupta/Desktop)",
