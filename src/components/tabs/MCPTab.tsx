@@ -69,6 +69,19 @@ export function MCPTab() {
     }
   }, [deploymentStatus]);
 
+  // Clear query and results when switching MCP types
+  useEffect(() => {
+    setMcpQuery('');
+    setMcpResult(null);
+  }, [activeMCP]);
+
+  // Handle MCP type change
+  const handleMCPChange = (mcpType: 'github' | 'filesystem' | 'sqlite') => {
+    setActiveMCP(mcpType);
+    setMcpQuery('');
+    setMcpResult(null);
+  };
+
   // Execute MCP query and generate collection
   const executeMCPQuery = async (mcpType: string, query: string, generateCollection: boolean = false) => {
     setIsExecuting(true);
@@ -225,7 +238,7 @@ export function MCPTab() {
           <div className="border-b border-gray-200">
             <nav className="-mb-px flex space-x-8 px-6">
               <button
-                onClick={() => setActiveMCP('github')}
+                onClick={() => handleMCPChange('github')}
                 className={`py-4 px-1 border-b-2 font-medium text-sm flex items-center space-x-2 ${
                   activeMCP === 'github'
                     ? 'border-purple-500 text-purple-600'
@@ -236,7 +249,7 @@ export function MCPTab() {
                 <span>GitHub MCP</span>
               </button>
               <button
-                onClick={() => setActiveMCP('filesystem')}
+                onClick={() => handleMCPChange('filesystem')}
                 className={`py-4 px-1 border-b-2 font-medium text-sm flex items-center space-x-2 ${
                   activeMCP === 'filesystem'
                     ? 'border-green-500 text-green-600'
@@ -247,7 +260,7 @@ export function MCPTab() {
                 <span>Filesystem MCP</span>
               </button>
               <button
-                onClick={() => setActiveMCP('sqlite')}
+                onClick={() => handleMCPChange('sqlite')}
                 className={`py-4 px-1 border-b-2 font-medium text-sm flex items-center space-x-2 ${
                   activeMCP === 'sqlite'
                     ? 'border-blue-500 text-blue-600'
