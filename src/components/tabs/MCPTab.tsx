@@ -12,7 +12,7 @@ export function MCPTab() {
   
   // MCP Execution States
   const [activeMCP, setActiveMCP] = useState<'github' | 'filesystem' | 'sqlite' | null>('github');
-  const [activeTab, setActiveTab] = useState<'execute' | 'collections'>('execute');
+  const [activeTab, setActiveTab] = useState<'execute'>('execute');
   const [mcpQuery, setMcpQuery] = useState('');
   const [mcpResult, setMcpResult] = useState<any>(null);
   const [isExecuting, setIsExecuting] = useState(false);
@@ -388,16 +388,7 @@ export function MCPTab() {
                     >
                       Execute Queries
                     </button>
-                    <button
-                      onClick={() => setActiveTab('collections')}
-                      className={`py-2 px-1 border-b-2 font-medium text-sm ${
-                        activeTab === 'collections'
-                          ? 'border-blue-500 text-blue-600'
-                          : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
-                      }`}
-                    >
-                      Collections
-                    </button>
+
                   </nav>
                 </div>
 
@@ -525,80 +516,6 @@ export function MCPTab() {
                   </div>
                 )}
 
-                {activeTab === 'collections' && (
-                  <div className="space-y-4">
-                    <p className="text-gray-600">
-                      Generate Postman collections for {activeMCP} MCP operations. Use the Execute tab to test queries first, then create collections with real data.
-                    </p>
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                      <button
-                        onClick={async () => {
-                          try {
-                            const response = await fetch(`/postman-collections/${activeMCP}-mcp-${activeMCP === 'github' ? 'unified' : activeMCP === 'filesystem' ? 'official-fixed' : 'server'}.json`);
-                            const collection = await response.json();
-                            
-                            const apiResponse = await fetch('/api/postman/create-collection', {
-                              method: 'POST',
-                              headers: { 'Content-Type': 'application/json' },
-                              body: JSON.stringify({ collection, createInWeb: false }),
-                            });
-                            
-                            const result = await apiResponse.json();
-                            
-                            if (result.success) {
-                              setDeploymentStatus({
-                                type: 'success',
-                                message: `${activeMCP.charAt(0).toUpperCase() + activeMCP.slice(1)} MCP Collection created successfully in Postman Desktop!`
-                              });
-                            } else {
-                              setDeploymentStatus({
-                                type: 'error',
-                                message: 'Failed to create collection'
-                              });
-                            }
-                          } catch (error) {
-                            setDeploymentStatus({
-                              type: 'error',
-                              message: 'Failed to create collection'
-                            });
-                          }
-                        }}
-                        className="p-4 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors"
-                      >
-                        <div className="flex items-center space-x-3">
-                          <img src="/postman-logo.svg" alt="Postman" className="w-6 h-6" />
-                          <div>
-                            <h4 className="font-medium text-gray-900">Static Collection</h4>
-                            <p className="text-sm text-gray-600">Pre-built collection with sample data</p>
-                          </div>
-                        </div>
-                      </button>
-                      
-                      <button
-                        onClick={() => {
-                          if (mcpResult) {
-                            executeMCPQuery(activeMCP, mcpQuery, true);
-                          } else {
-                            setDeploymentStatus({
-                              type: 'error',
-                              message: 'Execute a query first to create a dynamic collection'
-                            });
-                          }
-                        }}
-                        disabled={!mcpResult}
-                        className="p-4 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors disabled:opacity-50"
-                      >
-                        <div className="flex items-center space-x-3">
-                          <Zap className="w-6 h-6 text-green-600" />
-                          <div>
-                            <h4 className="font-medium text-gray-900">Dynamic Collection</h4>
-                            <p className="text-sm text-gray-600">Collection based on executed query results</p>
-                          </div>
-                        </div>
-                      </button>
-                    </div>
-                  </div>
-                )}
               </div>
             )}
 
