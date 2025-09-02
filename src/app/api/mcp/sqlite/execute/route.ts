@@ -83,7 +83,7 @@ export async function POST(request: NextRequest) {
 
     // Execute SQLite MCP operations using real MCP API
     const executeSQLiteMCP = async (op: string, p: Record<string, any>): Promise<any> => {
-      const sqliteMCPUrl = process.env.SQLITE_MCP_URL || 'http://localhost:4000';
+      const sqliteMCPUrl = process.env.SQLITE_MCP_URL || 'http://localhost:3001';
       
       let endpoint = '';
       let method = 'GET';
