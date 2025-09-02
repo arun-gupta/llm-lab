@@ -79,7 +79,7 @@ export async function POST(request: NextRequest) {
 
     // Create entities in ArangoDB
     const arangoEntities = graphData.nodes.map(node => ({
-      _key: node.id,
+      _key: `${graphKey}_${node.id}`,
       label: node.label,
       type: node.type,
       frequency: node.frequency,

@@ -62,8 +62,10 @@ const loadTokenLimits = () => {
   
   // Return defaults if file doesn't exist or error
   return {
-    gpt5Streaming: 2000,
+    gpt5Streaming: 1500,
     gpt5NonStreaming: 500,
+          gpt5NanoMax: 400,
+          gpt5MiniMax: 3000,
     otherModels: 1000
   };
 };
@@ -156,6 +158,28 @@ export async function callOpenAIStreaming(prompt: string, context?: string, mode
   try {
     const fullPrompt = context ? `${context}\n\n${prompt}` : prompt;
     
+    // For GPT-5 Nano, if the prompt is too long, reject it early
+    if (model === 'gpt-5-nano' && fullPrompt.length > 400) {
+      console.log('=== GPT-5 Nano Early Rejection ===');
+      console.log('Prompt too long for Nano - rejecting before API call');
+      console.log('Prompt length:', fullPrompt.length);
+      console.log('Max allowed:', 400);
+      console.log('================================');
+      
+      return {
+        provider: `OpenAI (${model})`,
+        content: `GPT-5 Nano prompt too long (${fullPrompt.length} chars). Please use a much shorter prompt (under 400 chars) or switch to GPT-5 Mini for longer content.`,
+        latency: Date.now() - startTime,
+        tokens: {
+          prompt: Math.ceil(fullPrompt.length / 4),
+          completion: 0,
+          total: Math.ceil(fullPrompt.length / 4),
+        },
+        truncationWarning: 'Prompt too long for GPT-5 Nano. Use much shorter prompts or different model.',
+        finishReason: 'length'
+      };
+    }
+    
     // Add timeout to individual provider calls - increased for Codespaces and GPT-5 models
     const baseTimeoutMs = process.env.CODESPACES ? 45000 : 20000; // 45 seconds for Codespaces, 20 for local
     const timeoutMs = model.startsWith('gpt-5') ? 60000 : baseTimeoutMs; // 60 seconds for GPT-5 models
@@ -164,10 +188,18 @@ export async function callOpenAIStreaming(prompt: string, context?: string, mode
     const tokenParam = model.startsWith('gpt-5') ? 'max_completion_tokens' : 'max_tokens';
     
     const tokenLimits = loadTokenLimits();
-    // Use higher token limits for nano to account for its different streaming behavior
-    let tokenLimit = tokenLimits.gpt5Streaming;
+    // Use appropriate token limits for different GPT-5 models
+    let tokenLimit;
+    
     if (model === 'gpt-5-nano') {
-      tokenLimit = Math.max(tokenLimit, 1500); // Higher limit for nano (1500-2000 range)
+      // Nano has very limited context - use much lower limits
+      tokenLimit = tokenLimits.gpt5NanoMax || 400;
+    } else if (model === 'gpt-5-mini') {
+      // Mini can handle more tokens - use the higher limit
+      tokenLimit = tokenLimits.gpt5MiniMax || 2000;
+    } else {
+      // Other GPT-5 models use the default streaming limit
+      tokenLimit = tokenLimits.gpt5Streaming || 1500;
     }
     
     console.log('=== GPT-5 Streaming Debug ===');
@@ -176,6 +208,9 @@ export async function callOpenAIStreaming(prompt: string, context?: string, mode
     console.log('Token limit:', tokenLimit);
     console.log('Token limits config:', tokenLimits);
     console.log('Model type:', model === 'gpt-5-nano' ? 'NANO' : model === 'gpt-5-mini' ? 'MINI' : 'OTHER');
+    console.log('Prompt length (chars):', fullPrompt.length);
+    console.log('Estimated prompt tokens:', Math.ceil(fullPrompt.length / 4));
+    console.log('Available completion tokens:', tokenLimit);
     console.log('================================');
     
     const stream = await Promise.race([
@@ -187,7 +222,7 @@ export async function callOpenAIStreaming(prompt: string, context?: string, mode
             content: fullPrompt,
           },
         ],
-        [tokenParam]: tokenLimit, // Configurable token limit for GPT-5
+        [tokenParam]: tokenLimit, // Use max_completion_tokens for all GPT-5 models
         stream: true, // Enable streaming
       }),
       new Promise((_, reject) => 
@@ -221,6 +256,19 @@ export async function callOpenAIStreaming(prompt: string, context?: string, mode
       }
     }
     
+    // Enhanced logging for debugging
+    console.log('=== Streaming Debug Details ===');
+    console.log('Chunks received:', chunkCount);
+    console.log('Finish reason:', finishReason);
+    console.log('Has content:', hasContent);
+    console.log('Content length:', content.length);
+    console.log('Content preview:', content.substring(0, 200));
+    console.log('Final usage:', finalUsage);
+    console.log('Token limit used:', tokenLimit);
+    console.log('Prompt tokens (estimated):', Math.ceil(fullPrompt.length / 4));
+    console.log('Available for completion:', tokenLimit);
+    console.log('================================');
+    
     const latency = Date.now() - startTime;
     
     // Fallback token estimation if usage data is not available
@@ -230,20 +278,56 @@ export async function callOpenAIStreaming(prompt: string, context?: string, mode
       estimatedTokens = Math.ceil(content.length / 4);
     }
 
+    // Handle length limit scenarios with simplified logic
+    if (finishReason === 'length' && !content) {
+      // No content received due to length limit
+      const promptTokens = Math.ceil(fullPrompt.length / 4);
+      return {
+        provider: `OpenAI (${model})`,
+        content: `Response was cut off due to token limit. Available tokens: ${tokenLimit}, Prompt tokens: ${promptTokens}. Try using a shorter prompt or increasing the token limit.`,
+        latency,
+        tokens: {
+          prompt: promptTokens,
+          completion: 0,
+          total: promptTokens,
+        },
+        truncationWarning: 'Response truncated due to token limit.',
+        finishReason: finishReason
+      };
+    }
+    
+    if (finishReason === 'length' && content) {
+      // Content received but truncated
+      const promptTokens = Math.ceil(fullPrompt.length / 4);
+      return {
+        provider: `OpenAI (${model})`,
+        content: content + `\n\n[Response was truncated due to token limit.]`,
+        latency,
+        tokens: {
+          prompt: finalUsage?.prompt_tokens || promptTokens,
+          completion: finalUsage?.completion_tokens || Math.ceil(content.length / 4),
+          total: finalUsage?.total_tokens || (promptTokens + Math.ceil(content.length / 4)),
+        },
+        truncationWarning: `Response truncated at ${tokenLimit} tokens.`,
+        finishReason: finishReason
+      };
+    }
+
     return {
       provider: `OpenAI (${model})`,
-      content: content || (finishReason === 'length' && !hasContent ? 
-        'Response was cut off due to token limit. Try increasing the token limit for GPT-5 nano.' : 
-        'No response received'),
+      content: content || 'No response received',
       latency,
       tokens: {
-        prompt: finalUsage?.prompt_tokens || 0,
+        prompt: finalUsage?.prompt_tokens || Math.ceil(fullPrompt.length / 4),
         completion: finalUsage?.completion_tokens || (finalUsage ? finalUsage.total_tokens : estimatedTokens),
         total: finalUsage?.total_tokens || estimatedTokens,
       },
       // Add truncation warning if content seems incomplete
       truncationWarning: content && content.length > 0 && (finalUsage?.total_tokens || estimatedTokens) >= 1400 ? 
-        'Response may be truncated. Consider increasing token limit or using a shorter prompt for complete responses.' : undefined
+        'Response may be truncated. Consider increasing token limit or using a shorter prompt for complete responses.' : 
+        model === 'gpt-5-nano' && fullPrompt.length > 1000 ? 
+        'Warning: Your prompt is quite long for GPT-5 Nano. Consider using a shorter prompt or switching to GPT-5 Mini for better results.' : undefined,
+      finishReason: finishReason
     };
   } catch (error) {
     console.error('GPT-5 Streaming Error:', error instanceof Error ? error.message : 'Unknown error');

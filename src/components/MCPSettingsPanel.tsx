@@ -16,6 +16,8 @@ interface GitHubSettings {
 interface TokenLimits {
   gpt5Streaming: number;
   gpt5NonStreaming: number;
+  gpt5NanoMax: number;
+  gpt5MiniMax: number;
   otherModels: number;
 }
 
@@ -28,8 +30,10 @@ export function MCPSettingsPanel({ isOpen, onClose, onConfigChange }: MCPSetting
     reposCount: 5
   });
   const [tokenLimits, setTokenLimits] = useState<TokenLimits>({
-    gpt5Streaming: 2000,
+    gpt5Streaming: 1500,
     gpt5NonStreaming: 500,
+    gpt5NanoMax: 400,
+    gpt5MiniMax: 3000,
     otherModels: 1000
   });
 
@@ -53,8 +57,10 @@ export function MCPSettingsPanel({ isOpen, onClose, onConfigChange }: MCPSetting
       if (response.ok) {
         const limits = await response.json();
         setTokenLimits({
-          gpt5Streaming: limits.gpt5Streaming || 2000,
+          gpt5Streaming: limits.gpt5Streaming || 1500,
           gpt5NonStreaming: limits.gpt5NonStreaming || 500,
+          gpt5NanoMax: limits.gpt5NanoMax || 400,
+          gpt5MiniMax: limits.gpt5MiniMax || 3000,
           otherModels: limits.otherModels || 1000
         });
       }
@@ -232,6 +238,48 @@ export function MCPSettingsPanel({ isOpen, onClose, onConfigChange }: MCPSetting
                 </div>
                 <p className="text-xs text-purple-600">
                   Token limit for GPT-5 models without streaming (50-2000)
+                </p>
+              </div>
+
+              <div className="space-y-3">
+                <div className="flex items-center justify-between">
+                  <label className="block text-sm font-medium text-purple-700">
+                    GPT-5 Nano Max
+                  </label>
+                </div>
+                <div className="relative">
+                  <input
+                    type="number"
+                    min="100"
+                    max="1000"
+                    value={tokenLimits.gpt5NanoMax}
+                    onChange={(e) => setTokenLimits(prev => ({ ...prev, gpt5NanoMax: parseInt(e.target.value) || 800 }))}
+                    className="w-full px-3 py-2 border border-purple-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent text-gray-900"
+                  />
+                </div>
+                <p className="text-xs text-purple-600">
+                  Max tokens for GPT-5 Nano (100-1000) - very limited context. Recommended: 400 tokens max.
+                </p>
+              </div>
+
+              <div className="space-y-3">
+                <div className="flex items-center justify-between">
+                  <label className="block text-sm font-medium text-purple-700">
+                    GPT-5 Mini Max
+                  </label>
+                </div>
+                <div className="relative">
+                  <input
+                    type="number"
+                    min="500"
+                    max="3000"
+                    value={tokenLimits.gpt5MiniMax}
+                    onChange={(e) => setTokenLimits(prev => ({ ...prev, gpt5MiniMax: parseInt(e.target.value) || 2000 }))}
+                    className="w-full px-3 py-2 border border-purple-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent text-gray-900"
+                  />
+                </div>
+                <p className="text-xs text-purple-600">
+                  Max tokens for GPT-5 Mini (500-4000) - good context for longer responses
                 </p>
               </div>
 

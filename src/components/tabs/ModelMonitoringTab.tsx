@@ -606,35 +606,46 @@ export function ABTestingTab({ onTabChange }: ABTestingTabProps) {
   }, [savedTestRuns]);
 
   const generateUnifiedCollection = async () => {
-    if (!models.filter(m => m.enabled).length) return;
-
+    // Get models that are currently selected for A/B testing
+    const selectedModels = models.filter(m => m.enabled);
+    
+    // If no models are selected for A/B testing, show message and return
+    if (selectedModels.length === 0) {
+      alert('No models are selected for A/B testing. Please select at least one model to generate a collection.');
+      return;
+    }
+    
+    console.log('Generating collection with selected models:', selectedModels);
     setImportStatus('importing');
     
     try {
-      const enabledModels = models.filter(m => m.enabled);
-      
       const collection = {
         info: {
-          name: `A/B Testing Collection - ${new Date().toLocaleDateString()}`,
-          description: `A/B testing collection for comparing ${enabledModels.length} models`,
+          name: `A/B Testing Collection - ${selectedModels.map(m => m.name).join(', ')} - ${new Date().toLocaleDateString()}`,
+          description: `Streamlined A/B testing collection with comprehensive analysis for: ${selectedModels.map(m => `${m.name} (${m.provider})`).join(', ')}`,
           schema: "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
         },
         variable: [
           {
             key: "base_url",
-            value: "http://localhost:3000",
+            value: window.location.origin || "http://localhost:3000",
             type: "string"
           },
           {
             key: "test_prompt",
             value: testPrompt || "Compare the performance of different AI models",
             type: "string"
+          },
+          {
+            key: "selected_models",
+            value: selectedModels.map(m => m.id).join(','),
+            type: "string"
           }
         ],
         item: [
-          // A/B Testing Setup Request
+          // A/B Testing Request - Compare all models together (True A/B testing)
           {
-            name: "Setup A/B Testing Environment",
+            name: `Run A/B Test - Compare ${selectedModels.length} Models`,
             request: {
               method: "POST",
               header: [
@@ -646,23 +657,20 @@ export function ABTestingTab({ onTabChange }: ABTestingTabProps) {
               body: {
                 mode: "raw",
                 raw: JSON.stringify({
-                  models: enabledModels.map(m => ({
-                    id: m.id,
-                    provider: m.provider,
-                    model: m.model
-                  })),
-                  test_prompt: "{{test_prompt}}"
+                  prompt: "{{test_prompt}}",
+                  providers: selectedModels.map(m => `${m.provider.toLowerCase()}:${m.model}`),
+                  context: undefined
                 }, null, 2)
               },
               url: {
-                raw: "{{base_url}}/api/monitoring/setup-ab-test",
+                raw: "{{base_url}}/api/llm",
                 host: ["{{base_url}}"],
-                path: ["api", "monitoring", "setup-ab-test"]
+                path: ["api", "llm"]
               }
             }
           },
-          // Individual model test requests
-          ...enabledModels.map(model => ({
+          // Individual model test requests (for isolated testing and debugging)
+          ...selectedModels.map(model => ({
             name: `Test ${model.name} (${model.provider})`,
             request: {
               method: "POST",
@@ -676,9 +684,8 @@ export function ABTestingTab({ onTabChange }: ABTestingTabProps) {
                 mode: "raw",
                 raw: JSON.stringify({
                   prompt: "{{test_prompt}}",
-                  provider: model.provider,
-                  model: model.model,
-                  track_performance: true
+                  providers: [`${model.provider.toLowerCase()}:${model.model}`],
+                  context: undefined
                 }, null, 2)
               },
               url: {
@@ -686,54 +693,7 @@ export function ABTestingTab({ onTabChange }: ABTestingTabProps) {
                 host: ["{{base_url}}"],
                 path: ["api", "llm"]
               }
-            },
-            response: [
-              {
-                name: "Sample Response",
-                originalRequest: {
-                  method: "POST",
-                  header: [
-                    {
-                      key: "Content-Type",
-                      value: "application/json"
-                    }
-                  ],
-                  body: {
-                    mode: "raw",
-                    raw: JSON.stringify({
-                      prompt: "{{test_prompt}}",
-                      provider: model.provider,
-                      model: model.model,
-                      track_performance: true
-                    }, null, 2)
-                  },
-                  url: {
-                    raw: "{{base_url}}/api/llm",
-                    host: ["{{base_url}}"],
-                    path: ["api", "llm"]
-                  }
-                },
-                status: "OK",
-                code: 200,
-                _postman_previewlanguage: "json",
-                header: [
-                  {
-                    key: "Content-Type",
-                    value: "application/json"
-                  }
-                ],
-                cookie: [],
-                body: JSON.stringify({
-                  provider: model.provider,
-                  model: model.model,
-                  content: `Sample response from ${model.name}`,
-                  latency: Math.floor(Math.random() * 2000) + 500,
-                  tokens: Math.floor(Math.random() * 1000) + 100,
-                  cost: (Math.random() * 0.1).toFixed(6),
-                  quality: (Math.random() * 0.3 + 0.7).toFixed(2)
-                }, null, 2)
-              }
-            ]
+            }
           })),
           // Performance Analysis Request
           {
@@ -742,15 +702,87 @@ export function ABTestingTab({ onTabChange }: ABTestingTabProps) {
               method: "GET",
               header: [],
               url: {
-                raw: "{{base_url}}/api/monitoring/ab-test-results",
+                raw: "{{base_url}}/api/monitoring/ab-test-results?models={{selected_models}}",
                 host: ["{{base_url}}"],
-                path: ["api", "monitoring", "ab-test-results"]
+                path: ["api", "monitoring", "ab-test-results"],
+                query: [
+                  {
+                    key: "models",
+                    value: "{{selected_models}}",
+                    description: "Comma-separated list of model IDs to analyze"
+                  }
+                ]
+              }
+            }
+          },
+          
+          // Detailed Metrics Dashboard
+          {
+            name: "Get Detailed Metrics Dashboard",
+            request: {
+              method: "GET",
+              header: [],
+              url: {
+                raw: "{{base_url}}/api/monitoring/metrics-dashboard?models={{selected_models}}",
+                host: ["{{base_url}}"],
+                path: ["api", "monitoring", "metrics-dashboard"],
+                query: [
+                  {
+                    key: "models",
+                    value: "{{selected_models}}",
+                    description: "Comma-separated list of model IDs for detailed metrics"
+                  }
+                ]
+              }
+            }
+          },
+          
+          // Quality Assessment Data
+          {
+            name: "Get Quality Assessment Data",
+            request: {
+              method: "GET",
+              header: [],
+              url: {
+                raw: "{{base_url}}/api/monitoring/quality-assessment?models={{selected_models}}",
+                host: ["{{base_url}}"],
+                path: ["api", "monitoring", "quality-assessment"],
+                query: [
+                  {
+                    key: "models",
+                    value: "{{selected_models}}",
+                    description: "Comma-separated list of model IDs for quality analysis"
+                  }
+                ]
+              }
+            }
+          },
+          
+          // Fact-Checking Analysis
+          {
+            name: "Get Fact-Checking Analysis",
+            request: {
+              method: "GET",
+              header: [],
+              url: {
+                raw: "{{base_url}}/api/monitoring/fact-checking?models={{selected_models}}",
+                host: ["{{base_url}}"],
+                path: ["api", "monitoring", "fact-checking"],
+                query: [
+                  {
+                    key: "models",
+                    value: "{{selected_models}}",
+                    description: "Comma-separated list of model IDs for fact-checking analysis"
+                  }
+                ]
               }
             }
           }
         ]
       };
 
+      console.log('Generated collection structure:', JSON.stringify(collection, null, 2));
+      
       // Create collection via Postman API
       const apiResponse = await fetch('/api/postman/create-collection', {
         method: 'POST',
@@ -780,7 +812,7 @@ export function ABTestingTab({ onTabChange }: ABTestingTabProps) {
           const url = URL.createObjectURL(blob);
           const a = document.createElement('a');
           a.href = url;
-          a.download = `ab-testing-collection-${new Date().toISOString().split('T')[0]}.json`;
+          a.download = `ab-testing-collection-${selectedModels.map(m => m.name.replace(/\s+/g, '-')).join('-')}-${new Date().toISOString().split('T')[0]}.json`;
           document.body.appendChild(a);
           a.click();
           document.body.removeChild(a);
@@ -1512,14 +1544,22 @@ export function ABTestingTab({ onTabChange }: ABTestingTabProps) {
             </p>
           </div>
           <div className="flex items-center space-x-3">
-            <button
-              onClick={generateUnifiedCollection}
-              disabled={importStatus === 'importing'}
-              className="flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed"
-            >
-              <img src="/postman-logo.svg" alt="Postman" className="w-4 h-4 mr-2" />
-              {importStatus === 'importing' ? 'Importing...' : 'Add A/B Testing Collection'}
-            </button>
+            <div className="flex flex-col items-end space-y-2">
+              <button
+                onClick={generateUnifiedCollection}
+                disabled={importStatus === 'importing' || !models.filter(m => m.enabled).length}
+                className="flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                <img src="/postman-logo.svg" alt="Postman" className="w-4 h-4 mr-2" />
+                {importStatus === 'importing' ? 'Importing...' : 
+                 !models.filter(m => m.enabled).length ? 'Select Models First' : 'Add A/B Testing Collection'}
+              </button>
+              {!models.filter(m => m.enabled).length && (
+                <p className="text-xs text-gray-500 text-right">
+                  Select at least one model for A/B testing to generate a collection
+                </p>
+              )}
+            </div>
           </div>
         </div>
       </div>

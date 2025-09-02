@@ -1,5 +1,7 @@
 {
-  "gpt5Streaming": 3000,
+  "gpt5Streaming": 1500,
   "gpt5NonStreaming": 500,
+  "gpt5NanoMax": 400,
+  "gpt5MiniMax": 3000,
   "otherModels": 1000
 }
