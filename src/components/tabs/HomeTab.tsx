@@ -115,7 +115,7 @@ export function HomeTab({ onTabChange, apiKeyStatus }: HomeTabProps) {
           <div className="text-center p-4 bg-purple-50 rounded-lg border border-purple-200">
             <div className="text-2xl mb-2">🦙</div>
             <div className="font-medium text-purple-800">Ollama</div>
-            <div className="text-xs text-purple-600">Local Models</div>
+            <div className="text-xs text-purple-600">Llama 3.2, Phi-3, Mistral</div>
           </div>
           <div className="text-center p-4 bg-amber-50 rounded-lg border border-amber-200">
             <div className="text-2xl mb-2">🚀</div>
