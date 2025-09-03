@@ -57,7 +57,7 @@ export function HomeTab({ onTabChange, apiKeyStatus }: HomeTabProps) {
           Welcome to Postman Labs
         </h1>
         <p className="text-lg text-gray-600 mb-4">
-          Comprehensive platform for GraphRAG development, protocol comparison, A/B testing, and MCP integration
+          Comprehensive platform for GraphRAG development with protocol comparison, LLM A/B testing & analytics, and MCP server integration - accessible through web interface and Postman integration
         </p>
       </div>
 
