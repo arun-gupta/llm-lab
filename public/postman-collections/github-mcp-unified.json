@@ -34,6 +34,11 @@
         "method": "POST",
         "header": [
           {
+            "key": "Content-Type",
+            "value": "application/json",
+            "type": "text"
+          },
+          {
             "key": "Authorization",
             "value": "Bearer {{github_token}}",
             "type": "text"
