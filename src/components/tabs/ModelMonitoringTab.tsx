@@ -609,6 +609,15 @@ export function ABTestingTab({ onTabChange }: ABTestingTabProps) {
     // Get models that are currently selected for A/B testing
     const selectedModels = models.filter(m => m.enabled);
     
+    // Debug: Log what models are selected
+    console.log('Selected models for collection:', selectedModels);
+    console.log('Models with providers:', selectedModels.map(m => ({ 
+      name: m.name, 
+      provider: m.provider, 
+      model: m.model,
+      enabled: m.enabled 
+    })));
+    
     // If no models are selected for A/B testing, show message and return
     if (selectedModels.length === 0) {
       alert('No models are selected for A/B testing. Please select at least one model to generate a collection.');
@@ -656,15 +665,22 @@ export function ABTestingTab({ onTabChange }: ABTestingTabProps) {
               ],
               body: {
                 mode: "raw",
-                raw: JSON.stringify({
-                  prompt: "{{test_prompt}}",
-                  providers: selectedModels.map(m => 
-                    m.provider.toLowerCase() === 'ollama' 
-                      ? `ollama:${m.model}` 
-                      : `${m.provider.toLowerCase()}:${m.model}`
-                  ),
-                  context: null
-                })
+                raw: (() => {
+                  const bodyData = {
+                    prompt: "{{test_prompt}}",
+                    providers: selectedModels.map(m => 
+                      m.provider.toLowerCase() === 'ollama' 
+                        ? `ollama:${m.model}` 
+                        : `${m.provider.toLowerCase()}:${m.model}`
+                    ),
+                    context: null
+                  };
+                  const jsonString = JSON.stringify(bodyData);
+                  console.log('Generated JSON for A/B test:', jsonString);
+                  console.log('JSON length:', jsonString.length);
+                  console.log('JSON at position 106:', jsonString.charAt(106));
+                  return jsonString;
+                })()
               },
               url: {
                 raw: "{{base_url}}/api/llm",
