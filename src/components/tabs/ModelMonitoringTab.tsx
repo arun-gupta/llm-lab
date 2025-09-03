@@ -664,7 +664,7 @@ export function ABTestingTab({ onTabChange }: ABTestingTabProps) {
                       : `${m.provider.toLowerCase()}:${m.model}`
                   ),
                   context: undefined
-                }, null, 2)
+                })
               },
               url: {
                 raw: "{{base_url}}/api/llm",
@@ -694,7 +694,7 @@ export function ABTestingTab({ onTabChange }: ABTestingTabProps) {
                       : `${model.provider.toLowerCase()}:${model.model}`
                   ],
                   context: undefined
-                }, null, 2)
+                })
               },
               url: {
                 raw: "{{base_url}}/api/llm",
