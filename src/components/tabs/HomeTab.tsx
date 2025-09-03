@@ -62,9 +62,9 @@ export function HomeTab({ onTabChange, apiKeyStatus }: HomeTabProps) {
       </div>
 
       {/* Protocol Overview */}
-      <div className="mb-8">
+      <div className="mb-6">
         <h2 className="text-xl font-semibold text-gray-900 mb-4">🚀 Supported Protocols</h2>
-        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4 mb-6">
+        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4 mb-4">
           <div className="text-center p-4 bg-blue-50 rounded-lg border border-blue-200">
             <div className="text-2xl mb-2">🔍</div>
             <div className="font-medium text-blue-800">REST API</div>
@@ -94,6 +94,33 @@ export function HomeTab({ onTabChange, apiKeyStatus }: HomeTabProps) {
             <div className="text-2xl mb-2">🤖</div>
             <div className="font-medium text-indigo-800">MCP</div>
             <div className="text-xs text-indigo-600">Model Context</div>
+          </div>
+        </div>
+      </div>
+
+      {/* LLM Overview */}
+      <div className="mb-6">
+        <h2 className="text-xl font-semibold text-gray-900 mb-4">🤖 Supported LLMs</h2>
+        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 mb-4">
+          <div className="text-center p-4 bg-emerald-50 rounded-lg border border-emerald-200">
+            <div className="text-2xl mb-2">⚡</div>
+            <div className="font-medium text-emerald-800">GPT-5 Mini</div>
+            <div className="text-xs text-emerald-600">Default Model</div>
+          </div>
+          <div className="text-center p-4 bg-blue-50 rounded-lg border border-blue-200">
+            <div className="text-2xl mb-2">🔮</div>
+            <div className="font-medium text-blue-800">Claude 3.5</div>
+            <div className="text-xs text-blue-600">Sonnet & Haiku</div>
+          </div>
+          <div className="text-center p-4 bg-purple-50 rounded-lg border border-purple-200">
+            <div className="text-2xl mb-2">🦙</div>
+            <div className="font-medium text-purple-800">Ollama</div>
+            <div className="text-xs text-purple-600">Local Models</div>
+          </div>
+          <div className="text-center p-4 bg-amber-50 rounded-lg border border-amber-200">
+            <div className="text-2xl mb-2">🚀</div>
+            <div className="font-medium text-amber-800">GPT-5 Nano</div>
+            <div className="text-xs text-amber-600">Lightweight</div>
           </div>
         </div>
       </div>
