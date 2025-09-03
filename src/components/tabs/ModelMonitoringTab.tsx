@@ -663,7 +663,7 @@ export function ABTestingTab({ onTabChange }: ABTestingTabProps) {
                       ? `ollama:${m.model}` 
                       : `${m.provider.toLowerCase()}:${m.model}`
                   ),
-                  context: undefined
+                  context: null
                 })
               },
               url: {
@@ -693,7 +693,7 @@ export function ABTestingTab({ onTabChange }: ABTestingTabProps) {
                       ? `ollama:${model.model}` 
                       : `${model.provider.toLowerCase()}:${model.model}`
                   ],
-                  context: undefined
+                  context: null
                 })
               },
               url: {
