@@ -9,7 +9,7 @@ export async function POST(request: NextRequest) {
       {
         name: 'postman-labs',
         full_name: 'arun-gupta/postman-labs',
-        description: 'Advanced GraphRAG development, protocol comparison, and model monitoring platform',
+        description: 'Advanced GraphRAG development with protocol comparison, LLM A/B testing & analytics, and MCP server integration - accessible through web interface and Postman integration',
         html_url: 'https://github.com/arun-gupta/postman-labs',
         stargazers_count: 42,
         language: 'TypeScript',

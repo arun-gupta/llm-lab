@@ -65,7 +65,7 @@ export default function Home() {
               </div>
               <div>
                 <h1 className="text-xl font-bold text-gray-900">Postman Labs</h1>
-                <p className="text-xs text-gray-600">Advanced GraphRAG development, protocol comparison, and model monitoring platform with MCP integration</p>
+                <p className="text-xs text-gray-600">Advanced GraphRAG development with protocol comparison, LLM A/B testing & analytics, and MCP server integration - accessible through web interface and Postman integration</p>
               </div>
             </button>
             
