@@ -658,7 +658,11 @@ export function ABTestingTab({ onTabChange }: ABTestingTabProps) {
                 mode: "raw",
                 raw: JSON.stringify({
                   prompt: "{{test_prompt}}",
-                  providers: selectedModels.map(m => `${m.provider.toLowerCase()}:${m.model}`),
+                  providers: selectedModels.map(m => 
+                    m.provider.toLowerCase() === 'ollama' 
+                      ? `ollama:${m.model}` 
+                      : `${m.provider.toLowerCase()}:${m.model}`
+                  ),
                   context: undefined
                 }, null, 2)
               },
@@ -684,7 +688,11 @@ export function ABTestingTab({ onTabChange }: ABTestingTabProps) {
                 mode: "raw",
                 raw: JSON.stringify({
                   prompt: "{{test_prompt}}",
-                  providers: [`${model.provider.toLowerCase()}:${model.model}`],
+                  providers: [
+                    model.provider.toLowerCase() === 'ollama' 
+                      ? `ollama:${model.model}` 
+                      : `${model.provider.toLowerCase()}:${model.model}`
+                  ],
                   context: undefined
                 }, null, 2)
               },
