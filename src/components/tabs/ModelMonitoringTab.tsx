@@ -438,7 +438,7 @@ export function ABTestingTab({ onTabChange }: ABTestingTabProps) {
     {
       id: 'code-review',
       title: 'Code Review',
-      prompt: 'Review this Python function for potential issues, performance improvements, and best practices:\n\ndef process_data(data_list):\n    result = []\n    for item in data_list:\n        if item > 0:\n            result.append(item * 2)\n    return result',
+      prompt: 'Review this Python function for potential issues, performance improvements, and best practices: def process_data(data_list): result = []; for item in data_list: if item > 0: result.append(item * 2); return result',
       category: 'Technical',
       difficulty: 'Easy'
     },
