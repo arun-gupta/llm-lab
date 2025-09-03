@@ -22,7 +22,7 @@
     },
     
     {
-      "key": "mcp_session_id",
+      "key": "github_mcp_session_id",
       "value": "",
       "type": "string"
     }
@@ -61,7 +61,7 @@
               "console.log('repo_owner:', pm.environment.get('repo_owner'));",
               "console.log('repo_name:', pm.environment.get('repo_name'));",
               "console.log('github_token:', pm.environment.get('github_token') ? 'SET' : 'NOT SET');",
-              "console.log('mcp_session_id:', pm.environment.get('mcp_session_id'));",
+              "console.log('github_mcp_session_id:', pm.environment.get('github_mcp_session_id'));",
               "console.log('========================');",
               "",
               "pm.test(\"Status code is 200\", function () {",
@@ -71,7 +71,7 @@
               "// Extract session ID from response headers",
               "const sessionId = pm.response.headers.get('mcp-session-id');",
               "if (sessionId) {",
-              "    pm.environment.set('mcp_session_id', sessionId);",
+              "    pm.environment.set('github_mcp_session_id', sessionId);",
               "    console.log('✅ MCP Session initialized:', sessionId);",
               "} else {",
               "    console.log('⚠️ No session ID found in response');",
@@ -99,7 +99,7 @@
           },
           {
             "key": "Mcp-Session-Id",
-            "value": "{{mcp_session_id}}",
+            "value": "{{github_mcp_session_id}}",
             "type": "text"
           }
         ],
@@ -168,7 +168,7 @@
           },
           {
             "key": "Mcp-Session-Id",
-            "value": "{{mcp_session_id}}",
+            "value": "{{github_mcp_session_id}}",
             "type": "text"
           }
         ],
@@ -211,7 +211,7 @@
               "            console.log('⚠️ Repository not found');",
               "        }",
               "    } catch (e) {",
-              "        console.log('⚠️ Could not parse repository data');",
+              "                console.log('⚠️ Could not parse repository data');",
               "    }",
               "}"
             ],
@@ -237,7 +237,7 @@
           },
           {
             "key": "Mcp-Session-Id",
-            "value": "{{mcp_session_id}}",
+            "value": "{{github_mcp_session_id}}",
             "type": "text"
           }
         ],
@@ -294,7 +294,7 @@
       ]
     },
     {
-      "name": "5. Get Pull Requests",
+              "name": "5. Get Pull Requests",
       "request": {
         "method": "POST",
         "header": [
@@ -310,7 +310,7 @@
           },
           {
             "key": "Mcp-Session-Id",
-            "value": "{{mcp_session_id}}",
+            "value": "{{github_mcp_session_id}}",
             "type": "text"
           }
         ],
@@ -367,7 +367,7 @@
       ]
     },
     {
-      "name": "6. Generate Repository Health Report",
+              "name": "6. Generate Repository Health Report",
       "request": {
         "method": "POST",
         "header": [
@@ -383,7 +383,7 @@
           },
           {
             "key": "Mcp-Session-Id",
-            "value": "{{mcp_session_id}}",
+            "value": "{{github_mcp_session_id}}",
             "type": "text"
           }
         ],

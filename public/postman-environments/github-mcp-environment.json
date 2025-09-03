@@ -21,7 +21,7 @@
       "enabled": true
     },
     {
-      "key": "mcp_session_id",
+      "key": "github_mcp_session_id",
       "value": "",
       "type": "default",
       "enabled": true
