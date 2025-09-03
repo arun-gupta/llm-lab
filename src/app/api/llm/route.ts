@@ -3,7 +3,27 @@ import { callAllProviders, LLMRequest } from '@/lib/llm-apis';
 
 export async function POST(request: NextRequest) {
   try {
-    const body: LLMRequest = await request.json();
+    // Debug: Log the raw request
+    const rawBody = await request.text();
+    console.log('=== LLM API Debug ===');
+    console.log('Raw request body:', rawBody);
+    console.log('Raw body length:', rawBody.length);
+    console.log('Raw body at position 106:', rawBody.charAt(106));
+    console.log('Raw body as hex:', rawBody.split('').map((c, i) => i >= 100 && i <= 110 ? `${i}:${c.charCodeAt(0).toString(16)}` : '').filter(Boolean).join(', '));
+    console.log('========================');
+    
+    // Try to parse the JSON
+    let body: LLMRequest;
+    try {
+      body = JSON.parse(rawBody);
+    } catch (parseError) {
+      console.error('JSON parse error details:', parseError);
+      console.error('Failed to parse body:', rawBody);
+      return NextResponse.json(
+        { error: `JSON parsing failed: ${parseError.message}`, rawBody: rawBody.substring(0, 200) },
+        { status: 400 }
+      );
+    }
     
     // Validate request
     if (!body.prompt || !body.providers || body.providers.length === 0) {
