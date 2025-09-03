@@ -44,7 +44,7 @@ MCP (Model Context Protocol) allows AI models to interact with external tools an
 - `list_allowed_directories` - List accessible directories
 
 ### 3. **SQLite MCP Server**
-- **URL**: `http://localhost:4000`
+- **URL**: `http://localhost:3001`
 - **Tools**: Database operations with SQLite
 - **Use Cases**: Test database integrations, generate test data, validate database state
 
@@ -130,7 +130,7 @@ docker run -d \
 - **Start HTTP Mode**: `docker run -d --name sqlite-mcp-http -p 4000:4000 -v $(pwd)/data:/data -e SERVER_MODE=http -e HTTP_PORT=4000 arungupta/sqlite-mcp-server`
 - **Stop**: `docker stop sqlite-mcp-http && docker rm sqlite-mcp-http`
 - **Logs**: `docker logs sqlite-mcp-http`
-- **Health Check**: `curl http://localhost:4000/health`
+- **Health Check**: `curl http://localhost:3001/health`
 
 **HTTP Mode Features:**
 - ✅ HTTP API accessible on port 4000
